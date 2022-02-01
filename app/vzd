@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ -z "$*" ]
+then
+  gradle run
+else
+  gradle run --args="$*"
+fi
