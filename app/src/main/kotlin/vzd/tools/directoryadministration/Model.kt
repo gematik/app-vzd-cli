@@ -1,4 +1,4 @@
-package vzd.directoryadministration
+package vzd.tools.directoryadministration
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

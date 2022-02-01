@@ -1,4 +1,4 @@
-package vzd.directoryadministration
+package vzd.tools.directoryadministration
 
 import io.ktor.client.*
 import io.ktor.client.call.*

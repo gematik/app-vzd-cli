@@ -47,7 +47,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("vzd.cli.CliKt")
+    mainClass.set("vzd.tools.CliKt")
 }
 
 tasks {

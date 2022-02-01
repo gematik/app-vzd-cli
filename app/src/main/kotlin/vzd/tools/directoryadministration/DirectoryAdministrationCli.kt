@@ -1,4 +1,4 @@
-package vzd.directoryadministration
+package vzd.tools.directoryadministration
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.UsageError
@@ -14,7 +14,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
-import vzd.cli.dotenv
+import vzd.tools.dotenv
 
 private val logger = KotlinLogging.logger {}
 
