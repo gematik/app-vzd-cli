@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import io.github.cdimascio.dotenv.dotenv
@@ -32,6 +33,7 @@ val DirectoryEntryPrinters = mapOf(
 
 class ListDirectoryEntries: CliktCommand(name = "list", help="List directory entries") {
     private val parameters by argument(name="KEY=VALUE").multiple(required = true)
+    private val sync by option(help="use Sync mode").flag()
     private val printer by option(help="How the entries should be displayed").choice(*DirectoryEntryPrinters.keys.toTypedArray()).default("short")
     override fun run() {
         val client = Client {
@@ -51,7 +53,12 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
             Pair(kv[0], kv[1] )
         }.associateBy ( { it.first }, { it.second } )
 
-        val result = runBlocking {  client.readDirectoryEntry( paramsMap ) }
+        val result: List<DirectoryEntry>?
+        if (sync) {
+            result = runBlocking {  client.readDirectoryEntryForSync( paramsMap ) }
+        } else {
+            result = runBlocking {  client.readDirectoryEntry( paramsMap ) }
+        }
 
         result?.forEach {
             println(DirectoryEntryPrinters[printer]?.invoke(it) )
@@ -61,11 +68,12 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
 
 }
 
+
 class AuthenticateAdmin: CliktCommand(name="auth", help="Perform authentication") {
     override fun run() {
         logger.debug { "Executing command: Auth" }
-        val auth = ClientCredentialsAuthenticator(dotenv["AUTH_ENDPOINT"])
-        val tokens = auth.authenticate(dotenv["CLIENT_ID"], dotenv["CLIENT_SECRET"])
+        val auth = ClientCredentialsAuthenticator(dotenv["ADMIN_AUTH_URL"])
+        val tokens = auth.authenticate(dotenv["ADMIN_CLIENT_ID"], dotenv["ADMIN_CLIENT_SECRET"])
         println (tokens.accessToken)
     }
 }

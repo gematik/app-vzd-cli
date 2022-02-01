@@ -50,10 +50,14 @@ class Client {
         }
     }
 
-    suspend fun readDirectoryEntry(parameters: Map<String, String>): List<DirectoryEntry>? {
-        logger.debug { "GET ${config.apiURL}" }
+    suspend fun readDirectoryEntryForSync(parameters: Map<String, String>): List<DirectoryEntry>? {
+        return readDirectoryEntry(parameters,"/DirectoryEntriesSync")
+    }
 
-        val response = http.get("/DirectoryEntries") {
+    suspend fun readDirectoryEntry(parameters: Map<String, String>, path: String = "/DirectoryEntries"): List<DirectoryEntry>? {
+        logger.debug { "GET ${config.apiURL} ${path}" }
+
+        val response = http.get(path) {
             for (param in parameters.entries) {
                 parameter(param.key, param.value)
             }
