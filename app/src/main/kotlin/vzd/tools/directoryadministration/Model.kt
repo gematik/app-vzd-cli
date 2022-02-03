@@ -8,9 +8,39 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable
+@SerialName("Error")
+data class AttributeError (
+    val attributeName: String? = null,
+    val attributeError: String? = null,
+)
+
+@Serializable
+data class Contact(
+    val name: String? = null,
+    val url: String? = null,
+    val email: String? = null,
+)
+
+@Serializable
+data class License(
+    val name: String?,
+    val url: String?,
+)
+
+@Serializable
+data class InfoObject(
+    val title: String,
+    val version: String,
+    val description: String? = null,
+    val termsOfService: String? = null,
+    val contact: Contact? = null,
+    val license: License? = null,
+)
+
+@Serializable
 data class DistinguishedName(
     var uid: String,
-    var dc:  List<String>?,
+    var dc: List<String>?,
     var ou: List<String>?,
     var cn: String?,
 )

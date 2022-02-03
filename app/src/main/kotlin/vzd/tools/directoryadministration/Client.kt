@@ -23,7 +23,10 @@ class VZDResponseException(response: HttpResponse, message: String) :
             "Status: ${response.status}. Text: \"$message\". Reason: \"${response.headers["RS-DIRECTORY-ADMIN-ERROR"]}\" "
 }
 
-
+/**
+ * Directory Administration API Client
+ * @see <a href="https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml">Directory Administration Open API</a>
+ */
 class Client {
     private val config: Configuration = Configuration();
     private val http: HttpClient
@@ -59,6 +62,9 @@ class Client {
         }
     }
 
+    /**
+     * Implements POST /DirectoryEntries (add_Directory_Entry)
+     */
     suspend fun addDirectoryEntry(directoryEntry: CreateDirectoryEntry): DistinguishedName {
         val response = http.post("/DirectoryEntries") {
             contentType(ContentType.Application.Json)
@@ -72,6 +78,9 @@ class Client {
         return response.body()
     }
 
+    /**
+     * Implements DELETE /DirectoryEntries/{uid} (add_Delete_Directory_Entry)
+     */
     suspend fun deleteDirectoryEntry(uid: String) {
         val response = http.delete("/DirectoryEntries/${uid}") {
         }
@@ -83,10 +92,16 @@ class Client {
         return response.body()
     }
 
+    /**
+     * Implements GET /DirectoryEntriesSync (read_Directory_Entry_for_Sync)
+     */
     suspend fun readDirectoryEntryForSync(parameters: Map<String, String>): List<DirectoryEntry>? {
         return readDirectoryEntry(parameters,"/DirectoryEntriesSync")
     }
 
+    /**
+     * Implements GET /DirectoryEntries (read_Directory_Entry)
+     */
     suspend fun readDirectoryEntry(parameters: Map<String, String>, path: String = "/DirectoryEntries"): List<DirectoryEntry>? {
         logger.debug { "GET ${config.apiURL} ${path}" }
 
@@ -104,8 +119,55 @@ class Client {
         return response.body();
     }
 
+    /**
+     * Implements GET / (getInfo)
+     */
+    suspend fun getInfo(): InfoObject {
+        TODO()
+    }
 
+    /**
+     * Implements PUT /DirectoryEntries/{uid}/baseDirectoryEntries (modify_Directory_Entry)
+     */
+    suspend fun modifyDirectoryEntry(baseDirectoryEntry: BaseDirectoryEntry) {
+        TODO()
+    }
+
+    /**
+     * Implements PUT /DirectoryEntries/{uid}/Certificates (add_Directory_Entry_Certificate)
+     */
+    suspend fun addDirectoryEntryCertificate() {
+        TODO()
+    }
+
+    /**
+     * Implements GET /DirectoryEntries/Certificates (read_Directory_Certificates)
+     */
+    suspend fun readDirectoryCertificates(parameters: Map<String, String>): List<UserCertificate>? {
+        logger.debug { "GET ${config.apiURL} /DirectoryEntries/Certificates" }
+
+        val response = http.get("/DirectoryEntries/Certificates") {
+            for (param in parameters.entries) {
+                parameter(param.key, param.value)
+            }
+        }
+
+        if (response.status == HttpStatusCode.NotFound) {
+            logger.debug { "Server returned 404 Not Found" }
+            return null
+        }
+
+        return response.body();
+    }
+
+    /**
+     * Implements DELETE /DirectoryEntries/{uid}/Certificates/{certificateEntryID} (delete_Directory_Entry_Certificate)
+     */
+    suspend fun deleteDirectoryEntryCertificate() {
+        TODO()
+    }
 }
+
 
 class Configuration {
     var apiURL = ""
