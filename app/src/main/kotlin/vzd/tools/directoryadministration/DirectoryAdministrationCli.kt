@@ -2,6 +2,7 @@ package vzd.tools.directoryadministration
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.UsageError
+import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
@@ -9,6 +10,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
+import io.github.cdimascio.dotenv.Dotenv
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -22,7 +24,6 @@ import kotlinx.serialization.modules.contextual
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import org.bouncycastle.util.encoders.Base64
-import vzd.tools.dotenv
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 
@@ -96,23 +97,13 @@ val DirectoryEntryPrinters = mapOf(
     }
 )
 
-fun createClient(): Client {
-    return Client {
-        apiURL = dotenv["ADMIN_API_URL"]
-        loadTokens = {
-            val auth = ClientCredentialsAuthenticator(dotenv["ADMIN_AUTH_URL"])
-            auth.authenticate(dotenv["ADMIN_CLIENT_ID"], dotenv["ADMIN_CLIENT_SECRET"])
-        }
-    }
-}
-
 class ListDirectoryEntries: CliktCommand(name = "list", help="List directory entries") {
     private val parameters by argument(name="KEY=VALUE").multiple(required = true)
     private val sync by option(help="use Sync mode").flag()
     private val printer by option(help="How the entries should be displayed").choice(*DirectoryEntryPrinters.keys.toTypedArray()).default("short")
     private val showCert by option("--show-cert", help="Show or hide the content of X509 certificate").flag("--hide-cert", default = true)
+    private val client by requireObject<Client>();
     override fun run() {
-        val client = createClient();
         val paramsMap = parameters.map {
             val kv = it.split("=")
             if (kv.size != 2) {
@@ -135,17 +126,57 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
 }
 
 class AuthenticateAdmin: CliktCommand(name="auth", help="Perform authentication") {
+    private val dotenv by requireObject<Dotenv>()
     override fun run() {
-        logger.debug { "Executing command: Auth" }
+        logger.debug { "Executing command: AuthenticateAdmin" }
         val auth = ClientCredentialsAuthenticator(dotenv["ADMIN_AUTH_URL"])
         val tokens = auth.authenticate(dotenv["ADMIN_CLIENT_ID"], dotenv["ADMIN_CLIENT_SECRET"])
         println (tokens.accessToken)
     }
 }
 
-class DirectoryAdministrationCli : CliktCommand(name="admin", help="CLI for DirectoryAdministration API") {
-    override fun run() = Unit
+class DeleteDiectoryEntry: CliktCommand(name="delete", help="Delete specified directory entries") {
+    val uid by argument(help="List of UIDs for to be deleted directory entries").multiple(required = true)
+    val force by option(help="Force delete").flag()
+    private val client by requireObject<Client>()
+
+    override fun run() {
+        if (force) {
+            logger.debug { "Deleting {uid}" }
+            runBlocking {
+                uid.forEach { client.deleteDirectoryEntry( it ) }
+            }
+        } else {
+            throw UsageError("Specify --force option")
+        }
+
+    }
+}
+
+
+class DirectoryAdministrationCli : CliktCommand(name="admin", help="""CLI for DirectoryAdministration API
+
+Commands require following environment variables:
+ 
+```
+ - ADMIN_AUTH_URL
+ - ADMIN_CLIENT_ID
+ - ADMIN_CLIENT_SECRET
+ - ADMIN_API_URL
+ - ADMIN_ACCESS_TOKEN (optional)
+``` 
+""".trimMargin()) {
+    private val dotenv by requireObject<Dotenv>()
+    override fun run() {
+        currentContext.obj = Client {
+            apiURL = dotenv["ADMIN_API_URL"]
+            loadTokens = {
+                val auth = ClientCredentialsAuthenticator(dotenv["ADMIN_AUTH_URL"])
+                auth.authenticate(dotenv["ADMIN_CLIENT_ID"], dotenv["ADMIN_CLIENT_SECRET"])
+            }
+        }
+    }
     init {
-        subcommands(AuthenticateAdmin(), ListDirectoryEntries())
+        subcommands(AuthenticateAdmin(), ListDirectoryEntries(), DeleteDiectoryEntry())
     }
 }

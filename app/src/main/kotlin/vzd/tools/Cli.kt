@@ -10,13 +10,12 @@ import vzd.tools.directoryadministration.DirectoryAdministrationCli
 import java.nio.file.Paths
 
 private val logger = KotlinLogging.logger {}
-public var dotenv = dotenv { ignoreIfMissing=true }
 
 class Cli : CliktCommand(name="vzd/tools") {
     private val env by option(help="specify env file", metavar="FILENAME").default(".env")
     override fun run() {
         logger.debug { "Trying to load environment from: $env" }
-        dotenv = dotenv {
+        currentContext.obj = dotenv {
             directory = Paths.get("").toAbsolutePath().toString()
             filename = env
             ignoreIfMissing = true

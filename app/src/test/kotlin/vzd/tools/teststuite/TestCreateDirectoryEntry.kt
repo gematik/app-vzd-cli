@@ -1,11 +1,11 @@
 package vzd.tools.teststuite
 
 
+import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import vzd.tools.directoryadministration.*
-import vzd.tools.dotenv
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -13,6 +13,7 @@ private val logger = KotlinLogging.logger {}
 
 class TestCreateDirectoryEntry {
     var client: Client? = null
+    var dotenv = dotenv { ignoreIfMissing = true }
 
     @BeforeTest fun setUp() {
         this.client = Client {
