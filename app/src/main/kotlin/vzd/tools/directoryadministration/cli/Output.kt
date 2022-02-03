@@ -11,6 +11,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
+import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.util.encoders.Base64
 import vzd.tools.directoryadministration.CertificateDataDER
 import java.security.cert.CertificateFactory
@@ -39,7 +40,8 @@ data class CertificateDataDERSurrogate (
     val subject: String,
     val issuer: String,
     val signatureAlgorithm: String,
-    val publicKeyAlgorithm: String
+    val publicKeyAlgorithm: String,
+    val keyUsage: List<String>,
 ) {
     companion object Factory {
         fun convert(base64String: String): CertificateDataDERSurrogate {
@@ -47,13 +49,40 @@ data class CertificateDataDERSurrogate (
             val cf = CertificateFactory.getInstance("X.509")
             val cert: X509Certificate = cf.generateCertificate(bytes.inputStream()) as X509Certificate
 
-            cert.publicKey.algorithm
+            val keyUsage = mutableListOf<String>()
+
+            /*
+            KeyUsage ::= BIT STRING {
+           digitalSignature        (0),
+           nonRepudiation          (1),
+           keyEncipherment         (2),
+           dataEncipherment        (3),
+           keyAgreement            (4),
+           keyCertSign             (5),
+           cRLSign                 (6),
+           encipherOnly            (7),
+           decipherOnly            (8) }
+             */
+            cert.keyUsage.forEachIndexed { index, element ->
+                when (index) {
+                    0 -> if (element) keyUsage.add("digitalSignature")
+                    1 -> if (element) keyUsage.add("nonRepudiation")
+                    2 -> if (element) keyUsage.add("keyEncipherment")
+                    3 -> if (element) keyUsage.add("dataEncipherment")
+                    4 -> if (element) keyUsage.add("keyAgreement")
+                    5 -> if (element) keyUsage.add("keyCertSign")
+                    6 -> if (element) keyUsage.add("cRLSign")
+                    7 -> if (element) keyUsage.add("encipherOnly")
+                    8 -> if (element) keyUsage.add("decipherOnly")
+                }
+            }
 
             return CertificateDataDERSurrogate(
                 cert.subjectDN.name,
                 cert.issuerDN.name,
                 cert.sigAlgName,
-                cert.publicKey.algorithm
+                cert.publicKey.algorithm,
+                keyUsage
             )
         }
 
