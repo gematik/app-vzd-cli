@@ -1,7 +1,11 @@
 package vzd.tools.directoryadministration
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 data class DistinguishedName(
@@ -37,6 +41,29 @@ data class BaseDirectoryEntry(
     var changeDateTime: String? = null
 )
 
+/**
+ * Simple datatype for base64 encoded certificates to differentiate them from plain strings
+ */
+@Serializable(with=CertificateDataDERSerializer::class)
+data class CertificateDataDER (
+    var base64String: String
+)
+
+/**
+ * Serializes {CertificateDataDER} to primitive string.
+ */
+object CertificateDataDERSerializer : KSerializer<CertificateDataDER> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: CertificateDataDER) {
+        encoder.encodeString(value.base64String)
+    }
+
+    override fun deserialize(decoder: Decoder): CertificateDataDER {
+        return CertificateDataDER(decoder.decodeString())
+    }
+}
+
 @Serializable
 data class UserCertificate(
     var dn: DistinguishedName,
@@ -44,7 +71,8 @@ data class UserCertificate(
     var telematikID: String? = null,
     var professionOID: List<String>? = null,
     var usage: List<String>? = null,
-    var userCertificate: String? = null,
+    @Contextual
+    var userCertificate: CertificateDataDER? = null,
     var description: String? = null
 )
 

@@ -3,3 +3,5 @@
 build
 app/bin
 .env*
+app/cert.b64
+app/cert.der

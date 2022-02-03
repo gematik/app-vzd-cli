@@ -40,6 +40,7 @@ dependencies {
     implementation("net.mamoe.yamlkt:yamlkt:0.10.2")
 
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
+    implementation("org.bouncycastle:bcprov-jdk15on:1.70")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
