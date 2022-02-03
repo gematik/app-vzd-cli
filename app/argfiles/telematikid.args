@@ -1,0 +1,6 @@
+--env=.env.ru
+admin
+list
+--sync
+--printer=yaml
+telematikID=1-2-202106170940
