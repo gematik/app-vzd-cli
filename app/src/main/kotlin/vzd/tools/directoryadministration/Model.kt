@@ -17,8 +17,9 @@ data class DistinguishedName(
 
 @Serializable
 data class BaseDirectoryEntry(
-    var cn: String,
-    var dn: DistinguishedName,
+    var telematikID: String,
+    var cn: String? = null,
+    var dn: DistinguishedName? = null,
     var givenName: String? = null,
     var sn: String? = null,
     var displayName: String? = null,
@@ -30,7 +31,6 @@ data class BaseDirectoryEntry(
     var title: String? = null,
     var organization: String? = null,
     var otherName: String? = null,
-    var telematikID: String? = null,
     var specialization: List<String>? = null,
     var domainID: List<String>? = null,
     var holder: List<String>? = null,
@@ -66,7 +66,7 @@ object CertificateDataDERSerializer : KSerializer<CertificateDataDER> {
 
 @Serializable
 data class UserCertificate(
-    var dn: DistinguishedName,
+    var dn: DistinguishedName? = null,
     var entryType: String? = null,
     var telematikID: String? = null,
     var professionOID: List<String>? = null,
@@ -98,4 +98,11 @@ data class DirectoryEntry(
     var userCertificates: List<UserCertificate>? = null,
     @SerialName("Fachdaten")
     var fachdaten: List<Fachdaten>? = null
+)
+
+@Serializable
+data class CreateDirectoryEntry(
+    @SerialName("DirectoryEntryBase")
+    var directoryEntryBase: BaseDirectoryEntry? = null,
+    var userCertificates: List<UserCertificate>? = null,
 )

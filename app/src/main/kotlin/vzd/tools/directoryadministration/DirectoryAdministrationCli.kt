@@ -49,7 +49,6 @@ data class CertificateDataDERSurrogate (
                 cert.issuerDN.name,
                 cert.sigAlgName,
                 cert.publicKey.algorithm
-
             )
         }
 
@@ -77,7 +76,7 @@ val printerSerializersModule = SerializersModule {
 val DirectoryEntryPrinters = mapOf(
     "short" to { value: List<DirectoryEntry>?, _: Boolean, _: Array<String>? ->
         value?.forEach {
-            println("${it.directoryEntryBase.dn.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
+            println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
         }
     },
     "yaml" to { value: List<DirectoryEntry>?, showCert: Boolean, _: Array<String>? ->
