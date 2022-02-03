@@ -39,6 +39,7 @@ class TestCreateDirectoryEntry {
         baseDirectoryEntry.postalCode = "12345"
         baseDirectoryEntry.streetAddress = "Kaiserstraße 1"
         baseDirectoryEntry.otherName = "UK Entenhausen"
+        baseDirectoryEntry.holder = listOf("gematik_test")
         val directoryEntry = CreateDirectoryEntry(baseDirectoryEntry)
 
         /*
