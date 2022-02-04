@@ -53,6 +53,7 @@ application {
     mainClass.set("vzd.tools.CliKt")
 }
 
+tasks.shadowDistZip { archiveBaseName.set("vzd-cli") }
 tasks.distZip.configure { enabled = false  }
 tasks.distTar.configure { enabled = false }
 tasks.shadowDistTar.configure { enabled = false }
