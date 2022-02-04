@@ -1,7 +1,4 @@
 # Ignore Gradle project-specific cache directory
 .gradle
 build
-app/bin
 .env*
-app/cert.b64
-app/cert.der

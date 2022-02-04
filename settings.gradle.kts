@@ -8,4 +8,4 @@
  */
 
 rootProject.name = "vzd-tools"
-include("app")
+include("vzd-cli")

@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
 import io.github.cdimascio.dotenv.dotenv
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -16,9 +17,11 @@ import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.*
 import java.io.File
+import java.nio.charset.Charset
 import kotlin.math.log
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.typeOf
 
 private val logger = KotlinLogging.logger {}
 
@@ -67,25 +70,41 @@ class LoadDirectoryEntry: CliktCommand(name = "load", help="Load the specified e
             throw UsageError("The query must return exactly one value. Got: ${result?.size}")
         }
 
-        echo( Json { prettyPrint=true }.encodeToString(result?.first()))
+        echo( Json { prettyPrint=true }.encodeToString(result.first()))
     }
 
 }
 
 class DeleteDiectoryEntry: CliktCommand(name="delete", help="Delete specified directory entries") {
-    val uid by argument(help="List of UIDs for to be deleted directory entries").multiple(required = true)
-    val force by option(help="Force delete").flag()
+    private val params: Map<String, String> by option("-Q", "--query").associate()
+    //val force by option(help="Force delete").flag()
     private val client by requireObject<Client>()
 
     override fun run() {
+        runBlocking {
+            if (params.isEmpty()) {
+                throw UsageError("Specify at least one query parameter")
+            }
+            val result = client.readDirectoryEntry(params)
+            result?.forEach {
+                val answer = prompt("Type YES to delete '${it.directoryEntryBase.displayName}' '${it.directoryEntryBase.dn?.uid}'")
+                if (answer == "YES") {
+                    logger.debug { "Deleting '${it.directoryEntryBase.displayName}' '${it.directoryEntryBase.dn?.uid}'" }
+                    if (it.directoryEntryBase.dn?.uid != null) {
+                        client.deleteDirectoryEntry( it.directoryEntryBase.dn!!.uid )
+                    }
+                }
+            }
+        }
+        /*
         if (force) {
             logger.debug { "Deleting {uid}" }
             runBlocking {
-                uid.forEach { client.deleteDirectoryEntry( it ) }
+
             }
         } else {
             throw UsageError("Specify --force option")
-        }
+        }*/
 
     }
 }
@@ -93,15 +112,23 @@ class DeleteDiectoryEntry: CliktCommand(name="delete", help="Delete specified di
 private fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<String, String>) {
     attrs.forEach { (name, value) ->
 
-        BaseDirectoryEntry::class.memberProperties
+        val property = BaseDirectoryEntry::class.memberProperties
             .filterIsInstance<KMutableProperty<*>>()
-            .first { it.name == name }.setter.call(baseDirectoryEntry, value)
+            .first { it.name == name }
+
+        if (property.returnType == typeOf<String>() || property.returnType == typeOf<String?>()) {
+            property.setter.call(baseDirectoryEntry, value)
+        } else if (property.returnType == typeOf<List<String>>() || property.returnType == typeOf<List<String>?>()) {
+            property.setter.call(baseDirectoryEntry, value.split(',').map { it.trim() })
+        } else {
+            throw UsageError("Unsupported property type '$name': ${property.returnType}")
+        }
     }
 
 }
 
 class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry") {
-    private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE", help="Set the attribute value in BaseDirectoryEntry. Only String attributes are supported").associate()
+    private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE", help="Set the attribute value in BaseDirectoryEntry.").associate()
     private val file by option("--file", "-f")
 
     private val client by requireObject<Client>();
@@ -112,7 +139,7 @@ class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry"
 
         if (file != null) {
             logger.debug { "Loading file: $file" }
-            directoryEntry =Json.decodeFromStream<CreateDirectoryEntry>(File(file).inputStream())
+            directoryEntry = Json.decodeFromString<CreateDirectoryEntry>(File(file).readText(Charsets.UTF_8))
         } else {
             val telematikID: String = attrs.get("telematikID") ?: throw UsageError("Attribute telematikID is required")
             val baseDirectoryEntry = BaseDirectoryEntry(

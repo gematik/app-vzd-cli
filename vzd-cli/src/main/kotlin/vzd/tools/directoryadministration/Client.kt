@@ -66,6 +66,8 @@ class Client {
      * Implements POST /DirectoryEntries (add_Directory_Entry)
      */
     suspend fun addDirectoryEntry(directoryEntry: CreateDirectoryEntry): DistinguishedName {
+        logger.debug { "POST ${config.apiURL} /DirectoryEntries" }
+
         val response = http.post("/DirectoryEntries") {
             contentType(ContentType.Application.Json)
             setBody(directoryEntry)
@@ -82,6 +84,7 @@ class Client {
      * Implements DELETE /DirectoryEntries/{uid} (add_Delete_Directory_Entry)
      */
     suspend fun deleteDirectoryEntry(uid: String) {
+        logger.debug { "DELETE ${config.apiURL} /DirectoryEntries/{uid}" }
         val response = http.delete("/DirectoryEntries/${uid}") {
         }
 
@@ -123,6 +126,7 @@ class Client {
      * Implements GET / (getInfo)
      */
     suspend fun getInfo(): InfoObject {
+        logger.debug { "GET ${config.apiURL} /" }
         TODO()
     }
 
@@ -130,6 +134,7 @@ class Client {
      * Implements PUT /DirectoryEntries/{uid}/baseDirectoryEntries (modify_Directory_Entry)
      */
     suspend fun modifyDirectoryEntry(baseDirectoryEntry: BaseDirectoryEntry) {
+        logger.debug { "PUT ${config.apiURL} /DirectoryEntries/{uid}/baseDirectoryEntries" }
         TODO()
     }
 
@@ -137,6 +142,7 @@ class Client {
      * Implements PUT /DirectoryEntries/{uid}/Certificates (add_Directory_Entry_Certificate)
      */
     suspend fun addDirectoryEntryCertificate() {
+        logger.debug { "PUT ${config.apiURL} /DirectoryEntries/{uid}/Certificates" }
         TODO()
     }
 
@@ -164,6 +170,7 @@ class Client {
      * Implements DELETE /DirectoryEntries/{uid}/Certificates/{certificateEntryID} (delete_Directory_Entry_Certificate)
      */
     suspend fun deleteDirectoryEntryCertificate() {
+        logger.debug { "PUT ${config.apiURL} /DirectoryEntries/{uid}/Certificates/{certificateEntryID}" }
         TODO()
     }
 }

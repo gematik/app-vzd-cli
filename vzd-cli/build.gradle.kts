@@ -8,6 +8,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val ktor_version = "2.0.0-beta-1"
+version = "0.4.0-alpha"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -52,12 +53,6 @@ application {
     mainClass.set("vzd.tools.CliKt")
 }
 
-tasks {
-    named<ShadowJar>("shadowJar") {
-        archiveFileName.set("vzd-cli.jar")
-        mergeServiceFiles()
-        manifest {
-            attributes(mapOf("Main-Class" to "com.github.csolem.gradle.shadow.kotlin.example.App"))
-        }
-    }
-}
+tasks.distZip.configure { enabled = false  }
+tasks.distTar.configure { enabled = false }
+tasks.shadowDistTar.configure { enabled = false }
