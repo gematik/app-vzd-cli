@@ -41,6 +41,7 @@ data class CertificateDataDERSurrogate (
     val issuer: String,
     val signatureAlgorithm: String,
     val publicKeyAlgorithm: String,
+    val serialNumber: String,
     val keyUsage: List<String>,
 ) {
     companion object Factory {
@@ -52,16 +53,16 @@ data class CertificateDataDERSurrogate (
             val keyUsage = mutableListOf<String>()
 
             /*
-            KeyUsage ::= BIT STRING {
-           digitalSignature        (0),
-           nonRepudiation          (1),
-           keyEncipherment         (2),
-           dataEncipherment        (3),
-           keyAgreement            (4),
-           keyCertSign             (5),
-           cRLSign                 (6),
-           encipherOnly            (7),
-           decipherOnly            (8) }
+                KeyUsage ::= BIT STRING {
+                   digitalSignature        (0),
+                   nonRepudiation          (1),
+                   keyEncipherment         (2),
+                   dataEncipherment        (3),
+                   keyAgreement            (4),
+                   keyCertSign             (5),
+                   cRLSign                 (6),
+                   encipherOnly            (7),
+                   decipherOnly            (8) }
              */
             cert.keyUsage.forEachIndexed { index, element ->
                 when (index) {
@@ -82,7 +83,8 @@ data class CertificateDataDERSurrogate (
                 cert.issuerDN.name,
                 cert.sigAlgName,
                 cert.publicKey.algorithm,
-                keyUsage
+                serialNumber = cert.serialNumber.toString(),
+                keyUsage = keyUsage
             )
         }
 

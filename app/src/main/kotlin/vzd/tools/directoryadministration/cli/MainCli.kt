@@ -42,7 +42,7 @@ Commands require following environment variables:
         }
     }
     init {
-        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), AddDirectoryEntry(), ModifyDirectoryEntry(), DeleteDiectoryEntry(), ListCertificates(), DeleteCertificates())
+        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), AddDirectoryEntry(), LoadDirectoryEntry(), ModifyDirectoryEntry(), DeleteDiectoryEntry(), ListCertificates(), DeleteCertificates())
     }
 }
 

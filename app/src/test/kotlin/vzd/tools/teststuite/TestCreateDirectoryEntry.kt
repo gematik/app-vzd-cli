@@ -15,6 +15,7 @@ class TestCreateDirectoryEntry {
     var client: Client? = null
     var dotenv = dotenv { ignoreIfMissing = true }
 
+
     @BeforeTest fun setUp() {
         this.client = Client {
             apiURL = dotenv["ADMIN_API_URL"]

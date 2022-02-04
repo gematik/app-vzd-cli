@@ -28,6 +28,7 @@ dependencies {
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.github.microutils:kotlin-logging:2.1.21")
     implementation("ch.qos.logback:logback-classic:1.2.9")
     implementation("io.github.cdimascio:dotenv-kotlin:6.2.2")
@@ -53,7 +54,7 @@ application {
 
 tasks {
     named<ShadowJar>("shadowJar") {
-        archiveBaseName.set("shadow")
+        archiveFileName.set("vzd-cli.jar")
         mergeServiceFiles()
         manifest {
             attributes(mapOf("Main-Class" to "com.github.csolem.gradle.shadow.kotlin.example.App"))

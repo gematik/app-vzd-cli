@@ -2,5 +2,5 @@
 admin
 list
 --sync
---printer=yaml
-telematikID=1-2-202106170940
+--output=yaml
+--query telematikID=3-vzd-cli-Test-Apotheke-001
