@@ -31,6 +31,8 @@ class Cli : CliktCommand(name="vzd-cli") {
                 directory = path.parent.absolutePathString()
                 filename = path.fileName.name
                 ignoreIfMissing = false
+            } else {
+                ignoreIfMissing = true
             }
         }
     }

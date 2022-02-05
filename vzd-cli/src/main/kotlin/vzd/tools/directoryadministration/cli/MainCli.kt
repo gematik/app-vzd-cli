@@ -16,15 +16,14 @@ class DirectoryAdministrationCli : CliktCommand(name="admin", help="""CLI for Di
 Commands require following environment variables:
  
 ```
- - ADMIN_AUTH_URL
- - ADMIN_CLIENT_ID
- - ADMIN_CLIENT_SECRET
  - ADMIN_API_URL
- - ADMIN_ACCESS_TOKEN (optional)
+ - ADMIN_AUTH_URL, ADMIN_CLIENT_ID, ADMIN_CLIENT_SECRET
+ - ... or ADMIN_ACCESS_TOKEN 
 ``` 
 """.trimMargin()) {
     private val dotenv by requireObject<Dotenv>()
     override fun run() {
+
         currentContext.obj = Client {
             apiURL = dotenv["ADMIN_API_URL"]
             val accessToken = dotenv.get("ACCESS_TOKEN", null)
