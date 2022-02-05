@@ -71,6 +71,26 @@ data class BaseDirectoryEntry(
     var changeDateTime: String? = null
 )
 
+@Serializable
+data class UpdateBaseDirectoryEntry(
+    var sn: String? = null,
+    var telematikID: String? = null,
+    var displayName: String? = null,
+    var streetAddress: String? = null,
+    var postalCode: String? = null,
+    var countryCode: String? = null,
+    var localityName: String? = null,
+    var stateOrProvinceName: String? = null,
+    var title: String? = null,
+    var organization: String? = null,
+    var otherName: String? = null,
+    var specialization: List<String>? = null,
+    var domainID: List<String>? = null,
+    var holder: List<String>? = null,
+    var items: String? = null,
+    var maxKOMLEadr: Int? = null,
+)
+
 /**
  * Simple datatype for base64 encoded certificates to differentiate them from plain strings
  */

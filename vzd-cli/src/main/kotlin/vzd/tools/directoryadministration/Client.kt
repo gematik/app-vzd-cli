@@ -11,7 +11,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 
@@ -38,7 +37,7 @@ class Client {
             expectSuccess = false
             install(Logging) {
                 logger = Logger.DEFAULT
-                level = LogLevel.NONE
+                level = LogLevel.ALL
             }
             install(Auth) {
                 bearer {
@@ -138,9 +137,16 @@ class Client {
     /**
      * Implements PUT /DirectoryEntries/{uid}/baseDirectoryEntries (modify_Directory_Entry)
      */
-    suspend fun modifyDirectoryEntry(baseDirectoryEntry: BaseDirectoryEntry) {
+    suspend fun modifyDirectoryEntry(uid: String, baseDirectoryEntry: UpdateBaseDirectoryEntry) {
         logger.debug { "PUT ${config.apiURL} /DirectoryEntries/{uid}/baseDirectoryEntries" }
-        TODO()
+        val response = http.put("/DirectoryEntries/${uid}/baseDirectoryEntries") {
+            contentType(ContentType.Application.Json)
+            setBody(baseDirectoryEntry)
+        }
+
+        if (response.status != HttpStatusCode.OK) {
+            throw VZDResponseException(response, "Unable to modify entry: ${response.body<String>()}")
+        }
     }
 
     /**

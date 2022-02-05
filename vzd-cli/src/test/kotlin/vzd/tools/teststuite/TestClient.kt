@@ -8,10 +8,11 @@ import mu.KotlinLogging
 import vzd.tools.directoryadministration.*
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertNotNull
 
 private val logger = KotlinLogging.logger {}
 
-class TestCreateDirectoryEntry {
+class TestClient {
     var client: Client? = null
     var dotenv = dotenv { ignoreIfMissing = true }
 
@@ -22,16 +23,17 @@ class TestCreateDirectoryEntry {
             loadTokens = { BearerTokens(dotenv["ADMIN_ACCESS_TOKEN"], "") }
         }
 
-        var entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "3-vzd-tools-123456890") ) }
-        if (entries?.size == 1) {
-            runBlocking { client?.deleteDirectoryEntry(entries[0].directoryEntryBase.dn!!.uid) }
+        var entries = runBlocking { client?.readDirectoryEntry(mapOf("domainID" to TestClient::class.qualifiedName!!) ) }
+        entries?.forEach {
+            runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }
+            return
         }
     }
 
     @Test fun testCreateDirectoryEntry() {
 
         val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "3-vzd-tools-123456890")
-        baseDirectoryEntry.domainID = listOf("gematik_test", TestCreateDirectoryEntry::class.qualifiedName!!)
+        baseDirectoryEntry.domainID = listOf("gematik_test", TestClient::class.qualifiedName!!)
         baseDirectoryEntry.displayName = "Uniklinik Entenhausen"
         baseDirectoryEntry.organization = "Comics Krankenhaus"
         baseDirectoryEntry.countryCode = "DE";
@@ -50,8 +52,19 @@ class TestCreateDirectoryEntry {
         */
 
         val dn = runBlocking { client?.addDirectoryEntry(directoryEntry) }
-
+        assertNotNull(dn)
         logger.info { "Created directory entry: ${dn}" }
+
+        val updateDirectoryEntry = UpdateBaseDirectoryEntry(
+            //telematikID = "3-vzd-tools-123456890",
+            displayName = "Uniklinik Entenhausen (modified)",
+            domainID = directoryEntry.directoryEntryBase!!.domainID,
+            postalCode = "54321",
+            holder = listOf("gematik_test")
+        );
+
+        runBlocking { client?.modifyDirectoryEntry(dn!!.uid, updateDirectoryEntry) }
+
     }
 
 }

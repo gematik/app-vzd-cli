@@ -28,9 +28,9 @@ Commands require following environment variables:
 
         currentContext.obj = Client {
             apiURL = dotenv["ADMIN_API_URL"]
-            val accessToken = dotenv.get("ACCESS_TOKEN", null)
+            val accessToken = dotenv.get("ADMIN_ACCESS_TOKEN", null)
             if (accessToken != null) {
-                logger.debug { "Found ACCESS_TOKEN env variable. Using it to authenticate. " }
+                logger.debug { "Found ADMIN_ACCESS_TOKEN env variable. Using it to authenticate. " }
                 loadTokens = {
                     BearerTokens(accessToken, "")
                 }
@@ -43,7 +43,8 @@ Commands require following environment variables:
         }
     }
     init {
-        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), AddDirectoryEntry(), LoadDirectoryEntry(), ModifyDirectoryEntry(), DeleteDiectoryEntry(), ListCertificates(), DeleteCertificates())
+        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), AddDirectoryEntry(), LoadBaseDirectoryEntry(),
+            ModifyBaseDirectoryEntry(), DeleteDiectoryEntry(), ListCertificates(), AddCertificate(), DeleteCertificates())
     }
 }
 

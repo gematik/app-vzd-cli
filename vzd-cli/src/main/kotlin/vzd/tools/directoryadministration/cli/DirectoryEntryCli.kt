@@ -3,22 +3,15 @@ package vzd.tools.directoryadministration.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
-import io.github.cdimascio.dotenv.dotenv
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
 import mu.KotlinLogging
-import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.*
 import java.io.File
-import java.nio.charset.Charset
-import kotlin.math.log
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.typeOf
@@ -36,10 +29,13 @@ val DirectoryEntryOutputMapping = mapOf(
 )
 
 class ListDirectoryEntries: CliktCommand(name = "list", help="List directory entries") {
-    private val params: Map<String, String> by option("-Q", "--query").associate()
+    private val params: Map<String, String> by option("-Q", "--query",
+        help="Specify query parameters to find matching entries").associate()
     private val sync by option(help="use Sync mode").flag()
-    private val output by option(help="How the entries should be displayed").choice(*DirectoryEntryOutputMapping.keys.toTypedArray()).default("list")
-    private val showRawCert by option("--cert-raw", help="Show raw certificate data instead of text summary").flag()
+    private val output by option(help="How the entries should be displayed")
+        .choice(*DirectoryEntryOutputMapping.keys.toTypedArray()).default("list")
+    private val showRawCert by option("--cert-raw",
+        help="Show raw certificate data instead of text summary").flag()
     private val client by requireObject<Client>();
     override fun run() {
         val result: List<DirectoryEntry>?
@@ -54,8 +50,9 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
 
 }
 
-class LoadDirectoryEntry: CliktCommand(name = "load", help="Load the specified entry") {
-    private val params: Map<String, String> by option("-Q", "--query").associate()
+class LoadBaseDirectoryEntry: CliktCommand(name = "load-base", help="Load the base entry for editing.") {
+    private val params: Map<String, String> by option("-Q", "--query",
+        help="Specify query parameters to find matching entries").associate()
     private val sync by option(help="use Sync mode").flag()
     private val client by requireObject<Client>();
     override fun run() {
@@ -70,13 +67,14 @@ class LoadDirectoryEntry: CliktCommand(name = "load", help="Load the specified e
             throw UsageError("The query must return exactly one value. Got: ${result?.size}")
         }
 
-        echo( Json { prettyPrint=true }.encodeToString(result.first()))
+        echo( Json { prettyPrint=true }.encodeToString(result.first().directoryEntryBase))
     }
 
 }
 
 class DeleteDiectoryEntry: CliktCommand(name="delete", help="Delete specified directory entries") {
-    private val params: Map<String, String> by option("-Q", "--query").associate()
+    private val params: Map<String, String> by option("-Q", "--query",
+        help="Specify query parameters to find matching entries").associate()
     //val force by option(help="Force delete").flag()
     private val client by requireObject<Client>()
 
@@ -96,15 +94,6 @@ class DeleteDiectoryEntry: CliktCommand(name="delete", help="Delete specified di
                 }
             }
         }
-        /*
-        if (force) {
-            logger.debug { "Deleting {uid}" }
-            runBlocking {
-
-            }
-        } else {
-            throw UsageError("Specify --force option")
-        }*/
 
     }
 }
@@ -128,10 +117,12 @@ private fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<St
 }
 
 class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry") {
-    private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE", help="Set the attribute value in BaseDirectoryEntry.").associate()
-    private val file by option("--file", "-f")
-
+    private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE",
+        help="Set the attribute value in BaseDirectoryEntry.").associate()
+    private val file by option("--file", "-f", metavar = "FILENAME.json",
+        help="Read the directory entry from specified JSON file")
     private val client by requireObject<Client>();
+
     override fun run() {
 
 
@@ -149,7 +140,6 @@ class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry"
             directoryEntry = CreateDirectoryEntry(baseDirectoryEntry)
         }
 
-
         setAttributes(directoryEntry.directoryEntryBase, attrs)
 
         logger.debug { "Creating new directory entry with telematikID: ${directoryEntry.directoryEntryBase?.telematikID}" }
@@ -160,8 +150,27 @@ class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry"
     }
 }
 
-class ModifyDirectoryEntry: CliktCommand(name="modify", help="Modify directory entry") {
+class ModifyBaseDirectoryEntry: CliktCommand(name="modify-base", help="Modify base directory entry") {
+    private val params: Map<String, String> by option("-Q", "--query", metavar = "PARAM=VALUE",
+        help="Specify query parameters to find matching entries").associate()
+    private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE",
+        help="Set the attribute value in BaseDirectoryEntry.").associate()
+    private val file by option("--file", "-f",
+        help="Read base directory entry from file.")
+    private val client by requireObject<Client>();
+
     override fun run() {
-        TODO("Not yet implemented")
+        if (file != null) {
+            var jsonData = File(file).readText(Charsets.UTF_8)
+            val baseDirectoryEntry = Json.decodeFromString<BaseDirectoryEntry>(jsonData)
+            val updateBaseDirectoryEntry = Json { ignoreUnknownKeys = true }.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
+            // arvato bug: when updating telematikID with no certificates the exception is thrown
+            updateBaseDirectoryEntry.telematikID = null
+            runBlocking { client.modifyDirectoryEntry(baseDirectoryEntry.dn!!.uid, updateBaseDirectoryEntry) }
+        } else {
+            throw UsageError("not implemented yet")
+        }
+
+
     }
 }

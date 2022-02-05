@@ -33,9 +33,12 @@ val CertificateOutputMapping = mapOf(
 )
 
 class ListCertificates: CliktCommand(name = "list-cert", help="List certificates") {
-    private val output by option(help="How the entries should be displayed").choice(*CertificateOutputMapping.keys.toTypedArray()).default("list")
-    private val showRawCert by option("--cert-raw", help="Show raw certificate data instead of text summary").flag()
-    private val params: Map<String, String> by option("-Q", "--query").associate()
+    private val output by option(help="How the entries should be displayed")
+        .choice(*CertificateOutputMapping.keys.toTypedArray()).default("list")
+    private val showRawCert by option("--cert-raw",
+        help="Show raw certificate data instead of text summary").flag()
+    private val params: Map<String, String> by option("-Q", "--query",
+        help="Specify query parameters to find matching entries").associate()
     private val client by requireObject<Client>();
 
     override fun run() {
@@ -46,6 +49,13 @@ class ListCertificates: CliktCommand(name = "list-cert", help="List certificates
         val result = runBlocking { client.readDirectoryCertificates(params) }
 
         CertificateOutputMapping.get(output)?.invoke(result, showRawCert)
+    }
+}
+
+class AddCertificate: CliktCommand(name = "add-cert", help="Add certificate") {
+    private val client by requireObject<Client>();
+    override fun run() {
+        TODO("Not yet implemented")
     }
 }
 
