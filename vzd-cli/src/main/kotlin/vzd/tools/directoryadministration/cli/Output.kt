@@ -1,21 +1,21 @@
 package vzd.tools.directoryadministration.cli
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import de.gematik.pki.certificate.Admission
+import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
-import org.bouncycastle.asn1.x509.KeyUsage
 import org.bouncycastle.util.encoders.Base64
 import vzd.tools.directoryadministration.CertificateDataDER
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 inline fun <reified E>printYaml(value: E?, showRawCert: Boolean) {
     println(Yaml {
@@ -34,6 +34,15 @@ inline fun <reified E>printJson(value: E?, showRawCert: Boolean) {
     }.encodeToString(value))
 }
 
+
+@Serializable
+data class AdmissionSurrogate(
+    val admissionAuthority: String,
+    val professionItems: Set<String>,
+    val professionOids: Set<String>,
+    val registrationNumber: String
+)
+
 @Serializable
 @SerialName("CertificateDataDER")
 data class CertificateDataDERSurrogate (
@@ -43,6 +52,9 @@ data class CertificateDataDERSurrogate (
     val publicKeyAlgorithm: String,
     val serialNumber: String,
     val keyUsage: List<String>,
+    val notBefore: String,
+    val notAfter: String,
+    val admission: AdmissionSurrogate,
 ) {
     companion object Factory {
         fun convert(base64String: String): CertificateDataDERSurrogate {
@@ -64,7 +76,7 @@ data class CertificateDataDERSurrogate (
                    encipherOnly            (7),
                    decipherOnly            (8) }
              */
-            cert.keyUsage.forEachIndexed { index, element ->
+            cert.keyUsage?.forEachIndexed { index, element ->
                 when (index) {
                     0 -> if (element) keyUsage.add("digitalSignature")
                     1 -> if (element) keyUsage.add("nonRepudiation")
@@ -78,13 +90,30 @@ data class CertificateDataDERSurrogate (
                 }
             }
 
+            fun dateToString(date: Date): String {
+                return DateTimeFormatter.ISO_DATE_TIME.format(date.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime())
+            }
+
+            var admission = Admission(cert)
+            var admissionSurrogate = AdmissionSurrogate(
+                admissionAuthority = admission.admissionAuthority,
+                professionItems = admission.professionItems,
+                professionOids = admission.professionOids,
+                registrationNumber = admission.registrationNumber
+            )
+
             return CertificateDataDERSurrogate(
                 cert.subjectDN.name,
                 cert.issuerDN.name,
                 cert.sigAlgName,
                 cert.publicKey.algorithm,
                 serialNumber = cert.serialNumber.toString(),
-                keyUsage = keyUsage
+                keyUsage = keyUsage,
+                dateToString(cert.notBefore),
+                dateToString(cert.notAfter),
+                admissionSurrogate,
             )
         }
 
