@@ -5,7 +5,9 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.client.plugins.auth.providers.*
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.Client
 import vzd.tools.directoryadministration.ClientCredentialsAuthenticator
 
@@ -56,7 +58,9 @@ class AuthenticateAdmin: CliktCommand(name="auth", help="Perform authentication"
 }
 
 class Info: CliktCommand(name="info", help="Show information about the API") {
+    private val client by requireObject<Client>()
     override fun run() {
-        TODO("Not yet implemented")
+        val info = runBlocking { client.getInfo() }
+        println(Yaml{}.encodeToString(info))
     }
 }

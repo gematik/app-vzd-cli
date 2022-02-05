@@ -127,7 +127,12 @@ class Client {
      */
     suspend fun getInfo(): InfoObject {
         logger.debug { "GET ${config.apiURL} /" }
-        TODO()
+        val response = http.get("/")
+        if (response.status != HttpStatusCode.OK) {
+            throw VZDResponseException(response, "Unable to get info: ${response.body<String>()}")
+        }
+
+        return response.body()
     }
 
     /**
@@ -139,10 +144,10 @@ class Client {
     }
 
     /**
-     * Implements PUT /DirectoryEntries/{uid}/Certificates (add_Directory_Entry_Certificate)
+     * Implements POST /DirectoryEntries/{uid}/Certificates (add_Directory_Entry_Certificate)
      */
     suspend fun addDirectoryEntryCertificate() {
-        logger.debug { "PUT ${config.apiURL} /DirectoryEntries/{uid}/Certificates" }
+        logger.debug { "POST ${config.apiURL} /DirectoryEntries/{uid}/Certificates" }
         TODO()
     }
 
@@ -170,7 +175,7 @@ class Client {
      * Implements DELETE /DirectoryEntries/{uid}/Certificates/{certificateEntryID} (delete_Directory_Entry_Certificate)
      */
     suspend fun deleteDirectoryEntryCertificate() {
-        logger.debug { "PUT ${config.apiURL} /DirectoryEntries/{uid}/Certificates/{certificateEntryID}" }
+        logger.debug { "DELETE ${config.apiURL} /DirectoryEntries/{uid}/Certificates/{certificateEntryID}" }
         TODO()
     }
 }
