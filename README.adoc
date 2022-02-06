@@ -1,4 +1,6 @@
-= 🗂️ Tools for gematik Directory (Werkzeuge für TI Verzeichnisdienst)
+= 🗂️ Werkzeuge für TI Verzeichnisdienst
+
+Dieses Repository enthält diverse Werkzeuge für Test und Betrieb des https://github.com/gematik/api-vzd[TI Verzeichnisdienstes]
 
 .Authentisiert und speichert den ACCESS_TOKEN in die Umgebungsvariable 
 [source=bash]

@@ -12,21 +12,22 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import mu.KotlinLogging
+import vzd.tools.directoryadministration.CertificateDataDERInfoSerializer
 import vzd.tools.directoryadministration.Client
 import vzd.tools.directoryadministration.UserCertificate
+import vzd.tools.directoryadministration.toCertificateInfo
 
 private val logger = KotlinLogging.logger {}
 
 val printerSerializersModule = SerializersModule {
-    contextual(CertificateDataDERPrinterSerializer)
+    contextual(CertificateDataDERInfoSerializer)
 }
 val CertificateOutputMapping = mapOf(
     "yaml" to { value: List<UserCertificate>?, showCert: Boolean -> printYaml(value, showCert) },
     "json" to { value: List<UserCertificate>?, showCert: Boolean -> printJson(value, showCert) },
     "list" to { value: List<UserCertificate>?, _: Boolean ->
         value?.forEach {
-            val base64str = it.userCertificate?.base64String
-            val cert = if (base64str != null) CertificateDataDERSurrogate.Factory.convert(base64str) else null
+            val cert = it.userCertificate?.toCertificateInfo()
             println("${it.dn?.uid} ${it.telematikID} ${it.entryType} ${cert?.publicKeyAlgorithm} ${it.description}")
         }
     },

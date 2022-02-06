@@ -6,8 +6,10 @@ import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import vzd.tools.directoryadministration.*
+import kotlin.math.log
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 private val logger = KotlinLogging.logger {}
@@ -25,14 +27,35 @@ class TestClient {
 
         var entries = runBlocking { client?.readDirectoryEntry(mapOf("domainID" to TestClient::class.qualifiedName!!) ) }
         entries?.forEach {
+            if (it.directoryEntryBase.telematikID.startsWith("vzd-testsuite")) {
+                logger.debug { "Deleting ${it.directoryEntryBase}" }
+                runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }
+            }
+        }
+    }
+
+    @Test fun testCreateWithOnlyTelematikID() {
+
+        var entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-testsuite-only-telematikID") ) }
+        entries?.forEach {
             runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }
             return
         }
+
+        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-testsuite-only-telematikID")
+        val directoryEntry = CreateDirectoryEntry(baseDirectoryEntry)
+        val dn = runBlocking { client?.addDirectoryEntry(directoryEntry) }
+        assertNotNull(dn)
+
+        val loadedDirectoryEntry = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-testsuite-only-telematikID")) }
+        assertEquals(1, loadedDirectoryEntry?.size)
+        assertEquals(dn.uid, loadedDirectoryEntry?.first()?.directoryEntryBase?.dn?.uid)
+
     }
 
     @Test fun testCreateDirectoryEntry() {
 
-        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "3-vzd-tools-123456890")
+        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-tools-123456890")
         baseDirectoryEntry.domainID = listOf("gematik_test", TestClient::class.qualifiedName!!)
         baseDirectoryEntry.displayName = "Uniklinik Entenhausen"
         baseDirectoryEntry.organization = "Comics Krankenhaus"
@@ -56,7 +79,7 @@ class TestClient {
         logger.info { "Created directory entry: ${dn}" }
 
         val updateDirectoryEntry = UpdateBaseDirectoryEntry(
-            //telematikID = "3-vzd-tools-123456890",
+            //telematikID = "vzd-testsuite-123456890",
             displayName = "Uniklinik Entenhausen (modified)",
             domainID = directoryEntry.directoryEntryBase!!.domainID,
             postalCode = "54321",
