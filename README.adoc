@@ -47,14 +47,29 @@ Benutzt <<cmd-admin-auth,admin auth>> um den Token zu besorgen.
 
 |===
 
+Die Umgebungsvariablen können in einer `.env` Datei gespeichert werden. Hier ist ein Beispiel für die Referenzumgebung:
 
-.Authentisiert und speichert den ACCESS_TOKEN in die Umgebungsvariable 
-[source=bash]
 ----
-export ADMIN_ACCESS_TOKEN=`./vzd-cli --env=.env.ru admin auth`
+ADMIN_API_URL=https://vzdpflege-ref.vzd.ti-dienste.de:9543/
+ADMIN_AUTH_URL=https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token
+ADMIN_CLIENT_ID=gematik_test
+ADMIN_CLIENT_SECRET=<secret>
+----
+
+Standardmäßig wird die Datei mit Namen `.env` im aktuellen Arbeitsverzeichnis geladen. Alternativer Dateiname kann über  `--env` Option angegeben werden:
+
+[source,bash]
+----
+bin/vzd-cli --env ../.env.ru admin ...
 ----
 
 [#cmd-admin-auth]
 === `admin auth`
 
 Authentisiert den Client und gibt `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client Aufrufe keine erneute explizite Authentisierung durchführen müssen.
+
+.Authentisiert und speichert den ACCESS_TOKEN in die Umgebungsvariable 
+[source=bash]
+----
+export ADMIN_ACCESS_TOKEN=`bin/vzd-cli --env=.env.ru admin auth`
+----
