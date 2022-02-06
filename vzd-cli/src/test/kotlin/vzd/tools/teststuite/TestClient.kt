@@ -27,7 +27,7 @@ class TestClient {
 
         var entries = runBlocking { client?.readDirectoryEntry(mapOf("domainID" to TestClient::class.qualifiedName!!) ) }
         entries?.forEach {
-            if (it.directoryEntryBase.telematikID.startsWith("vzd-testsuite")) {
+            if (it.directoryEntryBase.telematikID.startsWith("vzd-cli")) {
                 logger.debug { "Deleting ${it.directoryEntryBase}" }
                 runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }
             }
@@ -36,18 +36,18 @@ class TestClient {
 
     @Test fun testCreateWithOnlyTelematikID() {
 
-        var entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-testsuite-only-telematikID") ) }
+        var entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID") ) }
         entries?.forEach {
             runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }
             return
         }
 
-        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-testsuite-only-telematikID")
+        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-cli-only-telematikID")
         val directoryEntry = CreateDirectoryEntry(baseDirectoryEntry)
         val dn = runBlocking { client?.addDirectoryEntry(directoryEntry) }
         assertNotNull(dn)
 
-        val loadedDirectoryEntry = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-testsuite-only-telematikID")) }
+        val loadedDirectoryEntry = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID")) }
         assertEquals(1, loadedDirectoryEntry?.size)
         assertEquals(dn.uid, loadedDirectoryEntry?.first()?.directoryEntryBase?.dn?.uid)
 
@@ -55,7 +55,7 @@ class TestClient {
 
     @Test fun testCreateDirectoryEntry() {
 
-        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-tools-123456890")
+        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-cli-123456890")
         baseDirectoryEntry.domainID = listOf("gematik_test", TestClient::class.qualifiedName!!)
         baseDirectoryEntry.displayName = "Uniklinik Entenhausen"
         baseDirectoryEntry.organization = "Comics Krankenhaus"
@@ -79,7 +79,7 @@ class TestClient {
         logger.info { "Created directory entry: ${dn}" }
 
         val updateDirectoryEntry = UpdateBaseDirectoryEntry(
-            //telematikID = "vzd-testsuite-123456890",
+            //telematikID = "vzd-cli-123456890",
             displayName = "Uniklinik Entenhausen (modified)",
             domainID = directoryEntry.directoryEntryBase!!.domainID,
             postalCode = "54321",

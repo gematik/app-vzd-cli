@@ -37,7 +37,7 @@ class Client {
             expectSuccess = false
             install(Logging) {
                 logger = Logger.DEFAULT
-                level = LogLevel.ALL
+                level = LogLevel.NONE
             }
             install(Auth) {
                 bearer {
