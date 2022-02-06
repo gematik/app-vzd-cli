@@ -1,6 +1,5 @@
 package vzd.tools.directoryadministration
 
-import de.gematik.pki.certificate.Admission
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -8,13 +7,19 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import org.bouncycastle.asn1.ASN1Encodable
+import org.bouncycastle.asn1.ASN1ObjectIdentifier
+import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers
+import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax
+import org.bouncycastle.asn1.x500.DirectoryString
+import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.util.encoders.Base64
-import java.lang.UnsupportedOperationException
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.stream.Collectors
 
 /**
  * Information about the admisstionStatement in the X509 Certificate
@@ -91,8 +96,8 @@ fun CertificateDataDER.toCertificateInfo(): CertificateInfo {
             .toLocalDateTime())
     }
 
-    var admission = Admission(cert)
-    var admissionInfo = AdmissionStatementInfo(
+    val admission = Admission(cert)
+    val admissionInfo = AdmissionStatementInfo(
         admissionAuthority = admission.admissionAuthority,
         professionItems = admission.professionItems,
         professionOids = admission.professionOids,
@@ -120,10 +125,76 @@ object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
 
     override fun serialize(encoder: Encoder, value: CertificateDataDER) {
         val surrogate = value.toCertificateInfo()
-        encoder.encodeSerializableValue(CertificateInfo.serializer(), surrogate);
+        encoder.encodeSerializableValue(CertificateInfo.serializer(), surrogate)
     }
 
     override fun deserialize(decoder: Decoder): CertificateDataDER {
         throw UnsupportedOperationException()
     }
+}
+
+/**
+ * Port of gematik Java class to Kotlin.
+ */
+class Admission(x509EeCert: X509Certificate) {
+    private val asn1Admission: ASN1Encodable
+
+    init {
+        asn1Admission = X509CertificateHolder(x509EeCert.encoded)
+            .extensions
+            .getExtensionParsedValue(ISISMTTObjectIdentifiers.id_isismtt_at_admission)
+    }
+
+    /**
+     * Reading admission authority
+     *
+     * @return String of the admission authority or an empty string if not present
+     */
+    val admissionAuthority: String
+        get() {
+            return try {
+                AdmissionSyntax.getInstance(asn1Admission).admissionAuthority.name.toString()
+            } catch (e: NullPointerException) {
+                ""
+            }
+        }
+
+    /**
+     * Reading profession items
+     *
+     * @return Non duplicate list of profession items of the first profession info of the first admission in the certificate
+     */
+    val professionItems: Set<String>
+        get() = Arrays.stream(
+            AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos[0]
+                .professionItems
+        )
+            .map { obj: DirectoryString -> obj.getString() }
+            .collect(Collectors.toSet())
+
+    /**
+     * Reading profession oid's
+     *
+     * @return Non duplicate list of profession oid's of the first profession info of the first admission in the certificate
+     */
+    val professionOids: Set<String>
+        get() {
+            return Arrays.stream(
+                AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions.get(0).professionInfos.get(
+                    0
+                ).professionOIDs
+            )
+                .map { obj: ASN1ObjectIdentifier -> obj.getId() }
+                .collect(Collectors.toSet())
+        }
+
+    /**
+     * Reading registration number
+     *
+     * @return String of the registration number of the first profession info of the first admission in the certificate
+     */
+    val registrationNumber: String
+        get() {
+            return AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos[0].registrationNumber
+        }
 }

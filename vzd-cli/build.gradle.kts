@@ -1,5 +1,5 @@
 val ktor_version = "2.0.0-beta-1"
-version = "0.6.0-alpha"
+version = "0.6.1-alpha"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -34,8 +34,7 @@ dependencies {
 
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
-
-    implementation("de.gematik.pki:gemLibPki:0.5.2")
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")

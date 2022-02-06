@@ -14,7 +14,6 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import java.lang.UnsupportedOperationException
 
 private val logger = KotlinLogging.logger {}
 
@@ -23,7 +22,7 @@ class VZDResponseException(response: HttpResponse, message: String) :
 
     val details: String
     get() {
-        var details = "Bad response: ${response}"
+        var details = "Bad response: $response"
 
         val reason = response.headers["RS-DIRECTORY-ADMIN-ERROR"]
         if ( reason != null ) {
@@ -32,7 +31,7 @@ class VZDResponseException(response: HttpResponse, message: String) :
 
         val body: String? = if (reason == null) runBlocking { response.body() } else null
         if (body != null && body.isNotEmpty()) {
-            details += " Body: ${body}"
+            details += " Body: $body"
         }
 
         return details
@@ -44,13 +43,12 @@ class VZDResponseException(response: HttpResponse, message: String) :
  * Directory Administration API Client
  * @see <a href="https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml">Directory Administration Open API</a>
  */
-class Client {
-    private val config: Configuration = Configuration();
+class Client(block: Configuration.() -> Unit = {}) {
+    private val config: Configuration = Configuration()
     private val http: HttpClient
 
-    constructor(block: Configuration.() -> Unit = {}) {
+    init {
         block(this.config)
-
         this.http = HttpClient(CIO) {
             expectSuccess = false
             install(Logging) {
@@ -131,7 +129,7 @@ class Client {
             return null
         }
 
-        return response.body();
+        return response.body()
     }
 
     /**
@@ -163,9 +161,11 @@ class Client {
     /**
      * Implements POST /DirectoryEntries/{uid}/Certificates (add_Directory_Entry_Certificate)
      */
+    /*
     suspend fun addDirectoryEntryCertificate() {
         TODO()
     }
+    */
 
     /**
      * Implements GET /DirectoryEntries/Certificates (read_Directory_Certificates)
@@ -182,15 +182,17 @@ class Client {
             return null
         }
 
-        return response.body();
+        return response.body()
     }
 
     /**
      * Implements DELETE /DirectoryEntries/{uid}/Certificates/{certificateEntryID} (delete_Directory_Entry_Certificate)
      */
+    /*
     suspend fun deleteDirectoryEntryCertificate() {
         TODO()
     }
+    */
 }
 
 
