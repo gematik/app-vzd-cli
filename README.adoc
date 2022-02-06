@@ -1,6 +1,78 @@
-= 🗂️ Werkzeuge für TI Verzeichnisdienst
+= 🗂️ `vzd-cli`: Command Line Client für Verzeichnisdienste der TI 
+:toc: auto
 
-Dieses Repository enthält diverse Werkzeuge für Test und Betrieb des https://github.com/gematik/api-vzd[TI Verzeichnisdienstes]
+`vzd-cli` wurde in Vorbereitung der Migration des gematik Verzeichnisdienstes (VZD) von LDAP nach FHIR entwickelt. Über ein modernes CLI (Command Line Interface) können neue und alte Schnittstellen des VZD genutzt werden.
+
+`vzd-cli` wurde komplett in Kotlin entwickelt und ist basiert auf wunderbaren https://ajalt.github.io/clikt/[Clikt-Bibliothek].
+
+
+== Installation
+
+1. Download link:releases/latest/[Latest Release] von `vzd-cli` von github.
+2. ``vzd-cli-<VERSION>.zip`` extrahieren 
+3. Die Skripte in bin/ benutzen um `vzd-cli` zu starten
+
+[source, bash]
+----
+$ bin/vzd-cli --help
+Usage: vzd-cli [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --env FILENAME  specify env file
+  --version       Show the version and exit
+  -h, --help      Show this message and exit
+
+Commands:
+  admin  CLI for DirectoryAdministration API
+
+$ bin/vzd-cli admin --help
+Usage: vzd-cli admin [OPTIONS] COMMAND [ARGS]...
+
+  CLI for DirectoryAdministration API
+
+  Commands require following environment variables:
+
+  - ADMIN_API_URL
+  - ADMIN_AUTH_URL, ADMIN_CLIENT_ID, ADMIN_CLIENT_SECRET
+  - ... or ADMIN_ACCESS_TOKEN
+
+Options:
+  -h, --help  Show this message and exit
+
+Commands:
+  info         Show information about the API
+  auth         Perform authentication
+  list         List directory entries
+  add          Add new directory entry
+  load-base    Load the base entry for editing.
+  modify-base  Modify base directory entry
+  delete       Delete specified directory entries
+  list-cert    List certificates
+  add-cert     Add certificate
+  delete-cert  Delete certificates
+----
+
+== Configuration
+
+Die globale Konfiguration für die Aufrufe des  `vzd-cli` erfolgt über die Umgebungsvariablen.
+
+|===
+|Variable | Beschreibung 
+|`ADMIN_API_URL`
+| URL des Directory Administration API Endpoints 
+
+|`ADMIN_AUTH_URL` +
+`ADMIN_CLIENT_ID` +
+`ADMIN_CLIENT_SECRET`
+| Authentisierunginformation 
+
+|`ADMIN_ACCESS_TOKEN`
+| Alternativ kann Access-Token als Umgebungsvariable gesetzt werden. Dadurch können mehrere Aufrufe des Clients ohne expliziten Authentisierung durchgeführt werden.
+
+Benutzt <<cmd-admin-auth,admin auth>> um den Token zu besorgen.
+
+|===
+
 
 .Authentisiert und speichert den ACCESS_TOKEN in die Umgebungsvariable 
 [source=bash]
@@ -8,3 +80,7 @@ Dieses Repository enthält diverse Werkzeuge für Test und Betrieb des https://g
 export ADMIN_ACCESS_TOKEN=`./vzd-cli --env=.env.ru admin auth`
 ----
 
+[#cmd-admin-auth]
+=== `admin auth`
+
+Authentisiert den Client und gibt `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client Aufrufe keine erneute explizite Authentisierung durchführen müssen.
