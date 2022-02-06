@@ -86,7 +86,7 @@ class TestClient {
             holder = listOf("gematik_test")
         );
 
-        runBlocking { client?.modifyDirectoryEntry(dn!!.uid, updateDirectoryEntry) }
+        runBlocking { client?.modifyDirectoryEntry(dn.uid, updateDirectoryEntry) }
 
     }
 
