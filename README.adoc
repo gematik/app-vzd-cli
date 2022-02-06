@@ -5,7 +5,6 @@
 
 `vzd-cli` wurde komplett in Kotlin entwickelt und ist basiert auf wunderbaren https://ajalt.github.io/clikt/[Clikt-Bibliothek].
 
-
 == Installation
 
 1. Download link:https://github.com/spilikin/app-vzd-cli/releases[Latest Release] von `vzd-cli` von github.
@@ -24,6 +23,16 @@ Options:
 
 Commands:
   admin  CLI for DirectoryAdministration API
+----
+
+== Schnellstart
+
+Aufbau der CLI folgt aktuellen Best-Practices analog z.B. zu Docker, Kubernetes, Helm.
+
+.Suche den Einträge mit spezifischen telematikID und zeige es als YAML
+[source,bash]
+----
+bin/vzd-cli admin list --query telematikID=5-SMC-B-Testkarte-883110000092568 --output=yaml
 ----
 
 == `admin`: CLI für Directory Administration 
