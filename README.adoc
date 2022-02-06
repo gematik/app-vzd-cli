@@ -12,7 +12,7 @@
 2. ``vzd-cli-<VERSION>.zip`` extrahieren 
 3. Die Skripte in bin/ benutzen um `vzd-cli` zu starten
 
-[source, bash]
+[source]
 ----
 $ bin/vzd-cli --help
 Usage: vzd-cli [OPTIONS] COMMAND [ARGS]...
