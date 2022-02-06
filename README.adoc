@@ -8,7 +8,7 @@
 
 == Installation
 
-1. Download link:releases/latest/[Latest Release] von `vzd-cli` von github.
+1. Download link:https://github.com/spilikin/app-vzd-cli/releases[Latest Release] von `vzd-cli` von github.
 2. ``vzd-cli-<VERSION>.zip`` extrahieren 
 3. Die Skripte in bin/ benutzen um `vzd-cli` zu starten
 
