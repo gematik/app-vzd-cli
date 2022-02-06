@@ -38,7 +38,7 @@ Commands:
 |`ADMIN_AUTH_URL` +
 `ADMIN_CLIENT_ID` +
 `ADMIN_CLIENT_SECRET`
-| Authentisierunginformation 
+| Authentisierungsinformation 
 
 |`ADMIN_ACCESS_TOKEN`
 | Alternativ kann Access-Token als Umgebungsvariable gesetzt werden. Dadurch können mehrere Aufrufe des Clients ohne expliziten Authentisierung durchgeführt werden.
@@ -78,6 +78,16 @@ export ADMIN_ACCESS_TOKEN=`bin/vzd-cli --env=.env.ru admin auth`
 [#cmd-admin-list]
 === `admin list`
 
+|===
+| Option | Beschreibung
+
+| `--query` oder `-Q`
+| Setzt einen Query-Parameter bei der Suche der Einträge über die API. Kann mehrfach angegeben werden um die Parameter zu kombinieren.
+
+Die Liste von gültigen Parametern kann aus https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml[DirectoryAdministration API] entnommen werden (s. `read_Directory_Entry`)
+
+|===
+
 Suche und Anzeige von Verzeichnisdiensteinträgen.
 
 [#cmd-admin-add]
@@ -91,7 +101,7 @@ Neuen Verzeichnisdiensteintrag erstellen.
 Lädt einen Basiseintrag als JSON. Die geladene Struktur kann als Datei gespeichert, bearbeitet und mit `admin modify-base` modifiziert werden.
 
 [#cmd-admin-modify-base]
-=== ⚠️ `admin modify-base`
+=== `admin modify-base`
 
 Modifiziert einen Basiseintrag im Verzeichnisdienst.
 
