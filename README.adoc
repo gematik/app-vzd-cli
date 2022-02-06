@@ -24,37 +24,11 @@ Options:
 
 Commands:
   admin  CLI for DirectoryAdministration API
-
-$ bin/vzd-cli admin --help
-Usage: vzd-cli admin [OPTIONS] COMMAND [ARGS]...
-
-  CLI for DirectoryAdministration API
-
-  Commands require following environment variables:
-
-  - ADMIN_API_URL
-  - ADMIN_AUTH_URL, ADMIN_CLIENT_ID, ADMIN_CLIENT_SECRET
-  - ... or ADMIN_ACCESS_TOKEN
-
-Options:
-  -h, --help  Show this message and exit
-
-Commands:
-  info         Show information about the API
-  auth         Perform authentication
-  list         List directory entries
-  add          Add new directory entry
-  load-base    Load the base entry for editing.
-  modify-base  Modify base directory entry
-  delete       Delete specified directory entries
-  list-cert    List certificates
-  add-cert     Add certificate
-  delete-cert  Delete certificates
 ----
 
-== Configuration
+== `admin`: CLI für Directory Administration 
 
-Die globale Konfiguration für die Aufrufe des  `vzd-cli` erfolgt über die Umgebungsvariablen.
+=== Configuration
 
 |===
 |Variable | Beschreibung 
