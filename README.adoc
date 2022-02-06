@@ -49,6 +49,7 @@ Benutzt <<cmd-admin-auth,admin auth>> um den Token zu besorgen.
 
 Die Umgebungsvariablen können in einer `.env` Datei gespeichert werden. Hier ist ein Beispiel für die Referenzumgebung:
 
+[source,bash]
 ----
 ADMIN_API_URL=https://vzdpflege-ref.vzd.ti-dienste.de:9543/
 ADMIN_AUTH_URL=https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token
@@ -66,10 +67,55 @@ bin/vzd-cli --env ../.env.ru admin ...
 [#cmd-admin-auth]
 === `admin auth`
 
-Authentisiert den Client und gibt `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client Aufrufe keine erneute explizite Authentisierung durchführen müssen.
+Authentisiert den Client und gibt `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client-Aufrufe keine erneute explizite Authentisierung durchführen müssen.
 
 .Authentisiert und speichert den ACCESS_TOKEN in die Umgebungsvariable 
 [source=bash]
 ----
 export ADMIN_ACCESS_TOKEN=`bin/vzd-cli --env=.env.ru admin auth`
 ----
+
+[#cmd-admin-list]
+=== `admin list`
+
+Suche und Anzeige von Verzeichnisdiensteinträgen.
+
+[#cmd-admin-add]
+=== ⚠️ `admin add`
+
+Neuen Verzeichnisdiensteintrag erstellen.
+
+[#cmd-admin-load-base]
+=== `admin load-base`
+
+Lädt einen Basiseintrag als JSON. Die geladene Struktur kann als Datei gespeichert, bearbeitet und mit `admin modify-base` modifiziert werden.
+
+[#cmd-admin-modify-base]
+=== ⚠️ `admin modify-base`
+
+Modifiziert einen Basiseintrag im Verzeichnisdienst.
+
+[#cmd-admin-delete]
+=== ⚠️ `admin delete`
+
+Löscht Einträge aus dem Verzeichnisdienst.
+
+[#cmd-admin-list-cert]
+=== ⚠️ `admin list-cert`
+
+Suche und Anzeige von X509-Zertifikaten.
+
+[#cmd-admin-add-cert]
+=== ⚠️ `admin add-cert`
+
+WARNING: Nicht implementiert
+
+Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinzu.
+
+[#cmd-admin-delete-cert]
+=== ⚠️ `admin delete-cert`
+
+WARNING: Nicht implementiert
+
+Löscht einen X509-Zertifikat.
+
