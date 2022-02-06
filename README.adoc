@@ -3,8 +3,6 @@
 
 `vzd-cli` wurde in Vorbereitung der Migration des gematik Verzeichnisdienstes (VZD) von LDAP nach FHIR entwickelt. Über ein modernes CLI (Command Line Interface) können neue und alte Schnittstellen des VZD genutzt werden.
 
-`vzd-cli` wurde komplett in Kotlin entwickelt und ist basiert auf wunderbaren https://ajalt.github.io/clikt/[Clikt-Bibliothek].
-
 == Installation
 
 1. Download link:https://github.com/spilikin/app-vzd-cli/releases[Latest Release] von `vzd-cli` von github.
