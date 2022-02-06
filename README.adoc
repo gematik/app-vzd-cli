@@ -81,7 +81,7 @@ export ADMIN_ACCESS_TOKEN=`bin/vzd-cli --env=.env.ru admin auth`
 Suche und Anzeige von Verzeichnisdiensteinträgen.
 
 [#cmd-admin-add]
-=== ⚠️ `admin add`
+=== `admin add`
 
 Neuen Verzeichnisdiensteintrag erstellen.
 
@@ -96,24 +96,24 @@ Lädt einen Basiseintrag als JSON. Die geladene Struktur kann als Datei gespeich
 Modifiziert einen Basiseintrag im Verzeichnisdienst.
 
 [#cmd-admin-delete]
-=== ⚠️ `admin delete`
+=== `admin delete`
 
 Löscht Einträge aus dem Verzeichnisdienst.
 
 [#cmd-admin-list-cert]
-=== ⚠️ `admin list-cert`
+=== `admin list-cert`
 
 Suche und Anzeige von X509-Zertifikaten.
 
 [#cmd-admin-add-cert]
-=== ⚠️ `admin add-cert`
+=== `admin add-cert`
 
 WARNING: Nicht implementiert
 
 Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinzu.
 
 [#cmd-admin-delete-cert]
-=== ⚠️ `admin delete-cert`
+=== `admin delete-cert`
 
 WARNING: Nicht implementiert
 
