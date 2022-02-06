@@ -42,7 +42,7 @@ class ListCertificates: CliktCommand(name = "list-cert", help="List certificates
         help="Specify query parameters to find matching entries").associate()
     private val client by requireObject<Client>();
 
-    override fun run() {
+    override fun run() = catching {
         if (params.isEmpty()) {
             throw UsageError("Specify at least one query parameter")
         }
@@ -55,13 +55,13 @@ class ListCertificates: CliktCommand(name = "list-cert", help="List certificates
 
 class AddCertificate: CliktCommand(name = "add-cert", help="Add certificate") {
     private val client by requireObject<Client>();
-    override fun run() {
+    override fun run() = catching {
         TODO("Not yet implemented")
     }
 }
 
 class DeleteCertificates: CliktCommand(name = "delete-cert", help="Delete certificates") {
-    override fun run() {
+    override fun run() = catching {
         TODO("Not yet implemented")
     }
 }

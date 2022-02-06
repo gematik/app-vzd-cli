@@ -1,5 +1,5 @@
 val ktor_version = "2.0.0-beta-1"
-version = "0.5.0-alpha"
+version = "0.6.0-alpha"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.

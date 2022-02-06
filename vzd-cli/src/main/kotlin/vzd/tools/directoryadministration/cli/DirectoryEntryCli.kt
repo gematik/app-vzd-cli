@@ -37,12 +37,12 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
     private val showRawCert by option("--cert-raw",
         help="Show raw certificate data instead of text summary").flag()
     private val client by requireObject<Client>();
-    override fun run() {
-        val result: List<DirectoryEntry>?
-        if (sync) {
-            result = runBlocking {  client.readDirectoryEntryForSync( params ) }
+
+    override fun run() = catching {
+        val result: List<DirectoryEntry>? = if (sync) {
+            runBlocking {  client.readDirectoryEntryForSync( params ) }
         } else {
-            result = runBlocking {  client.readDirectoryEntry( params ) }
+            runBlocking {  client.readDirectoryEntry( params ) }
         }
 
         DirectoryEntryOutputMapping[output]?.invoke(result, showRawCert)
@@ -55,7 +55,8 @@ class LoadBaseDirectoryEntry: CliktCommand(name = "load-base", help="Load the ba
         help="Specify query parameters to find matching entries").associate()
     private val sync by option(help="use Sync mode").flag()
     private val client by requireObject<Client>();
-    override fun run() {
+
+    override fun run() = catching {
         val result: List<DirectoryEntry>?
         if (sync) {
             result = runBlocking {  client.readDirectoryEntryForSync( params ) }
