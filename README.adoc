@@ -81,7 +81,7 @@ Authentisiert den Client und gibt `ACCESS_TOKEN` zurück. Token kann danach in d
 .Authentisiert und speichert den ACCESS_TOKEN in die Umgebungsvariable 
 [source=bash]
 ----
-export ADMIN_ACCESS_TOKEN=`bin/vzd-cli --env=.env.ru admin auth`
+export ADMIN_ACCESS_TOKEN=`bin/vzd-cli admin auth`
 ----
 
 [#cmd-admin-list]
