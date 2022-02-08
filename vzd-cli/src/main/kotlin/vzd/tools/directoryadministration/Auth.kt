@@ -2,6 +2,7 @@ package vzd.tools.directoryadministration
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
@@ -31,10 +32,16 @@ data class TokenResponse (
     val refresh_token: String
 )
 
-class ClientCredentialsAuthenticator(private val authURL: String) {
+class ClientCredentialsAuthenticator(private val authURL: String, private val httpProxyUrl: String? ) {
     fun authenticate(clientId: String, clientSecret: String): BearerTokens {
         logger.debug { "Authenticating at: $authURL, client_id: $clientId"}
         val authClient = HttpClient(CIO) {
+            httpProxyUrl?.let {
+                engine {
+                    logger.debug { "Using proxy: ${it}" }
+                    proxy = ProxyBuilder.http(it)
+                }
+            }
             install(Logging) {
                 logger = Logger.DEFAULT
                 level = LogLevel.NONE
@@ -70,3 +77,4 @@ class ClientCredentialsAuthenticator(private val authURL: String) {
         return BearerTokens(tokenResponse.access_token, tokenResponse.refresh_token)
     }
 }
+

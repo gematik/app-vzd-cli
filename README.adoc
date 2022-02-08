@@ -27,10 +27,10 @@ Commands:
 
 Aufbau der CLI folgt aktuellen Best-Practices analog z.B. zu Docker, Kubernetes, Helm.
 
-.Suche den Einträge mit spezifischen telematikID und zeige es als YAML
+.Suche einem Eintrag mit spezifischen telematikID
 [source,bash]
 ----
-bin/vzd-cli admin list --query telematikID=5-SMC-B-Testkarte-883110000092568 --output=yaml
+bin/vzd-cli admin list --query telematikID=5-SMC-B-Testkarte-883110000092568
 ----
 
 == `admin`: CLI für Directory Administration 
@@ -52,6 +52,9 @@ bin/vzd-cli admin list --query telematikID=5-SMC-B-Testkarte-883110000092568 --o
 
 Benutzt <<cmd-admin-auth,admin auth>> um den Token zu besorgen.
 
+|`HTTP_PROXY_URL`
+| Optional: URL zum HTTP-Proxy, z.B.: `http://192.168.110.10:3128/`
+
 |===
 
 Die Umgebungsvariablen können in einer `.env` Datei gespeichert werden. Hier ist ein Beispiel für die Referenzumgebung:
@@ -68,7 +71,7 @@ Standardmäßig wird die Datei mit Namen `.env` im aktuellen Arbeitsverzeichnis 
 
 [source,bash]
 ----
-bin/vzd-cli --env ../.env.ru admin ...
+bin/vzd-cli --env ../.env.ru admin list
 ----
 
 [#cmd-admin-auth]

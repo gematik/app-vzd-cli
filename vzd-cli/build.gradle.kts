@@ -1,5 +1,5 @@
-val ktor_version = "2.0.0-beta-1"
-version = "0.6.1-alpha"
+val ktorVersion = "2.0.0-beta-1"
+version = "0.7.0-beta"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -24,12 +24,12 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:2.1.21")
     implementation("ch.qos.logback:logback-classic:1.2.9")
     implementation("io.github.cdimascio:dotenv-kotlin:6.2.2")
-    implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-cio:$ktor_version")
-    implementation("io.ktor:ktor-client-logging:$ktor_version")
-    implementation("io.ktor:ktor-client-auth:$ktor_version")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion")
+    implementation("io.ktor:ktor-client-auth:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("net.mamoe.yamlkt:yamlkt:0.10.2")
 
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
@@ -49,3 +49,7 @@ tasks.shadowDistZip { archiveBaseName.set("vzd-cli") }
 tasks.distZip.configure { enabled = false  }
 tasks.distTar.configure { enabled = false }
 tasks.shadowDistTar.configure { enabled = false }
+
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
+}

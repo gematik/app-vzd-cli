@@ -2,6 +2,7 @@ package vzd.tools.directoryadministration
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
@@ -26,7 +27,7 @@ class VZDResponseException(response: HttpResponse, message: String) :
 
         val reason = response.headers["RS-DIRECTORY-ADMIN-ERROR"]
         if ( reason != null ) {
-            details += " Reason: reason"
+            details += " Reason: $reason"
         }
 
         val body: String? = if (reason == null) runBlocking { response.body() } else null
@@ -43,13 +44,19 @@ class VZDResponseException(response: HttpResponse, message: String) :
  * Directory Administration API Client
  * @see <a href="https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml">Directory Administration Open API</a>
  */
-class Client(block: Configuration.() -> Unit = {}) {
-    private val config: Configuration = Configuration()
+class Client(block: ClientConfiguration.() -> Unit = {}) {
+    private val config: ClientConfiguration = ClientConfiguration()
     private val http: HttpClient
 
     init {
         block(this.config)
         this.http = HttpClient(CIO) {
+            engine {
+                config.httpProxyURL?.let {
+                    logger.debug { "Using proxy: $it" }
+                    proxy = ProxyBuilder.http(it)
+                }
+            }
             expectSuccess = false
             install(Logging) {
                 logger = Logger.DEFAULT
@@ -74,7 +81,10 @@ class Client(block: Configuration.() -> Unit = {}) {
             defaultRequest {
                 url(config.apiURL)
             }
+
         }
+
+        logger.debug { "Client created ${config.apiURL}" }
     }
 
     /**
@@ -129,6 +139,10 @@ class Client(block: Configuration.() -> Unit = {}) {
             return null
         }
 
+        if (response.status != HttpStatusCode.OK) {
+            throw VZDResponseException(response, "No entries found")
+        }
+
         return response.body()
     }
 
@@ -138,7 +152,7 @@ class Client(block: Configuration.() -> Unit = {}) {
     suspend fun getInfo(): InfoObject {
         val response = http.get("/")
         if (response.status != HttpStatusCode.OK) {
-            throw VZDResponseException(response, "Unable to get info: ${response.body<String>()}")
+            throw VZDResponseException(response, "Unable to get info}")
         }
 
         return response.body()
@@ -196,7 +210,8 @@ class Client(block: Configuration.() -> Unit = {}) {
 }
 
 
-class Configuration {
+class ClientConfiguration {
     var apiURL = ""
     var loadTokens: suspend () -> BearerTokens? = { null }
+    var httpProxyURL: String? = null
 }
