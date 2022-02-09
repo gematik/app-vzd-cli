@@ -26,7 +26,7 @@ fun catching(throwingBlock: () -> Unit = {}) {
     }
 }
 
-class CommandContext(val client: Client, val output: String)
+class CommandContext(val client: Client, val output: String, var firstCommand: Boolean = true)
 
 class DirectoryAdministrationCli : CliktCommand(name="admin", allowMultipleSubcommands = true, help="""CLI for DirectoryAdministration API
 

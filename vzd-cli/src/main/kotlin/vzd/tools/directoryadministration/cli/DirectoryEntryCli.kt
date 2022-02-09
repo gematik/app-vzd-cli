@@ -1,17 +1,21 @@
 package vzd.tools.directoryadministration.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
+import io.ktor.utils.io.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.*
-import java.io.File
+import java.io.*
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.typeOf
@@ -26,7 +30,38 @@ val DirectoryEntryOutputMapping = mapOf(
             println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
         }
     },
+    "csv" to {value: List<DirectoryEntry>?, _: Boolean ->
+        value?.forEach {
+            println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
+        }
+    },
 )
+
+fun csvHeaders(): List<String> {
+    return listOf(
+        "Query",
+        "TelematikID",
+        "displayName",
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "stateOrProvinceName",
+        "certificateCount",
+    )
+}
+
+fun toCsv(query: Map<String, String>, entry: DirectoryEntry?): List<String?> {
+    return listOf(
+        query.toString(),
+        entry?.directoryEntryBase?.telematikID,
+        entry?.directoryEntryBase?.displayName,
+        entry?.directoryEntryBase?.streetAddress,
+        entry?.directoryEntryBase?.postalCode,
+        entry?.directoryEntryBase?.localityName,
+        entry?.directoryEntryBase?.stateOrProvinceName,
+        entry?.userCertificates?.size.toString(),
+    )
+}
 
 class ListDirectoryEntries: CliktCommand(name = "list", help="List directory entries") {
     private val query: Map<String, String> by option("-Q", "--query",
@@ -43,7 +78,22 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
             runBlocking {  context.client.readDirectoryEntry( query ) }
         }
 
-        DirectoryEntryOutputMapping[context.output]?.invoke(result, showRawCert)
+        if (context.output == "csv") {
+            val out = ByteArrayOutputStream()
+            val writer = csvWriter()
+            if (context.firstCommand) {
+                context.firstCommand = false
+                writer.writeAll(listOf(csvHeaders()), out)
+            }
+
+            result?.forEach {
+                writer.writeAll(listOf(toCsv(query, it)), out)
+            }
+            print(String(out.toByteArray(), Charsets.UTF_8))
+        } else {
+            DirectoryEntryOutputMapping[context.output]?.invoke(result, showRawCert)
+        }
+
     }
 
 }

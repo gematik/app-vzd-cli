@@ -1,5 +1,5 @@
 val ktorVersion = "2.0.0-beta-1"
-version = "0.7.0-beta"
+version = "0.7.0-alpha"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -31,6 +31,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("net.mamoe.yamlkt:yamlkt:0.10.2")
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0")
 
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
