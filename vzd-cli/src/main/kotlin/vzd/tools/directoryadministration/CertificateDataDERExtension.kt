@@ -118,22 +118,6 @@ fun CertificateDataDER.toCertificateInfo(): CertificateInfo {
 }
 
 /**
- * Special Serializer to display the textual summary of the X509Certificate
- */
-object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: CertificateDataDER) {
-        val surrogate = value.toCertificateInfo()
-        encoder.encodeSerializableValue(CertificateInfo.serializer(), surrogate)
-    }
-
-    override fun deserialize(decoder: Decoder): CertificateDataDER {
-        throw UnsupportedOperationException()
-    }
-}
-
-/**
  * Port of gematik Java class to Kotlin.
  */
 class Admission(x509EeCert: X509Certificate) {

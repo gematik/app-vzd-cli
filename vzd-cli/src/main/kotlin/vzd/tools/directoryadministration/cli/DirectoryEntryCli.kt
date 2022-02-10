@@ -1,74 +1,71 @@
 package vzd.tools.directoryadministration.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
-import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.choice
-import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
-import io.ktor.utils.io.*
+import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.*
-import java.io.*
+import java.io.File
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.typeOf
 
 private val logger = KotlinLogging.logger {}
 
-val DirectoryEntryOutputMapping = mapOf(
-    "yaml" to { value: List<DirectoryEntry>?, showRawCert: Boolean -> printYaml(value, showRawCert) },
-    "json" to { value: List<DirectoryEntry>?, showRawCert: Boolean -> printJson(value, showRawCert) },
-    "list" to { value: List<DirectoryEntry>?, _: Boolean ->
-        value?.forEach {
-            println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
-        }
-    },
-    "csv" to {value: List<DirectoryEntry>?, _: Boolean ->
-        value?.forEach {
-            println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
-        }
-    },
+val CsvHeaders = listOf(
+    "Query",
+    "TelematikID",
+    "displayName",
+    "streetAddress",
+    "postalCode",
+    "localityName",
+    "stateOrProvinceName",
+    "certificateCount",
 )
 
-fun csvHeaders(): List<String> {
-    return listOf(
-        "Query",
-        "TelematikID",
-        "displayName",
-        "streetAddress",
-        "postalCode",
-        "localityName",
-        "stateOrProvinceName",
-        "certificateCount",
-    )
-}
 
-fun toCsv(query: Map<String, String>, entry: DirectoryEntry?): List<String?> {
-    return listOf(
-        query.toString(),
-        entry?.directoryEntryBase?.telematikID,
-        entry?.directoryEntryBase?.displayName,
-        entry?.directoryEntryBase?.streetAddress,
-        entry?.directoryEntryBase?.postalCode,
-        entry?.directoryEntryBase?.localityName,
-        entry?.directoryEntryBase?.stateOrProvinceName,
-        entry?.userCertificates?.size.toString(),
-    )
-}
+val DirectoryEntryOutputMapping = mapOf(
+    "yaml" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYamlOptimized(value) },
+    "json" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJson(value) },
+    "json-ext" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJsonOptimized(value) },
+    "list" to { _: Map<String, String>, value: List<DirectoryEntry>? ->
+        value?.forEach {
+            println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
+        }
+    },
+    "csv" to {query: Map<String, String>, value: List<DirectoryEntry>? ->
+
+        value?.forEach {
+            Output.printCsv(listOf(
+                query.toString(),
+                it.directoryEntryBase.telematikID,
+                it.directoryEntryBase.displayName,
+                it.directoryEntryBase.streetAddress,
+                it.directoryEntryBase.postalCode,
+                it.directoryEntryBase.localityName,
+                it.directoryEntryBase.stateOrProvinceName,
+                it.userCertificates?.size.toString(),
+            ))
+        }
+
+        if (value == null || value.isEmpty()) {
+            Output.printCsv(listOf(query.toString(), "Not Found"))
+        }
+
+    },
+)
 
 class ListDirectoryEntries: CliktCommand(name = "list", help="List directory entries") {
     private val query: Map<String, String> by option("-Q", "--query",
         help="Specify query parameters to find matching entries").associate()
     private val sync by option(help="use Sync mode").flag()
-    private val showRawCert by option("--cert-raw",
-        help="Show raw certificate data instead of text summary").flag()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
@@ -79,20 +76,16 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
         }
 
         if (context.output == "csv") {
-            val out = ByteArrayOutputStream()
-            val writer = csvWriter()
             if (context.firstCommand) {
                 context.firstCommand = false
-                writer.writeAll(listOf(csvHeaders()), out)
+                Output.printCsv(CsvHeaders)
             }
-
-            result?.forEach {
-                writer.writeAll(listOf(toCsv(query, it)), out)
-            }
-            print(String(out.toByteArray(), Charsets.UTF_8))
-        } else {
-            DirectoryEntryOutputMapping[context.output]?.invoke(result, showRawCert)
         }
+
+        logger.debug { DirectoryEntryOutputMapping[context.output] }
+        logger.debug { result?.size }
+
+        DirectoryEntryOutputMapping[context.output]?.invoke(query, result)
 
     }
 
@@ -117,7 +110,7 @@ class LoadBaseDirectoryEntry: CliktCommand(name = "load-base", help="Load the ba
             throw UsageError("The query must return exactly one value. Got: ${result?.size}")
         }
 
-        echo( Json { prettyPrint=true }.encodeToString(result.first().directoryEntryBase))
+        Output.printJson(result.first().directoryEntryBase)
     }
 
 }
@@ -182,7 +175,7 @@ class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry"
             logger.debug { "Loading file: $file" }
             Json.decodeFromString(File(file.toString()).readText(Charsets.UTF_8))
         } else {
-            val telematikID: String = attrs.get("telematikID") ?: throw UsageError("Option --set telematikID or --file is required")
+            val telematikID: String = attrs["telematikID"] ?: throw UsageError("Option --set telematikID or --file is required")
             val baseDirectoryEntry = BaseDirectoryEntry(
                 telematikID = telematikID,
                 domainID = listOf("vzd-cli")
@@ -193,7 +186,6 @@ class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry"
         setAttributes(directoryEntry.directoryEntryBase, attrs)
 
         logger.debug { "Creating new directory entry with telematikID: ${directoryEntry.directoryEntryBase?.telematikID}" }
-        logger.debug(Json { prettyPrint = true }.encodeToString(directoryEntry))
 
         val dn = runBlocking {  context.client.addDirectoryEntry(directoryEntry) }
         echo(dn.uid)
