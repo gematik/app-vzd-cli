@@ -65,11 +65,10 @@ val DirectoryEntryOutputMapping = mapOf(
 class ListDirectoryEntries: CliktCommand(name = "list", help="List directory entries") {
     private val query: Map<String, String> by option("-Q", "--query",
         help="Specify query parameters to find matching entries").associate()
-    private val sync by option(help="use Sync mode").flag()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
-        val result: List<DirectoryEntry>? = if (sync) {
+        val result: List<DirectoryEntry>? = if (context.syncMode) {
             runBlocking {  context.client.readDirectoryEntryForSync( query ) }
         } else {
             runBlocking {  context.client.readDirectoryEntry( query ) }

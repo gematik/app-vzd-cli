@@ -14,6 +14,7 @@ import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.CertificateDataDER
 import vzd.tools.directoryadministration.CertificateInfo
+import vzd.tools.directoryadministration.DistinguishedName
 import vzd.tools.directoryadministration.toCertificateInfo
 import java.io.ByteArrayOutputStream
 
@@ -33,15 +34,33 @@ object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
     }
 }
 
-val printerSerializersModule = SerializersModule {
+/**
+ * Human friendly serializer for DN
+ */
+object DistinguishedNameSerializer: KSerializer<DistinguishedName> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("DistinguishedName", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: DistinguishedName) {
+        var str = "uid=${value.uid}"
+        encoder.encodeString(str)
+    }
+
+    override fun deserialize(decoder: Decoder): DistinguishedName {
+        throw UnsupportedOperationException()
+    }
+}
+
+
+val optimizedSerializersModule = SerializersModule {
     contextual(CertificateDataDERInfoSerializer)
+    contextual(DistinguishedNameSerializer)
 }
 
 object Output {
-    private val yamlOptimized = Yaml { serializersModule = printerSerializersModule }
+    private val yamlOptimized = Yaml { serializersModule = optimizedSerializersModule }
     private val jsonOptimized = Json {
         prettyPrint = true
-        serializersModule = printerSerializersModule
+        serializersModule = optimizedSerializersModule
     }
     private val json = Json {
         prettyPrint = true

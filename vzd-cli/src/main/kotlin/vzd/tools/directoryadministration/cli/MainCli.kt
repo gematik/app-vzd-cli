@@ -2,6 +2,7 @@ package vzd.tools.directoryadministration.cli
 
 import com.github.ajalt.clikt.core.*
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import io.github.cdimascio.dotenv.Dotenv
@@ -26,7 +27,12 @@ fun catching(throwingBlock: () -> Unit = {}) {
     }
 }
 
-class CommandContext(val client: Client, val output: String, var firstCommand: Boolean = true)
+class CommandContext(
+    val client: Client,
+    val output: String,
+    val syncMode: Boolean=false,
+    var firstCommand: Boolean = true,
+)
 
 class DirectoryAdministrationCli : CliktCommand(name="admin", allowMultipleSubcommands = true, help="""CLI for DirectoryAdministration API
 
@@ -42,6 +48,7 @@ Commands require following environment variables:
     private val dotenv by requireObject<Dotenv>()
     private val output by option(help="How the entries should be displayed")
         .choice("human", "json", "yaml", "csv", "list").default("human")
+    private val sync by option(help="use Sync mode").flag()
     override fun run() = catching {
 
         val client = Client {
@@ -64,10 +71,10 @@ Commands require following environment variables:
                 }
             }
 
-            httpProxyURL = dotenv.get("HTTP_PROXY_URL", output)
+            httpProxyURL = dotenv.get("HTTP_PROXY_URL", null)
         }
 
-        currentContext.obj = CommandContext(client, output)
+        currentContext.obj = CommandContext(client, output, syncMode = sync)
     }
     init {
         subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), AddDirectoryEntry(), LoadBaseDirectoryEntry(),

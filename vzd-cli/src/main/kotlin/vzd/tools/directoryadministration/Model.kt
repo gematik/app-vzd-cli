@@ -49,6 +49,7 @@ data class DistinguishedName(
 data class BaseDirectoryEntry(
     var telematikID: String,
     var cn: String? = null,
+    @Contextual
     var dn: DistinguishedName? = null,
     var givenName: String? = null,
     var sn: String? = null,
@@ -116,6 +117,7 @@ object CertificateDataDERSerializer : KSerializer<CertificateDataDER> {
 
 @Serializable
 data class UserCertificate(
+    @Contextual
     var dn: DistinguishedName? = null,
     var entryType: String? = null,
     var telematikID: String? = null,
@@ -128,6 +130,7 @@ data class UserCertificate(
 
 @Serializable
 data class FAD1(
+    @Contextual
     var dn: DistinguishedName,
     var mail: List<String>? = null,
     @SerialName("KOM-LE_Version")
@@ -136,6 +139,7 @@ data class FAD1(
 
 @Serializable
 data class Fachdaten (
+    @Contextual
     var dn: DistinguishedName,
     @SerialName("FAD1")
     var fad1: List<FAD1>? = null,
