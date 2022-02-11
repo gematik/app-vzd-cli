@@ -34,7 +34,7 @@ val CsvHeaders = listOf(
 
 
 val DirectoryEntryOutputMapping = mapOf(
-    "human" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYamlOptimized(value) },
+    "human" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printHuman(value) },
     "yaml" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYaml(value) },
     "json" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJson(value) },
     "list" to { _: Map<String, String>, value: List<DirectoryEntry>? ->

@@ -56,28 +56,22 @@ val optimizedSerializersModule = SerializersModule {
     contextual(DistinguishedNameSerializer)
 }
 
+/**
+ * Output helper class für human, json, yaml and csv outputs
+ */
 object Output {
     private val yamlOptimized = Yaml { serializersModule = optimizedSerializersModule }
-    val jsonOptimized = Json {
-        prettyPrint = true
-        serializersModule = optimizedSerializersModule
-    }
     val json = Json() {
         prettyPrint = true
     }
     private val csv = csvWriter()
 
-
-    fun printYamlOptimized(value: Any?) {
+    fun printHuman(value: Any?) {
         println(yamlOptimized.encodeToString(value))
     }
 
     fun printYaml(value: Any?) {
         println(Yaml.encodeToString(value))
-    }
-
-    inline fun <reified T>printJsonOptimized(value: T) {
-        println(jsonOptimized.encodeToString(value))
     }
 
     inline fun <reified T>printJson(value: T) {

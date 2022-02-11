@@ -14,7 +14,7 @@ import vzd.tools.directoryadministration.toCertificateInfo
 private val logger = KotlinLogging.logger {}
 
 val CertificateOutputMapping = mapOf(
-    "human" to { value: List<UserCertificate>? -> Output.printYamlOptimized(value) },
+    "human" to { value: List<UserCertificate>? -> Output.printHuman(value) },
     "yaml" to { value: List<UserCertificate>? -> Output.printYaml(value) },
     "json" to { value: List<UserCertificate>?-> Output.printJson(value) },
     "list" to { value: List<UserCertificate>? ->
