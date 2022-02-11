@@ -41,7 +41,7 @@ Commands require following environment variables:
 """.trimMargin()) {
     private val dotenv by requireObject<Dotenv>()
     private val output by option(help="How the entries should be displayed")
-        .choice("json", "yaml", "csv", "list").default("yaml")
+        .choice("human", "json", "yaml", "csv", "list").default("human")
     override fun run() = catching {
 
         val client = Client {

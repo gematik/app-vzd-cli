@@ -4,9 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.associate
-import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.choice
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import vzd.tools.directoryadministration.Client
@@ -16,15 +14,17 @@ import vzd.tools.directoryadministration.toCertificateInfo
 private val logger = KotlinLogging.logger {}
 
 val CertificateOutputMapping = mapOf(
-    "yaml" to { value: List<UserCertificate>? -> Output.printYamlOptimized(value) },
+    "human" to { value: List<UserCertificate>? -> Output.printYamlOptimized(value) },
+    "yaml" to { value: List<UserCertificate>? -> Output.printYaml(value) },
     "json" to { value: List<UserCertificate>?-> Output.printJson(value) },
-    "json-ext" to { value: List<UserCertificate>?-> Output.printJsonOptimized(value) },
     "list" to { value: List<UserCertificate>? ->
         value?.forEach {
             val cert = it.userCertificate?.toCertificateInfo()
             println("${it.dn?.uid} ${it.telematikID} ${it.entryType} ${cert?.publicKeyAlgorithm} ${cert?.subject}")
         }
     },
+    "csv" to { value: List<UserCertificate>?-> TODO("Not implemented") },
+
 )
 
 class ListCertificates: CliktCommand(name = "list-cert", help="List certificates") {

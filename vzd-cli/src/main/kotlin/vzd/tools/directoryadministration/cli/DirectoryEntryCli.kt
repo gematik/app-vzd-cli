@@ -32,9 +32,9 @@ val CsvHeaders = listOf(
 
 
 val DirectoryEntryOutputMapping = mapOf(
-    "yaml" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYamlOptimized(value) },
+    "human" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYamlOptimized(value) },
+    "yaml" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYaml(value) },
     "json" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJson(value) },
-    "json-ext" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJsonOptimized(value) },
     "list" to { _: Map<String, String>, value: List<DirectoryEntry>? ->
         value?.forEach {
             println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
