@@ -15,6 +15,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import kotlin.math.log
 
 private val logger = KotlinLogging.logger {}
 
@@ -57,10 +58,18 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
                     proxy = ProxyBuilder.http(it)
                 }
             }
+
             expectSuccess = false
+
+            val l = logger;
+
             install(Logging) {
                 logger = Logger.DEFAULT
-                level = LogLevel.INFO
+                if (l.isDebugEnabled) {
+                    level = LogLevel.ALL
+                } else if (l.isInfoEnabled) {
+                    level = LogLevel.INFO
+                }
             }
             install(Auth) {
                 bearer {

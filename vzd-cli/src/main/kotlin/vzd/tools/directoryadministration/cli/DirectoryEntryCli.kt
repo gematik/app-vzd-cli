@@ -3,6 +3,8 @@ package vzd.tools.directoryadministration.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -61,6 +63,17 @@ val DirectoryEntryOutputMapping = mapOf(
 
     },
 )
+class ListDirectoryEntriesByTelematikIds: CliktCommand(name = "list-tid", help="List directory entries with given TelematikIDs") {
+    private val telematikIDs by argument(name="TELEMATIK_ID", help = "Liste der Telematik IDs").multiple(required = true)
+    val context by requireObject<CommandContext>()
+    override fun run() = catching {
+        telematikIDs.forEach {
+            ListDirectoryEntries().run(mapOf("telematikID" to it), context)
+        }
+    }
+
+
+}
 
 class ListDirectoryEntries: CliktCommand(name = "list", help="List directory entries") {
     private val query: Map<String, String> by option("-Q", "--query",
@@ -68,6 +81,10 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
+        run(query, context)
+    }
+
+    fun run(query: Map<String, String>, context: CommandContext) {
         val result: List<DirectoryEntry>? = if (context.syncMode) {
             runBlocking {  context.client.readDirectoryEntryForSync( query ) }
         } else {
@@ -81,11 +98,7 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
             }
         }
 
-        logger.debug { DirectoryEntryOutputMapping[context.output] }
-        logger.debug { result?.size }
-
         DirectoryEntryOutputMapping[context.output]?.invoke(query, result)
-
     }
 
 }

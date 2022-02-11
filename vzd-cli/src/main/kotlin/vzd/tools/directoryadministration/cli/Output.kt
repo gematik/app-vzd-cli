@@ -58,11 +58,11 @@ val optimizedSerializersModule = SerializersModule {
 
 object Output {
     private val yamlOptimized = Yaml { serializersModule = optimizedSerializersModule }
-    private val jsonOptimized = Json {
+    val jsonOptimized = Json {
         prettyPrint = true
         serializersModule = optimizedSerializersModule
     }
-    private val json = Json {
+    val json = Json() {
         prettyPrint = true
     }
     private val csv = csvWriter()
@@ -76,17 +76,17 @@ object Output {
         println(Yaml.encodeToString(value))
     }
 
-    fun printJsonOptimized(value: Any?) {
+    inline fun <reified T>printJsonOptimized(value: T) {
         println(jsonOptimized.encodeToString(value))
     }
 
-    fun printJson(value: Any?) {
+    inline fun <reified T>printJson(value: T) {
         println(json.encodeToString(value))
     }
 
     fun printCsv(value: List<Any?>) {
         val out = ByteArrayOutputStream()
         csv.writeAll(listOf(value), out)
-        println(String(out.toByteArray(), Charsets.UTF_8))
+        print(String(out.toByteArray(), Charsets.UTF_8))
     }
 }
