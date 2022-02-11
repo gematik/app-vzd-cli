@@ -32,7 +32,6 @@ val CsvHeaders = listOf(
     "certificateCount",
 )
 
-
 val DirectoryEntryOutputMapping = mapOf(
     "human" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printHuman(value) },
     "yaml" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYaml(value) },

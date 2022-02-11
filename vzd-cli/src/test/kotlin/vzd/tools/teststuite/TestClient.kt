@@ -5,8 +5,10 @@ import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import vzd.tools.directoryadministration.*
-import kotlin.math.log
+import vzd.tools.directoryadministration.BaseDirectoryEntry
+import vzd.tools.directoryadministration.Client
+import vzd.tools.directoryadministration.CreateDirectoryEntry
+import vzd.tools.directoryadministration.UpdateBaseDirectoryEntry
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,7 +27,7 @@ class TestClient {
             loadTokens = { BearerTokens(dotenv["ADMIN_ACCESS_TOKEN"], "") }
         }
 
-        var entries = runBlocking { client?.readDirectoryEntry(mapOf("domainID" to TestClient::class.qualifiedName!!) ) }
+        val entries = runBlocking { client?.readDirectoryEntry(mapOf("domainID" to TestClient::class.qualifiedName!!) ) }
         entries?.forEach {
             if (it.directoryEntryBase.telematikID.startsWith("vzd-cli")) {
                 logger.debug { "Deleting ${it.directoryEntryBase}" }
@@ -36,7 +38,7 @@ class TestClient {
 
     @Test fun testCreateWithOnlyTelematikID() {
 
-        var entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID") ) }
+        val entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID") ) }
         entries?.forEach {
             runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }
             return
@@ -59,7 +61,7 @@ class TestClient {
         baseDirectoryEntry.domainID = listOf("gematik_test", TestClient::class.qualifiedName!!)
         baseDirectoryEntry.displayName = "Uniklinik Entenhausen"
         baseDirectoryEntry.organization = "Comics Krankenhaus"
-        baseDirectoryEntry.countryCode = "DE";
+        baseDirectoryEntry.countryCode = "DE"
         baseDirectoryEntry.localityName = "Entenhausen"
         baseDirectoryEntry.stateOrProvinceName = "Bayern"
         baseDirectoryEntry.postalCode = "12345"
@@ -84,7 +86,7 @@ class TestClient {
             domainID = directoryEntry.directoryEntryBase!!.domainID,
             postalCode = "54321",
             holder = listOf("gematik_test")
-        );
+        )
 
         runBlocking { client?.modifyDirectoryEntry(dn.uid, updateDirectoryEntry) }
 

@@ -1,12 +1,6 @@
 package vzd.tools.directoryadministration
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers
@@ -153,7 +147,7 @@ class Admission(x509EeCert: X509Certificate) {
             AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos[0]
                 .professionItems
         )
-            .map { obj: DirectoryString -> obj.getString() }
+            .map { obj: DirectoryString -> obj.string }
             .collect(Collectors.toSet())
 
     /**
@@ -164,11 +158,9 @@ class Admission(x509EeCert: X509Certificate) {
     val professionOids: Set<String>
         get() {
             return Arrays.stream(
-                AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions.get(0).professionInfos.get(
-                    0
-                ).professionOIDs
+                AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos[0].professionOIDs
             )
-                .map { obj: ASN1ObjectIdentifier -> obj.getId() }
+                .map { obj: ASN1ObjectIdentifier -> obj.id }
                 .collect(Collectors.toSet())
         }
 

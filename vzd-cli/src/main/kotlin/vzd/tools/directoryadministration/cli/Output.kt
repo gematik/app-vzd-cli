@@ -41,8 +41,7 @@ object DistinguishedNameSerializer: KSerializer<DistinguishedName> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("DistinguishedName", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: DistinguishedName) {
-        var str = "uid=${value.uid}"
-        encoder.encodeString(str)
+        encoder.encodeString("uid=${value.uid}")
     }
 
     override fun deserialize(decoder: Decoder): DistinguishedName {
@@ -61,7 +60,7 @@ val optimizedSerializersModule = SerializersModule {
  */
 object Output {
     private val yamlOptimized = Yaml { serializersModule = optimizedSerializersModule }
-    val json = Json() {
+    val json = Json {
         prettyPrint = true
     }
     private val csv = csvWriter()

@@ -7,7 +7,6 @@ import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import vzd.tools.directoryadministration.Client
 import vzd.tools.directoryadministration.UserCertificate
 import vzd.tools.directoryadministration.toCertificateInfo
 
@@ -23,14 +22,14 @@ val CertificateOutputMapping = mapOf(
             println("${it.dn?.uid} ${it.telematikID} ${it.entryType} ${cert?.publicKeyAlgorithm} ${cert?.subject}")
         }
     },
-    "csv" to { value: List<UserCertificate>?-> TODO("Not implemented") },
+    "csv" to { _: List<UserCertificate>? -> TODO("Not implemented") },
 
 )
 
 class ListCertificates: CliktCommand(name = "list-cert", help="List certificates") {
     private val params: Map<String, String> by option("-Q", "--query",
         help="Specify query parameters to find matching entries").associate()
-    private val context by requireObject<CommandContext>();
+    private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
         if (params.isEmpty()) {
@@ -44,7 +43,6 @@ class ListCertificates: CliktCommand(name = "list-cert", help="List certificates
 }
 
 class AddCertificate: CliktCommand(name = "add-cert", help="Add certificate") {
-    private val client by requireObject<Client>();
     override fun run() = catching {
         TODO("Not yet implemented")
     }
