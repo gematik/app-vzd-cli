@@ -66,7 +66,9 @@ object Output {
     private val csv = csvWriter()
 
     fun printHuman(value: Any?) {
-        println(yamlOptimized.encodeToString(value))
+        value?.let {
+            println(yamlOptimized.encodeToString(value))
+        }
     }
 
     fun printYaml(value: Any?) {

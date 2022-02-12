@@ -4,7 +4,7 @@ import com.github.ajalt.clikt.core.*
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.choice
+import com.github.ajalt.clikt.parameters.options.switch
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
@@ -27,9 +27,13 @@ fun catching(throwingBlock: () -> Unit = {}) {
     }
 }
 
+enum class OutputFormat {
+    HUMAN, JSON, YAML, CSV, SHORT
+}
+
 class CommandContext(
     val client: Client,
-    val output: String,
+    val outputFormat: OutputFormat,
     val syncMode: Boolean=false,
     var firstCommand: Boolean = true,
 )
@@ -46,8 +50,14 @@ Commands require following environment variables:
 ``` 
 """.trimMargin()) {
     private val dotenv by requireObject<Dotenv>()
-    private val output by option(help="How the entries should be displayed")
-        .choice("human", "json", "yaml", "csv", "list").default("human")
+    private val outputFormat by option().switch(
+        "--human" to  OutputFormat.HUMAN,
+        "--json" to OutputFormat.JSON,
+        "--yaml" to OutputFormat.YAML,
+        "--csv" to OutputFormat.CSV,
+        "--short" to OutputFormat.SHORT,
+    ).default(OutputFormat.HUMAN)
+
     private val sync by option(help="use Sync mode").flag()
     override fun run() = catching {
 
@@ -74,10 +84,10 @@ Commands require following environment variables:
             httpProxyURL = dotenv.get("HTTP_PROXY_URL", null)
         }
 
-        currentContext.obj = CommandContext(client, output, syncMode = sync)
+        currentContext.obj = CommandContext(client, outputFormat, syncMode = sync)
     }
     init {
-        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), ListDirectoryEntriesByTelematikIds(), AddDirectoryEntry(), LoadBaseDirectoryEntry(),
+        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), AddDirectoryEntry(), LoadBaseDirectoryEntry(),
             ModifyBaseDirectoryEntry(), DeleteDiectoryEntry(), ListCertificates(), AddCertificate(), DeleteCertificates())
     }
 

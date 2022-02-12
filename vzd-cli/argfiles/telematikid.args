@@ -1,6 +1,0 @@
---env=.env.ru
-admin
-list
---sync
---output=yaml
---query telematikID=3-vzd-cli-Test-Apotheke-001

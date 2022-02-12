@@ -13,21 +13,21 @@ import vzd.tools.directoryadministration.toCertificateInfo
 private val logger = KotlinLogging.logger {}
 
 val CertificateOutputMapping = mapOf(
-    "human" to { value: List<UserCertificate>? -> Output.printHuman(value) },
-    "yaml" to { value: List<UserCertificate>? -> Output.printYaml(value) },
-    "json" to { value: List<UserCertificate>?-> Output.printJson(value) },
-    "list" to { value: List<UserCertificate>? ->
+    OutputFormat.HUMAN to { value: List<UserCertificate>? -> Output.printHuman(value) },
+    OutputFormat.YAML to { value: List<UserCertificate>? -> Output.printYaml(value) },
+    OutputFormat.JSON to { value: List<UserCertificate>?-> Output.printJson(value) },
+    OutputFormat.SHORT to { value: List<UserCertificate>? ->
         value?.forEach {
             val cert = it.userCertificate?.toCertificateInfo()
             println("${it.dn?.uid} ${it.telematikID} ${it.entryType} ${cert?.publicKeyAlgorithm} ${cert?.subject}")
         }
     },
-    "csv" to { _: List<UserCertificate>? -> TODO("Not implemented") },
+    OutputFormat.CSV to { _: List<UserCertificate>? -> TODO("Not implemented") },
 
 )
 
 class ListCertificates: CliktCommand(name = "list-cert", help="List certificates") {
-    private val params: Map<String, String> by option("-Q", "--query",
+    private val params: Map<String, String> by option("-q", "--query",
         help="Specify query parameters to find matching entries").associate()
     private val context by requireObject<CommandContext>()
 
@@ -38,7 +38,7 @@ class ListCertificates: CliktCommand(name = "list-cert", help="List certificates
 
         val result = runBlocking { context.client.readDirectoryCertificates(params) }
 
-        CertificateOutputMapping[context.output]?.invoke(result)
+        CertificateOutputMapping[context.outputFormat]?.invoke(result)
     }
 }
 

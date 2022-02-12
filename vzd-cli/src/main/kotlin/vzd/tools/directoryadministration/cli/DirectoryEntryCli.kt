@@ -1,20 +1,26 @@
 package vzd.tools.directoryadministration.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.pair
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import vzd.tools.directoryadministration.*
+import vzd.tools.directoryadministration.BaseDirectoryEntry
+import vzd.tools.directoryadministration.CreateDirectoryEntry
+import vzd.tools.directoryadministration.DirectoryEntry
+import vzd.tools.directoryadministration.UpdateBaseDirectoryEntry
 import java.io.File
+import kotlin.io.path.Path
+import kotlin.io.path.exists
+import kotlin.io.path.useLines
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.typeOf
@@ -33,15 +39,15 @@ val CsvHeaders = listOf(
 )
 
 val DirectoryEntryOutputMapping = mapOf(
-    "human" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printHuman(value) },
-    "yaml" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYaml(value) },
-    "json" to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJson(value) },
-    "list" to { _: Map<String, String>, value: List<DirectoryEntry>? ->
+    OutputFormat.HUMAN to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printHuman(value) },
+    OutputFormat.YAML to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYaml(value) },
+    OutputFormat.JSON to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJson(value) },
+    OutputFormat.SHORT to { _: Map<String, String>, value: List<DirectoryEntry>? ->
         value?.forEach {
             println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
         }
     },
-    "csv" to {query: Map<String, String>, value: List<DirectoryEntry>? ->
+    OutputFormat.CSV to {query: Map<String, String>, value: List<DirectoryEntry>? ->
 
         value?.forEach {
             Output.printCsv(listOf(
@@ -62,48 +68,50 @@ val DirectoryEntryOutputMapping = mapOf(
 
     },
 )
-class ListDirectoryEntriesByTelematikIds: CliktCommand(name = "list-tid", help="List directory entries with given TelematikIDs") {
-    private val telematikIDs by argument(name="TELEMATIK_ID", help = "Liste der Telematik IDs").multiple(required = true)
-    val context by requireObject<CommandContext>()
-    override fun run() = catching {
-        telematikIDs.forEach {
-            ListDirectoryEntries().run(mapOf("telematikID" to it), context)
-        }
-    }
-
-
-}
 
 class ListDirectoryEntries: CliktCommand(name = "list", help="List directory entries") {
-    private val query: Map<String, String> by option("-Q", "--query",
+    private val paramFile: Pair<String, String>? by option("-f", "--param-file",
+        help="Read parameter values from file", metavar = "PARAM FILENAME").pair()
+    private val params: Map<String, String> by option("-p", "--param",
         help="Specify query parameters to find matching entries").associate()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
-        run(query, context)
-    }
-
-    fun run(query: Map<String, String>, context: CommandContext) {
-        val result: List<DirectoryEntry>? = if (context.syncMode) {
-            runBlocking {  context.client.readDirectoryEntryForSync( query ) }
-        } else {
-            runBlocking {  context.client.readDirectoryEntry( query ) }
+        paramFile?.let { paramFile ->
+            val file = Path(paramFile.second)
+            if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
+            file.useLines { line ->
+                line.forEach {
+                    runQuery(params + Pair(paramFile.first, it), context)
+                }
+            }
+        } ?: run {
+            runQuery(params, context)
         }
 
-        if (context.output == "csv") {
+    }
+
+    fun runQuery(params: Map<String, String>, context: CommandContext) {
+        val result: List<DirectoryEntry>? = if (context.syncMode) {
+            runBlocking {  context.client.readDirectoryEntryForSync( params ) }
+        } else {
+            runBlocking {  context.client.readDirectoryEntry( params ) }
+        }
+
+        if (context.outputFormat == OutputFormat.CSV) {
             if (context.firstCommand) {
                 context.firstCommand = false
                 Output.printCsv(CsvHeaders)
             }
         }
 
-        DirectoryEntryOutputMapping[context.output]?.invoke(query, result)
+        DirectoryEntryOutputMapping[context.outputFormat]?.invoke(params, result)
     }
 
 }
 
 class LoadBaseDirectoryEntry: CliktCommand(name = "load-base", help="Load the base entry for editing.") {
-    private val params: Map<String, String> by option("-Q", "--query",
+    private val params: Map<String, String> by option("-p", "--param",
         help="Specify query parameters to find matching entries").associate()
     private val sync by option(help="use Sync mode").flag()
     private val context by requireObject<CommandContext>()
