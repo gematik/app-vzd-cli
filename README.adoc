@@ -1,4 +1,4 @@
-= 🗂️ `vzd-cli`: Command Line Client für Verzeichnisdienste der TI 
+= 🗂️ `vzd-cli`: Command Line Client für Verzeichnisdienst der TI 
 :toc: auto
 
 `vzd-cli` wurde in Vorbereitung der Migration des gematik Verzeichnisdienstes (VZD) von LDAP nach FHIR entwickelt. Über ein modernes CLI (Command Line Interface) können neue und alte Schnittstellen des VZD genutzt werden.
@@ -27,10 +27,19 @@ Commands:
 
 Aufbau der CLI folgt aktuellen Best-Practices analog z.B. zu Docker, Kubernetes, Helm.
 
+.File namens `.env` im aktuellen Ordner anlegen:
+[source,bash]
+----
+ADMIN_API_URL=https://vzdpflege-ref.vzd.ti-dienste.de:9543/
+ADMIN_AUTH_URL=https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token
+ADMIN_CLIENT_ID=<client id>
+ADMIN_CLIENT_SECRET=<client secret>
+#HTTP_PROXY_URL=http://192.168.110.10:3128/
+----
 .Suche einem Eintrag mit spezifischen telematikID
 [source,bash]
 ----
-bin/vzd-cli admin list --query telematikID=5-SMC-B-Testkarte-883110000092568
+bin/vzd-cli admin list --param telematikID=5-SMC-B-Testkarte-883110000092568
 ----
 
 == `admin`: CLI für Directory Administration 
@@ -63,7 +72,7 @@ Die Umgebungsvariablen können in einer `.env` Datei gespeichert werden. Hier is
 ----
 ADMIN_API_URL=https://vzdpflege-ref.vzd.ti-dienste.de:9543/
 ADMIN_AUTH_URL=https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token
-ADMIN_CLIENT_ID=gematik_test
+ADMIN_CLIENT_ID=<client id>
 ADMIN_CLIENT_SECRET=<secret>
 ----
 
