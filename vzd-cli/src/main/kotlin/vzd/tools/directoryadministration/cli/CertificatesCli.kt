@@ -7,27 +7,60 @@ import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import vzd.tools.directoryadministration.DirectoryEntry
 import vzd.tools.directoryadministration.UserCertificate
 import vzd.tools.directoryadministration.toCertificateInfo
 
 private val logger = KotlinLogging.logger {}
 
+private val CsvHeaders = listOf(
+    "query",
+    "uid",
+    "telematikID",
+    "entryType",
+    "publicKeyAlgorithm",
+    "subject",
+    "notBefore",
+    "notAfter",
+)
+
 val CertificateOutputMapping = mapOf(
-    OutputFormat.HUMAN to { value: List<UserCertificate>? -> Output.printHuman(value) },
-    OutputFormat.YAML to { value: List<UserCertificate>? -> Output.printYaml(value) },
-    OutputFormat.JSON to { value: List<UserCertificate>?-> Output.printJson(value) },
-    OutputFormat.SHORT to { value: List<UserCertificate>? ->
+    OutputFormat.HUMAN to { _: Map<String, String>, value: List<UserCertificate>? -> Output.printHuman(value) },
+    OutputFormat.YAML to { _: Map<String, String>, value: List<UserCertificate>? -> Output.printYaml(value) },
+    OutputFormat.JSON to { _: Map<String, String>, value: List<UserCertificate>?-> Output.printJson(value) },
+    OutputFormat.SHORT to { _: Map<String, String>, value: List<UserCertificate>? ->
         value?.forEach {
             val cert = it.userCertificate?.toCertificateInfo()
             println("${it.dn?.uid} ${it.telematikID} ${it.entryType} ${cert?.publicKeyAlgorithm} ${cert?.subject}")
         }
     },
-    OutputFormat.CSV to { _: List<UserCertificate>? -> TODO("Not implemented") },
+    OutputFormat.CSV to {query: Map<String, String>, value: List<UserCertificate>? ->
+
+        value?.forEach {
+            val cert = it.userCertificate?.toCertificateInfo()
+            Output.printCsv(listOf(
+                query.toString(),
+                it.dn?.uid,
+                it.telematikID,
+                it.entryType,
+                cert?.publicKeyAlgorithm,
+                cert?.subject,
+                cert?.notBefore,
+                cert?.notAfter,
+
+            ))
+        }
+
+        if (value == null || value.isEmpty()) {
+            Output.printCsv(listOf(query.toString(), "Not Found"))
+        }
+
+    },
 
 )
 
 class ListCertificates: CliktCommand(name = "list-cert", help="List certificates") {
-    private val params: Map<String, String> by option("-q", "--query",
+    private val params: Map<String, String> by option("-p", "--param",
         help="Specify query parameters to find matching entries").associate()
     private val context by requireObject<CommandContext>()
 
@@ -38,7 +71,14 @@ class ListCertificates: CliktCommand(name = "list-cert", help="List certificates
 
         val result = runBlocking { context.client.readDirectoryCertificates(params) }
 
-        CertificateOutputMapping[context.outputFormat]?.invoke(result)
+        if (context.outputFormat == OutputFormat.CSV) {
+            if (context.firstCommand) {
+                context.firstCommand = false
+                Output.printCsv(CsvHeaders)
+            }
+        }
+
+        CertificateOutputMapping[context.outputFormat]?.invoke(params, result)
     }
 }
 

@@ -26,9 +26,9 @@ import kotlin.reflect.typeOf
 
 private val logger = KotlinLogging.logger {}
 
-val CsvHeaders = listOf(
-    "Query",
-    "TelematikID",
+private val CsvHeaders = listOf(
+    "query",
+    "telematikID",
     "displayName",
     "streetAddress",
     "postalCode",
