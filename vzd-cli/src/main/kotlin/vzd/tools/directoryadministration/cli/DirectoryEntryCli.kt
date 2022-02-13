@@ -265,7 +265,7 @@ class AddBaseDirectoryEntry: CliktCommand(name="add-base", help="Add new directo
             null
         }
 
-        val baseDirectoryEntry: BaseDirectoryEntry? = data?.let {
+        val baseDirectoryEntry: BaseDirectoryEntry = data?.let {
             when(context.outputFormat) {
                 OutputFormat.HUMAN, OutputFormat.YAML -> Yaml.decodeFromString(it)
                 OutputFormat.JSON -> Json.decodeFromString(it)
@@ -281,7 +281,7 @@ class AddBaseDirectoryEntry: CliktCommand(name="add-base", help="Add new directo
 
         setAttributes(baseDirectoryEntry, attrs)
 
-        logger.debug { "Creating new directory entry with telematikID: ${baseDirectoryEntry?.telematikID}" }
+        logger.debug { "Creating new directory entry with telematikID: ${baseDirectoryEntry.telematikID}" }
 
         val dn = runBlocking {  context.client.addDirectoryEntry(CreateDirectoryEntry(baseDirectoryEntry)) }
 
@@ -309,11 +309,9 @@ class ModifyBaseDirectoryEntry: CliktCommand(name="modify-base", help="Modify si
 
     override fun run() = catching {
 
-        val baseFromServer: BaseDirectoryEntry? = params?.let {
-            var result = runBlocking { context.client.readDirectoryEntry(params) }
-            result?.first()?.let {
-                it.directoryEntryBase
-            }
+        val baseFromServer: BaseDirectoryEntry? = params.let {
+            val result = runBlocking { context.client.readDirectoryEntry(params) }
+            result?.first()?.directoryEntryBase
         }
 
         logger.debug { "Data from server: $baseFromServer" }
