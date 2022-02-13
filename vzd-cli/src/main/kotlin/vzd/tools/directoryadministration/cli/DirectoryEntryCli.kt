@@ -81,16 +81,15 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
             if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
             file.useLines { line ->
                 line.forEach {
-                    runQuery(params + Pair(paramFile.first, it), context)
+                    runQuery(params + Pair(paramFile.first, it))
                 }
             }
         } ?: run {
-            runQuery(params, context)
+            runQuery(params)
         }
-
     }
 
-    private fun runQuery(params: Map<String, String>, context: CommandContext) {
+    private fun runQuery(params: Map<String, String>) {
         val result: List<DirectoryEntry>? = if (context.syncMode) {
             runBlocking {  context.client.readDirectoryEntryForSync( params ) }
         } else {
@@ -352,28 +351,5 @@ class ModifyBaseDirectoryEntry: CliktCommand(name="modify-base", help="Modify si
                 else -> throw UsageError("Cant load for editing in for format: ${context.outputFormat}")
             }
         }
-
-
-        /*
-
-
-         */
-        //
-
-        /*
-        if (file != null) {
-            val jsonData = if (file == "-") {
-                generateSequence(::readLine).joinToString("\n")
-            } else {
-
-            }
-            val baseDirectoryEntry = Json.decodeFromString<BaseDirectoryEntry>(jsonData)
-            val updateBaseDirectoryEntry = Json { ignoreUnknownKeys = true }.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
-            // arvato bug: when updating telematikID with no certificates the exception is thrown
-            //updateBaseDirectoryEntry.telematikID = null
-        } else {
-            throw UsageError("not implemented yet")
-        }
-         */
     }
 }
