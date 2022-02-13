@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.options.switch
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerializationException
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.Client
@@ -24,6 +25,8 @@ fun catching(throwingBlock: () -> Unit = {}) {
         throwingBlock()
     } catch (e: VZDResponseException) {
         throw CliktError(e.details)
+    } catch (e: SerializationException) {
+        throw CliktError(e.message)
     }
 }
 
@@ -87,7 +90,7 @@ Commands require following environment variables:
         currentContext.obj = CommandContext(client, outputFormat, syncMode = sync)
     }
     init {
-        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), AddDirectoryEntry(), LoadBaseDirectoryEntry(),
+        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), CommandTemplate(), AddDirectoryEntry(), LoadBaseDirectoryEntry(),
             ModifyBaseDirectoryEntry(), DeleteDiectoryEntry(), ListCertificates(), AddCertificate(), DeleteCertificates())
     }
 
@@ -102,7 +105,6 @@ class AuthenticateAdmin: CliktCommand(name="auth", help="Perform authentication"
         println (tokens.accessToken)
     }
 }
-
 
 class Info: CliktCommand(name="info", help="Show information about the API") {
     private val context by requireObject<CommandContext>()

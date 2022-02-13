@@ -1,11 +1,10 @@
-package vzd.tools.teststuite
+package vzd.teststuite.admin
 
 import org.bouncycastle.util.encoders.Base64
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import kotlin.test.Test
 import kotlin.test.assertEquals
-
 
 class TestCert {
     @Test fun testCertificateParsing() {

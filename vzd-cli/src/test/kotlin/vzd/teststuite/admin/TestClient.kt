@@ -1,5 +1,4 @@
-package vzd.tools.teststuite
-
+package vzd.teststuite.admin
 
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.plugins.auth.providers.*

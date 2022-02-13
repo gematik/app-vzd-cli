@@ -1,12 +1,12 @@
 val ktorVersion = "2.0.0-beta-1"
-version = "0.7.0-alpha"
+version = "0.8.0-alpha"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     kotlin("jvm").version("1.6.10")
     kotlin("plugin.serialization").version("1.6.10")
     id("com.github.johnrengelman.shadow").version("7.1.2")
-
+    // id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
@@ -31,6 +31,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("net.mamoe.yamlkt:yamlkt:0.10.2")
+
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0")
 
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
@@ -38,7 +39,9 @@ dependencies {
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+    //testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("io.kotest:kotest-runner-junit5:5.1.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.1.0")
 }
 
 application {
@@ -47,10 +50,14 @@ application {
 }
 
 tasks.shadowDistZip { archiveBaseName.set("vzd-cli") }
-tasks.distZip.configure { enabled = false  }
+tasks.distZip.configure { enabled = false }
 tasks.distTar.configure { enabled = false }
 tasks.shadowDistTar.configure { enabled = false }
 
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

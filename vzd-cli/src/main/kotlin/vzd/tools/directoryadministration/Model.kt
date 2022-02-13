@@ -40,9 +40,9 @@ data class InfoObject(
 @Serializable
 data class DistinguishedName(
     var uid: String,
-    var dc: List<String>?,
-    var ou: List<String>?,
-    var cn: String?,
+    var dc: List<String>? = null,
+    var ou: List<String>? = null,
+    var cn: String? = null,
 )
 
 @Serializable

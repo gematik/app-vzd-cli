@@ -59,7 +59,13 @@ val optimizedSerializersModule = SerializersModule {
  * Output helper class für human, json, yaml and csv outputs
  */
 object Output {
-    private val yamlOptimized = Yaml { serializersModule = optimizedSerializersModule }
+    private val yamlOptimized = Yaml {
+        serializersModule = optimizedSerializersModule
+        encodeDefaultValues = false
+    }
+    private val yaml = Yaml {
+        encodeDefaultValues = false
+    }
     val json = Json {
         prettyPrint = true
     }
@@ -72,7 +78,7 @@ object Output {
     }
 
     fun printYaml(value: Any?) {
-        println(Yaml.encodeToString(value))
+        println(yaml.encodeToString(value))
     }
 
     inline fun <reified T>printJson(value: T) {
