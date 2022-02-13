@@ -90,7 +90,7 @@ Commands require following environment variables:
         currentContext.obj = CommandContext(client, outputFormat, syncMode = sync)
     }
     init {
-        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), CommandTemplate(), AddDirectoryEntry(), LoadBaseDirectoryEntry(),
+        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), CommandTemplate(), AddBaseDirectoryEntry(), LoadBaseDirectoryEntry(),
             ModifyBaseDirectoryEntry(), DeleteDiectoryEntry(), ListCertificates(), AddCertificate(), DeleteCertificates())
     }
 

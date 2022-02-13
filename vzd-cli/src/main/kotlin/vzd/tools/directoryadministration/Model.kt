@@ -49,7 +49,8 @@ data class DistinguishedName(
 data class BaseDirectoryEntry(
     var telematikID: String,
     var cn: String? = null,
-    @Contextual
+    //TODO: YAML decode is not working when I add this
+    //@Contextual
     var dn: DistinguishedName? = null,
     var givenName: String? = null,
     var sn: String? = null,

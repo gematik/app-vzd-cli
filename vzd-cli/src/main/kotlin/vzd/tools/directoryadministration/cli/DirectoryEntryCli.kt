@@ -176,6 +176,15 @@ class LoadBaseDirectoryEntry: CliktCommand(name = "load-base", help="Load the ba
         help="Specify query parameters to find matching entries").associate()
     private val context by requireObject<CommandContext>()
 
+    private val json = Json {
+        prettyPrint = true
+        encodeDefaults = true
+    }
+
+    private val yaml = Yaml {
+        encodeDefaultValues = true
+    }
+
     override fun run() = catching {
         val result = runBlocking {
             context.client.readDirectoryEntry(params)
@@ -186,11 +195,12 @@ class LoadBaseDirectoryEntry: CliktCommand(name = "load-base", help="Load the ba
         }
 
         when (context.outputFormat) {
-            OutputFormat.JSON -> Output.printJson(result.first().directoryEntryBase)
-            OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(result.first().directoryEntryBase)
+            OutputFormat.JSON -> println ( json.encodeToString(result.first().directoryEntryBase) )
+            OutputFormat.HUMAN, OutputFormat.YAML -> println ( yaml.encodeToString(result.first().directoryEntryBase) )
             else -> throw UsageError("Cant load for editing in for format: ${context.outputFormat}")
         }
     }
+
 }
 
 class DeleteDiectoryEntry: CliktCommand(name="delete", help="Delete specified directory entries") {
@@ -237,7 +247,7 @@ private fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<St
 
 }
 
-class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry") {
+class AddBaseDirectoryEntry: CliktCommand(name="add-base", help="Add new directory entry") {
     private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE",
         help="Set the attribute value in BaseDirectoryEntry.").associate()
     private val file: String? by option("--file", "-f", metavar = "FILENAME",
@@ -245,7 +255,6 @@ class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry"
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
-
         val data = if (file != null && file == "-") {
             logger.debug { "Loading from STDIN" }
             generateSequence(::readLine).joinToString("\n")
@@ -279,35 +288,94 @@ class AddDirectoryEntry: CliktCommand(name="add", help="Add new directory entry"
         logger.info("Created new DirectoryEntry: ${dn.uid}")
 
         val query = mapOf("uid" to dn.uid)
-        val directoryEntry = runBlocking {  context.client.readDirectoryEntry(query) }
+        val result = runBlocking {  context.client.readDirectoryEntry(query) }
 
-        DirectoryEntryOutputMapping[context.outputFormat]?.invoke(query, directoryEntry)
+        when (context.outputFormat) {
+            OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)
+            OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
+            else -> throw UsageError("Cant load for editing in for format: ${context.outputFormat}")
+        }
     }
 }
 
-class ModifyBaseDirectoryEntry: CliktCommand(name="modify-base", help="Modify base directory entry") {
-    private val query: Map<String, String> by option("-q", "--query", metavar = "PARAM=VALUE",
+class ModifyBaseDirectoryEntry: CliktCommand(name="modify-base", help="Modify single base directory entry") {
+    private val params: Map<String, String> by option("-p", "--param",
         help="Specify query parameters to find matching entries").associate()
     private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE",
         help="Set the attribute value in BaseDirectoryEntry.").associate()
-    private val file: String? by option("--file", "-f",
-        help="Read base directory entry from file. Use - to read data from STDIN.")
+    private val file: String? by option("--file", "-f", metavar = "FILENAME",
+        help="Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN")
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
+
+        val baseFromServer: BaseDirectoryEntry? = params?.let {
+            var result = runBlocking { context.client.readDirectoryEntry(params) }
+            result?.first()?.let {
+                it.directoryEntryBase
+            }
+        }
+
+        logger.debug { "Data from server: $baseFromServer" }
+
+        val baseFromFile: BaseDirectoryEntry? = file?.let {
+            when (it) {
+                "-" -> generateSequence(::readLine).joinToString("\n")
+                else -> File(file.toString()).readText(Charsets.UTF_8)
+            }
+        }?.let {
+            when(context.outputFormat) {
+                OutputFormat.HUMAN, OutputFormat.YAML -> Yaml.decodeFromString(it)
+                OutputFormat.JSON -> Json.decodeFromString(it)
+                else -> throw CliktError("Unsupported format: ${context.outputFormat}")
+            }
+        }
+
+        val baseToUpdate = baseFromFile ?: baseFromServer
+        val dn = baseFromServer?.dn ?: baseFromFile?.dn
+
+        logger.debug { "Data from file: $baseFromFile" }
+
+        setAttributes(baseToUpdate, attrs)
+
+        logger.debug { "Data will to send to server: $baseToUpdate" }
+
+        if (dn != null && baseToUpdate != null) {
+            val jsonData = Json.encodeToString(baseToUpdate)
+            val updateBaseDirectoryEntry = Json { ignoreUnknownKeys = true }.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
+            // server bug: when updating telematikID with no certificates the exception is thrown
+            updateBaseDirectoryEntry.telematikID = null
+            runBlocking { context.client.modifyDirectoryEntry(dn.uid, updateBaseDirectoryEntry) }
+            val result = runBlocking {  context.client.readDirectoryEntry(mapOf("uid" to dn.uid)) }
+
+            when (context.outputFormat) {
+                OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)
+                OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
+                else -> throw UsageError("Cant load for editing in for format: ${context.outputFormat}")
+            }
+        }
+
+
+        /*
+
+
+         */
+        //
+
+        /*
         if (file != null) {
             val jsonData = if (file == "-") {
                 generateSequence(::readLine).joinToString("\n")
             } else {
-                File(file.toString()).readText(Charsets.UTF_8)
+
             }
             val baseDirectoryEntry = Json.decodeFromString<BaseDirectoryEntry>(jsonData)
             val updateBaseDirectoryEntry = Json { ignoreUnknownKeys = true }.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
             // arvato bug: when updating telematikID with no certificates the exception is thrown
             //updateBaseDirectoryEntry.telematikID = null
-            runBlocking { context.client.modifyDirectoryEntry(baseDirectoryEntry.dn!!.uid, updateBaseDirectoryEntry) }
         } else {
             throw UsageError("not implemented yet")
         }
+         */
     }
 }
