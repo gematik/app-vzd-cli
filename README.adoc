@@ -100,12 +100,29 @@ export ADMIN_ACCESS_TOKEN=`bin/vzd-cli admin auth`
 |===
 | Option | Beschreibung
 
-| `--query` oder `-Q`
+| `--param` oder `-p`
 | Setzt einen Query-Parameter bei der Suche der Einträge über die API. Kann mehrfach angegeben werden um die Parameter zu kombinieren.
 
 Die Liste von gültigen Parametern kann aus https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml[DirectoryAdministration API] entnommen werden (s. `read_Directory_Entry`)
 
+| `--param-file` oder `-f`
+| List Werte eines Parameters aus der Datei und fragt für jeden Wert nach Eintrag im VZD ab. Die Datei soll den gewünschten Wert einmal pro Zeile enthalten:
+
+.`telematik.txt`
+----
+4-SMC-B-Testkarte-883110000093329
+3-SMC-B-Testkarte-883110000093294
+2-SMC-B-Testkarte-883110000093645
+3-SMCB-Testkarte-883110000092193
+----
+
+.Finde alle Einträge mit TelematikID aus `telematik.txt`
+---
+bin/vzd-cli admin --short list -f telematikID telematik.txt
+---
+
 |===
+
 
 Suche und Anzeige von Verzeichnisdiensteinträgen.
 
