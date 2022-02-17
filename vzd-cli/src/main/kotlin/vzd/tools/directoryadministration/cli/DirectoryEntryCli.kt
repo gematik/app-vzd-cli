@@ -72,7 +72,7 @@ class ListDirectoryEntries: CliktCommand(name = "list", help="List directory ent
     private val paramFile: Pair<String, String>? by option("-f", "--param-file",
         help="Read parameter values from file", metavar = "PARAM FILENAME").pair()
     private val params: Map<String, String> by option("-p", "--param",
-        help="Specify query parameters to find matching entries").associate()
+        help="Specify query parameters to find matching entries", metavar = "NAME=VALUE").associate()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {

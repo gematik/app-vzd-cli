@@ -40,6 +40,7 @@ data class CertificateInfo (
     val notBefore: String,
     val notAfter: String,
     val admissionStatement: AdmissionStatementInfo,
+    val der: String,
 )
 
 /**
@@ -108,6 +109,7 @@ fun CertificateDataDER.toCertificateInfo(): CertificateInfo {
         dateToString(cert.notBefore),
         dateToString(cert.notAfter),
         admissionInfo,
+        base64String
     )
 }
 
