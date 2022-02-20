@@ -10,7 +10,6 @@ import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import mu.KotlinLogging
-import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.Client
 import vzd.tools.directoryadministration.ClientCredentialsAuthenticator
 import vzd.tools.directoryadministration.VZDResponseException
@@ -90,8 +89,9 @@ Commands require following environment variables:
         currentContext.obj = CommandContext(client, outputFormat, syncMode = sync)
     }
     init {
-        subcommands(Info(), AuthenticateAdmin(), ListDirectoryEntries(), CommandTemplate(), AddBaseDirectoryEntry(), LoadBaseDirectoryEntry(),
-            ModifyBaseDirectoryEntry(), DeleteDiectoryEntry(), ListCertificates(), AddCertificate(), DeleteCertificates())
+        subcommands(Info(), AuthenticateAdmin(), ListCommand(), TempolateCommand(), AddBaseCommand(),
+            LoadBaseCommand(), ModifyBaseDirectoryEntry(), ModifyBaseAttrCommand(), DeleteCommand(),
+            ListCertificates(), AddCertificate(), DeleteCertificates())
     }
 
 }
@@ -111,7 +111,11 @@ class Info: CliktCommand(name="info", help="Show information about the API") {
 
     override fun run() = catching {
         val info = runBlocking { context.client.getInfo() }
-        println(Yaml{}.encodeToString(info))
+        when (context.outputFormat) {
+            OutputFormat.JSON -> Output.printJson(info)
+            OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(info)
+            else -> throw UsageError("Info is not available for format: ${context.outputFormat}")
+        }
     }
 
 }

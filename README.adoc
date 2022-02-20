@@ -83,6 +83,17 @@ Standardmäßig wird die Datei mit Namen `.env` im aktuellen Arbeitsverzeichnis 
 bin/vzd-cli --env ../.env.ru admin list
 ----
 
+[#cmd-admin-info]
+=== `admin info`
+
+Zeigt die Information über den VZD-Server und die API.
+
+[source,bash]
+----
+bin/vzd-cli info
+----
+
+
 [#cmd-admin-auth]
 === `admin auth`
 
@@ -122,20 +133,42 @@ bin/vzd-cli admin --short list -f telematikID telematik.txt
 
 Suche und Anzeige von Verzeichnisdiensteinträgen.
 
-[#cmd-admin-add]
-=== `admin add`
+[#cmd-admin-template]
+=== `admin template`
+
+Generiert die Dateivorlagen für `admin add` oder `admin modify` Befehle.
+
+.Beispiel: Erzeugt eine Vorlage und schreibt es in eine YAML-Datei 
+[source,bash]
+----
+bin/vzd-cli admin template base > Eintrag.yaml
+----
+
+.Beispiel: Erzeugt eine Vorlage und schreibt es in eine JSON-Datei 
+[source,bash]
+----
+bin/vzd-cli admin --json template base > Eintrag.json
+----
+
+[#cmd-admin-add-base]
+=== `admin add-base`
 
 Neuen Verzeichnisdiensteintrag erstellen.
 
 [#cmd-admin-load-base]
 === `admin load-base`
 
-Lädt einen Basiseintrag als JSON. Die geladene Struktur kann als Datei gespeichert, bearbeitet und mit `admin modify-base` modifiziert werden.
+Lädt einen Basiseintrag. Die geladene Struktur kann als Datei gespeichert werden, in einem Text-Editor bearbeitet und anschließend mit `admin modify-base` modifiziert werden.
 
 [#cmd-admin-modify-base]
 === `admin modify-base`
 
-Modifiziert einen Basiseintrag im Verzeichnisdienst.
+Modifiziert den gesamten Basiseintrag im Verzeichnisdienst.
+
+[#cmd-admin-modify-base-attr]
+=== `admin modify-base-attr`
+
+Modifiziert einzelne Attribute des Basiseintrags
 
 [#cmd-admin-delete]
 === `admin delete`

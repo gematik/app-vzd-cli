@@ -12,10 +12,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
-import vzd.tools.directoryadministration.CertificateDataDER
-import vzd.tools.directoryadministration.CertificateInfo
-import vzd.tools.directoryadministration.DistinguishedName
-import vzd.tools.directoryadministration.toCertificateInfo
+import vzd.tools.directoryadministration.*
 import java.io.ByteArrayOutputStream
 
 /**
@@ -69,7 +66,9 @@ object Output {
     val json = Json {
         prettyPrint = true
     }
-    private val csv = csvWriter()
+    private val csv = csvWriter {
+        delimiter = ';'
+    }
 
     fun printHuman(value: Any?) {
         value?.let {
@@ -91,3 +90,47 @@ object Output {
         print(String(out.toByteArray(), Charsets.UTF_8))
     }
 }
+
+val DirectoryEntryCsvHeaders = listOf(
+    "query",
+    "telematikID",
+    "displayName",
+    "streetAddress",
+    "postalCode",
+    "localityName",
+    "stateOrProvinceName",
+    "certificateCount",
+    "kimAdresses"
+)
+
+val DirectoryEntryOutputMapping = mapOf(
+    OutputFormat.HUMAN to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printHuman(value) },
+    OutputFormat.YAML to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYaml(value) },
+    OutputFormat.JSON to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJson(value) },
+    OutputFormat.SHORT to { _: Map<String, String>, value: List<DirectoryEntry>? ->
+        value?.forEach {
+            println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
+        }
+    },
+    OutputFormat.CSV to {query: Map<String, String>, value: List<DirectoryEntry>? ->
+
+        value?.forEach {
+            Output.printCsv(listOf(
+                query.toString(),
+                it.directoryEntryBase.telematikID.escape(),
+                it.directoryEntryBase.displayName,
+                it.directoryEntryBase.streetAddress,
+                it.directoryEntryBase.postalCode,
+                it.directoryEntryBase.localityName,
+                it.directoryEntryBase.stateOrProvinceName,
+                it.userCertificates?.size.toString(),
+                it.fachdaten?.let { it.mapNotNull { it.fad1 }.mapNotNull { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.joinToString()
+            ))
+        }
+
+        if (value == null || value.isEmpty()) {
+            Output.printCsv(listOf(query.toString(), "Not Found"))
+        }
+
+    },
+)
