@@ -1,47 +1,48 @@
-package vzd.tools.directoryadministration.cli
+package vzd.admin.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
-import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.BaseDirectoryEntry
 import vzd.tools.directoryadministration.UpdateBaseDirectoryEntry
-import java.io.File
 
-class ModifyBaseDirectoryEntry: CliktCommand(name="modify-base", help="Modify single base directory entry") {
+class ModifyBaseAttrCommand: CliktCommand(name="modify-base-attr", help="Modify specific attributes of a base entry") {
     private val logger = KotlinLogging.logger {}
-    private val file: String? by argument("FILENAME",
-        help="Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN")
+    private val params: Map<String, String> by option("-p", "--param",
+        help="Specify query parameters to find matching entries").associate()
+    private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE",
+        help="Set the attribute value in BaseDirectoryEntry.").associate()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
 
-        val baseFromFile: BaseDirectoryEntry? = file?.let {
-            when (it) {
-                "-" -> generateSequence(::readLine).joinToString("\n")
-                else -> File(file.toString()).readText(Charsets.UTF_8)
-            }
-        }?.let {
-            when(context.outputFormat) {
-                OutputFormat.HUMAN, OutputFormat.YAML -> Yaml.decodeFromString(it)
-                OutputFormat.JSON -> Json.decodeFromString(it)
-                else -> throw CliktError("Unsupported format: ${context.outputFormat}")
-            }
+        if (params.isEmpty()) {
+            throw UsageError("Please specify at least one query parameter")
         }
 
-        val baseToUpdate = baseFromFile
-        val dn = baseFromFile?.dn
+        val baseToUpdate: BaseDirectoryEntry? = params.let {
+            val result = runBlocking { context.client.readDirectoryEntry(params) }
+            if (result?.size ?: 0 > 1) {
+                throw CliktError("Found too many entries: ${result?.size}. Please change your query.")
+            }
+            result?.first()?.directoryEntryBase
+        }
+
+        val dn = baseToUpdate?.dn
+
+        setAttributes(baseToUpdate, attrs)
 
         logger.debug { "Data will to send to server: $baseToUpdate" }
 
-        if (dn != null && baseToUpdate != null) {
+        if (dn != null) {
             val jsonData = Json.encodeToString(baseToUpdate)
             val updateBaseDirectoryEntry = Json { ignoreUnknownKeys = true }.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
             // server bug: when updating telematikID with no certificates the exception is thrown

@@ -1,4 +1,4 @@
-package vzd.tools.directoryadministration.cli
+package vzd.admin.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
@@ -38,7 +38,7 @@ val CertificateOutputMapping = mapOf(
             println("${it.dn?.uid} ${it.telematikID} ${it.entryType} ${cert?.publicKeyAlgorithm} ${cert?.subject}")
         }
     },
-    OutputFormat.CSV to {query: Map<String, String>, value: List<UserCertificate>? ->
+    OutputFormat.CSV to { query: Map<String, String>, value: List<UserCertificate>? ->
 
         value?.forEach {
             val cert = it.userCertificate?.toCertificateInfo()
@@ -52,7 +52,7 @@ val CertificateOutputMapping = mapOf(
                 cert?.notBefore,
                 cert?.notAfter,
 
-            ))
+                ))
         }
 
         if (value == null || value.isEmpty()) {

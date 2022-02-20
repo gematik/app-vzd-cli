@@ -1,4 +1,4 @@
-package vzd.tools.directoryadministration.cli
+package vzd.admin.cli
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

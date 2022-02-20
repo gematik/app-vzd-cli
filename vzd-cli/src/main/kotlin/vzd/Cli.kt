@@ -1,4 +1,4 @@
-package vzd.tools
+package vzd
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
@@ -11,7 +11,8 @@ import com.github.ajalt.clikt.parameters.types.path
 import io.github.cdimascio.dotenv.dotenv
 import mu.KotlinLogging
 import org.slf4j.LoggerFactory
-import vzd.tools.directoryadministration.cli.DirectoryAdministrationCli
+import vzd.BuildConfig
+import vzd.admin.cli.DirectoryAdministrationCli
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.absolutePathString

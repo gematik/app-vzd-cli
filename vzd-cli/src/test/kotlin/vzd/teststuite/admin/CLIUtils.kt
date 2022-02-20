@@ -1,6 +1,6 @@
 package vzd.teststuite.admin
 
-import vzd.tools.Cli
+import vzd.Cli
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream

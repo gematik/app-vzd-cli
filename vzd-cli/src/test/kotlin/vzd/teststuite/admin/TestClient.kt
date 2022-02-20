@@ -55,7 +55,6 @@ class TestClient {
     }
 
     @Test fun testCreateDirectoryEntry() {
-
         val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-cli-123456890")
         baseDirectoryEntry.domainID = listOf("gematik_test", TestClient::class.qualifiedName!!)
         baseDirectoryEntry.displayName = "Uniklinik Entenhausen"

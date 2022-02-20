@@ -1,4 +1,4 @@
-package vzd.tools.directoryadministration.cli
+package vzd.admin.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.UsageError

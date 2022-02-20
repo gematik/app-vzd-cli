@@ -3,7 +3,7 @@ package vzd.teststuite.admin
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.jce.PrincipalUtil
 import org.bouncycastle.util.encoders.Base64
-import vzd.tools.directoryadministration.cli.escape
+import vzd.admin.cli.escape
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import kotlin.test.Test

@@ -1,4 +1,4 @@
-package vzd.tools.directoryadministration.cli
+package vzd.admin.cli
 
 import com.github.ajalt.clikt.core.*
 import com.github.ajalt.clikt.parameters.options.default
@@ -53,7 +53,7 @@ Commands require following environment variables:
 """.trimMargin()) {
     private val dotenv by requireObject<Dotenv>()
     private val outputFormat by option().switch(
-        "--human" to  OutputFormat.HUMAN,
+        "--human" to OutputFormat.HUMAN,
         "--json" to OutputFormat.JSON,
         "--yaml" to OutputFormat.YAML,
         "--csv" to OutputFormat.CSV,

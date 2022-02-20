@@ -1,4 +1,4 @@
-package vzd.tools.directoryadministration.cli
+package vzd.admin.cli
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import kotlinx.serialization.KSerializer
@@ -112,7 +112,7 @@ val DirectoryEntryOutputMapping = mapOf(
             println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
         }
     },
-    OutputFormat.CSV to {query: Map<String, String>, value: List<DirectoryEntry>? ->
+    OutputFormat.CSV to { query: Map<String, String>, value: List<DirectoryEntry>? ->
 
         value?.forEach {
             Output.printCsv(listOf(
@@ -124,7 +124,8 @@ val DirectoryEntryOutputMapping = mapOf(
                 it.directoryEntryBase.localityName,
                 it.directoryEntryBase.stateOrProvinceName,
                 it.userCertificates?.size.toString(),
-                it.fachdaten?.let { it.mapNotNull { it.fad1 }.mapNotNull { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.joinToString()
+                it.fachdaten?.let { it.mapNotNull { it.fad1 }.mapNotNull { it.mapNotNull { it.mail } } }?.flatten()
+                    ?.flatten()?.joinToString()
             ))
         }
 

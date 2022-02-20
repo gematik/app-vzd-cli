@@ -7,6 +7,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.DirectoryEntry
+import java.io.File
 
 class TestAdminList : FeatureSpec({
     feature("admin list") {
@@ -23,11 +24,10 @@ class TestAdminList : FeatureSpec({
         scenario("Befehl 'admin list -p telematikID=5-SMC-B-Testkarte-883110000092568' liefert Bonifatiuskrankenhaus als YAML") {
             val output = runCLI(listOf("admin", "--yaml", "list", "-p", "telematikID=5-SMC-B-Testkarte-883110000092568"))
             output shouldContain "5-SMC-B-Testkarte-883110000092568"
-            /*
-            val entry: List<DirectoryEntry>? = Yaml().decodeFromString(output)
-            entry?.first()?.directoryEntryBase?.telematikID shouldBe "5-SMC-B-Testkarte-883110000092568"
-            entry?.first()?.directoryEntryBase?.displayName shouldBe "BonifatiuskrankenhausTEST-ONLY"
-             */
+
+            output shouldContain "5-SMC-B-Testkarte-883110000092568"
+            output shouldContain "BonifatiuskrankenhausTEST-ONLY"
+
         }
     }
 })

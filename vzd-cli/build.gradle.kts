@@ -46,7 +46,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("vzd.tools.CliKt")
+    mainClass.set("vzd.CliKt")
 }
 
 tasks.shadowDistZip { archiveBaseName.set("vzd-cli") }
