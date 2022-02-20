@@ -75,6 +75,7 @@ data class BaseDirectoryEntry(
 
 @Serializable
 data class UpdateBaseDirectoryEntry(
+    var givenName: String? = null,
     var sn: String? = null,
     var telematikID: String? = null,
     var displayName: String? = null,
