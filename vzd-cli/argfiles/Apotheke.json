@@ -1,9 +1,0 @@
-{
-  "DirectoryEntryBase": {
-      "telematikID": "3-vzd-cli-Test-Apotheke-001",
-      "displayName": "Mac Moneysac Apotheke",
-      "domainID": [
-          "vzd-cli"
-      ]
-  }
-}
