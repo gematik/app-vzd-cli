@@ -5,9 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import net.mamoe.yamlkt.Yaml
 import vzd.tools.directoryadministration.DirectoryEntry
-import java.io.File
 
 class TestAdminList : FeatureSpec({
     feature("admin list") {
