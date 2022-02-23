@@ -90,7 +90,7 @@ Zeigt die Information über den VZD-Server und die API.
 
 [source,bash]
 ----
-bin/vzd-cli info
+bin/vzd-cli admin info
 ----
 
 
