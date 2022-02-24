@@ -1,4 +1,4 @@
-package vzd.tools.directoryadministration
+package vzd.admin.client
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -15,7 +15,6 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import kotlin.math.log
 
 private val logger = KotlinLogging.logger {}
 

@@ -5,10 +5,10 @@ import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.choice
-import vzd.tools.directoryadministration.BaseDirectoryEntry
-import vzd.tools.directoryadministration.CertificateDataDER
-import vzd.tools.directoryadministration.DirectoryEntry
-import vzd.tools.directoryadministration.UserCertificate
+import vzd.admin.client.BaseDirectoryEntry
+import vzd.admin.client.CertificateDataDER
+import vzd.admin.client.DirectoryEntry
+import vzd.admin.client.UserCertificate
 
 class TempolateCommand: CliktCommand(name="template", help="""Create template for a resource
      

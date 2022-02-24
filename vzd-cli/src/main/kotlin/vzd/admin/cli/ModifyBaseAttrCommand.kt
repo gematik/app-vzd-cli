@@ -11,8 +11,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import vzd.tools.directoryadministration.BaseDirectoryEntry
-import vzd.tools.directoryadministration.UpdateBaseDirectoryEntry
+import vzd.admin.client.BaseDirectoryEntry
+import vzd.admin.client.UpdateBaseDirectoryEntry
 
 class ModifyBaseAttrCommand: CliktCommand(name="modify-base-attr", help="Modify specific attributes of a base entry") {
     private val logger = KotlinLogging.logger {}

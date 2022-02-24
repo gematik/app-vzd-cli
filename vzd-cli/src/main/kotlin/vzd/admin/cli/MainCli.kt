@@ -10,9 +10,9 @@ import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import mu.KotlinLogging
-import vzd.tools.directoryadministration.Client
-import vzd.tools.directoryadministration.ClientCredentialsAuthenticator
-import vzd.tools.directoryadministration.VZDResponseException
+import vzd.admin.client.Client
+import vzd.admin.client.ClientCredentialsAuthenticator
+import vzd.admin.client.VZDResponseException
 
 private val logger = KotlinLogging.logger {}
 

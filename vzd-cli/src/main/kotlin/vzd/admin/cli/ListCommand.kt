@@ -7,7 +7,7 @@ import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import kotlinx.coroutines.runBlocking
-import vzd.tools.directoryadministration.DirectoryEntry
+import vzd.admin.client.DirectoryEntry
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.useLines

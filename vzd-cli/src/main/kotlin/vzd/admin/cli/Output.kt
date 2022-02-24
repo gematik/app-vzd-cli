@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
-import vzd.tools.directoryadministration.*
+import vzd.admin.client.*
 import java.io.ByteArrayOutputStream
 
 /**

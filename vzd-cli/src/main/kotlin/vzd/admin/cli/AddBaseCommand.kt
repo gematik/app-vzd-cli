@@ -11,8 +11,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
-import vzd.tools.directoryadministration.BaseDirectoryEntry
-import vzd.tools.directoryadministration.CreateDirectoryEntry
+import vzd.admin.client.BaseDirectoryEntry
+import vzd.admin.client.CreateDirectoryEntry
 import java.io.File
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties

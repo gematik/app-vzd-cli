@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import vzd.tools.directoryadministration.DirectoryEntry
+import vzd.admin.client.DirectoryEntry
 
 class TestAdminList : FeatureSpec({
     feature("admin list") {

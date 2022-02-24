@@ -1,4 +1,4 @@
-package vzd.tools.directoryadministration
+package vzd.admin.client
 
 import kotlinx.serialization.Serializable
 import org.bouncycastle.asn1.ASN1Encodable

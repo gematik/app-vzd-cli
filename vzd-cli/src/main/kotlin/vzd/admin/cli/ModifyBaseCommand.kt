@@ -11,8 +11,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
-import vzd.tools.directoryadministration.BaseDirectoryEntry
-import vzd.tools.directoryadministration.UpdateBaseDirectoryEntry
+import vzd.admin.client.BaseDirectoryEntry
+import vzd.admin.client.UpdateBaseDirectoryEntry
 import java.io.File
 
 class ModifyBaseDirectoryEntry: CliktCommand(name="modify-base", help="Modify single base directory entry") {

@@ -4,10 +4,10 @@ import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import vzd.tools.directoryadministration.BaseDirectoryEntry
-import vzd.tools.directoryadministration.Client
-import vzd.tools.directoryadministration.CreateDirectoryEntry
-import vzd.tools.directoryadministration.UpdateBaseDirectoryEntry
+import vzd.admin.client.BaseDirectoryEntry
+import vzd.admin.client.Client
+import vzd.admin.client.CreateDirectoryEntry
+import vzd.admin.client.UpdateBaseDirectoryEntry
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

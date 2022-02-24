@@ -9,8 +9,8 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import vzd.tools.directoryadministration.UserCertificate
-import vzd.tools.directoryadministration.toCertificateInfo
+import vzd.admin.client.UserCertificate
+import vzd.admin.client.toCertificateInfo
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.useLines

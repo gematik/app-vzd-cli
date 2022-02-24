@@ -1,4 +1,4 @@
-package vzd.tools.directoryadministration
+package vzd.admin.client
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -66,7 +66,6 @@ data class BaseDirectoryEntry(
     var specialization: List<String>? = null,
     var domainID: List<String>? = null,
     var holder: List<String>? = null,
-    var items: String? = null,
     var maxKOMLEadr: Int? = null,
     var personalEntry: Boolean? = null,
     var dataFromAuthority: Boolean? = null,
@@ -90,14 +89,13 @@ data class UpdateBaseDirectoryEntry(
     var specialization: List<String>? = null,
     var domainID: List<String>? = null,
     var holder: List<String>? = null,
-    var items: String? = null,
     var maxKOMLEadr: Int? = null,
 )
 
 /**
  * Simple datatype for base64 encoded certificates to differentiate them from plain strings
  */
-@Serializable(with=CertificateDataDERSerializer::class)
+@Serializable(with= CertificateDataDERSerializer::class)
 data class CertificateDataDER (
     var base64String: String
 )
