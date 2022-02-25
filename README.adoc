@@ -191,13 +191,13 @@ Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinz
 bin/vzd-cli admin add-base -s telematikID=1-123123
 # danach Zertifikat hinzufügen
 # Achtung: TelematikID beim Befehl admin add-base und im Zertifikat müssen identisch sein
-bin/vzd-cli admin add-cert --der 1-123123.der
+bin/vzd-cli admin add-cert 1-123123.der
 ----
 
 [#cmd-admin-clear-cert]
 === `admin clear-cert`
 
-Löscht alle Zertifikate aud dem angegeben Eintrag.
+Löscht alle Zertifikate aus dem angegeben Eintrag.
 
 [source,bash]
 ----
