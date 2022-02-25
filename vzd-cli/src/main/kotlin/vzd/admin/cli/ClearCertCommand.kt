@@ -51,7 +51,7 @@ class ClearCertCommand : CliktCommand(name = "clear-cert", help = "Clear all cer
         }
 
         // Make sure we clear only one Entry per run. Just to be safe.
-        if (result?.size > 1) {
+        if (result.size > 1) {
             logger.error { "Query matches too many entries: $params" }
             throw CliktError("Query matches too many entries: $params")
         }
