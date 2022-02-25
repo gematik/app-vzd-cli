@@ -194,6 +194,16 @@ bin/vzd-cli admin add-base -s telematikID=1-123123
 bin/vzd-cli admin add-cert --der 1-123123.der
 ----
 
+[#cmd-admin-clear-cert]
+=== `admin clear-cert`
+
+Löscht alle Zertifikate aud dem angegeben Eintrag.
+
+[source,bash]
+----
+bin/vzd-cli admin clear-cert -p telematikID=1-123123
+----
+
 [#cmd-admin-delete-cert]
 === `admin delete-cert`
 
