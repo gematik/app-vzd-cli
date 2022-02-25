@@ -30,7 +30,7 @@ class TempolateCommand : CliktCommand(name = "template", help = """Create templa
             localityName = "Berlin",
             stateOrProvinceName = "Berlin",
             title = "Dr.",
-            domainID = listOf("vzd-cli", "030", "033")
+            domainID = listOf("vzd-cli")
         )
         when (resourceType) {
             "base" -> {
