@@ -3,8 +3,8 @@ package vzd.admin.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
-import com.github.ajalt.clikt.parameters.options.multiple
-import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.types.path
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -17,25 +17,26 @@ import kotlin.io.path.inputStream
 
 class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate to existing DirectoryEntry") {
     private val logger = KotlinLogging.logger {}
-    val derFiles by option("--der", "-d", metavar = "FILENAME.der", help = "Read certificate from DER/CRT file").path(
-        mustBeReadable = true).multiple(required = true)
+    //val inputFormat by option("--inform", "-i").choice("der", "pem")
+    private val files by argument().path(mustBeReadable = true).multiple()
+
 
     private val context by requireObject<CommandContext>()
     override fun run() = catching {
-        derFiles.forEach {
+        files.forEach {
             val certB64 = Base64.toBase64String(it.inputStream().readBytes())
             val userCertificate = UserCertificate(userCertificate = CertificateDataDER(certB64))
             val certificateInfo = userCertificate.userCertificate!!.toCertificateInfo()
             logger.info { "Adding Certificate ${Yaml.encodeToString(userCertificate.userCertificate?.toCertificateInfo())}" }
 
             val entries = runBlocking {
-                context.client?.readDirectoryEntry(mapOf("telematikID" to certificateInfo.admissionStatement.registrationNumber))
+                context.client.readDirectoryEntry(mapOf("telematikID" to certificateInfo.admissionStatement.registrationNumber))
             }
 
             entries?.first()?.let {
                 logger.info { "Found matching Entry: ${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.displayName}" }
                 runBlocking {
-                    context.client?.addDirectoryEntryCertificate(it.directoryEntryBase.dn?.uid!!,
+                    context.client.addDirectoryEntryCertificate(it.directoryEntryBase.dn?.uid!!,
                         userCertificate)
                 }
             }

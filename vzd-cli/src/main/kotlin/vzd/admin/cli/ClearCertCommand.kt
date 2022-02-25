@@ -64,7 +64,7 @@ class ClearCertCommand : CliktCommand(name = "clear-cert", help = "Clear all cer
             logger.debug { "Deleting certificate: ${it.userCertificate?.base64String}" }
             logger.debug { it.dn }
             echo("Deleting certificate: telematikID=${it.telematikID} serialNumber=${it.userCertificate?.toCertificateInfo()?.serialNumber}")
-            //runBlocking { context.client.deleteDirectoryEntryCertificate(it.dn?.uid!!, it.dn?.cn!!) }
+            runBlocking { context.client.deleteDirectoryEntryCertificate(it.dn?.uid!!, it.dn?.cn!!) }
         }
     }
 

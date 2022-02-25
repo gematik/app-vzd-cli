@@ -38,7 +38,11 @@ object DistinguishedNameSerializer: KSerializer<DistinguishedName> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("DistinguishedName", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: DistinguishedName) {
-        encoder.encodeString("uid=${value.uid}")
+        if (value.cn != null) {
+            encoder.encodeString("uid=${value.uid},cn=${value.cn}")
+        } else {
+            encoder.encodeString("uid=${value.uid}")
+        }
     }
 
     override fun deserialize(decoder: Decoder): DistinguishedName {
