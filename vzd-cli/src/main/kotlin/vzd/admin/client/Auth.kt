@@ -20,7 +20,7 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 @Serializable
-data class TokenResponse (
+data class TokenResponse(
     val access_token: String,
     val token_type: String,
     @SerialName("not-before-policy")
@@ -29,12 +29,12 @@ data class TokenResponse (
     val scope: String,
     val expires_in: Int,
     val refresh_expires_in: Int,
-    val refresh_token: String
+    val refresh_token: String,
 )
 
-class ClientCredentialsAuthenticator(private val authURL: String, private val httpProxyUrl: String? ) {
+class ClientCredentialsAuthenticator(private val authURL: String, private val httpProxyUrl: String?) {
     fun authenticate(clientId: String, clientSecret: String): BearerTokens {
-        logger.debug { "Authenticating at: $authURL, client_id: $clientId"}
+        logger.debug { "Authenticating at: $authURL, client_id: $clientId" }
         val authClient = HttpClient(CIO) {
             httpProxyUrl?.let {
                 engine {
@@ -66,7 +66,7 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
 
         }
         val tokenResponse: TokenResponse = runBlocking {
-            authClient.submitForm (
+            authClient.submitForm(
                 url = authURL,
                 formParameters = Parameters.build {
                     append("grant_type", "client_credentials")

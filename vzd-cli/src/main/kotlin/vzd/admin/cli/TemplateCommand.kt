@@ -10,12 +10,12 @@ import vzd.admin.client.CertificateDataDER
 import vzd.admin.client.DirectoryEntry
 import vzd.admin.client.UserCertificate
 
-class TempolateCommand: CliktCommand(name="template", help="""Create template for a resource
+class TempolateCommand : CliktCommand(name = "template", help = """Create template for a resource
      
      Supported types: base, entry, cert
 """) {
     private val context by requireObject<CommandContext>()
-    val resourceType by argument(help="Specify type of a resource").choice("base", "entry", "cert")
+    val resourceType by argument(help = "Specify type of a resource").choice("base", "entry", "cert")
 
     override fun run() = catching {
         val base = BaseDirectoryEntry(
@@ -63,7 +63,7 @@ class TempolateCommand: CliktCommand(name="template", help="""Create template fo
 
     }
 
-    private inline fun <reified T>printTemplate(template: T, outputFormat: OutputFormat) {
+    private inline fun <reified T> printTemplate(template: T, outputFormat: OutputFormat) {
         when (outputFormat) {
             OutputFormat.JSON -> Output.printJson(template)
             OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(template)

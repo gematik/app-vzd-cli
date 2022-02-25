@@ -12,7 +12,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
-import vzd.admin.client.*
+import vzd.admin.client.CertificateDataDER
+import vzd.admin.client.CertificateInfo
+import vzd.admin.client.DistinguishedName
+import vzd.admin.client.toCertificateInfo
 import java.io.ByteArrayOutputStream
 
 /**
@@ -34,7 +37,7 @@ object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
 /**
  * Human friendly serializer for DN
  */
-object DistinguishedNameSerializer: KSerializer<DistinguishedName> {
+object DistinguishedNameSerializer : KSerializer<DistinguishedName> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("DistinguishedName", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: DistinguishedName) {
@@ -84,7 +87,7 @@ object Output {
         println(yaml.encodeToString(value))
     }
 
-    inline fun <reified T>printJson(value: T) {
+    inline fun <reified T> printJson(value: T) {
         println(json.encodeToString(value))
     }
 

@@ -20,13 +20,14 @@ class TestClient {
     var dotenv = dotenv { ignoreIfMissing = true }
 
 
-    @BeforeTest fun setUp() {
+    @BeforeTest
+    fun setUp() {
         this.client = Client {
             apiURL = dotenv["ADMIN_API_URL"]
             loadTokens = { BearerTokens(dotenv["ADMIN_ACCESS_TOKEN"], "") }
         }
 
-        val entries = runBlocking { client?.readDirectoryEntry(mapOf("domainID" to TestClient::class.qualifiedName!!) ) }
+        val entries = runBlocking { client?.readDirectoryEntry(mapOf("domainID" to TestClient::class.qualifiedName!!)) }
         entries?.forEach {
             if (it.directoryEntryBase.telematikID.startsWith("vzd-cli")) {
                 logger.debug { "Deleting ${it.directoryEntryBase}" }
@@ -35,9 +36,10 @@ class TestClient {
         }
     }
 
-    @Test fun testCreateWithOnlyTelematikID() {
+    @Test
+    fun testCreateWithOnlyTelematikID() {
 
-        val entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID") ) }
+        val entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID")) }
         entries?.forEach {
             runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }
             return
@@ -48,13 +50,15 @@ class TestClient {
         val dn = runBlocking { client?.addDirectoryEntry(directoryEntry) }
         assertNotNull(dn)
 
-        val loadedDirectoryEntry = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID")) }
+        val loadedDirectoryEntry =
+            runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID")) }
         assertEquals(1, loadedDirectoryEntry?.size)
         assertEquals(dn.uid, loadedDirectoryEntry?.first()?.directoryEntryBase?.dn?.uid)
 
     }
 
-    @Test fun testCreateDirectoryEntry() {
+    @Test
+    fun testCreateDirectoryEntry() {
         val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-cli-123456890")
         baseDirectoryEntry.domainID = listOf("gematik_test", TestClient::class.qualifiedName!!)
         baseDirectoryEntry.displayName = "Uniklinik Entenhausen"

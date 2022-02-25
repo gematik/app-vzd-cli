@@ -1,6 +1,9 @@
 package vzd.admin.client
 
-import kotlinx.serialization.*
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -9,7 +12,7 @@ import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 @SerialName("Error")
-data class AttributeError (
+data class AttributeError(
     val attributeName: String? = null,
     val attributeError: String? = null,
 )
@@ -69,7 +72,7 @@ data class BaseDirectoryEntry(
     var maxKOMLEadr: Int? = null,
     var personalEntry: Boolean? = null,
     var dataFromAuthority: Boolean? = null,
-    var changeDateTime: String? = null
+    var changeDateTime: String? = null,
 )
 
 @Serializable
@@ -95,9 +98,9 @@ data class UpdateBaseDirectoryEntry(
 /**
  * Simple datatype for base64 encoded certificates to differentiate them from plain strings
  */
-@Serializable(with= CertificateDataDERSerializer::class)
-data class CertificateDataDER (
-    var base64String: String
+@Serializable(with = CertificateDataDERSerializer::class)
+data class CertificateDataDER(
+    var base64String: String,
 )
 
 /**
@@ -125,7 +128,7 @@ data class UserCertificate(
     var usage: List<String>? = null,
     @Contextual
     var userCertificate: CertificateDataDER? = null,
-    var description: String? = null
+    var description: String? = null,
 )
 
 @Serializable
@@ -138,7 +141,7 @@ data class FAD1(
 )
 
 @Serializable
-data class Fachdaten (
+data class Fachdaten(
     @Contextual
     var dn: DistinguishedName,
     @SerialName("FAD1")
@@ -151,7 +154,7 @@ data class DirectoryEntry(
     var directoryEntryBase: BaseDirectoryEntry,
     var userCertificates: List<UserCertificate>? = null,
     @SerialName("Fachdaten")
-    var fachdaten: List<Fachdaten>? = null
+    var fachdaten: List<Fachdaten>? = null,
 )
 
 @Serializable

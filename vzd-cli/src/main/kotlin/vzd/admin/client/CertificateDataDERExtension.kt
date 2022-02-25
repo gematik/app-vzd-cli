@@ -3,10 +3,8 @@ package vzd.admin.client
 import kotlinx.serialization.Serializable
 import mu.KotlinLogging
 import org.bouncycastle.asn1.ASN1Encodable
-import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax
-import org.bouncycastle.asn1.x500.DirectoryString
 import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.util.encoders.Base64
 import java.security.cert.CertificateFactory
@@ -14,7 +12,6 @@ import java.security.cert.X509Certificate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.stream.Collectors
 
 private val logger = KotlinLogging.logger {}
 

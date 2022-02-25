@@ -14,12 +14,13 @@ import mu.KotlinLogging
 import vzd.admin.client.BaseDirectoryEntry
 import vzd.admin.client.UpdateBaseDirectoryEntry
 
-class ModifyBaseAttrCommand: CliktCommand(name="modify-base-attr", help="Modify specific attributes of a base entry") {
+class ModifyBaseAttrCommand :
+    CliktCommand(name = "modify-base-attr", help = "Modify specific attributes of a base entry") {
     private val logger = KotlinLogging.logger {}
     private val params: Map<String, String> by option("-p", "--param",
-        help="Specify query parameters to find matching entries").associate()
+        help = "Specify query parameters to find matching entries").associate()
     private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE",
-        help="Set the attribute value in BaseDirectoryEntry.").associate()
+        help = "Set the attribute value in BaseDirectoryEntry.").associate()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
@@ -44,11 +45,12 @@ class ModifyBaseAttrCommand: CliktCommand(name="modify-base-attr", help="Modify 
 
         if (dn != null) {
             val jsonData = Json.encodeToString(baseToUpdate)
-            val updateBaseDirectoryEntry = Json { ignoreUnknownKeys = true }.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
+            val updateBaseDirectoryEntry =
+                Json { ignoreUnknownKeys = true }.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
             // server bug: when updating telematikID with no certificates the exception is thrown
             updateBaseDirectoryEntry.telematikID = null
             runBlocking { context.client.modifyDirectoryEntry(dn.uid, updateBaseDirectoryEntry) }
-            val result = runBlocking {  context.client.readDirectoryEntry(mapOf("uid" to dn.uid)) }
+            val result = runBlocking { context.client.readDirectoryEntry(mapOf("uid" to dn.uid)) }
 
             when (context.outputFormat) {
                 OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)

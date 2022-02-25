@@ -8,10 +8,11 @@ import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 
-class DeleteCommand: CliktCommand(name="delete", help="Delete specified directory entries") {
+class DeleteCommand : CliktCommand(name = "delete", help = "Delete specified directory entries") {
     private val logger = KotlinLogging.logger {}
     private val params: Map<String, String> by option("-p", "--param",
-        help="Specify query parameters to find matching entries").associate()
+        help = "Specify query parameters to find matching entries").associate()
+
     //val force by option(help="Force delete").flag()
     private val context by requireObject<CommandContext>()
 
@@ -22,11 +23,12 @@ class DeleteCommand: CliktCommand(name="delete", help="Delete specified director
             }
             val result = context.client.readDirectoryEntry(params)
             result?.forEach {
-                val answer = prompt("Type YES to delete '${it.directoryEntryBase.telematikID}' '${it.directoryEntryBase.displayName}': ")
+                val answer =
+                    prompt("Type YES to delete '${it.directoryEntryBase.telematikID}' '${it.directoryEntryBase.displayName}': ")
                 if (answer == "YES") {
                     logger.debug { "Deleting '${it.directoryEntryBase.displayName}' '${it.directoryEntryBase.dn?.uid}'" }
                     if (it.directoryEntryBase.dn?.uid != null) {
-                        context.client.deleteDirectoryEntry( it.directoryEntryBase.dn!!.uid )
+                        context.client.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid)
                     }
                 }
             }

@@ -12,11 +12,11 @@ import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.useLines
 
-class ListCommand: CliktCommand(name = "list", help="List directory entries") {
+class ListCommand : CliktCommand(name = "list", help = "List directory entries") {
     private val paramFile: Pair<String, String>? by option("-f", "--param-file",
-        help="Read parameter values from file", metavar = "PARAM FILENAME").pair()
+        help = "Read parameter values from file", metavar = "PARAM FILENAME").pair()
     private val params: Map<String, String> by option("-p", "--param",
-        help="Specify query parameters to find matching entries", metavar = "NAME=VALUE").associate()
+        help = "Specify query parameters to find matching entries", metavar = "NAME=VALUE").associate()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
@@ -35,9 +35,9 @@ class ListCommand: CliktCommand(name = "list", help="List directory entries") {
 
     private fun runQuery(params: Map<String, String>) {
         val result: List<DirectoryEntry>? = if (context.syncMode) {
-            runBlocking {  context.client.readDirectoryEntryForSync( params ) }
+            runBlocking { context.client.readDirectoryEntryForSync(params) }
         } else {
-            runBlocking {  context.client.readDirectoryEntry( params ) }
+            runBlocking { context.client.readDirectoryEntry(params) }
         }
 
         if (context.outputFormat == OutputFormat.CSV) {

@@ -36,11 +36,12 @@ enum class OutputFormat {
 class CommandContext(
     val client: Client,
     val outputFormat: OutputFormat,
-    val syncMode: Boolean=false,
+    val syncMode: Boolean = false,
     var firstCommand: Boolean = true,
 )
 
-class DirectoryAdministrationCli : CliktCommand(name="admin", allowMultipleSubcommands = true, help="""CLI for DirectoryAdministration API
+class DirectoryAdministrationCli :
+    CliktCommand(name = "admin", allowMultipleSubcommands = true, help = """CLI for DirectoryAdministration API
 
 Commands require following environment variables:
  
@@ -60,7 +61,7 @@ Commands require following environment variables:
         "--short" to OutputFormat.SHORT,
     ).default(OutputFormat.HUMAN)
 
-    private val sync by option(help="use Sync mode").flag()
+    private val sync by option(help = "use Sync mode").flag()
     override fun run() = catching {
 
         val client = Client {
@@ -75,10 +76,13 @@ Commands require following environment variables:
                 }
             } else {
                 dotenv.get("ADMIN_AUTH_URL", null) ?: throw UsageError("Environment variable ADMIN_AUTH_URL is not set")
-                dotenv.get("ADMIN_CLIENT_ID", null) ?: throw UsageError("Environment variable ADMIN_CLIENT_ID is not set")
-                dotenv.get("ADMIN_CLIENT_SECRET", null) ?: throw UsageError("Environment variable ADMIN_CLIENT_SECRET is not set")
+                dotenv.get("ADMIN_CLIENT_ID", null)
+                    ?: throw UsageError("Environment variable ADMIN_CLIENT_ID is not set")
+                dotenv.get("ADMIN_CLIENT_SECRET", null)
+                    ?: throw UsageError("Environment variable ADMIN_CLIENT_SECRET is not set")
                 loadTokens = {
-                    val auth = ClientCredentialsAuthenticator(dotenv["ADMIN_AUTH_URL"], dotenv.get("HTTP_PROXY_URL", null))
+                    val auth =
+                        ClientCredentialsAuthenticator(dotenv["ADMIN_AUTH_URL"], dotenv.get("HTTP_PROXY_URL", null))
                     auth.authenticate(dotenv["ADMIN_CLIENT_ID"], dotenv["ADMIN_CLIENT_SECRET"])
                 }
             }
@@ -88,6 +92,7 @@ Commands require following environment variables:
 
         currentContext.obj = CommandContext(client, outputFormat, syncMode = sync)
     }
+
     init {
         subcommands(Info(), AuthenticateAdmin(), ListCommand(), TempolateCommand(), AddBaseCommand(),
             LoadBaseCommand(), ModifyBaseDirectoryEntry(), ModifyBaseAttrCommand(), DeleteCommand(),
@@ -96,17 +101,17 @@ Commands require following environment variables:
 
 }
 
-class AuthenticateAdmin: CliktCommand(name="auth", help="Perform authentication") {
+class AuthenticateAdmin : CliktCommand(name = "auth", help = "Perform authentication") {
     private val dotenv by requireObject<Dotenv>()
     override fun run() = catching {
         logger.debug { "Executing command: AuthenticateAdmin" }
         val auth = ClientCredentialsAuthenticator(dotenv["ADMIN_AUTH_URL"], dotenv.get("HTTP_PROXY_URL", null))
         val tokens = auth.authenticate(dotenv["ADMIN_CLIENT_ID"], dotenv["ADMIN_CLIENT_SECRET"])
-        println (tokens.accessToken)
+        println(tokens.accessToken)
     }
 }
 
-class Info: CliktCommand(name="info", help="Show information about the API") {
+class Info : CliktCommand(name = "info", help = "Show information about the API") {
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {

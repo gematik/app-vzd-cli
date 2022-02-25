@@ -5,14 +5,10 @@ import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import mu.KotlinLogging
-import net.mamoe.yamlkt.Yaml
 import org.bouncycastle.util.encoders.Base64
 import vzd.admin.client.CertificateDataDER
-import vzd.admin.client.UserCertificate
 import vzd.admin.client.toCertificateInfo
 import kotlin.io.path.inputStream
 

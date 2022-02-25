@@ -22,7 +22,8 @@ fun createClient(): Client {
         } ?: run {
             dotenv.get("ADMIN_AUTH_URL", null) ?: throw UsageError("Environment variable ADMIN_AUTH_URL is not set")
             dotenv.get("ADMIN_CLIENT_ID", null) ?: throw UsageError("Environment variable ADMIN_CLIENT_ID is not set")
-            dotenv.get("ADMIN_CLIENT_SECRET", null) ?: throw UsageError("Environment variable ADMIN_CLIENT_SECRET is not set")
+            dotenv.get("ADMIN_CLIENT_SECRET", null)
+                ?: throw UsageError("Environment variable ADMIN_CLIENT_SECRET is not set")
             loadTokens = {
                 val auth = ClientCredentialsAuthenticator(dotenv["ADMIN_AUTH_URL"], dotenv.get("HTTP_PROXY_URL", null))
                 auth.authenticate(dotenv["ADMIN_CLIENT_ID"], dotenv["ADMIN_CLIENT_SECRET"])

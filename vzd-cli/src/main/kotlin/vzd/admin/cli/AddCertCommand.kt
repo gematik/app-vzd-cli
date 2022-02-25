@@ -17,6 +17,7 @@ import kotlin.io.path.inputStream
 
 class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate to existing DirectoryEntry") {
     private val logger = KotlinLogging.logger {}
+
     //val inputFormat by option("--inform", "-i").choice("der", "pem")
     private val files by argument().path(mustBeReadable = true).multiple()
 

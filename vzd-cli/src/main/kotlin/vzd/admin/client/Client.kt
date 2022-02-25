@@ -22,21 +22,21 @@ class VZDResponseException(response: HttpResponse, message: String) :
     ResponseException(response, message) {
 
     val details: String
-    get() {
-        var details = "Bad response: $response"
+        get() {
+            var details = "Bad response: $response"
 
-        val reason = response.headers["RS-DIRECTORY-ADMIN-ERROR"]
-        if ( reason != null ) {
-            details += " Reason: $reason"
+            val reason = response.headers["RS-DIRECTORY-ADMIN-ERROR"]
+            if (reason != null) {
+                details += " Reason: $reason"
+            }
+
+            val body: String? = if (reason == null) runBlocking { response.body() } else null
+            if (body != null && body.isNotEmpty()) {
+                details += " Body: $body"
+            }
+
+            return details
         }
-
-        val body: String? = if (reason == null) runBlocking { response.body() } else null
-        if (body != null && body.isNotEmpty()) {
-            details += " Body: $body"
-        }
-
-        return details
-    }
 
 }
 
@@ -75,7 +75,7 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
                     sendWithoutRequest {
                         true
                     }
-                    loadTokens ( config.loadTokens )
+                    loadTokens(config.loadTokens)
                 }
             }
             install(ContentNegotiation) {
@@ -129,13 +129,16 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
      * Implements GET /DirectoryEntriesSync (read_Directory_Entry_for_Sync)
      */
     suspend fun readDirectoryEntryForSync(parameters: Map<String, String>): List<DirectoryEntry>? {
-        return readDirectoryEntry(parameters,"/DirectoryEntriesSync")
+        return readDirectoryEntry(parameters, "/DirectoryEntriesSync")
     }
 
     /**
      * Implements GET /DirectoryEntries (read_Directory_Entry)
      */
-    suspend fun readDirectoryEntry(parameters: Map<String, String>, path: String = "/DirectoryEntries"): List<DirectoryEntry>? {
+    suspend fun readDirectoryEntry(
+        parameters: Map<String, String>,
+        path: String = "/DirectoryEntries",
+    ): List<DirectoryEntry>? {
         val response = http.get(path) {
             for (param in parameters.entries) {
                 parameter(param.key, param.value)
@@ -229,7 +232,6 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
 
     }
 }
-
 
 class ClientConfiguration {
     var apiURL = ""
