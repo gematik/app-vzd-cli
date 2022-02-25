@@ -1,6 +1,7 @@
 package vzd.admin.client
 
 import kotlinx.serialization.Serializable
+import mu.KotlinLogging
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers
@@ -15,22 +16,24 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.stream.Collectors
 
+private val logger = KotlinLogging.logger {}
+
 /**
  * Information about the admisstionStatement in the X509 Certificate
  */
 @Serializable
-data class AdmissionStatementInfo (
+data class AdmissionStatementInfo(
     val admissionAuthority: String,
-    val professionItems: Set<String>,
-    val professionOids: Set<String>,
-    val registrationNumber: String
+    val professionItems: List<String>,
+    val professionOids: List<String>,
+    val registrationNumber: String,
 )
 
 /**
  * Textual information about the C509 Certificate
  */
 @Serializable
-data class CertificateInfo (
+data class CertificateInfo(
     val subject: String,
     val issuer: String,
     val signatureAlgorithm: String,
@@ -40,7 +43,7 @@ data class CertificateInfo (
     val notBefore: String,
     val notAfter: String,
     val admissionStatement: AdmissionStatementInfo,
-    val der: String,
+    val certData: String,
 )
 
 /**
@@ -144,26 +147,29 @@ class Admission(x509EeCert: X509Certificate) {
      *
      * @return Non duplicate list of profession items of the first profession info of the first admission in the certificate
      */
-    val professionItems: Set<String>
-        get() = Arrays.stream(
-            AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos[0]
-                .professionItems
-        )
-            .map { obj: DirectoryString -> obj.string }
-            .collect(Collectors.toSet())
+    val professionItems: List<String>
+        get() {
+            return AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos.map {
+                it.professionItems.map {
+                    it.string
+                }
+            }.flatten()
+        }
 
     /**
      * Reading profession oid's
      *
      * @return Non duplicate list of profession oid's of the first profession info of the first admission in the certificate
      */
-    val professionOids: Set<String>
+    val professionOids: List<String>
         get() {
-            return Arrays.stream(
-                AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos[0].professionOIDs
-            )
-                .map { obj: ASN1ObjectIdentifier -> obj.id }
-                .collect(Collectors.toSet())
+
+            return AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos.map {
+                it.professionOIDs.map {
+                    it.id
+                }
+            }.flatten()
+
         }
 
     /**

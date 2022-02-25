@@ -20,7 +20,7 @@ class TestCreate : FeatureSpec({
                     fail("Etwas ist schiefgelaufen. Es wurden zu viele entries gefunden")
                 }
                 logger.info { "Deleting $entry" }
-                client?.deleteDirectoryEntry(entry.directoryEntryBase?.dn?.uid!!)
+                client?.deleteDirectoryEntry(entry.directoryEntryBase.dn?.uid!!)
             }
     }
 
@@ -31,12 +31,16 @@ class TestCreate : FeatureSpec({
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
             val dn = client?.addDirectoryEntry(entry)
 
+            val reloaded = client?.readDirectoryEntry(mapOf("uid" to dn!!.uid))?.first()
+
+            reloaded?.directoryEntryBase?.telematikID shouldBe "1-" + TestCreate::class.qualifiedName!!
+
         }
         scenario("Eintrag mit existierenden TelematikID wird abgelehnt") {
             val entry = CreateDirectoryEntry()
             entry.directoryEntryBase = BaseDirectoryEntry("1-" + TestCreate::class.qualifiedName!!)
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
-            val exception = shouldThrow<VZDResponseException> {
+            shouldThrow<VZDResponseException> {
                 client?.addDirectoryEntry(entry)
             }
 
@@ -61,7 +65,7 @@ class TestCreate : FeatureSpec({
             val entry = CreateDirectoryEntry()
             client?.readDirectoryEntry(mapOf("telematikID" to certData.toCertificateInfo().admissionStatement.registrationNumber))?.first()?.let {
                 logger.info { "Deleting $it" }
-                client?.deleteDirectoryEntry(it.directoryEntryBase?.dn?.uid!!)
+                client?.deleteDirectoryEntry(it.directoryEntryBase.dn?.uid!!)
             }
             entry.directoryEntryBase = BaseDirectoryEntry(certData.toCertificateInfo().admissionStatement.registrationNumber)
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
@@ -71,7 +75,17 @@ class TestCreate : FeatureSpec({
 
             reloaded?.directoryEntryBase?.telematikID shouldBe "1-21234567asdfghb"
             reloaded?.directoryEntryBase?.givenName shouldBe null
-            reloaded?.userCertificates?.isNullOrEmpty() shouldBe true
+            reloaded?.userCertificates shouldBe null
+
+            client?.addDirectoryEntryCertificate(dn?.uid!!, UserCertificate(userCertificate = certData ))
+
+            val reloaded2 = client?.readDirectoryEntry(mapOf("uid" to dn!!.uid))?.first()
+            logger.info { reloaded2 }
+
+            reloaded2?.directoryEntryBase?.telematikID shouldBe "1-21234567asdfghb"
+            reloaded2?.directoryEntryBase?.givenName shouldBe "Dominique-Michelle"
+            reloaded2?.userCertificates?.size shouldBe 1
+            reloaded2?.userCertificates?.first()?.userCertificate?.base64String shouldBe certData.base64String
 
         }
     }

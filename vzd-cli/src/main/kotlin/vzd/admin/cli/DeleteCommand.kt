@@ -22,7 +22,7 @@ class DeleteCommand: CliktCommand(name="delete", help="Delete specified director
             }
             val result = context.client.readDirectoryEntry(params)
             result?.forEach {
-                val answer = prompt("Type YES to delete '${it.directoryEntryBase.displayName}' '${it.directoryEntryBase.dn?.uid}'")
+                val answer = prompt("Type YES to delete '${it.directoryEntryBase.telematikID}' '${it.directoryEntryBase.displayName}': ")
                 if (answer == "YES") {
                     logger.debug { "Deleting '${it.directoryEntryBase.displayName}' '${it.directoryEntryBase.dn?.uid}'" }
                     if (it.directoryEntryBase.dn?.uid != null) {

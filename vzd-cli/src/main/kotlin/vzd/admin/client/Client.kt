@@ -169,7 +169,7 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
     /**
      * Implements PUT /DirectoryEntries/{uid}/baseDirectoryEntries (modify_Directory_Entry)
      */
-    suspend fun modifyDirectoryEntry(uid: String, baseDirectoryEntry: UpdateBaseDirectoryEntry) {
+    suspend fun modifyDirectoryEntry(uid: String, baseDirectoryEntry: UpdateBaseDirectoryEntry): DistinguishedName {
         val response = http.put("/DirectoryEntries/${uid}/baseDirectoryEntries") {
             contentType(ContentType.Application.Json)
             setBody(baseDirectoryEntry)
@@ -178,16 +178,25 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
         if (response.status != HttpStatusCode.OK) {
             throw VZDResponseException(response, "Unable to modify entry: ${response.body<String>()}")
         }
+
+        return response.body()
     }
 
     /**
      * Implements POST /DirectoryEntries/{uid}/Certificates (add_Directory_Entry_Certificate)
      */
-    /*
-    suspend fun addDirectoryEntryCertificate() {
-        TODO()
+    suspend fun addDirectoryEntryCertificate(uid: String, userCertificate: UserCertificate): DistinguishedName {
+        val response = http.post("/DirectoryEntries/${uid}/Certificates") {
+            contentType(ContentType.Application.Json)
+            setBody(userCertificate)
+        }
+
+        if (response.status != HttpStatusCode.Created) {
+            throw VZDResponseException(response, "Unable to modify entry: ${response.body<String>()}")
+        }
+
+        return response.body()
     }
-    */
 
     /**
      * Implements GET /DirectoryEntries/Certificates (read_Directory_Certificates)
@@ -210,11 +219,15 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
     /**
      * Implements DELETE /DirectoryEntries/{uid}/Certificates/{certificateEntryID} (delete_Directory_Entry_Certificate)
      */
-    /*
-    suspend fun deleteDirectoryEntryCertificate() {
-        TODO()
+    suspend fun deleteDirectoryEntryCertificate(uid: String, certificateEntryID: String) {
+        val response = http.delete("/DirectoryEntries/$uid/Certificates/$certificateEntryID")
+
+        if (response.status != HttpStatusCode.OK) {
+            throw VZDResponseException(response, "Unable to delete entry $certificateEntryID")
+        }
+
+
     }
-    */
 }
 
 

@@ -91,7 +91,7 @@ Commands require following environment variables:
     init {
         subcommands(Info(), AuthenticateAdmin(), ListCommand(), TempolateCommand(), AddBaseCommand(),
             LoadBaseCommand(), ModifyBaseDirectoryEntry(), ModifyBaseAttrCommand(), DeleteCommand(),
-            ListCertificates(), AddCertificate(), DeleteCertificates())
+            ListCertCommand(), AddCertCommand(), DeleteCertCommand(), ClearCertCommand(), CertInfoCommand())
     }
 
 }

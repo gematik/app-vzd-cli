@@ -183,9 +183,16 @@ Suche und Anzeige von X509-Zertifikaten.
 [#cmd-admin-add-cert]
 === `admin add-cert`
 
-WARNING: Nicht implementiert
-
 Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinzu.
+
+[source,bash]
+----
+# zuerst einen leeren Basiseintrag erzeugen
+bin/vzd-cli admin add-base -s telematikID=1-123123
+# danach Zertifikat hinzufügen
+# Achtung: TelematikID beim Befehl admin add-base und im Zertifikat müssen identisch sein
+bin/vzd-cli admin add-cert --der 1-123123.der
+----
 
 [#cmd-admin-delete-cert]
 === `admin delete-cert`
