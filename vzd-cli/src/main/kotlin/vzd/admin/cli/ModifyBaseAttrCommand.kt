@@ -31,7 +31,7 @@ class ModifyBaseAttrCommand :
 
         val baseToUpdate: BaseDirectoryEntry? = params.let {
             val result = runBlocking { context.client.readDirectoryEntry(params) }
-            if (result?.size ?: 0 > 1) {
+            if ((result?.size ?: 0) > 1) {
                 throw CliktError("Found too many entries: ${result?.size}. Please change your query.")
             }
             result?.first()?.directoryEntryBase
@@ -55,7 +55,7 @@ class ModifyBaseAttrCommand :
             when (context.outputFormat) {
                 OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)
                 OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
-                else -> throw UsageError("Cant load for editing in for format: ${context.outputFormat}")
+                else -> throw UsageError("Unsupported format: ${context.outputFormat}")
             }
         }
     }

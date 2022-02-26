@@ -5,7 +5,9 @@ import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -13,6 +15,7 @@ import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import vzd.admin.client.BaseDirectoryEntry
 import vzd.admin.client.CreateDirectoryEntry
+import vzd.admin.client.VZDResponseException
 import java.io.File
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
@@ -43,6 +46,7 @@ class AddBaseCommand: CliktCommand(name="add-base", help="Add new directory entr
     private val file: String? by option("--file", "-f", metavar = "FILENAME",
         help="Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN")
     private val context by requireObject<CommandContext>()
+    private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (entry exists).").flag()
 
     override fun run() = catching {
         val data = if (file != null && file == "-") {
@@ -73,12 +77,19 @@ class AddBaseCommand: CliktCommand(name="add-base", help="Add new directory entr
 
         logger.debug { "Creating new directory entry with telematikID: ${baseDirectoryEntry.telematikID}" }
 
-        val dn = runBlocking {  context.client.addDirectoryEntry(CreateDirectoryEntry(baseDirectoryEntry)) }
+        val result = try {
+            val dn = runBlocking {  context.client.addDirectoryEntry(CreateDirectoryEntry(baseDirectoryEntry)) }
+            logger.info("Created new DirectoryEntry: ${dn.uid}")
 
-        logger.info("Created new DirectoryEntry: ${dn.uid}")
-
-        val query = mapOf("uid" to dn.uid)
-        val result = runBlocking {  context.client.readDirectoryEntry(query) }
+            val query = mapOf("uid" to dn.uid)
+            runBlocking {  context.client.readDirectoryEntry(query) }
+        } catch (e: VZDResponseException) {
+            if (!ignore || e.response.status != HttpStatusCode.Conflict) {
+                throw e
+            }
+            logger.warn { "Entry with telematikID=${baseDirectoryEntry.telematikID} already exists. Ignoring conflict." }
+            runBlocking {  context.client.readDirectoryEntry(mapOf("telematikID" to baseDirectoryEntry.telematikID)) }
+        }
 
         when (context.outputFormat) {
             OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)

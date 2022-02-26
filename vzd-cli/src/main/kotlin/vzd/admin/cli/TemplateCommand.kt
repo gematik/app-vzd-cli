@@ -15,7 +15,7 @@ class TempolateCommand : CliktCommand(name = "template", help = """Create templa
      Supported types: base, entry, cert
 """) {
     private val context by requireObject<CommandContext>()
-    val resourceType by argument(help = "Specify type of a resource").choice("base", "entry", "cert")
+    private val resourceType by argument(help = "Specify type of a resource").choice("base", "entry", "cert")
 
     override fun run() = catching {
         val base = BaseDirectoryEntry(

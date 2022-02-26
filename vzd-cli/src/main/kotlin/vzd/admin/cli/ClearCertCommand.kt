@@ -58,7 +58,7 @@ class ClearCertCommand : CliktCommand(name = "clear-cert", help = "Clear all cer
 
         val entry = result.first()
 
-        logger.info { "Clearing ${entry.userCertificates?.size} certificate(s) in ${entry.directoryEntryBase.telematikID}" }
+        logger.info { "Clearing ${entry.userCertificates?.size ?: 0} certificate(s) in ${entry.directoryEntryBase.telematikID}" }
 
         entry.userCertificates?.forEach {
             logger.debug { "Deleting certificate: ${it.userCertificate?.base64String}" }
