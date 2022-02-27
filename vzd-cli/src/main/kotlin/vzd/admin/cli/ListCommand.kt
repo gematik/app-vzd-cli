@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import kotlinx.coroutines.runBlocking
@@ -18,6 +19,7 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
     private val params: Map<String, String> by option("-p", "--param",
         help = "Specify query parameters to find matching entries", metavar = "NAME=VALUE").associate()
     private val context by requireObject<CommandContext>()
+    private val sync by option(help = "use Sync mode").flag()
 
     override fun run() = catching {
         paramFile?.let { paramFile ->
@@ -34,7 +36,7 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
     }
 
     private fun runQuery(params: Map<String, String>) {
-        val result: List<DirectoryEntry>? = if (context.syncMode) {
+        val result: List<DirectoryEntry>? = if (sync) {
             runBlocking { context.client.readDirectoryEntryForSync(params) }
         } else {
             runBlocking { context.client.readDirectoryEntry(params) }

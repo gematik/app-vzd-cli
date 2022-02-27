@@ -2,7 +2,6 @@ package vzd.admin.cli
 
 import com.github.ajalt.clikt.core.*
 import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import io.github.cdimascio.dotenv.Dotenv
@@ -36,7 +35,6 @@ enum class OutputFormat {
 class CommandContext(
     val client: Client,
     val outputFormat: OutputFormat,
-    val syncMode: Boolean = false,
     var firstCommand: Boolean = true,
 )
 
@@ -61,7 +59,6 @@ Commands require following environment variables:
         "--short" to OutputFormat.SHORT,
     ).default(OutputFormat.HUMAN)
 
-    private val sync by option(help = "use Sync mode").flag()
     override fun run() = catching {
 
         val client = Client {
@@ -90,7 +87,7 @@ Commands require following environment variables:
             httpProxyURL = dotenv.get("HTTP_PROXY_URL", null)
         }
 
-        currentContext.obj = CommandContext(client, outputFormat, syncMode = sync)
+        currentContext.obj = CommandContext(client, outputFormat)
     }
 
     init {

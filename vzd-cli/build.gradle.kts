@@ -1,5 +1,5 @@
 val ktorVersion = "2.0.0-beta-1"
-version = "0.10.1-beta"
+version = "0.10.2-beta"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -60,4 +60,17 @@ tasks.named<JavaExec>("run") {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks {
+    val projectProps by registering(WriteProperties::class) {
+        outputFile = file("${buildDir}/project.properties")
+        comment = "BuildConfig"
+        property("project.version", project.version)
+
+    }
+
+    processResources {
+        from(projectProps)
+    }
 }

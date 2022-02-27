@@ -22,7 +22,11 @@ val DirectoryEntryOutputMapping = mapOf(
     OutputFormat.JSON to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJson(value) },
     OutputFormat.SHORT to { _: Map<String, String>, value: List<DirectoryEntry>? ->
         value?.forEach {
-            println("${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}")
+            val kims = it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }
+                ?.flatten()?.flatten()?.joinToString() ?: ""
+            println("${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}" +
+                    " ${it.directoryEntryBase.domainID?.joinToString()}" +
+                    " ${kims}")
         }
     },
     OutputFormat.CSV to { query: Map<String, String>, value: List<DirectoryEntry>? ->
@@ -37,7 +41,7 @@ val DirectoryEntryOutputMapping = mapOf(
                 it.directoryEntryBase.localityName,
                 it.directoryEntryBase.stateOrProvinceName,
                 it.userCertificates?.size.toString(),
-                it.fachdaten?.let { it.mapNotNull { it.fad1 }.mapNotNull { it.mapNotNull { it.mail } } }?.flatten()
+                it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
                     ?.flatten()?.joinToString()
             ))
         }
