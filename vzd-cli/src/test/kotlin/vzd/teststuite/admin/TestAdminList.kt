@@ -18,7 +18,6 @@ class TestAdminList : FeatureSpec({
                 runCLI(listOf("admin", "--json", "list", "-p", "telematikID=5-SMC-B-Testkarte-883110000092568"))
             val entry: List<DirectoryEntry>? = Json.decodeFromString(output)
             entry?.first()?.directoryEntryBase?.telematikID shouldBe "5-SMC-B-Testkarte-883110000092568"
-            entry?.first()?.directoryEntryBase?.displayName shouldBe "BonifatiuskrankenhausTEST-ONLY"
         }
         scenario("Befehl 'admin list -p telematikID=5-SMC-B-Testkarte-883110000092568' liefert Bonifatiuskrankenhaus als YAML") {
             val output =
@@ -26,7 +25,6 @@ class TestAdminList : FeatureSpec({
             output shouldContain "5-SMC-B-Testkarte-883110000092568"
 
             output shouldContain "5-SMC-B-Testkarte-883110000092568"
-            output shouldContain "BonifatiuskrankenhausTEST-ONLY"
 
         }
     }
