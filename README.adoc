@@ -204,6 +204,11 @@ Löscht alle Zertifikate aus dem angegeben Eintrag.
 bin/vzd-cli admin clear-cert -p telematikID=1-123123
 ----
 
+[#cmd-admin-save-cert]
+=== `admin save-cert`
+
+Speichert alle gefundene Zertifikate in ein Verzeichnis
+
 [#cmd-admin-delete-cert]
 === `admin delete-cert`
 
