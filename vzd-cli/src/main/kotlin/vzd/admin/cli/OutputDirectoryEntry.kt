@@ -40,7 +40,7 @@ val DirectoryEntryOutputMapping = mapOf(
                 it.directoryEntryBase.postalCode,
                 it.directoryEntryBase.localityName,
                 it.directoryEntryBase.stateOrProvinceName,
-                it.userCertificates?.size.toString(),
+                it.userCertificates?.count { it?.userCertificate != null },
                 it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
                     ?.flatten()?.joinToString()
             ))
