@@ -1,0 +1,11 @@
+= Changelog `vzd-cli`
+
+== Version 0.12.0
+
+
+== Backlog
+
+* Add 'holder' to CSV output
+* Do not count empty certificate blocks in CSV output
+* Remove the authentication requirement for commands that can work without it (e.g. cert-info)
+* Refactor ACCESS_TOKEN and ENV handling to be more secure
