@@ -58,7 +58,7 @@ tasks.named<JavaExec>("run") {
     standardInput = System.`in`
 }
 
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
 }
 
