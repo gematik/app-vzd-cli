@@ -1,5 +1,6 @@
 = 🗂️ `vzd-cli`: Command Line Client für Verzeichnisdienst der TI 
 :toc: auto
+:note-caption: Anmerkung
 
 image::images/vzd-cli.gif[]
 
@@ -25,65 +26,86 @@ Commands:
   admin  CLI for DirectoryAdministration API
 ----
 
-== Schnellstart
+== Erste Schritte
 
-Aufbau der CLI folgt aktuellen Best-Practices analog z.B. zu Docker, Kubernetes, Helm.
-
-.File namens `.env` im aktuellen Ordner anlegen:
+Aufbau der CLI folgt aktuellen Best-Practices analog z.B. zu Docker, Kubernetes, Helm. 
+Für alle Befehle (Command) und Unter-Befehle (Subcommand) kann man mittels `--help` Option eine abschließende Liste aller Optionen und Argumente anzeigen lassen.
 [source,bash]
 ----
-ADMIN_API_URL=https://vzdpflege-ref.vzd.ti-dienste.de:9543/
-ADMIN_AUTH_URL=https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token
-ADMIN_CLIENT_ID=<client id>
-ADMIN_CLIENT_SECRET=<client secret>
-#HTTP_PROXY_URL=http://192.168.110.10:3128/
+vzd-cli --help
+vzd-cli admin --help
+vzd-cli admin vault --help
+vzd-cli admin vault import --help
 ----
+
+Bevor eine Verbindung zum Verzeichnisdienst aufgebaut werden kann, benötigt man die OAuth2 Client Credentials. 
+Den Zugang bekommt man von der gematik. 
+
+.Einen neuen Vault für die Geheimnisse erstellen
+[source,bash]
+----
+vzd-cli admin vault reset
+----
+
+.Client Credentials für die jeweiligen Umgebungen hinterlegen
+[source,bash]
+----
+vzd-cli admin vault store --help
+vzd-cli admin vault store -e ru -c <CLIEND_ID> -s <CLIENT_SECRET>
+vzd-cli admin vault store -e pu -c <CLIEND_ID> -s <CLIENT_SECRET>
+----
+
+.Geheimnisse aus einem Transport- oder Backup-Vault importieren
+[source,bash]
+----
+vzd-cli admin vault import --help
+vzd-cli admin vault import -i vault.keystore
+----
+
+
 .Beispiel: Suche nach einem Eintrag mit angegebenen telematikID
 [source,bash]
 ----
-bin/vzd-cli admin list --param telematikID=5-SMC-B-Testkarte-883110000092568
+vzd-cli admin list -p telematikID=5-SMC-B-Testkarte-883110000092568
 ----
 
 == `admin`: CLI für Directory Administration 
 
-=== Configuration
+[#cmd-admin-info]
+=== `admin vault`
 
-|===
-|Variable | Beschreibung 
-|`ADMIN_API_URL`
-| URL des Directory Administration API Endpoints 
+Befehle zur Verwaltung von OAuth2 Geheimnissen  
 
-|`ADMIN_AUTH_URL` +
-`ADMIN_CLIENT_ID` +
-`ADMIN_CLIENT_SECRET`
-| Authentisierungsinformation 
-
-|`ADMIN_ACCESS_TOKEN`
-| Alternativ kann Access-Token als Umgebungsvariable gesetzt werden. Dadurch können mehrere Aufrufe des Clients ohne expliziten Authentisierung durchgeführt werden.
-
-Benutzt <<cmd-admin-auth,admin auth>> um den Token zu besorgen.
-
-|`HTTP_PROXY_URL`
-| Optional: URL zum HTTP-Proxy, z.B.: `http://192.168.110.10:3128/`
-
-|===
-
-Die Umgebungsvariablen können in einer `.env` Datei gespeichert werden. Hier ist ein Beispiel für die Referenzumgebung:
-
+.Aktuelle OAuth ClientIDs anzeigen
 [source,bash]
 ----
-ADMIN_API_URL=https://vzdpflege-ref.vzd.ti-dienste.de:9543/
-ADMIN_AUTH_URL=https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token
-ADMIN_CLIENT_ID=<client id>
-ADMIN_CLIENT_SECRET=<secret>
+vzd-cli admin vault list
 ----
 
-Standardmäßig wird die Datei mit Namen `.env` im aktuellen Arbeitsverzeichnis geladen. Alternativer Dateiname kann über  `--env` Option angegeben werden:
+=== `admin config`
 
+Befehle für Konfiguration des CLI
+
+.Aktuelle Konfiguration anzeigen
 [source,bash]
 ----
-bin/vzd-cli --env ../.env.ru admin list
+vzd-cli admin config view
 ----
+
+=== `admin config`
+
+Befehle für Konfiguration des CLI
+
+.In alle drei Umgebungen einloggen (vorausgesetzt alle drei ClientIDs sind über `admin vault` hinterlegt)
+[source,bash]
+----
+vzd-cli admin -e tu login
+vzd-cli admin -e ru login
+vzd-cli admin -e pu login
+----
+
+NOTE: Im Gegensatz zu Vault und `CLIENT_SECRETS`, werden die zeitlich befristete `ACCESS_TOKEN` unverschlüsselt im Ordner `$HOME/.telematik/` gespeichert
+
 
 [#cmd-admin-info]
 === `admin info`
@@ -92,7 +114,7 @@ Zeigt die Information über den VZD-Server und die API.
 
 [source,bash]
 ----
-bin/vzd-cli admin info
+vzd-cli admin info
 ----
 
 
@@ -104,7 +126,7 @@ Authentisiert den Client und gibt `ACCESS_TOKEN` zurück. Token kann danach in d
 .Beispiel: Authentisiert und speichert den ACCESS_TOKEN in die Umgebungsvariable 
 [source,bash]
 ----
-export ADMIN_ACCESS_TOKEN=`bin/vzd-cli admin auth`
+export ADMIN_ACCESS_TOKEN=$(vzd-cli admin auth)
 ----
 
 [#cmd-admin-list]
