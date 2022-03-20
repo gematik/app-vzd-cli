@@ -1,6 +1,8 @@
 = 🗂️ `vzd-cli`: Command Line Client für Verzeichnisdienst der TI 
 :toc: auto
 
+<a href="https://asciinema.org/a/V6StKmosHuJ6e2IWeUFhZT6Q4" target="_blank"><img src="https://asciinema.org/a/V6StKmosHuJ6e2IWeUFhZT6Q4.svg" /></a>
+
 `vzd-cli` wurde in Vorbereitung der Migration des gematik Verzeichnisdienstes (VZD) von LDAP nach FHIR entwickelt. Über ein modernes CLI (Command Line Interface) können neue und alte Schnittstellen des VZD genutzt werden.
 
 == Installation
