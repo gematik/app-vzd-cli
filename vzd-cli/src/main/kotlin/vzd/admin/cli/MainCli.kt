@@ -70,19 +70,19 @@ class DirectoryAdministrationCli :
     override fun run() = catching {
 
         val provider = FileConfigProvider()
-        val env =
+        val clientEnv =
             env ?: provider.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
+
+        logger.info { "Using environment: $clientEnv" }
 
         var clientDelegate: () -> Client = {
             val envcfg =
-                provider.config.environment(env) ?: throw CliktError("Default environment not configired: $env")
+                provider.config.environment(clientEnv) ?: throw CliktError("Default environment not configired: $env")
 
             var clientApiURL = envcfg.apiURL
-            var clientAccessToken = provider.config.tokens?.get(env)?.accessToken
+            var clientAccessToken = provider.config.tokens?.get(clientEnv)?.accessToken
             var clientHttpProxyURL = provider.config.httpProxy?.proxyURL
             var clientHttpProxyEnabled = provider.config.httpProxy?.enabled
-
-            logger.info { "Using environment: $env" }
 
             dotenv.get("ADMIN_API_URL", null)?.let {
                 logger.error { "ADMIN_API_URL is deprecated, use admin config instead" }
@@ -115,7 +115,7 @@ class DirectoryAdministrationCli :
             }
 
             if (clientAccessToken == null) {
-                throw CliktError("You are not logged in. Use 'vzd-cli admin -e $env login'")
+                throw CliktError("You are not logged in. Use 'vzd-cli admin -e $clientEnv login'")
             }
 
             Client {
@@ -127,7 +127,7 @@ class DirectoryAdministrationCli :
             }
         }
 
-        currentContext.obj = CommandContext(clientDelegate, outputFormat, env)
+        currentContext.obj = CommandContext(clientDelegate, outputFormat, clientEnv)
     }
 
     init {
@@ -168,15 +168,14 @@ class LoginCommand: CliktCommand(name = "login", help = "Login to OAuth2 Server 
 
     override fun run() = catching {
         val provider = FileConfigProvider()
-        val envcfg = provider.config.environment(context.env) ?: throw CliktError("Environmant is not configured: ${context.env}")
+        val envcfg = provider.config.environment(context.env) ?: throw CliktError("Environment is not configured: ${context.env}")
         val vault = KeyStoreVaultProvider(vaultOptions.password)
         val auth = ClientCredentialsAuthenticator(envcfg.authURL,
             if (provider.config.httpProxy?.enabled == true) provider.config.httpProxy?.proxyURL else null )
         val secret = vault.get(context.env) ?: throw CliktError("Secret für env '${context.env}' not found in Vault:")
         val authResponse = auth.authenticate(secret.clientID, secret.secret)
-        val tokens = provider.config.tokens
-            ?: emptyMap<String, TokenConfig>() + mapOf(context.env to TokenConfig(accessToken = authResponse.accessToken))
-        provider.config.tokens = tokens
+        val tokens = provider.config.tokens ?: emptyMap<String, TokenConfig>()
+        provider.config.tokens = tokens + mapOf(context.env to TokenConfig(accessToken = authResponse.accessToken))
         provider.save()
         // show token as pretty json
         val tokenParts = authResponse.accessToken.split(".")
