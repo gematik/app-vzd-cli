@@ -60,7 +60,7 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
 
             expectSuccess = false
 
-            val l = logger;
+            val l = logger
 
             install(Logging) {
                 logger = Logger.DEFAULT
@@ -75,7 +75,9 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
                     sendWithoutRequest {
                         true
                     }
-                    loadTokens(config.loadTokens)
+                    loadTokens {
+                        BearerTokens(config.accessToken, "")
+                    }
                 }
             }
             install(ContentNegotiation) {
@@ -94,6 +96,8 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
 
         logger.debug { "Client created ${config.apiURL}" }
     }
+
+    val accessToken get() = config.accessToken
 
     /**
      * Implements POST /DirectoryEntries (add_Directory_Entry)
@@ -235,6 +239,6 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
 
 class ClientConfiguration {
     var apiURL = ""
-    var loadTokens: suspend () -> BearerTokens? = { null }
+    var accessToken = ""
     var httpProxyURL: String? = null
 }

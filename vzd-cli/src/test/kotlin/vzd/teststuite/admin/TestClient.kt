@@ -24,7 +24,7 @@ class TestClient {
     fun setUp() {
         this.client = Client {
             apiURL = dotenv["ADMIN_API_URL"]
-            loadTokens = { BearerTokens(dotenv["ADMIN_ACCESS_TOKEN"], "") }
+            accessToken = dotenv["TEST_ACCESS_TOKEN"] ?: throw RuntimeException("Environment variable TEST_ACCESS_TOKEN ist not set")
         }
 
         val entries = runBlocking { client?.readDirectoryEntry(mapOf("domainID" to TestClient::class.qualifiedName!!)) }
