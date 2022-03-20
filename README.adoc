@@ -143,7 +143,7 @@ Liest Werte eines Parameters aus der Datei und fragt für jeden Wert nach Eintra
 .Beispiel: Findet alle Einträge mit TelematikID aus `telematik.txt`
 [source,bash]
 ----
-bin/vzd-cli admin --short list -f telematikID telematik.txt
+vzd-cli admin --short list -f telematikID telematik.txt
 ----
 
 .Inhalt von `telematik.txt`
@@ -165,13 +165,13 @@ Generiert die Dateivorlagen für `admin add` oder `admin modify` Befehle.
 .Beispiel: Erzeugt eine Vorlage und schreibt es in eine YAML-Datei 
 [source,bash]
 ----
-bin/vzd-cli admin template base > Eintrag.yaml
+vzd-cli admin template base > Eintrag.yaml
 ----
 
 .Beispiel: Erzeugt eine Vorlage und schreibt es in eine JSON-Datei 
 [source,bash]
 ----
-bin/vzd-cli admin --json template base > Eintrag.json
+vzd-cli admin --json template base > Eintrag.json
 ----
 
 [#cmd-admin-add-base]
@@ -212,10 +212,10 @@ Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinz
 [source,bash]
 ----
 # zuerst einen leeren Basiseintrag erzeugen
-bin/vzd-cli admin add-base -s telematikID=1-123123
+vzd-cli admin add-base -s telematikID=1-123123
 # danach Zertifikat hinzufügen
 # Achtung: TelematikID beim Befehl admin add-base und im Zertifikat müssen identisch sein
-bin/vzd-cli admin add-cert 1-123123.der
+vzd-cli admin add-cert 1-123123.der
 ----
 
 [#cmd-admin-clear-cert]
@@ -225,7 +225,7 @@ Löscht alle Zertifikate aus dem angegeben Eintrag.
 
 [source,bash]
 ----
-bin/vzd-cli admin clear-cert -p telematikID=1-123123
+vzd-cli admin clear-cert -p telematikID=1-123123
 ----
 
 [#cmd-admin-save-cert]
@@ -236,7 +236,7 @@ Speichert alle gefundene Zertifikate in ein Verzeichnis
 [#cmd-admin-delete-cert]
 === `admin delete-cert`
 
-WARNING: Nicht implementiert
+WARNING: Nicht implementiert. Bitte `admin clear-cert` verwenden.
 
 Löscht einen X509-Zertifikat.
 
