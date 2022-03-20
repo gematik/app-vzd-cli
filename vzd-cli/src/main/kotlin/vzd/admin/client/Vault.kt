@@ -33,7 +33,7 @@ class KeyStoreVaultProvider(val password: String,
             vaultPath.parent.toFile().mkdirs()
         }
         if (reset) {
-            logger.debug { "Deleting $vaultPath" }
+            logger.debug { "Resetting $vaultPath" }
             vaultPath.deleteIfExists()
         }
     }
