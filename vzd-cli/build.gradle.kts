@@ -1,5 +1,5 @@
 val ktorVersion = "2.0.0-beta-1"
-version = "0.12.0-wip"
+version = "0.12.0-beta"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -58,7 +58,7 @@ tasks.named<JavaExec>("run") {
     standardInput = System.`in`
 }
 
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
 }
 

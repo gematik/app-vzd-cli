@@ -53,7 +53,7 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
 
         result?.forEach {
             val cert = it.userCertificate?.toCertificateInfo() ?: return
-            val filename = "${cert.admissionStatement.registrationNumber}-${cert.serialNumber}.der"
+            val filename = "${cert.admissionStatement.registrationNumber.escape()}-${cert.serialNumber}.der"
             val path = outputDir?.resolve(filename) ?: return
             logger.info { "Writing certificate to file ${path.toRealPath()}" }
             path.writeBytes(Base64.decode(it.userCertificate?.base64String))

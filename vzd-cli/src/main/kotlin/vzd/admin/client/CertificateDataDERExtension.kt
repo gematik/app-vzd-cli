@@ -100,8 +100,8 @@ fun CertificateDataDER.toCertificateInfo(): CertificateInfo {
     )
 
     return CertificateInfo(
-        cert.subjectDN.name,
-        cert.issuerDN.name,
+        cert.subjectX500Principal.name,
+        cert.issuerX500Principal.name,
         cert.sigAlgName,
         cert.publicKey.algorithm,
         cert.serialNumber.toString(),
