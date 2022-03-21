@@ -1,11 +1,19 @@
 = Changelog `vzd-cli`
 
-== Version 0.12.0
+== Version 0.12.x
 
+- Konfiguration ist komplett neu geschrieben. 
+- Neue Befehle 
+  - `vzd-cli admin vault`
+  - `vzd-cli admin config`
+  - `vzd-cli admin login` 
+- Proxy kann jetzt ein- und ausgeschaltet werden:
+  - Proxy an: `vzd-cli admin -x list`
+  - Proxy aus: `vzd-cli admin -X list`
+- holder und domainID sind jetzt Teil von CVS-Output
+- Skelett-Zertifikatsblöcke werden beim CSV-Output nicht mehr gezählt 
+- Authentisierung wird jetzt nur beim Bedarf verlangt, z.B. `vzd-cli admin cert-info` funktioniert ohne Authentisierung. 
+- Viele Bugfixes
 
 == Backlog
 
-* Add 'holder' to CSV output
-* Do not count empty certificate blocks in CSV output
-* Remove the authentication requirement for commands that can work without it (e.g. cert-info)
-* Refactor ACCESS_TOKEN and ENV handling to be more secure
