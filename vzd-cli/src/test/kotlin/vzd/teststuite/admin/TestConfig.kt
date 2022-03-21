@@ -12,7 +12,6 @@ import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteIfExists
 
 class TestConfig : FeatureSpec({
-    val logger = KotlinLogging.logger {}
     val configDir = createTempDirectory()
     val configPath = Path(configDir.toString(), "directory-admin-test.yaml")
 

@@ -11,7 +11,6 @@ import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteIfExists
 
 class TestVault : FeatureSpec({
-    val logger = KotlinLogging.logger {}
     val vaultDir = createTempDirectory()
     val vaultPath = Path(vaultDir.toString(), "directory-vault-test.keystore")
     val badPassword = "BadPassword"
