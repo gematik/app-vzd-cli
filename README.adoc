@@ -14,16 +14,39 @@ image::images/vzd-cli.gif[]
 
 [source]
 ----
-$ bin/vzd-cli --help
-Usage: vzd-cli [OPTIONS] COMMAND [ARGS]...
+$ vzd-cli admin --help
+Usage: vzd-cli admin [OPTIONS] COMMAND [ARGS]...
+
+  CLI for DirectoryAdministration API
 
 Options:
-  --env FILENAME  specify env file
-  --version       Show the version and exit
-  -h, --help      Show this message and exit
+  --human, --json, --yaml, --csv, --short
+  -e, --env [tu|ru|pu]             Environment. Either tu, ru or pu. If not
+                                   specified default env is used.
+  -x, --proxy-on / -X, --proxy-off
+                                   Forces the use of the proxy, overrides the
+                                   configuration
+  -h, --help                       Show this message and exit
 
 Commands:
-  admin  CLI for DirectoryAdministration API
+  vault             Manage OAuth credentials in the Vault
+  config            Manage configuration
+  login             Login to OAuth2 Server and store token(s)
+  auth              Show current access token
+  info              Show information about the API
+  list              List directory entries
+  template          Create template for a resource
+  add-base          Add new directory entry
+  load-base         Load the base entry for editing.
+  modify-base       Modify single base directory entry
+  modify-base-attr  Modify specific attributes of a base entry
+  delete            Delete specified directory entries
+  list-cert         List certificates
+  add-cert          Add certificate to existing DirectoryEntry
+  save-cert         Saves certificate to DER files
+  delete-cert       Delete certificate
+  clear-cert        Clear all certificates of a given entry
+  cert-info         Show details of a certificate
 ----
 
 == Erste Schritte
