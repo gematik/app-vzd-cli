@@ -7,6 +7,8 @@ import vzd.admin.client.DirectoryEntry
 val DirectoryEntryCsvHeaders = listOf(
     "query",
     "telematikID",
+    "domainID",
+    "holder",
     "displayName",
     "streetAddress",
     "postalCode",
@@ -35,6 +37,8 @@ val DirectoryEntryOutputMapping = mapOf(
             Output.printCsv(listOf(
                 query.toString(),
                 it.directoryEntryBase.telematikID.escape(),
+                it.directoryEntryBase.domainID?.joinToString(),
+                it.directoryEntryBase.holder?.joinToString(),
                 it.directoryEntryBase.displayName,
                 it.directoryEntryBase.streetAddress,
                 it.directoryEntryBase.postalCode,

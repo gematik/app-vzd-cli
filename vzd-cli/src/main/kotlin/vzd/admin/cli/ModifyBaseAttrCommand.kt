@@ -14,6 +14,8 @@ import mu.KotlinLogging
 import vzd.admin.client.BaseDirectoryEntry
 import vzd.admin.client.UpdateBaseDirectoryEntry
 
+private val JSON = Json { ignoreUnknownKeys = true }
+
 class ModifyBaseAttrCommand :
     CliktCommand(name = "modify-base-attr", help = "Modify specific attributes of a base entry") {
     private val logger = KotlinLogging.logger {}
@@ -46,7 +48,7 @@ class ModifyBaseAttrCommand :
         if (dn != null) {
             val jsonData = Json.encodeToString(baseToUpdate)
             val updateBaseDirectoryEntry =
-                Json { ignoreUnknownKeys = true }.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
+                JSON.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
             // server bug: when updating telematikID with no certificates the exception is thrown
             updateBaseDirectoryEntry.telematikID = null
             runBlocking { context.client.modifyDirectoryEntry(dn.uid, updateBaseDirectoryEntry) }

@@ -31,6 +31,13 @@ fun catching(throwingBlock: () -> Unit = {}) {
         throw CliktError(e.message)
     } catch (e: VaultException) {
         throw CliktError(e.message)
+    } catch (e: IllegalStateException) {
+        // dirty, but no other way atm
+        if (e.message?.contains("Unsupported byte code, first byte is 0xfc") == true) {
+            throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin login`.")
+        } else {
+            throw e
+        }
     }
 }
 

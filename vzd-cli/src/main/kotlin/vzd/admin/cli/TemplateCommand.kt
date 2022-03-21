@@ -24,7 +24,7 @@ class TempolateCommand : CliktCommand(name = "template", help = """Create templa
             givenName = "Vorname",
             sn = "Nachname",
             displayName = "Name, Vorname",
-            streetAddress = "Hauptstraße 1",
+            streetAddress = "Hauptstr. 1",
             postalCode = "12345",
             countryCode = "DE",
             localityName = "Berlin",

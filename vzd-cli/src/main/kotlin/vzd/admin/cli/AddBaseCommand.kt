@@ -30,13 +30,14 @@ fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<String, St
 
         if (property.returnType == typeOf<String>() || property.returnType == typeOf<String?>()) {
             property.setter.call(baseDirectoryEntry, value)
+        } else if (property.returnType == typeOf<Int>() || property.returnType == typeOf<Int?>()) {
+            property.setter.call(baseDirectoryEntry, value.toInt())
         } else if (property.returnType == typeOf<List<String>>() || property.returnType == typeOf<List<String>?>()) {
             property.setter.call(baseDirectoryEntry, value.split(',').map { it.trim() })
         } else {
             throw UsageError("Unsupported property type '$name': ${property.returnType}")
         }
     }
-
 }
 
 class AddBaseCommand: CliktCommand(name="add-base", help="Add new directory entry") {

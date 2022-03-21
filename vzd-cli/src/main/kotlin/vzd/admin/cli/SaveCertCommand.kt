@@ -5,14 +5,13 @@ import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.options.associate
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.pair
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.path
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
 import vzd.admin.client.toCertificateInfo
+import java.nio.file.Paths
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.useLines
@@ -26,8 +25,9 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
         help = "Read parameter values from file", metavar = "PARAM FILENAME").pair()
     private val params: Map<String, String> by option("-p", "--param",
         help = "Specify query parameters to find matching entries").associate()
-    private val outputDir by option("-o", "--output-dir", metavar = "OUTPUT_DIR", help = "Output directory for certificate files")
+    private val outputDir by option("-o", "--output-dir", metavar = "OUTPUT_DIR", help = "Output directory for certificate files. Default ist current directory.")
         .path(mustExist = true, canBeFile = false)
+        .default(Paths.get(""))
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
@@ -54,7 +54,7 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
         result?.forEach {
             val cert = it.userCertificate?.toCertificateInfo() ?: return
             val filename = "${cert.admissionStatement.registrationNumber.escape()}-${cert.serialNumber}.der"
-            val path = outputDir?.resolve(filename) ?: return
+            val path = outputDir.resolve(filename)
             logger.info { "Writing certificate to file ${path.toRealPath()}" }
             path.writeBytes(Base64.decode(it.userCertificate?.base64String))
         }
