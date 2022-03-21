@@ -17,15 +17,11 @@ private val logger = KotlinLogging.logger {}
 
 class TestClient {
     var client: Client? = null
-    var dotenv = dotenv { ignoreIfMissing = true }
 
 
     @BeforeTest
     fun setUp() {
-        this.client = Client {
-            apiURL = dotenv["ADMIN_API_URL"]
-            accessToken = dotenv["TEST_ACCESS_TOKEN"] ?: throw RuntimeException("Environment variable TEST_ACCESS_TOKEN ist not set")
-        }
+        this.client = createClient()
 
         val entries = runBlocking { client?.readDirectoryEntry(mapOf("domainID" to TestClient::class.qualifiedName!!)) }
         entries?.forEach {

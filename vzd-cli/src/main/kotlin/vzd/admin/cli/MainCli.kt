@@ -2,10 +2,7 @@ package vzd.admin.cli
 
 import com.github.ajalt.clikt.core.*
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.prompt
-import com.github.ajalt.clikt.parameters.options.switch
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.client.plugins.auth.providers.*
@@ -65,10 +62,16 @@ class DirectoryAdministrationCli :
         "--short" to OutputFormat.SHORT,
     ).default(OutputFormat.HUMAN)
 
-    private val env by option("-e", "--env", help="Environment. Either tu, ru or pu. If not specified default env is used.").choice("tu", "ru", "pu")
+    private val env by option(
+        "-e", "--env",
+        help="Environment. Either tu, ru or pu. If not specified default env is used.")
+        .choice("tu", "ru", "pu")
+
+    private val useProxy: Boolean? by option(
+        "--proxy-on", "-x", help="Forces the use of the proxy, overrides the configuration")
+        .flag("--proxy-off", "-X")
 
     override fun run() = catching {
-
         val provider = FileConfigProvider()
         val clientEnv =
             env ?: provider.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
@@ -91,6 +94,9 @@ class DirectoryAdministrationCli :
             dotenv.get("HTTP_PROXY_URL", null)?.let {
                 logger.error { "HTTP_PROXY_URL is deprecated, use 'vzd-cli admin config' instead" }
                 clientHttpProxyURL = it
+                clientHttpProxyEnabled = true
+            }
+            if (useProxy == true) {
                 clientHttpProxyEnabled = true
             }
             dotenv.get("ADMIN_ACCESS_TOKEN", null)?.let {
