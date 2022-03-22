@@ -10,7 +10,7 @@
 - Proxy kann jetzt ein- und ausgeschaltet werden:
   - Proxy an: `vzd-cli admin -x list`
   - Proxy aus: `vzd-cli admin -X list`
-- holder und domainID sind jetzt Teil von CVS-Output
+- holder und domainID sind jetzt Teil von CSV-Output
 - Skelett-Zertifikatsblöcke werden beim CSV-Output nicht mehr gezählt 
 - Authentisierung wird jetzt nur beim Bedarf verlangt, z.B. `vzd-cli admin cert-info` funktioniert ohne Authentisierung. 
 - Viele Bugfixes
