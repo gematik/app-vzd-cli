@@ -6,10 +6,7 @@ import java.io.IOException
 import java.nio.file.Path
 import java.security.KeyStore
 import javax.crypto.spec.SecretKeySpec
-import kotlin.io.path.Path
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
+import kotlin.io.path.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -30,7 +27,7 @@ class KeyStoreVaultProvider(val password: String,
 
     init {
         if (!vaultPath.toFile().exists()) {
-            vaultPath.parent.toFile().mkdirs()
+            vaultPath.absolute().parent.toFile().mkdirs()
         }
         if (reset) {
             logger.debug { "Resetting $vaultPath" }
