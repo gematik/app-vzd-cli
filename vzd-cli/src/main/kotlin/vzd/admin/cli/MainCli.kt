@@ -1,11 +1,10 @@
 package vzd.admin.cli
 
 import com.github.ajalt.clikt.core.*
-import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
 import io.github.cdimascio.dotenv.Dotenv
-import io.ktor.client.plugins.auth.providers.*
+import io.ktor.client.network.sockets.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
@@ -31,6 +30,8 @@ fun catching(throwingBlock: () -> Unit = {}) {
         throw CliktError(e.message)
     } catch (e: VaultException) {
         throw CliktError(e.message)
+    } catch (e: ConnectTimeoutException) {
+        throw CliktError("${e.message}. Try using proxy: vzd-cli admin -x ...")
     } catch (e: IllegalStateException) {
         // dirty, but no other way atm
         if (e.message?.contains("Unsupported byte code, first byte is 0xfc") == true) {
@@ -46,9 +47,10 @@ enum class OutputFormat {
 }
 
 class CommandContext(
-    val clientDelegate: () -> Client,
+    private val clientDelegate: () -> Client,
     val outputFormat: OutputFormat,
     val env: String,
+    val useProxy: Boolean,
     var firstCommand: Boolean = true,
 ) {
 
@@ -85,7 +87,7 @@ class DirectoryAdministrationCli :
 
         logger.info { "Using environment: $clientEnv" }
 
-        var clientDelegate: () -> Client = {
+        val clientDelegate: () -> Client = {
             val envcfg =
                 provider.config.environment(clientEnv) ?: throw CliktError("Default environment not configired: $env")
 
@@ -140,7 +142,7 @@ class DirectoryAdministrationCli :
             }
         }
 
-        currentContext.obj = CommandContext(clientDelegate, outputFormat, clientEnv)
+        currentContext.obj = CommandContext(clientDelegate, outputFormat, clientEnv, useProxy == true)
     }
 
     init {
@@ -177,17 +179,20 @@ class Info : CliktCommand(name = "info", help = "Show information about the API"
 
 class LoginCommand: CliktCommand(name = "login", help = "Login to OAuth2 Server and store token(s)") {
     private val context by requireObject<CommandContext>()
-    private val vaultOptions by VaultCommonOptions()
+    private val password by option("--password", "-p", help="Password for protection of the Vault")
+        .prompt("Enter Vault Password")
 
     override fun run() = catching {
         val provider = FileConfigProvider()
         val envcfg = provider.config.environment(context.env) ?: throw CliktError("Environment is not configured: ${context.env}")
-        val vault = KeyStoreVaultProvider(vaultOptions.password)
+        val vaultProvider = KeyStoreVaultProvider()
+        if (!vaultProvider.exists()) throw CliktError("Vault is not initialized. See vzd-cli admin vault --help")
+        val vault = vaultProvider.open(password)
         val auth = ClientCredentialsAuthenticator(envcfg.authURL,
-            if (provider.config.httpProxy?.enabled == true) provider.config.httpProxy?.proxyURL else null )
-        val secret = vault.get(context.env) ?: throw CliktError("Secret für env '${context.env}' not found in Vault:")
+            if (provider.config.httpProxy?.enabled == true || context.useProxy) provider.config.httpProxy?.proxyURL else null)
+        val secret = vault.get(context.env) ?: throw CliktError("Secret for env '${context.env}' not found in Vault:")
         val authResponse = auth.authenticate(secret.clientID, secret.secret)
-        val tokens = provider.config.tokens ?: emptyMap<String, TokenConfig>()
+        val tokens = provider.config.tokens ?: emptyMap()
         provider.config.tokens = tokens + mapOf(context.env to TokenConfig(accessToken = authResponse.accessToken))
         provider.save()
         // show token as pretty json

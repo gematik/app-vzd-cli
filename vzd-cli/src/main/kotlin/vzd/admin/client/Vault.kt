@@ -12,45 +12,55 @@ private val logger = KotlinLogging.logger {}
 
 data class Secret(var environment: String, var clientID: String, var secret: String)
 
-private const val SERVICE_NAME = "urn:gematik:directory:admin"
-private val REGEX = "^$SERVICE_NAME:([\\w\\p{L}\\-_]+):([\\w\\p{L}\\-_]+)".toRegex()
+private const val DEFAULT_SERVICE_NAME = "urn:gematik:directory:admin"
 
 class VaultException(message: String): Exception(message)
 
-class KeyStoreVaultProvider(val password: String,
-                            val customVaultPath: Path? = null,
-                            val reset: Boolean = false) {
+class KeyStoreVaultProvider(val customVaultPath: Path? = null) {
 
     private val defaultVaultPath = Path(System.getProperty("user.home"), ".telematik", "directory-vault.keystore")
-
-    val vaultPath get() = customVaultPath ?: defaultVaultPath
+    private val vaultPath get() = customVaultPath ?: defaultVaultPath
 
     init {
         if (!vaultPath.toFile().exists()) {
             vaultPath.absolute().parent.toFile().mkdirs()
         }
-        if (reset) {
-            logger.debug { "Resetting $vaultPath" }
-            vaultPath.deleteIfExists()
-        }
     }
 
+    fun exists(): Boolean {
+        return vaultPath.exists()
+    }
+
+    fun purge() {
+        logger.debug { "Purging the Vault at $vaultPath" }
+        vaultPath.deleteIfExists()
+    }
+
+    fun open(password: String, serviceName: String = DEFAULT_SERVICE_NAME):  KeyStoreVault {
+        return KeyStoreVault(password, vaultPath, serviceName)
+    }
+
+
+}
+
+class KeyStoreVault(private val password: String, private val keystorePath: Path, private val serviceName: String) {
+    private val pattern = "^$serviceName:([\\w\\p{L}\\-_]+):([\\w\\p{L}\\-_]+)".toRegex()
     fun clear() {
         keyStore.aliases().asSequence().filter {
-            REGEX.matches(it)
+            pattern.matches(it)
         }.forEach {
             keyStore.deleteEntry(it)
         }
         saveKeystore()
     }
 
-    val keystorePassword: CharArray
+    private val keystorePassword: CharArray
         get() = this.password.toCharArray()
 
     fun list(): Sequence<Secret> {
         return keyStore.aliases().asSequence().mapNotNull { alias ->
-            REGEX.matchEntire(alias)?.let {
-                Secret(it.groups.get(1)!!.value, it.groups.get(2)!!.value,
+            pattern.matchEntire(alias)?.let {
+                Secret(it.groups[1]!!.value, it.groups[2]!!.value,
                     getSecret(alias)!!)
             }
         }
@@ -60,11 +70,11 @@ class KeyStoreVaultProvider(val password: String,
         val protection = KeyStore.PasswordProtection(keystorePassword)
         val secretSpec = SecretKeySpec(secret.toByteArray(Charsets.UTF_8), "AES")
         keyStore.aliases().asSequence().filter {
-            it.startsWith("$SERVICE_NAME:$environment:")
+            it.startsWith("$serviceName:$environment:")
         }.forEach {
             keyStore.deleteEntry(it)
         }
-        keyStore.setEntry("$SERVICE_NAME:$environment:$name", KeyStore.SecretKeyEntry(secretSpec), protection)
+        keyStore.setEntry("$serviceName:$environment:$name", KeyStore.SecretKeyEntry(secretSpec), protection)
         saveKeystore()
     }
 
@@ -82,20 +92,20 @@ class KeyStoreVaultProvider(val password: String,
 
     fun get(environment: String): Secret? {
 
-        val alias = keyStore.aliases().asSequence().find { it.startsWith("$SERVICE_NAME:$environment") }
+        val alias = keyStore.aliases().asSequence().find { it.startsWith("$serviceName:$environment") }
             ?: return null
 
         logger.debug { "Found vault entry: $alias" }
 
-        return REGEX.matchEntire(alias)?.let {
-            Secret(it.groups.get(1)!!.value, it.groups.get(2)!!.value,
+        return pattern.matchEntire(alias)?.let {
+            Secret(it.groups[1]!!.value, it.groups[2]!!.value,
                 getSecret(alias)!!)
         }
     }
 
     fun delete(environment: String) {
         keyStore.aliases().asSequence().filter {
-            it.startsWith("$SERVICE_NAME:$environment")
+            it.startsWith("$serviceName:$environment")
         }.forEach {
             keyStore.deleteEntry(it)
         }
@@ -105,20 +115,19 @@ class KeyStoreVaultProvider(val password: String,
     private val keyStore: KeyStore by lazy {
         val keyStore = KeyStore.getInstance("BCFKS", BouncyCastleProvider())
 
-        if (vaultPath.toFile().exists()) {
+        if (keystorePath.toFile().exists()) {
             try {
-                keyStore.load(vaultPath.inputStream(), keystorePassword)
+                keyStore.load(keystorePath.inputStream(), keystorePassword)
             } catch (e: IOException) {
                 throw VaultException("Unable to open the Vault. Invalid password.")
             }
         } else {
             keyStore.load(null, password.toCharArray())
-            keyStore.store(vaultPath.outputStream(), keystorePassword)
+            keyStore.store(keystorePath.outputStream(), keystorePassword)
         }
 
         keyStore
     }
 
-    private fun saveKeystore() = keyStore.store(vaultPath.outputStream(), keystorePassword)
-
+    private fun saveKeystore() = keyStore.store(keystorePath.outputStream(), keystorePassword)
 }

@@ -50,29 +50,42 @@ data class DistinguishedName(
 
 @Serializable
 data class BaseDirectoryEntry(
+    // Identifier
     var telematikID: String,
-    var cn: String? = null,
+    var domainID: List<String>? = null,
     //TODO: YAML decode is not working when I add this
     //@Contextual
     var dn: DistinguishedName? = null,
+
+    // Names
+    var displayName: String? = null,
+    var cn: String? = null,
+    var otherName: String? = null,
+    var organization: String? = null,
     var givenName: String? = null,
     var sn: String? = null,
-    var displayName: String? = null,
+    var title: String? = null,
+
+    // Addresses
     var streetAddress: String? = null,
     var postalCode: String? = null,
-    var countryCode: String? = null,
     var localityName: String? = null,
     var stateOrProvinceName: String? = null,
-    var title: String? = null,
-    var organization: String? = null,
-    var otherName: String? = null,
+    var countryCode: String? = null,
+
+    // Professional
+    var professionOID: List<String>? = null,
     var specialization: List<String>? = null,
-    var domainID: List<String>? = null,
+    var entryType: List<String>? = null,
+
+    // System
     var holder: List<String>? = null,
-    var maxKOMLEadr: Int? = null,
-    var personalEntry: Boolean? = null,
     var dataFromAuthority: Boolean? = null,
+    var personalEntry: Boolean? = null,
     var changeDateTime: String? = null,
+
+    // Internal
+    var maxKOMLEadr: Int? = null,
 )
 
 @Serializable
