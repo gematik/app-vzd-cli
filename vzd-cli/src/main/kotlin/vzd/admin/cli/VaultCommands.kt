@@ -4,8 +4,6 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.output.TermUi
-import com.github.ajalt.clikt.parameters.groups.OptionGroup
-import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
@@ -38,8 +36,8 @@ fun openOrCreateVault(password: String?): KeyStoreVault {
         vaultProvider.open(password)
     } ?: run {
         if (vaultProvider.exists()) {
-            val password = TermUi.prompt("Enter Vault password", hideInput = true) ?: throw CliktError()
-            vaultProvider.open(password)
+            val promptPassword = TermUi.prompt("Enter Vault password", hideInput = true) ?: throw CliktError()
+            vaultProvider.open(promptPassword)
         } else {
             logger.info { "Creating new vault" }
             val newPassword = TermUi.prompt("Creating new Vault. Enter new Vault password", hideInput = true, requireConfirmation = true) ?: throw CliktError()

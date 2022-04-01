@@ -1,5 +1,11 @@
 = Changelog `vzd-cli`
 
+== Version 0.13.x
+
+- Die Abfragen nach Vault-Password sind jetzt klarer
+- Neues Befehl: `vzd-cli admin vault purge` - löscht alle Credentials aus dem Vault
+- Fix Bug beim Einloggen hinter dem Proxy-Server
+
 == Version 0.12.x
 
 - Konfiguration ist komplett neu geschrieben. 

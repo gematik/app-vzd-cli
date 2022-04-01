@@ -3,5 +3,5 @@ if [ -z "$*" ]
 then
   gradle run
 else
-  gradle run --args="$*"
+  gradle -q run --args="$*"
 fi
