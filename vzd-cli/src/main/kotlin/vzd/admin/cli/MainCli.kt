@@ -180,7 +180,7 @@ class Info : CliktCommand(name = "info", help = "Show information about the API"
 class LoginCommand: CliktCommand(name = "login", help = "Login to OAuth2 Server and store token(s)") {
     private val context by requireObject<CommandContext>()
     private val password by option("--password", "-p", help="Password for protection of the Vault")
-        .prompt("Enter Vault Password")
+        .prompt("Enter Vault Password", hideInput = true)
 
     override fun run() = catching {
         val provider = FileConfigProvider()
