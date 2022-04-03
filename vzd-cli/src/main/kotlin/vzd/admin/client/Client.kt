@@ -1,5 +1,8 @@
 package vzd.admin.client
 
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -12,11 +15,23 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import java.io.InputStreamReader
+import java.io.Reader
+import java.io.StringWriter
+import java.math.BigDecimal
 
 private val logger = KotlinLogging.logger {}
+
+private val JSON = Json {
+    ignoreUnknownKeys = true
+    prettyPrint = true
+}
 
 class VZDResponseException(response: HttpResponse, message: String) :
     ResponseException(response, message) {
@@ -81,12 +96,7 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
                 }
             }
             install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        prettyPrint = true
-                    }
-                )
+                json(JSON)
             }
             defaultRequest {
                 url(config.apiURL)
@@ -155,10 +165,69 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
         }
 
         if (response.status != HttpStatusCode.OK) {
-            throw VZDResponseException(response, "No entries found")
+            throw VZDResponseException(response, "Unable to get entries")
         }
 
         return response.body()
+    }
+
+    /**
+     * Queries the server using `GET /DirectoryEntries` and returns a stream of DirectoryEntry objects.
+     * Allows processing of large amount of entries without loading all of them in RAM.
+     */
+    suspend fun streamDirectoryEntries(
+        parameters: Map<String, String>,
+        path: String = "/DirectoryEntriesSync",
+        sink: ( entry: DirectoryEntry) -> Unit,
+    ) {
+
+        // create custom client without automatic JSON parsing
+        val httpClient = HttpClient(CIO) {
+            engine {
+                config.httpProxyURL?.let {
+                    logger.debug { "Using proxy: $it" }
+                    proxy = ProxyBuilder.http(it)
+                }
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = 1000 * 60 * 60
+            }
+            expectSuccess = false
+
+            install(Auth) {
+                bearer {
+                    sendWithoutRequest {
+                        true
+                    }
+                    loadTokens {
+                        BearerTokens(config.accessToken, "")
+                    }
+                }
+            }
+
+            defaultRequest {
+                url(config.apiURL)
+                headers.set("Accept", "application/json")
+            }
+
+        }
+        httpClient.prepareGet(path) {
+            for (param in parameters.entries) {
+                parameter(param.key, param.value)
+            }
+        }
+            .execute { response ->
+            if (response.status != HttpStatusCode.OK) {
+                throw VZDResponseException(response, "Unable to get entries")
+            }
+            val channel: ByteReadChannel = response.body()
+            jsonArraySequence(InputStreamReader(channel.toInputStream()))
+                .forEach {
+                    sink(JSON.decodeFromString(it))
+                }
+        }
+
     }
 
     /**
@@ -241,4 +310,60 @@ class ClientConfiguration {
     var apiURL = ""
     var accessToken = ""
     var httpProxyURL: String? = null
+}
+
+fun jsonArraySequence(input: Reader): Sequence<String> = sequence {
+    val reader = JsonReader(input)
+
+    reader.beginArray()
+    while (reader.hasNext()) {
+        val strWriter = StringWriter()
+        val writer = JsonWriter(strWriter)
+        reader.beginObject()
+        writer.beginObject()
+        var depth = 0
+        while(reader.peek() != JsonToken.END_OBJECT || depth > 0) {
+            val token = reader.peek()
+            when (token) {
+                JsonToken.BEGIN_OBJECT -> {
+                    reader.beginObject()
+                    writer.beginObject()
+                    depth++
+                }
+                JsonToken.END_OBJECT -> {
+                    reader.endObject()
+                    writer.endObject()
+                    depth--
+                }
+                JsonToken.NAME ->
+                    writer.name(reader.nextName())
+                JsonToken.BOOLEAN ->
+                    writer.value(reader.nextBoolean())
+                JsonToken.STRING ->
+                    writer.value(reader.nextString())
+                JsonToken.NULL -> {
+                    reader.nextNull()
+                    writer.nullValue()
+                }
+                JsonToken.NUMBER ->
+                    writer.value(BigDecimal(reader.nextString()))
+                JsonToken.BEGIN_ARRAY -> {
+                    reader.beginArray()
+                    writer.beginArray()
+                }
+                JsonToken.END_ARRAY -> {
+                    reader.endArray()
+                    writer.endArray()
+                }
+                else -> reader.skipValue()
+            }
+
+        }
+
+        reader.endObject()
+        writer.endObject()
+        yield(strWriter.toString())
+
+    }
+    reader.endArray()
 }

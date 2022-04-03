@@ -150,7 +150,8 @@ class DirectoryAdministrationCli :
             LoginCommand(), AuthenticateAdmin(),
             Info(), ListCommand(), TempolateCommand(), AddBaseCommand(),
             LoadBaseCommand(), ModifyBaseDirectoryEntry(), ModifyBaseAttrCommand(), DeleteCommand(),
-            ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(), CertInfoCommand())
+            ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
+            CertInfoCommand(), DumpCommand())
     }
 
 }
