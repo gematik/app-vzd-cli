@@ -11,6 +11,7 @@ import mu.KotlinLogging
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.useLines
+import kotlin.system.measureTimeMillis
 
 class DumpCommand : CliktCommand(name = "dump", help = "Dump data from server") {
     private val paramFile: Pair<String, String>? by option("-f", "--param-file",
@@ -36,13 +37,15 @@ class DumpCommand : CliktCommand(name = "dump", help = "Dump data from server") 
 
     private fun runQuery(params: Map<String, String>) {
         var entries = 0
-        runBlocking {
-            context.client.streamDirectoryEntries(params) {
-                logger.debug { "Dumping ${it.directoryEntryBase.telematikID} (${it.directoryEntryBase.displayName})" }
-                Output.printJson(it)
-                entries++
+        val elapsed = measureTimeMillis {
+            runBlocking {
+                context.client.streamDirectoryEntries(params) {
+                    logger.debug { "Dumping ${it.directoryEntryBase.telematikID} (${it.directoryEntryBase.displayName})" }
+                    Output.printJson(it)
+                    entries++
+                }
             }
         }
-        logger.info { "Dumped $entries entries" }
+        logger.info { "Dumped $entries entries in ${elapsed/1000} seconds" }
     }
 }
