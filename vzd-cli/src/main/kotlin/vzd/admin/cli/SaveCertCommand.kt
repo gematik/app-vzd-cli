@@ -4,13 +4,11 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
-import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.path
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
-import vzd.admin.client.toCertificateInfo
 import java.nio.file.Paths
 import kotlin.io.path.Path
 import kotlin.io.path.exists
@@ -52,7 +50,7 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
         val result = runBlocking { context.client.readDirectoryCertificates(params) }
 
         result?.forEach {
-            val cert = it.userCertificate?.toCertificateInfo() ?: return
+            val cert = it.userCertificate?.certificateInfo ?: return
             val filename = "${cert.admissionStatement.registrationNumber.escape()}-${cert.serialNumber}.der"
             val path = outputDir.resolve(filename)
             logger.info { "Writing certificate to file ${path.toRealPath()}" }

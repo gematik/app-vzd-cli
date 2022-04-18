@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 import mu.KotlinLogging
 import vzd.admin.client.*
+import vzd.admin.pki.CertificateDataDER
 
 
 class TestCreate : FeatureSpec({
@@ -50,7 +51,7 @@ class TestCreate : FeatureSpec({
                 CertificateDataDER(TestData.cert1)
             val entry = CreateDirectoryEntry()
             entry.directoryEntryBase =
-                BaseDirectoryEntry(certData.toCertificateInfo().admissionStatement.registrationNumber)
+                BaseDirectoryEntry(certData.certificateInfo.admissionStatement.registrationNumber)
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
             entry.userCertificates = listOf(UserCertificate(userCertificate = certData))
             val dn = client?.addDirectoryEntry(entry)
@@ -65,13 +66,13 @@ class TestCreate : FeatureSpec({
             val certData =
                 CertificateDataDER(TestData.cert2)
             val entry = CreateDirectoryEntry()
-            client?.readDirectoryEntry(mapOf("telematikID" to certData.toCertificateInfo().admissionStatement.registrationNumber))
+            client?.readDirectoryEntry(mapOf("telematikID" to certData.certificateInfo.admissionStatement.registrationNumber))
                 ?.first()?.let {
                 logger.info { "Deleting $it" }
                 client?.deleteDirectoryEntry(it.directoryEntryBase.dn?.uid!!)
             }
             entry.directoryEntryBase =
-                BaseDirectoryEntry(certData.toCertificateInfo().admissionStatement.registrationNumber)
+                BaseDirectoryEntry(certData.certificateInfo.admissionStatement.registrationNumber)
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
             val dn = client?.addDirectoryEntry(entry)
 

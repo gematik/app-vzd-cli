@@ -12,10 +12,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
-import vzd.admin.client.CertificateDataDER
-import vzd.admin.client.CertificateInfo
 import vzd.admin.client.DistinguishedName
-import vzd.admin.client.toCertificateInfo
+import vzd.admin.pki.CertificateDataDER
+import vzd.admin.pki.CertificateInfo
 import java.io.ByteArrayOutputStream
 
 /**
@@ -25,7 +24,7 @@ object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: CertificateDataDER) {
-        val surrogate = value.toCertificateInfo()
+        val surrogate = value.certificateInfo
         encoder.encodeSerializableValue(CertificateInfo.serializer(), surrogate)
     }
 

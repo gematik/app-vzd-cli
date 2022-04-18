@@ -9,7 +9,6 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import vzd.admin.client.toCertificateInfo
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.useLines
@@ -63,7 +62,7 @@ class ClearCertCommand : CliktCommand(name = "clear-cert", help = "Clear all cer
         entry.userCertificates?.forEach {
             logger.debug { "Deleting certificate: ${it.userCertificate?.base64String}" }
             logger.debug { it.dn }
-            echo("Deleting certificate: telematikID=${it.telematikID} serialNumber=${it.userCertificate?.toCertificateInfo()?.serialNumber}")
+            echo("Deleting certificate: telematikID=${it.telematikID} serialNumber=${it.userCertificate?.certificateInfo?.serialNumber}")
             runBlocking { context.client.deleteDirectoryEntryCertificate(it.dn?.uid!!, it.dn?.cn!!) }
         }
     }

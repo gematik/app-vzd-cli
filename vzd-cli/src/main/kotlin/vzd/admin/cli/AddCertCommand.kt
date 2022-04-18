@@ -13,10 +13,9 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import org.bouncycastle.util.encoders.Base64
-import vzd.admin.client.CertificateDataDER
+import vzd.admin.pki.CertificateDataDER
 import vzd.admin.client.UserCertificate
 import vzd.admin.client.VZDResponseException
-import vzd.admin.client.toCertificateInfo
 import kotlin.io.path.inputStream
 
 class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate to existing DirectoryEntry") {
@@ -32,8 +31,8 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
         files.forEach {
             val certB64 = Base64.toBase64String(it.inputStream().readBytes())
             val userCertificate = UserCertificate(userCertificate = CertificateDataDER(certB64))
-            val certificateInfo = userCertificate.userCertificate!!.toCertificateInfo()
-            logger.info { "Adding Certificate ${Yaml.encodeToString(userCertificate.userCertificate?.toCertificateInfo())}" }
+            val certificateInfo = userCertificate.userCertificate!!.certificateInfo
+            logger.info { "Adding Certificate ${Yaml.encodeToString(userCertificate.userCertificate?.certificateInfo)}" }
 
             val entries = runBlocking {
                 context.client.readDirectoryEntry(mapOf("telematikID" to certificateInfo.admissionStatement.registrationNumber))
@@ -49,7 +48,7 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
                         if (!ignore || e.response.status != HttpStatusCode.Conflict) {
                             throw e
                         }
-                        logger.warn { "Certificate with serialNumber=${userCertificate.userCertificate?.toCertificateInfo()?.serialNumber} already exists. Ignoring conflict." }
+                        logger.warn { "Certificate with serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber} already exists. Ignoring conflict." }
                     }
 
             }

@@ -1,14 +1,9 @@
 package vzd.admin.client
 
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import vzd.admin.pki.CertificateDataDER
 
 @Serializable
 @SerialName("Error")
@@ -107,29 +102,6 @@ data class UpdateBaseDirectoryEntry(
     var holder: List<String>? = null,
     var maxKOMLEadr: Int? = null,
 )
-
-/**
- * Simple datatype for base64 encoded certificates to differentiate them from plain strings
- */
-@Serializable(with = CertificateDataDERSerializer::class)
-data class CertificateDataDER(
-    var base64String: String,
-)
-
-/**
- * Serializes {CertificateDataDER} to primitive string.
- */
-object CertificateDataDERSerializer : KSerializer<CertificateDataDER> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: CertificateDataDER) {
-        encoder.encodeString(value.base64String)
-    }
-
-    override fun deserialize(decoder: Decoder): CertificateDataDER {
-        return CertificateDataDER(decoder.decodeString())
-    }
-}
 
 @Serializable
 data class UserCertificate(

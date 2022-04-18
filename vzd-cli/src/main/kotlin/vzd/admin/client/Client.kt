@@ -59,8 +59,14 @@ class VZDResponseException(response: HttpResponse, message: String) :
  * Directory Administration API Client
  * @see <a href="https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml">Directory Administration Open API</a>
  */
-class Client(block: ClientConfiguration.() -> Unit = {}) {
-    private val config: ClientConfiguration = ClientConfiguration()
+class Client(block: Configuration.() -> Unit = {}) {
+    class Configuration {
+        var apiURL = ""
+        var accessToken = ""
+        var httpProxyURL: String? = null
+    }
+
+    private val config: Configuration = Configuration()
     private val http: HttpClient
 
     init {
@@ -76,6 +82,10 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
             expectSuccess = false
 
             val l = logger
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = 1000 * 60 * 60
+            }
 
             install(Logging) {
                 logger = Logger.DEFAULT
@@ -304,12 +314,6 @@ class Client(block: ClientConfiguration.() -> Unit = {}) {
 
 
     }
-}
-
-class ClientConfiguration {
-    var apiURL = ""
-    var accessToken = ""
-    var httpProxyURL: String? = null
 }
 
 fun jsonArraySequence(input: Reader): Sequence<String> = sequence {

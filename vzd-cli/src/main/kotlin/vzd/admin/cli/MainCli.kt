@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import mu.KotlinLogging
 import vzd.admin.client.*
+import vzd.admin.pki.PKIClient
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -48,14 +49,20 @@ enum class OutputFormat {
 
 class CommandContext(
     private val clientDelegate: () -> Client,
+    private val pkiClientDelegate: () -> PKIClient,
     val outputFormat: OutputFormat,
     val env: String,
     val useProxy: Boolean,
+    val enableOcsp: Boolean,
     var firstCommand: Boolean = true,
 ) {
 
     val client by lazy {
         clientDelegate.invoke()
+    }
+
+    val pkiClient by lazy {
+        pkiClientDelegate.invoke()
     }
 
 }
@@ -76,6 +83,10 @@ class DirectoryAdministrationCli :
         help="Environment. Either tu, ru or pu. If not specified default env is used.")
         .choice("tu", "ru", "pu")
 
+    private val enableOcsp: Boolean by option(
+        "-o", "--ocsp", help = "Validate certificates using OCSP")
+        .flag()
+
     private val useProxy: Boolean? by option(
         "--proxy-on", "-x", help="Forces the use of the proxy, overrides the configuration")
         .flag("--proxy-off", "-X")
@@ -87,7 +98,9 @@ class DirectoryAdministrationCli :
 
         logger.info { "Using environment: $clientEnv" }
 
+
         val clientDelegate: () -> Client = {
+
             val envcfg =
                 provider.config.environment(clientEnv) ?: throw CliktError("Default environment not configired: $env")
 
@@ -142,7 +155,16 @@ class DirectoryAdministrationCli :
             }
         }
 
-        currentContext.obj = CommandContext(clientDelegate, outputFormat, clientEnv, useProxy == true)
+        val pkiClientDelegate: () -> PKIClient = {
+            PKIClient {
+                if (provider.config.httpProxy?.enabled == true || useProxy == true) {
+                    httpProxyURL = provider.config.httpProxy?.proxyURL
+                }
+            }
+        }
+
+
+        currentContext.obj = CommandContext(clientDelegate, pkiClientDelegate, outputFormat, clientEnv, useProxy == true, enableOcsp)
     }
 
     init {

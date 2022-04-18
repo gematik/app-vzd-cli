@@ -1,7 +1,6 @@
 package vzd.admin.cli
 
 import vzd.admin.client.UserCertificate
-import vzd.admin.client.toCertificateInfo
 
 val UserCertificateCsvHeaders = listOf(
     "query",
@@ -12,6 +11,7 @@ val UserCertificateCsvHeaders = listOf(
     "subject",
     "notBefore",
     "notAfter",
+    "ocspResponse",
 )
 
 val CertificateOutputMapping = mapOf(
@@ -20,14 +20,14 @@ val CertificateOutputMapping = mapOf(
     OutputFormat.JSON to { _: Map<String, String>, value: List<UserCertificate>?-> Output.printJson(value) },
     OutputFormat.SHORT to { _: Map<String, String>, value: List<UserCertificate>? ->
         value?.forEach {
-            val cert = it.userCertificate?.toCertificateInfo()
+            val cert = it.userCertificate?.certificateInfo
             println("${it.dn?.uid} ${it.telematikID} ${it.entryType} ${cert?.publicKeyAlgorithm} ${cert?.subject}")
         }
     },
     OutputFormat.CSV to { query: Map<String, String>, value: List<UserCertificate>? ->
 
         value?.forEach {
-            val cert = it.userCertificate?.toCertificateInfo()
+            val cert = it.userCertificate?.certificateInfo
             Output.printCsv(listOf(
                 query.toString(),
                 it.dn?.uid,
@@ -37,7 +37,7 @@ val CertificateOutputMapping = mapOf(
                 cert?.subject,
                 cert?.notBefore,
                 cert?.notAfter,
-
+                cert?.ocspResponse?.status
                 ))
         }
 

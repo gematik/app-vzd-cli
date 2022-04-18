@@ -50,6 +50,17 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
             }
         }
 
+        if (context.enableOcsp) {
+            result?.mapNotNull { it.userCertificates }
+                ?.flatten()
+                ?.mapNotNull { it.userCertificate }
+                ?.forEach {
+                    val ocspResponse = runBlocking { context.pkiClient.ocsp(it) }
+                    it.certificateInfo.ocspResponse = ocspResponse
+                }
+        }
+
+
         DirectoryEntryOutputMapping[context.outputFormat]?.invoke(params, result)
     }
 

@@ -6,7 +6,7 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.choice
 import vzd.admin.client.BaseDirectoryEntry
-import vzd.admin.client.CertificateDataDER
+import vzd.admin.pki.CertificateDataDER
 import vzd.admin.client.DirectoryEntry
 import vzd.admin.client.UserCertificate
 

@@ -51,6 +51,15 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
             }
         }
 
+        if (context.enableOcsp) {
+            result?.forEach {
+                it.userCertificate?.let {
+                    val ocspResponse = runBlocking { context.pkiClient.ocsp(it) }
+                    it.certificateInfo.ocspResponse = ocspResponse
+                }
+            }
+        }
+
         CertificateOutputMapping[context.outputFormat]?.invoke(params, result)
     }
 }

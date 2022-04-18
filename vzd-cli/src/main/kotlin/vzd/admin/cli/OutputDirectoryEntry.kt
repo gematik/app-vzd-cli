@@ -14,8 +14,11 @@ val DirectoryEntryCsvHeaders = listOf(
     "postalCode",
     "localityName",
     "stateOrProvinceName",
-    "certificateCount",
-    "kimAdresses"
+    "userCertificateCount",
+    "userCertificateSerial",
+    "userCertificateOCSPStatus",
+    "mailCount",
+    "mail"
 )
 
 val DirectoryEntryOutputMapping = mapOf(
@@ -45,6 +48,9 @@ val DirectoryEntryOutputMapping = mapOf(
                 it.directoryEntryBase.localityName,
                 it.directoryEntryBase.stateOrProvinceName,
                 it.userCertificates?.count { it.userCertificate != null },
+                it.userCertificates?.mapNotNull {it.userCertificate?.certificate }?.map { it.serialNumber.toString() }?.joinToString(),
+                it.userCertificates?.mapNotNull {it.userCertificate?.certificateInfo }?.map { it.ocspResponse?.status }?.joinToString(),
+                it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.count(),
                 it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
                     ?.flatten()?.joinToString()
             ))
