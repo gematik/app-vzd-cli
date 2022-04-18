@@ -2,10 +2,10 @@
 
 == Version 0.14.x
 
-- Unterstützung der OCSP-Abfragen für X509-Zertifikate (s. --ocsp option by `vzd-cli admin list` und `vzd-cli admin cert-list`
-- Neues Befehl: `vzd-cli admin dump` lädt große Mengen von Einträgen vom Server für nachfolgende loikale Verarbeitung
+- Unterstützung der OCSP-Abfragen für X509-Zertifikate (s. `vzd-cli admin -o` oder `vzd-cli admin --ocsp`
+- Neues Befehl: `vzd-cli admin dump`: lädt große Mengen von Einträgen vom Server für nachfolgende loikale Verarbeitung
 (z.B. Datenanalysen)
-- Es werden mehr Zertifikatdetails angezeigt (z.B. einzelne Subject-Felder, OCSP-Responcer-URL)
+- Es werden mehr Zertifikatdetails angezeigt (z.B. einzelne Subject-Felder, OCSP-Responder-URL)
 - CSV-Output Verbesserungen:
   - Spalte für Anzahl der KIM-Adressen
   - Spalte für Anzahl der Zertifikate
