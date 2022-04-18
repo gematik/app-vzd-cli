@@ -20,7 +20,6 @@ import java.io.StringWriter
 import java.math.BigDecimal
 
 class TestDump: FeatureSpec({
-    val logger = KotlinLogging.logger {}
     var client: Client? = null
 
     beforeSpec {
