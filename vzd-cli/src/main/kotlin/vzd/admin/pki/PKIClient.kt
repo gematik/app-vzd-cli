@@ -61,9 +61,7 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
     }
 
     private val tsl: TrustedServiceListCache by lazy {
-        TrustedServiceListCache.load()?.let {
-            it
-        } ?: run {
+        TrustedServiceListCache.load() ?: run {
             val cache = TrustedServiceListCache(
                 TSLLoader(httpClient).load(TrustEnvironment.TU),
                 TSLLoader(httpClient).load(TrustEnvironment.RU),
@@ -78,7 +76,7 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
         try {
             val eeCert = eeCertDER.certificate
             logger.debug { "Looking for CA Certificate for ${eeCert.issuerDN}" }
-            var issuerCert =
+            val issuerCert =
                 tsl.caServices.first { it.caCertificate.certificate.subjectDN == eeCert.issuerDN }.caCertificate.certificate
             logger.info { "Verifying '${eeCert.subjectDN}' from '${issuerCert.subjectDN}' using OCSP Responder: '${eeCertDER.ocspResponderURL}'" }
 
@@ -107,9 +105,8 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
                 is UnknownStatus -> OCSPResponse(OCSPResponseCertificateStatus.UNKNOWN,
                     "Certificate is unknown by the OCSP server")
                 is RevokedStatus -> {
-                    val revokedStatus = certStatus as RevokedStatus
                     OCSPResponse(OCSPResponseCertificateStatus.REVOKED,
-                        "Revocation reason: '${revokedStatus.revocationReason}' at ${revokedStatus.revocationTime}")
+                        "Revocation reason: '${certStatus.revocationReason}' at ${certStatus.revocationTime}")
                 }
                 else -> OCSPResponse(OCSPResponseCertificateStatus.ERROR,
                     "Unknown status: $certStatus")

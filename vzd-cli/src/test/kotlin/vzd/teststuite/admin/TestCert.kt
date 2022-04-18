@@ -51,7 +51,6 @@ class TestCert : FeatureSpec({
         }
 
         scenario("Parse complex DN") {
-            val dn = "2.5.4.4=#0c07c38470706c6572+2.5.4.42=#0c12446f6d696e696b2d50657465722047726166+2.5.4.5=#13143830323736383833313130303030313039333534+CN=Dominik-Peter ÄpplerTEST-ONLY,C=DE"
 
             val dn2 = "SURNAME=Äppler + GIVENNAME=Dominik-Peter Graf + SERIALNUMBER=80276883110000109354 + CN=Dominik-Peter ÄpplerTEST-ONLY, C=DE"
 

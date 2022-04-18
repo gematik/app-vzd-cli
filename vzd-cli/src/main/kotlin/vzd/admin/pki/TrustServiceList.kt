@@ -61,7 +61,6 @@ data class TrustedServiceListCache(
     val pu: TrustedServiceList? = null,
     val lastModified: Long = Instant.now().epochSecond,
 ) {
-    @Transient
     val caServices by lazy {
         val result = mutableListOf<CAService>()
         result.addAll(tu?.caServices ?: emptyList())
