@@ -7,19 +7,23 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.util.*
 import kotlinx.serialization.Serializable
 import mu.KotlinLogging
+import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers
+import org.bouncycastle.asn1.isismtt.ocsp.CertHash
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder
 import org.bouncycastle.cert.ocsp.*
 import org.bouncycastle.operator.DigestCalculator
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder
 import java.nio.channels.UnresolvedAddressException
+import java.security.MessageDigest
 
 
 private val logger = KotlinLogging.logger {}
 
 enum class OCSPResponseCertificateStatus {
-    GOOD, REVOKED, UNKNOWN, ERROR
+    GOOD, REVOKED, UNKNOWN, CERT_HASH_ERROR, ERROR
 }
 
 @Serializable
@@ -74,10 +78,16 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
 
     suspend fun ocsp(eeCertDER: CertificateDataDER): OCSPResponse {
         try {
+            if (eeCertDER.ocspResponderURL == null) {
+                logger.error { "Certificate has no OCSP URL: ${eeCertDER.certificate.subjectDN}" }
+                return OCSPResponse(OCSPResponseCertificateStatus.ERROR, "Certificate has no OCSP URL")
+            }
+
             val eeCert = eeCertDER.certificate
             logger.debug { "Looking for CA Certificate for ${eeCert.issuerDN}" }
             val issuerCert =
                 tsl.caServices.first { it.caCertificate.certificate.subjectDN == eeCert.issuerDN }.caCertificate.certificate
+
             logger.info { "Verifying '${eeCert.subjectDN}' from '${issuerCert.subjectDN}' using OCSP Responder: '${eeCertDER.ocspResponderURL}'" }
 
             val certificateID = CertificateID(digestCalculator, JcaX509CertificateHolder(issuerCert),
@@ -87,7 +97,8 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
             builder.addRequest(certificateID)
             val ocspReq = builder.build()
 
-            val response = httpClient.post(eeCertDER.ocspResponderURL) {
+            logger.debug { "OCSP serialNumber: ${ocspReq.requestList[0].certID.serialNumber}, responder: ${eeCertDER.ocspResponderURL}" }
+            val response = httpClient.post(eeCertDER.ocspResponderURL!!) {
                 headers {
                     append(HttpHeaders.ContentType, "application/ocsp-request")
                 }
@@ -97,11 +108,25 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
             val body: ByteArray = response.body()
 
             val basicOcspResp = OCSPResp(body).responseObject as BasicOCSPResp
+            val ocspResp = basicOcspResp.responses.first()
 
-            logger.debug { "Got OCSP Response extensions: ${basicOcspResp.extensionOIDs}" }
+            val result = when (val certStatus = ocspResp.certStatus) {
+                CertificateStatus.GOOD -> {
+                    if (ocspResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash) == null) {
+                        logger.error { "Cert hash extension is missing in response" }
+                        return OCSPResponse(OCSPResponseCertificateStatus.CERT_HASH_ERROR)
+                    }
+                    val asn1CertHash = CertHash.getInstance(ocspResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash).parsedValue)
+                    val digest = MessageDigest.getInstance("SHA-256"); //NOSONAR
 
-            val result = when (val certStatus = basicOcspResp.responses.first().certStatus) {
-                CertificateStatus.GOOD -> OCSPResponse(OCSPResponseCertificateStatus.GOOD)
+                    if (!asn1CertHash.certificateHash.contentEquals(digest.digest(eeCert.encoded))) {
+                        logger.error { "Cert hash does not match ${asn1CertHash.certificateHash.encodeBase64()} != ${digest.digest(eeCert.encoded).encodeBase64()}" }
+                        return  OCSPResponse(OCSPResponseCertificateStatus.CERT_HASH_ERROR)
+                    } else {
+                        logger.error { "Cert hash matches: ${asn1CertHash.certificateHash.encodeBase64()}" }
+                    }
+                    return OCSPResponse(OCSPResponseCertificateStatus.GOOD)
+                }
                 is UnknownStatus -> OCSPResponse(OCSPResponseCertificateStatus.UNKNOWN,
                     "Certificate is unknown by the OCSP server")
                 is RevokedStatus -> {

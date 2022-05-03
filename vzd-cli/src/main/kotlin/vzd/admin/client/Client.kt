@@ -20,6 +20,8 @@ import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
 import java.io.InputStreamReader
 import java.io.Reader
@@ -33,8 +35,7 @@ private val JSON = Json {
     prettyPrint = true
 }
 
-class VZDResponseException(response: HttpResponse, message: String) :
-    ResponseException(response, message) {
+class VZDResponseException(response: HttpResponse, message: String) : ResponseException(response, message) {
 
     val details: String
         get() {
@@ -139,8 +140,7 @@ class Client(block: Configuration.() -> Unit = {}) {
      * Implements DELETE /DirectoryEntries/{uid} (add_Delete_Directory_Entry)
      */
     suspend fun deleteDirectoryEntry(uid: String) {
-        val response = http.delete("/DirectoryEntries/${uid}") {
-        }
+        val response = http.delete("/DirectoryEntries/${uid}") {}
 
         if (response.status != HttpStatusCode.OK) {
             throw VZDResponseException(response, "Unable to delete directory entry: ${response.body<String>()}")
@@ -188,7 +188,7 @@ class Client(block: Configuration.() -> Unit = {}) {
     suspend fun streamDirectoryEntries(
         parameters: Map<String, String>,
         path: String = "/DirectoryEntriesSync",
-        sink: ( entry: DirectoryEntry) -> Unit,
+        sink: (entry: DirectoryEntry) -> Unit,
     ) {
 
         // create custom client without automatic JSON parsing
@@ -226,17 +226,24 @@ class Client(block: Configuration.() -> Unit = {}) {
             for (param in parameters.entries) {
                 parameter(param.key, param.value)
             }
-        }
-            .execute { response ->
-            if (response.status != HttpStatusCode.OK) {
-                throw VZDResponseException(response, "Unable to get entries")
-            }
-            val channel: ByteReadChannel = response.body()
-            jsonArraySequence(InputStreamReader(channel.toInputStream()))
-                .forEach {
-                    sink(JSON.decodeFromString(it))
+        }.execute { response ->
+                if (response.status != HttpStatusCode.OK) {
+                    throw VZDResponseException(response, "Unable to get entries")
                 }
-        }
+                val channel: ByteReadChannel = response.body()
+                jsonArraySequence(InputStreamReader(channel.toInputStream())).forEach {
+                        try {
+                            sink(JSON.decodeFromString(it))
+                        } catch (e: Exception) {
+                            val json: JsonObject = JSON.decodeFromString(it)
+                            logger.error {
+                                "Unable to process Entry with uid=${
+                                    json.get("DirectoryEntryBase")?.jsonObject?.get("dn")?.jsonObject?.get("uid")
+                                }, telematikID=${json.get("DirectoryEntryBase")?.jsonObject?.get("telematikID")}"
+                            }
+                        }
+                    }
+            }
 
     }
 
@@ -326,7 +333,7 @@ fun jsonArraySequence(input: Reader): Sequence<String> = sequence {
         reader.beginObject()
         writer.beginObject()
         var depth = 0
-        while(reader.peek() != JsonToken.END_OBJECT || depth > 0) {
+        while (reader.peek() != JsonToken.END_OBJECT || depth > 0) {
             val token = reader.peek()
             when (token) {
                 JsonToken.BEGIN_OBJECT -> {
@@ -339,18 +346,14 @@ fun jsonArraySequence(input: Reader): Sequence<String> = sequence {
                     writer.endObject()
                     depth--
                 }
-                JsonToken.NAME ->
-                    writer.name(reader.nextName())
-                JsonToken.BOOLEAN ->
-                    writer.value(reader.nextBoolean())
-                JsonToken.STRING ->
-                    writer.value(reader.nextString())
+                JsonToken.NAME -> writer.name(reader.nextName())
+                JsonToken.BOOLEAN -> writer.value(reader.nextBoolean())
+                JsonToken.STRING -> writer.value(reader.nextString())
                 JsonToken.NULL -> {
                     reader.nextNull()
                     writer.nullValue()
                 }
-                JsonToken.NUMBER ->
-                    writer.value(BigDecimal(reader.nextString()))
+                JsonToken.NUMBER -> writer.value(BigDecimal(reader.nextString()))
                 JsonToken.BEGIN_ARRAY -> {
                     reader.beginArray()
                     writer.beginArray()

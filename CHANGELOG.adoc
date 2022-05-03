@@ -3,6 +3,7 @@
 == Version 0.14.x
 
 - Unterstützung der OCSP-Abfragen für X509-Zertifikate (s. `vzd-cli admin -o` oder `vzd-cli admin --ocsp`
+- Unterstützung von CertHash Extension
 - Neues Befehl: `vzd-cli admin dump`: lädt große Mengen von Einträgen vom Server für nachfolgende loikale Verarbeitung
 (z.B. Datenanalysen)
 - Es werden mehr Zertifikatdetails angezeigt (z.B. einzelne Subject-Felder, OCSP-Responder-URL)

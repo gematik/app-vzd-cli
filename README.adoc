@@ -14,7 +14,6 @@ image::images/vzd-cli.gif[]
 
 [source]
 ----
-$ vzd-cli admin --help
 Usage: vzd-cli admin [OPTIONS] COMMAND [ARGS]...
 
   CLI for DirectoryAdministration API
@@ -23,6 +22,7 @@ Options:
   --human, --json, --yaml, --csv, --short
   -e, --env [tu|ru|pu]             Environment. Either tu, ru or pu. If not
                                    specified default env is used.
+  -o, --ocsp                       Validate certificates using OCSP
   -x, --proxy-on / -X, --proxy-off
                                    Forces the use of the proxy, overrides the
                                    configuration
@@ -47,6 +47,7 @@ Commands:
   delete-cert       Delete certificate
   clear-cert        Clear all certificates of a given entry
   cert-info         Show details of a certificate
+  dump              Dump data from server
 ----
 
 == Erste Schritte
@@ -263,3 +264,7 @@ WARNING: Nicht implementiert. Bitte `admin clear-cert` verwenden.
 
 Löscht einen X509-Zertifikat.
 
+[#cmd-admin-dump]
+=== `admin dump`
+
+Lädt große Mengen von Einträgen und schreibt sie in `STDOUT`, eine Zeile per Eintrag als JSON. So erzeugte Dumps können durch weitere Tools verarbeitet werden, z.B. https://gnupg.org[GnuPG] oder https://github.com/antonmedv/fx[FX]. 
