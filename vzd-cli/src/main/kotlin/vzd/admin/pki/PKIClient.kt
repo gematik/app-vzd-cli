@@ -64,7 +64,7 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
         }
     }
 
-    private val tsl: TrustedServiceListCache by lazy {
+    val tsl: TrustedServiceListCache by lazy {
         TrustedServiceListCache.load() ?: run {
             val cache = TrustedServiceListCache(
                 TSLLoader(httpClient).load(TrustEnvironment.TU),
@@ -123,7 +123,7 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
                         logger.error { "Cert hash does not match ${asn1CertHash.certificateHash.encodeBase64()} != ${digest.digest(eeCert.encoded).encodeBase64()}" }
                         return  OCSPResponse(OCSPResponseCertificateStatus.CERT_HASH_ERROR)
                     } else {
-                        logger.error { "Cert hash matches: ${asn1CertHash.certificateHash.encodeBase64()}" }
+                        logger.info { "Cert hash matches: ${asn1CertHash.certificateHash.encodeBase64()}" }
                     }
                     return OCSPResponse(OCSPResponseCertificateStatus.GOOD)
                 }

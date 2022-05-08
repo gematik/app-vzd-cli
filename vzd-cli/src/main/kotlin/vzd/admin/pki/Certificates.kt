@@ -192,7 +192,7 @@ data class CertificateInfo(
     val notBefore: String,
     val notAfter: String,
     val admissionStatement: AdmissionStatementInfo,
-    val certData: String? = null,
+    val certData: String,
     val ocspReponderURL: String? = null,
     var ocspResponse: OCSPResponse? = null,
 )

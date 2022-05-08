@@ -68,7 +68,7 @@ class CommandContext(
 }
 
 class DirectoryAdministrationCli :
-    CliktCommand(name = "admin", allowMultipleSubcommands = true, help = """CLI for DirectoryAdministration API""".trimMargin()) {
+    CliktCommand(name = "admin", help = """CLI for DirectoryAdministration API""".trimMargin()) {
     private val dotenv by requireObject<Dotenv>()
     private val outputFormat by option().switch(
         "--human" to OutputFormat.HUMAN,

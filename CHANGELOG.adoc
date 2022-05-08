@@ -1,5 +1,13 @@
 = Changelog `vzd-cli`
 
+== Version 0.145x
+
+- `dump` Befehl wurde überarbeitet
+  - `vzd-cli admin dump create` erzeugt einen neuen dump
+  - `vzd-cli admin dump ocsp` ergänzt für jeden Zertifikat aus dem Dump die OCSP abfragen
+- Kleine Anpassungen am CSV-Format
+- Move to ktor.io v2.0.1
+
 == Version 0.14.x
 
 - Unterstützung der OCSP-Abfragen für X509-Zertifikate (s. `vzd-cli admin -o` oder `vzd-cli admin --ocsp`
