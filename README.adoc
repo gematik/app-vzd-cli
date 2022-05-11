@@ -1,6 +1,6 @@
 = 🗂️ `vzd-cli`: Command Line Client für Verzeichnisdienst der TI 
 :toc: auto
-:note-caption: Anmerkung
+:note-caption: Anmerkungen
 
 image::images/vzd-cli.gif[]
 
