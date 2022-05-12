@@ -19,6 +19,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import vzd.admin.client.DirectoryEntry
+import vzd.admin.pki.OCSPResponseCertificateStatus
 import java.io.PrintWriter
 import kotlin.io.path.Path
 import kotlin.io.path.deleteIfExists
@@ -102,8 +103,11 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
                             entries++
                             logger.debug { "Processing TelematikID: ${entry.directoryEntryBase.telematikID}" }
                             entry.userCertificates?.mapNotNull { it.userCertificate }?.forEach { cert ->
-                                cert.certificateInfo.ocspResponse =  context.pkiClient.ocsp(cert)
-                                //delay(2000L)
+                                if (cert.certificateInfo.ocspResponse?.status == OCSPResponseCertificateStatus.GOOD) {
+                                    logger.debug { "Certificate already GOOD: ${cert.certificateInfo.serialNumber}" }
+                                } else {
+                                    cert.certificateInfo.ocspResponse =  context.pkiClient.ocsp(cert)
+                                }
                             }
                             println(jsonExtended.encodeToString(entry))
                         }

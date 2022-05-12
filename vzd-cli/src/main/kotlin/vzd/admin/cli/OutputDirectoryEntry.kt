@@ -52,7 +52,7 @@ val DirectoryEntryOutputMapping = mapOf(
                 it.userCertificates?.firstOrNull()?.userCertificate?.certificateInfo?.subject ?: "",
                 it.userCertificates?.firstOrNull()?.userCertificate?.certificateInfo?.issuer ?: "",
                 it.userCertificates?.count { it.userCertificate != null },
-                it.userCertificates?.mapNotNull {it.userCertificate?.certificate }?.map { it.serialNumber.toString() }?.joinToString(),
+                it.userCertificates?.mapNotNull {it.userCertificate?.certificateInfo }?.map { it.serialNumber.toString() }?.joinToString(),
                 it.userCertificates?.mapNotNull {it.userCertificate?.certificateInfo }?.mapNotNull { it.ocspResponse?.status ?: "NONE"}?.joinToString(),
                 it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.count(),
                 it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()

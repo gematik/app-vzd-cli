@@ -18,45 +18,12 @@ import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
 import vzd.admin.client.DistinguishedName
 import vzd.admin.pki.CertificateDataDER
+import vzd.admin.pki.CertificateDataDERInfoSerializer
 import vzd.admin.pki.CertificateInfo
 import java.io.ByteArrayOutputStream
 
-/**
- * Special Serializer to display the textual summary of the X509Certificate
- */
-object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: CertificateDataDER) {
-        val surrogate = value.certificateInfo
-        encoder.encodeSerializableValue(CertificateInfo.serializer(), surrogate)
-    }
-
-    override fun deserialize(decoder: Decoder): CertificateDataDER {
-        val surrogate: CertificateInfo = decoder.decodeSerializableValue(CertificateInfo.serializer())
-        return CertificateDataDER(surrogate.certData)
-    }
-}
-
-/**
- * Human friendly serializer for DN
- */
-object DistinguishedNameSerializer : KSerializer<DistinguishedName> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("DistinguishedName", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: DistinguishedName) {
-        encoder.encodeString(Json.encodeToString(value))
-    }
-
-    override fun deserialize(decoder: Decoder): DistinguishedName {
-        return Json.decodeFromString(decoder.decodeString())
-    }
-}
-
-
 val optimizedSerializersModule = SerializersModule {
     contextual(CertificateDataDERInfoSerializer)
-    contextual(DistinguishedNameSerializer)
 }
 
 /**

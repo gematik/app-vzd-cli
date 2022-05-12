@@ -29,76 +29,65 @@ import java.util.*
  * Simple datatype for base64 encoded certificates to differentiate them from plain strings
  */
 @Serializable(with = CertificateDataDERSerializer::class)
-data class CertificateDataDER(
-    val base64String: String,
-) {
+data class CertificateDataDER(val base64String: String, val _certInfo: CertificateInfo? = null) {
+    val certificateInfo by lazy {
+        _certInfo ?: run {
+
+            val keyUsage = mutableListOf<String>()
+            certificate.keyUsage?.forEachIndexed { index, element ->
+                when (index) {
+                    0 -> if (element) keyUsage.add("digitalSignature")  // digitalSignature        (0)
+                    1 -> if (element) keyUsage.add("nonRepudiation")    // nonRepudiation          (1)
+                    2 -> if (element) keyUsage.add("keyEncipherment")   // keyEncipherment         (2)
+                    3 -> if (element) keyUsage.add("dataEncipherment")  // dataEncipherment        (3)
+                    4 -> if (element) keyUsage.add("keyAgreement")      // keyAgreement            (4)
+                    5 -> if (element) keyUsage.add("keyCertSign")       // keyCertSign             (5)
+                    6 -> if (element) keyUsage.add("cRLSign")           // cRLSign                 (6)
+                    7 -> if (element) keyUsage.add("encipherOnly")      // encipherOnly            (7)
+                    8 -> if (element) keyUsage.add("decipherOnly")      // decipherOnly            (8)
+                }
+            }
+
+            fun dateToString(date: Date): String {
+                return DateTimeFormatter.ISO_DATE_TIME.format(date.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime())
+            }
+
+            val admission = Admission(certificate)
+            val admissionInfo = AdmissionStatementInfo(
+                admissionAuthority = admission.admissionAuthority,
+                professionItems = admission.professionItems,
+                professionOids = admission.professionOids,
+                registrationNumber = admission.registrationNumber
+            )
+
+            CertificateInfo(
+                certificate.subjectDN.name,
+                NameInfo(X500Name(certificate.subjectDN.name)),
+                certificate.issuerX500Principal.name,
+                certificate.sigAlgName,
+                certificate.publicKey.algorithm,
+                certificate.serialNumber.toString(),
+                keyUsage,
+                dateToString(certificate.notBefore),
+                dateToString(certificate.notAfter),
+                admissionInfo,
+                base64String,
+                "ocspResponderURL"
+            )
+
+        }
+    }
+
     val certificate by lazy {
         val bytes = Base64.decode(base64String)
         val cf = CertificateFactory.getInstance("X.509")
         cf.generateCertificate(bytes.inputStream()) as X509Certificate
     }
 
-    val certificateInfo by lazy {
-        val keyUsage = mutableListOf<String>()
-
-        /*
-            KeyUsage ::= BIT STRING {
-               digitalSignature        (0),
-               nonRepudiation          (1),
-               keyEncipherment         (2),
-               dataEncipherment        (3),
-               keyAgreement            (4),
-               keyCertSign             (5),
-               cRLSign                 (6),
-               encipherOnly            (7),
-               decipherOnly            (8) }
-         */
-        certificate.keyUsage?.forEachIndexed { index, element ->
-            when (index) {
-                0 -> if (element) keyUsage.add("digitalSignature")
-                1 -> if (element) keyUsage.add("nonRepudiation")
-                2 -> if (element) keyUsage.add("keyEncipherment")
-                3 -> if (element) keyUsage.add("dataEncipherment")
-                4 -> if (element) keyUsage.add("keyAgreement")
-                5 -> if (element) keyUsage.add("keyCertSign")
-                6 -> if (element) keyUsage.add("cRLSign")
-                7 -> if (element) keyUsage.add("encipherOnly")
-                8 -> if (element) keyUsage.add("decipherOnly")
-            }
-        }
-
-        fun dateToString(date: Date): String {
-            return DateTimeFormatter.ISO_DATE_TIME.format(date.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime())
-        }
-
-        val admission = Admission(certificate)
-        val admissionInfo = AdmissionStatementInfo(
-            admissionAuthority = admission.admissionAuthority,
-            professionItems = admission.professionItems,
-            professionOids = admission.professionOids,
-            registrationNumber = admission.registrationNumber
-        )
-
-        CertificateInfo(
-            certificate.subjectDN.name,
-            NameInfo(X500Name(certificate.subjectDN.name)),
-            certificate.issuerX500Principal.name,
-            certificate.sigAlgName,
-            certificate.publicKey.algorithm,
-            certificate.serialNumber.toString(),
-            keyUsage,
-            dateToString(certificate.notBefore),
-            dateToString(certificate.notAfter),
-            admissionInfo,
-            base64String,
-            ocspResponderURL
-        )
-    }
-
-    val ocspResponderURL: String? by lazy {
-        var certHolder = X509CertificateHolder(Base64.decode(base64String))
+    val ocspResponderURL by lazy {
+        val certHolder = X509CertificateHolder(Base64.decode(base64String))
 
         val aiaExtension = AuthorityInformationAccess.fromExtensions(certHolder.extensions)
 
@@ -111,6 +100,7 @@ data class CertificateDataDER(
             null
         }
     }
+
 }
 
 /**
@@ -125,6 +115,23 @@ object CertificateDataDERSerializer : KSerializer<CertificateDataDER> {
 
     override fun deserialize(decoder: Decoder): CertificateDataDER {
         return CertificateDataDER(decoder.decodeString())
+    }
+}
+
+/**
+ * Special Serializer to display the textual summary of the X509Certificate
+ */
+object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: CertificateDataDER) {
+        val surrogate = value.certificateInfo
+        encoder.encodeSerializableValue(CertificateInfo.serializer(), surrogate)
+    }
+
+    override fun deserialize(decoder: Decoder): CertificateDataDER {
+        val surrogate: CertificateInfo = decoder.decodeSerializableValue(CertificateInfo.serializer())
+        return CertificateDataDER(surrogate.certData, surrogate)
     }
 }
 

@@ -55,10 +55,10 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
 
             install(Logging) {
                 logger = Logger.DEFAULT
-                if (l.isDebugEnabled) {
-                    level = LogLevel.INFO
+                level = if (l.isDebugEnabled) {
+                    LogLevel.INFO
                 } else {
-                    level = LogLevel.NONE
+                    LogLevel.NONE
                 }
             }
         }
@@ -77,18 +77,18 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
     }
 
     suspend fun ocsp(eeCertDER: CertificateDataDER): OCSPResponse {
+        val ocspResponderURL = eeCertDER.ocspResponderURL ?: run {
+            logger.error { "Certificate has no OCSP URL: ${eeCertDER.certificateInfo.subject}" }
+            return OCSPResponse(OCSPResponseCertificateStatus.ERROR, "Certificate has no OCSP URL")
+        }
         try {
-            if (eeCertDER.ocspResponderURL == null) {
-                logger.error { "Certificate has no OCSP URL: ${eeCertDER.certificate.subjectDN}" }
-                return OCSPResponse(OCSPResponseCertificateStatus.ERROR, "Certificate has no OCSP URL")
-            }
 
             val eeCert = eeCertDER.certificate
             logger.debug { "Looking for CA Certificate for ${eeCert.issuerDN}" }
             val issuerCert =
                 tsl.caServices.first { it.caCertificate.certificate.subjectDN == eeCert.issuerDN }.caCertificate.certificate
 
-            logger.info { "Verifying '${eeCert.subjectDN}' from '${issuerCert.subjectDN}' using OCSP Responder: '${eeCertDER.ocspResponderURL}'" }
+            logger.info { "Verifying '${eeCert.subjectDN}' from '${issuerCert.subjectDN}' using OCSP Responder: '${ocspResponderURL}'" }
 
             val certificateID = CertificateID(digestCalculator, JcaX509CertificateHolder(issuerCert),
                 eeCert.serialNumber)
@@ -97,8 +97,8 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
             builder.addRequest(certificateID)
             val ocspReq = builder.build()
 
-            logger.debug { "OCSP serialNumber: ${ocspReq.requestList[0].certID.serialNumber}, responder: ${eeCertDER.ocspResponderURL}" }
-            val response = httpClient.post(eeCertDER.ocspResponderURL!!) {
+            logger.debug { "OCSP serialNumber: ${ocspReq.requestList[0].certID.serialNumber}, responder: ${ocspResponderURL}" }
+            val response = httpClient.post(ocspResponderURL) {
                 headers {
                     append(HttpHeaders.ContentType, "application/ocsp-request")
                 }
@@ -117,7 +117,7 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
                         return OCSPResponse(OCSPResponseCertificateStatus.CERT_HASH_ERROR)
                     }
                     val asn1CertHash = CertHash.getInstance(ocspResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash).parsedValue)
-                    val digest = MessageDigest.getInstance("SHA-256"); //NOSONAR
+                    val digest = MessageDigest.getInstance("SHA-256")
 
                     if (!asn1CertHash.certificateHash.contentEquals(digest.digest(eeCert.encoded))) {
                         logger.error { "Cert hash does not match ${asn1CertHash.certificateHash.encodeBase64()} != ${digest.digest(eeCert.encoded).encodeBase64()}" }
@@ -130,8 +130,10 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
                 is UnknownStatus -> OCSPResponse(OCSPResponseCertificateStatus.UNKNOWN,
                     "Certificate is unknown by the OCSP server")
                 is RevokedStatus -> {
+                    val reason = if (certStatus.hasRevocationReason()) certStatus.revocationReason else "none"
                     OCSPResponse(OCSPResponseCertificateStatus.REVOKED,
-                        "Revocation reason: '${certStatus.revocationReason}' at ${certStatus.revocationTime}")
+
+                        "Revocation reason: '${reason}' at ${certStatus.revocationTime}")
                 }
                 else -> OCSPResponse(OCSPResponseCertificateStatus.ERROR,
                     "Unknown status: $certStatus")
@@ -139,10 +141,10 @@ class PKIClient (block: Configuration.() -> Unit = {}) {
 
             return result
         } catch (e: UnresolvedAddressException) {
-            return OCSPResponse(OCSPResponseCertificateStatus.ERROR, "Unresolvable OCSP URL: ${eeCertDER.ocspResponderURL}")
+            return OCSPResponse(OCSPResponseCertificateStatus.ERROR, "Unresolvable OCSP URL: ${ocspResponderURL}")
         } catch (e: Throwable) {
             logger.error { e }
-            return OCSPResponse(OCSPResponseCertificateStatus.ERROR, e.toString())
+            return OCSPResponse(OCSPResponseCertificateStatus.ERROR, e.message)
         }
     }
 
