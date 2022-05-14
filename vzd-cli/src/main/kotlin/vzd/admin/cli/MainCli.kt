@@ -58,7 +58,6 @@ class CommandContext(
     val pkiClient by lazy {
         pkiClientDelegate.invoke()
     }
-
 }
 
 class DirectoryAdministrationCli :
@@ -74,15 +73,18 @@ class DirectoryAdministrationCli :
 
     private val env by option(
         "-e", "--env",
-        help="Environment. Either tu, ru or pu. If not specified default env is used.")
+        help = "Environment. Either tu, ru or pu. If not specified default env is used."
+    )
         .choice("tu", "ru", "pu")
 
     private val enableOcsp: Boolean by option(
-        "-o", "--ocsp", help = "Validate certificates using OCSP")
+        "-o", "--ocsp", help = "Validate certificates using OCSP"
+    )
         .flag()
 
     private val useProxy: Boolean? by option(
-        "--proxy-on", "-x", help="Forces the use of the proxy, overrides the configuration")
+        "--proxy-on", "-x", help = "Forces the use of the proxy, overrides the configuration"
+    )
         .flag("--proxy-off", "-X")
 
     override fun run() = catching {
@@ -91,7 +93,6 @@ class DirectoryAdministrationCli :
             env ?: provider.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
 
         logger.info { "Using environment: $clientEnv" }
-
 
         val clientDelegate: () -> Client = {
 
@@ -157,19 +158,19 @@ class DirectoryAdministrationCli :
             }
         }
 
-
         currentContext.obj = CommandContext(clientDelegate, pkiClientDelegate, outputFormat, clientEnv, useProxy == true, enableOcsp)
     }
 
     init {
-        subcommands(VaultCommand(), ConfigCommand(),
+        subcommands(
+            VaultCommand(), ConfigCommand(),
             LoginCommand(), LoginCredCommand(), AuthenticateAdmin(),
             Info(), ListCommand(), TempolateCommand(), AddBaseCommand(),
             LoadBaseCommand(), ModifyBaseDirectoryEntry(), ModifyBaseAttrCommand(), DeleteCommand(),
             ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
-            CertInfoCommand(), DumpCommand())
+            CertInfoCommand(), DumpCommand()
+        )
     }
-
 }
 
 class AuthenticateAdmin : CliktCommand(name = "auth", help = "Show current access token") {
@@ -191,5 +192,4 @@ class Info : CliktCommand(name = "info", help = "Show information about the API"
             else -> throw UsageError("Info is not available for format: ${context.outputFormat}")
         }
     }
-
 }

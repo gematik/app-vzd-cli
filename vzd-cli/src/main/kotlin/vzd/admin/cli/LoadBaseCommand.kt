@@ -11,8 +11,10 @@ import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
 
 class LoadBaseCommand : CliktCommand(name = "load-base", help = "Load the base entry for editing.") {
-    private val params: Map<String, String> by option("-p", "--param",
-        help = "Specify query parameters to find matching entries").associate()
+    private val params: Map<String, String> by option(
+        "-p", "--param",
+        help = "Specify query parameters to find matching entries"
+    ).associate()
     private val context by requireObject<CommandContext>()
 
     private val json = Json {
@@ -39,5 +41,4 @@ class LoadBaseCommand : CliktCommand(name = "load-base", help = "Load the base e
             else -> throw UsageError("Cant load for editing in for format: ${context.outputFormat}")
         }
     }
-
 }

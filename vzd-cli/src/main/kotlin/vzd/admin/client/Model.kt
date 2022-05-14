@@ -48,8 +48,8 @@ data class BaseDirectoryEntry(
     // Identifier
     var telematikID: String,
     var domainID: List<String>? = null,
-    //TODO: YAML decode is not working when I add this
-    //@Contextual
+    // TODO: YAML decode is not working when I add this
+    // @Contextual
     var dn: DistinguishedName? = null,
 
     // Names

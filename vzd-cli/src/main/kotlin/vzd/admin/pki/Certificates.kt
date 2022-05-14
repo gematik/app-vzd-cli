@@ -36,22 +36,24 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
             val keyUsage = mutableListOf<String>()
             certificate.keyUsage?.forEachIndexed { index, element ->
                 when (index) {
-                    0 -> if (element) keyUsage.add("digitalSignature")  // digitalSignature        (0)
-                    1 -> if (element) keyUsage.add("nonRepudiation")    // nonRepudiation          (1)
-                    2 -> if (element) keyUsage.add("keyEncipherment")   // keyEncipherment         (2)
-                    3 -> if (element) keyUsage.add("dataEncipherment")  // dataEncipherment        (3)
-                    4 -> if (element) keyUsage.add("keyAgreement")      // keyAgreement            (4)
-                    5 -> if (element) keyUsage.add("keyCertSign")       // keyCertSign             (5)
-                    6 -> if (element) keyUsage.add("cRLSign")           // cRLSign                 (6)
-                    7 -> if (element) keyUsage.add("encipherOnly")      // encipherOnly            (7)
-                    8 -> if (element) keyUsage.add("decipherOnly")      // decipherOnly            (8)
+                    0 -> if (element) keyUsage.add("digitalSignature") // digitalSignature        (0)
+                    1 -> if (element) keyUsage.add("nonRepudiation") // nonRepudiation          (1)
+                    2 -> if (element) keyUsage.add("keyEncipherment") // keyEncipherment         (2)
+                    3 -> if (element) keyUsage.add("dataEncipherment") // dataEncipherment        (3)
+                    4 -> if (element) keyUsage.add("keyAgreement") // keyAgreement            (4)
+                    5 -> if (element) keyUsage.add("keyCertSign") // keyCertSign             (5)
+                    6 -> if (element) keyUsage.add("cRLSign") // cRLSign                 (6)
+                    7 -> if (element) keyUsage.add("encipherOnly") // encipherOnly            (7)
+                    8 -> if (element) keyUsage.add("decipherOnly") // decipherOnly            (8)
                 }
             }
 
             fun dateToString(date: Date): String {
-                return DateTimeFormatter.ISO_DATE_TIME.format(date.toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime())
+                return DateTimeFormatter.ISO_DATE_TIME.format(
+                    date.toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime()
+                )
             }
 
             val admission = Admission(certificate)
@@ -76,7 +78,6 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 base64String,
                 ocspResponderURL
             )
-
         }
     }
 
@@ -100,7 +101,6 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
             null
         }
     }
-
 }
 
 /**
@@ -150,7 +150,7 @@ data class NameInfo(
     var stateOrProvinceName: String? = null,
     var countryCode: String? = null,
 ) {
-    constructor(x500Name: X500Name): this() {
+    constructor(x500Name: X500Name) : this() {
         val rdns = x500Name.rdNs.map { it.typesAndValues.toList() }.flatten().toTypedArray()
         this.cn = valueOf(rdns, BCStyle.CN)
         this.sn = valueOf(rdns, BCStyle.SURNAME)
@@ -164,7 +164,7 @@ data class NameInfo(
     }
 
     private fun valueOf(rdns: Array<AttributeTypeAndValue>, type: ASN1ObjectIdentifier): String? {
-        val value = rdns.firstOrNull { it.type ==  type }?.value
+        val value = rdns.firstOrNull { it.type == type }?.value
         return value?.let {
             IETFUtils.valueToString(value)
         } ?: run {
@@ -257,7 +257,6 @@ class Admission(x509EeCert: X509Certificate) {
                     it.id
                 }
             }.flatten()
-
         }
 
     /**

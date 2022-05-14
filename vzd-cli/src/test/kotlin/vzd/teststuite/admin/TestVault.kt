@@ -3,9 +3,7 @@ package vzd.teststuite.admin
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import mu.KotlinLogging
 import vzd.admin.client.KeyStoreVaultProvider
-import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteIfExists
@@ -18,7 +16,7 @@ class TestVault : FeatureSpec({
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eget mattis ipsum. 
         Phasellus eleifend feugiat nisl vitae pellentesque. Sed viverra a ex et sagittis.
     """.trimIndent()
-    
+
     beforeSpec {
         vaultPath.deleteIfExists()
     }
@@ -69,7 +67,6 @@ class TestVault : FeatureSpec({
             vault2.get("ru") shouldBe null
             vault2.get("tu") shouldBe null
             vault2.get("pu") shouldBe null
-
         }
         scenario("Regex") {
             val SERVICE_NAME = "urn:gematik:directory:admin"
@@ -81,8 +78,6 @@ class TestVault : FeatureSpec({
         }
     }
 
-
     afterSpec {
     }
-
 })

@@ -14,7 +14,7 @@ data class Secret(var environment: String, var clientID: String, var secret: Str
 
 private const val DEFAULT_SERVICE_NAME = "urn:gematik:directory:admin"
 
-class VaultException(message: String): Exception(message)
+class VaultException(message: String) : Exception(message)
 
 class KeyStoreVaultProvider(val customVaultPath: Path? = null) {
 
@@ -36,11 +36,9 @@ class KeyStoreVaultProvider(val customVaultPath: Path? = null) {
         vaultPath.deleteIfExists()
     }
 
-    fun open(password: String, serviceName: String = DEFAULT_SERVICE_NAME):  KeyStoreVault {
+    fun open(password: String, serviceName: String = DEFAULT_SERVICE_NAME): KeyStoreVault {
         return KeyStoreVault(password, vaultPath, serviceName)
     }
-
-
 }
 
 class KeyStoreVault(private val password: String, private val keystorePath: Path, private val serviceName: String) {
@@ -60,8 +58,10 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
     fun list(): Sequence<Secret> {
         return keyStore.aliases().asSequence().mapNotNull { alias ->
             pattern.matchEntire(alias)?.let {
-                Secret(it.groups[1]!!.value, it.groups[2]!!.value,
-                    getSecret(alias)!!)
+                Secret(
+                    it.groups[1]!!.value, it.groups[2]!!.value,
+                    getSecret(alias)!!
+                )
             }
         }
     }
@@ -87,7 +87,6 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
         } else {
             null
         }
-
     }
 
     fun get(environment: String): Secret? {
@@ -98,8 +97,11 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
         logger.debug { "Found vault entry: $alias" }
 
         return pattern.matchEntire(alias)?.let {
-            Secret(it.groups[1]!!.value, it.groups[2]!!.value,
-                getSecret(alias)!!)
+            Secret(
+                it.groups[1]!!.value,
+                it.groups[2]!!.value,
+                getSecret(alias)!!
+            )
         }
     }
 

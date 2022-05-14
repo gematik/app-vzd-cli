@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import vzd.admin.client.Client
 import vzd.admin.client.FileConfigProvider
 
-
 fun createClient(): Client {
     var dotenv = dotenv { ignoreIfMissing = true }
     val root: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
@@ -23,5 +22,4 @@ fun createClient(): Client {
             httpProxyURL = provider.config.httpProxy?.proxyURL
         }
     }
-
 }

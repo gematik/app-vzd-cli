@@ -31,38 +31,41 @@ val DirectoryEntryOutputMapping = mapOf(
         value?.forEach {
             val kims = it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }
                 ?.flatten()?.flatten()?.joinToString() ?: ""
-            println("${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}" +
+            println(
+                "${it.directoryEntryBase.telematikID} ${Json.encodeToString(it.directoryEntryBase.displayName)}" +
                     " ${it.directoryEntryBase.domainID?.joinToString()}" +
-                    " ${kims}")
+                    " $kims"
+            )
         }
     },
     OutputFormat.CSV to { query: Map<String, String>, value: List<DirectoryEntry>? ->
 
         value?.forEach {
-            Output.printCsv(listOf(
-                query.toString(),
-                it.directoryEntryBase.telematikID.escape(),
-                it.directoryEntryBase.domainID?.joinToString(),
-                it.directoryEntryBase.holder?.joinToString(),
-                it.directoryEntryBase.displayName,
-                it.directoryEntryBase.streetAddress,
-                it.directoryEntryBase.postalCode,
-                it.directoryEntryBase.localityName,
-                it.directoryEntryBase.stateOrProvinceName,
-                it.userCertificates?.firstOrNull()?.userCertificate?.certificateInfo?.subject ?: "",
-                it.userCertificates?.firstOrNull()?.userCertificate?.certificateInfo?.issuer ?: "",
-                it.userCertificates?.count { it.userCertificate != null },
-                it.userCertificates?.mapNotNull {it.userCertificate?.certificateInfo }?.map { it.serialNumber.toString() }?.joinToString(),
-                it.userCertificates?.mapNotNull {it.userCertificate?.certificateInfo }?.mapNotNull { it.ocspResponse?.status ?: "NONE"}?.joinToString(),
-                it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.count(),
-                it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
-                    ?.flatten()?.joinToString()
-            ))
+            Output.printCsv(
+                listOf(
+                    query.toString(),
+                    it.directoryEntryBase.telematikID.escape(),
+                    it.directoryEntryBase.domainID?.joinToString(),
+                    it.directoryEntryBase.holder?.joinToString(),
+                    it.directoryEntryBase.displayName,
+                    it.directoryEntryBase.streetAddress,
+                    it.directoryEntryBase.postalCode,
+                    it.directoryEntryBase.localityName,
+                    it.directoryEntryBase.stateOrProvinceName,
+                    it.userCertificates?.firstOrNull()?.userCertificate?.certificateInfo?.subject ?: "",
+                    it.userCertificates?.firstOrNull()?.userCertificate?.certificateInfo?.issuer ?: "",
+                    it.userCertificates?.count { it.userCertificate != null },
+                    it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.map { it.serialNumber.toString() }?.joinToString(),
+                    it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.mapNotNull { it.ocspResponse?.status ?: "NONE" }?.joinToString(),
+                    it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.count(),
+                    it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
+                        ?.flatten()?.joinToString()
+                )
+            )
         }
 
         if (value == null || value.isEmpty()) {
             Output.printCsv(listOf(query.toString(), "Not Found"))
         }
-
     },
 )

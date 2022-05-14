@@ -40,7 +40,7 @@ dependencies {
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    //testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    // testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.kotest:kotest-runner-junit5:5.1.0")
     testImplementation("io.kotest:kotest-assertions-core:5.1.0")
 }
@@ -65,10 +65,9 @@ tasks.test {
 
 tasks {
     val projectProps by registering(WriteProperties::class) {
-        outputFile = file("${buildDir}/project.properties")
+        outputFile = file("$buildDir/project.properties")
         comment = "BuildConfig"
         property("project.version", project.version)
-
     }
 
     processResources {

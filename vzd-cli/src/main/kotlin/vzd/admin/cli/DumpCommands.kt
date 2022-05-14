@@ -4,12 +4,10 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
-import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.types.file
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -20,9 +18,7 @@ import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import vzd.admin.client.DirectoryEntry
 import vzd.admin.pki.OCSPResponseCertificateStatus
-import java.io.PrintWriter
 import kotlin.io.path.Path
-import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.useLines
 import kotlin.system.measureTimeMillis
@@ -32,7 +28,7 @@ private val jsonExtended = Json {
 }
 private val logger = KotlinLogging.logger {}
 
-class DumpCommand: CliktCommand(name = "dump", help = "Create and manage the data dumps") {
+class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the data dumps") {
     init {
         subcommands(
             DumpCreateCommand(),
@@ -43,11 +39,15 @@ class DumpCommand: CliktCommand(name = "dump", help = "Create and manage the dat
     override fun run() = Unit
 }
 class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetching the data from server") {
-    private val paramFile: Pair<String, String>? by option("-f", "--param-file",
-        help = "Read parameter values from file", metavar = "PARAM FILENAME").pair()
-    private val params: Map<String, String> by option("-p", "--param",
+    private val paramFile: Pair<String, String>? by option(
+        "-f", "--param-file",
+        help = "Read parameter values from file", metavar = "PARAM FILENAME"
+    ).pair()
+    private val params: Map<String, String> by option(
+        "-p", "--param",
         metavar = "PARAM=VALUE",
-        help = "Specify query parameters to find matching entries").associate()
+        help = "Specify query parameters to find matching entries"
+    ).associate()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
@@ -81,7 +81,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
                 }
             }
         }
-        logger.info { "Dumped $entries entries in ${elapsed/1000} seconds" }
+        logger.info { "Dumped $entries entries in ${elapsed / 1000} seconds" }
     }
 }
 
@@ -106,7 +106,7 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
                                 if (cert.certificateInfo.ocspResponse?.status == OCSPResponseCertificateStatus.GOOD) {
                                     logger.debug { "Certificate already GOOD: ${cert.certificateInfo.serialNumber}" }
                                 } else {
-                                    cert.certificateInfo.ocspResponse =  context.pkiClient.ocsp(cert)
+                                    cert.certificateInfo.ocspResponse = context.pkiClient.ocsp(cert)
                                 }
                             }
                             println(jsonExtended.encodeToString(entry))
@@ -115,8 +115,6 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
                 }
             }
         }
-        logger.info { "Processed $entries entries in ${elapsed/1000} seconds" }
-
+        logger.info { "Processed $entries entries in ${elapsed / 1000} seconds" }
     }
-
 }

@@ -6,14 +6,17 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.choice
 import vzd.admin.client.BaseDirectoryEntry
-import vzd.admin.pki.CertificateDataDER
 import vzd.admin.client.DirectoryEntry
 import vzd.admin.client.UserCertificate
+import vzd.admin.pki.CertificateDataDER
 
-class TempolateCommand : CliktCommand(name = "template", help = """Create template for a resource
+class TempolateCommand : CliktCommand(
+    name = "template",
+    help = """Create template for a resource
      
      Supported types: base, entry, cert
-""") {
+"""
+) {
     private val context by requireObject<CommandContext>()
     private val resourceType by argument(help = "Specify type of a resource").choice("base", "entry", "cert")
 
@@ -47,20 +50,22 @@ class TempolateCommand : CliktCommand(name = "template", help = """Create templa
 
                             )
                         )
-                    ), context.outputFormat)
-
+                    ),
+                    context.outputFormat
+                )
             }
             "cert" -> {
-                printTemplate(UserCertificate(
-                    userCertificate = CertificateDataDER("BASE64"),
-                    description = "Benutzt Zertifikat in DES (CRT) Binärformat konfertiert nach String mittels BASE64"
+                printTemplate(
+                    UserCertificate(
+                        userCertificate = CertificateDataDER("BASE64"),
+                        description = "Benutzt Zertifikat in DES (CRT) Binärformat konfertiert nach String mittels BASE64"
 
-                ), context.outputFormat)
+                    ),
+                    context.outputFormat
+                )
             }
             else -> throw UsageError("Undefinded resource type: $resourceType")
         }
-
-
     }
 
     private inline fun <reified T> printTemplate(template: T, outputFormat: OutputFormat) {

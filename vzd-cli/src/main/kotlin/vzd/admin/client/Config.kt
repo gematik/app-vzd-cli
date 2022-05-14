@@ -13,7 +13,7 @@ private val YAML = Yaml { encodeDefaultValues = false }
 class FileConfigProvider(val customConfigPath: Path? = null) {
     private val defaultConfigPath = Path(System.getProperty("user.home"), ".telematik", "directory-admin.yaml")
     val configPath get() = customConfigPath ?: defaultConfigPath
-    var config: Config;
+    var config: Config
 
     init {
         if (!configPath.toFile().exists()) {
@@ -27,7 +27,6 @@ class FileConfigProvider(val customConfigPath: Path? = null) {
         }
     }
 
-
     fun reset(): Config {
         config = DefaultConfig
         save()
@@ -37,7 +36,6 @@ class FileConfigProvider(val customConfigPath: Path? = null) {
     fun save() {
         configPath.writeText(YAML.encodeToString(config))
     }
-
 }
 
 val DefaultConfig = Config(
@@ -64,9 +62,9 @@ val DefaultConfig = Config(
 
 @Serializable
 data class Config(
-    var environments: Map<String,EnvironmentConfig>,
+    var environments: Map<String, EnvironmentConfig>,
     var currentEnvironment: String?,
-    var tokens: Map<String,TokenConfig>? = null,
+    var tokens: Map<String, TokenConfig>? = null,
     var httpProxy: HttpProxyConfig? = null
 ) {
     fun environment(name: String? = null) = environments.get(name ?: currentEnvironment)

@@ -13,18 +13,17 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import org.bouncycastle.util.encoders.Base64
-import vzd.admin.pki.CertificateDataDER
 import vzd.admin.client.UserCertificate
 import vzd.admin.client.VZDResponseException
+import vzd.admin.pki.CertificateDataDER
 import kotlin.io.path.inputStream
 
 class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate to existing DirectoryEntry") {
     private val logger = KotlinLogging.logger {}
 
-    //val inputFormat by option("--inform", "-i").choice("der", "pem")
+    // val inputFormat by option("--inform", "-i").choice("der", "pem")
     private val files by argument().path(mustBeReadable = true).multiple()
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (certificate exists).").flag()
-
 
     private val context by requireObject<CommandContext>()
     override fun run() = catching {
@@ -42,19 +41,19 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
                 logger.info { "Found matching Entry: ${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.displayName}" }
                 runBlocking {
                     try {
-                        context.client.addDirectoryEntryCertificate(it.directoryEntryBase.dn?.uid!!,
-                            userCertificate)
+                        context.client.addDirectoryEntryCertificate(
+                            it.directoryEntryBase.dn?.uid!!,
+                            userCertificate
+                        )
                     } catch (e: VZDResponseException) {
                         if (!ignore || e.response.status != HttpStatusCode.Conflict) {
                             throw e
                         }
                         logger.warn { "Certificate with serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber} already exists. Ignoring conflict." }
                     }
-
-            }
+                }
             }
                 ?: run { throw CliktError("Entry with telematikID ${certificateInfo.admissionStatement.registrationNumber} not found.") }
         }
-
     }
 }

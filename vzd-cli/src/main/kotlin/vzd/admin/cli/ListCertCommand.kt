@@ -15,12 +15,15 @@ import kotlin.io.path.useLines
 
 private val logger = KotlinLogging.logger {}
 
-
 class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificates") {
-    private val paramFile: Pair<String, String>? by option("-f", "--param-file",
-        help = "Read parameter values from file", metavar = "PARAM FILENAME").pair()
-    private val params: Map<String, String> by option("-p", "--param",
-        help = "Specify query parameters to find matching entries").associate()
+    private val paramFile: Pair<String, String>? by option(
+        "-f", "--param-file",
+        help = "Read parameter values from file", metavar = "PARAM FILENAME"
+    ).pair()
+    private val params: Map<String, String> by option(
+        "-p", "--param",
+        help = "Specify query parameters to find matching entries"
+    ).associate()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {

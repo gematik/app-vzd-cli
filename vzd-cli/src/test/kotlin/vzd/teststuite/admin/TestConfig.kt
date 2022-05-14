@@ -3,8 +3,6 @@ package vzd.teststuite.admin
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldHave
-import mu.KotlinLogging
 import vzd.admin.client.DefaultConfig
 import vzd.admin.client.FileConfigProvider
 import kotlin.io.path.Path
@@ -23,7 +21,7 @@ class TestConfig : FeatureSpec({
         scenario("Default config hat 3 Umgebungen") {
             val config = DefaultConfig
             config.environments.size shouldBe 3
-            config.environments.keys shouldContain  "tu"
+            config.environments.keys shouldContain "tu"
         }
         scenario("Beim resetten der Konfiguration wird die Konfig-Datei neu erzeugt") {
             configPath.toFile().exists() shouldBe false
@@ -32,8 +30,6 @@ class TestConfig : FeatureSpec({
         }
     }
 
-
     afterSpec {
     }
-
 })

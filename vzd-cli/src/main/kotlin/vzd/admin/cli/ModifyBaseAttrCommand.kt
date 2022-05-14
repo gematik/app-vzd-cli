@@ -19,10 +19,14 @@ private val JSON = Json { ignoreUnknownKeys = true }
 class ModifyBaseAttrCommand :
     CliktCommand(name = "modify-base-attr", help = "Modify specific attributes of a base entry") {
     private val logger = KotlinLogging.logger {}
-    private val params: Map<String, String> by option("-p", "--param",
-        help = "Specify query parameters to find matching entries").associate()
-    private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE",
-        help = "Set the attribute value in BaseDirectoryEntry.").associate()
+    private val params: Map<String, String> by option(
+        "-p", "--param",
+        help = "Specify query parameters to find matching entries"
+    ).associate()
+    private val attrs: Map<String, String> by option(
+        "-s", "--set", metavar = "ATTR=VALUE",
+        help = "Set the attribute value in BaseDirectoryEntry."
+    ).associate()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {

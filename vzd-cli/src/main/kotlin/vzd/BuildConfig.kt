@@ -11,5 +11,4 @@ object BuildConfig {
 
     val APP_VERSION: String
         get() = properties["project.version"] as String
-
 }

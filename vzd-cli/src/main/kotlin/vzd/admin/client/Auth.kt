@@ -38,7 +38,7 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
         val authClient = HttpClient(CIO) {
             httpProxyUrl?.let {
                 engine {
-                    logger.debug { "Using proxy: ${it}" }
+                    logger.debug { "Using proxy: $it" }
                     proxy = ProxyBuilder.http(it)
                 }
             }
@@ -63,7 +63,6 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
                     }
                 )
             }
-
         }
         val tokenResponse: TokenResponse = runBlocking {
             var response = authClient.submitForm(
@@ -83,4 +82,3 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
         return BearerTokens(tokenResponse.access_token, tokenResponse.refresh_token)
     }
 }
-

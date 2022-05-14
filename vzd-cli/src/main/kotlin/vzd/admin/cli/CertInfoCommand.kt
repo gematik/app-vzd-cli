@@ -23,7 +23,7 @@ class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of
             val certificateInfo = userCertificate.certificateInfo
 
             if (context.enableOcsp) {
-                certificateInfo.ocspResponse = runBlocking {  context.pkiClient.ocsp(userCertificate) }
+                certificateInfo.ocspResponse = runBlocking { context.pkiClient.ocsp(userCertificate) }
             }
 
             when (context.outputFormat) {
@@ -32,6 +32,5 @@ class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of
                 else -> throw UsageError("Cant use output format: ${context.outputFormat}")
             }
         }
-
     }
 }

@@ -8,7 +8,6 @@ import mu.KotlinLogging
 import vzd.admin.client.*
 import vzd.admin.pki.CertificateDataDER
 
-
 class TestCreate : FeatureSpec({
     val logger = KotlinLogging.logger {}
     var client: Client? = null
@@ -35,7 +34,6 @@ class TestCreate : FeatureSpec({
             val reloaded = client?.readDirectoryEntry(mapOf("uid" to dn!!.uid))?.first()
 
             reloaded?.directoryEntryBase?.telematikID shouldBe "1-" + TestCreate::class.qualifiedName!!
-
         }
         scenario("Eintrag mit existierenden TelematikID wird abgelehnt") {
             val entry = CreateDirectoryEntry()
@@ -44,7 +42,6 @@ class TestCreate : FeatureSpec({
             shouldThrow<VZDResponseException> {
                 client?.addDirectoryEntry(entry)
             }
-
         }
         scenario("Eintrag erzeugen und gleichzeitig Zertifikat setzten") {
             val certData =
@@ -68,9 +65,9 @@ class TestCreate : FeatureSpec({
             val entry = CreateDirectoryEntry()
             client?.readDirectoryEntry(mapOf("telematikID" to certData.certificateInfo.admissionStatement.registrationNumber))
                 ?.first()?.let {
-                logger.info { "Deleting $it" }
-                client?.deleteDirectoryEntry(it.directoryEntryBase.dn?.uid!!)
-            }
+                    logger.info { "Deleting $it" }
+                    client?.deleteDirectoryEntry(it.directoryEntryBase.dn?.uid!!)
+                }
             entry.directoryEntryBase =
                 BaseDirectoryEntry(certData.certificateInfo.admissionStatement.registrationNumber)
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
@@ -90,7 +87,6 @@ class TestCreate : FeatureSpec({
             reloaded2?.directoryEntryBase?.telematikID shouldBe TestData.telematikID
             reloaded2?.userCertificates?.size shouldBe 1
             reloaded2?.userCertificates?.first()?.userCertificate?.base64String shouldBe certData.base64String
-
         }
     }
 
@@ -103,7 +99,5 @@ class TestCreate : FeatureSpec({
                 logger.info { "Deleting $entry" }
                 client?.deleteDirectoryEntry(entry.directoryEntryBase.dn!!.uid)
             }
-
     }
-
 })

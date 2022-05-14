@@ -15,7 +15,7 @@ import vzd.admin.client.KeyStoreVaultProvider
 
 private val logger = KotlinLogging.logger {}
 
-class VaultCommand: CliktCommand(name = "vault", help = "Manage OAuth credentials in the Vault") {
+class VaultCommand : CliktCommand(name = "vault", help = "Manage OAuth credentials in the Vault") {
     init {
         subcommands(
             VaultResetCommand(),
@@ -46,14 +46,14 @@ fun openOrCreateVault(password: String?): KeyStoreVault {
     }
 }
 
-class VaultResetCommand: CliktCommand(name = "purge", help = "Remove Vault") {
+class VaultResetCommand : CliktCommand(name = "purge", help = "Remove Vault") {
     override fun run() = catching {
         vaultProvider.purge()
     }
 }
 
-class VaultListCommand: CliktCommand(name = "list", help = "List configured OAuth2 credentials") {
-    private val password by option("--password", "-p", help="Password for protection of the Vault")
+class VaultListCommand : CliktCommand(name = "list", help = "List configured OAuth2 credentials") {
+    private val password by option("--password", "-p", help = "Password for protection of the Vault")
 
     override fun run() = catching {
         val vault = openOrCreateVault(password)
@@ -63,33 +63,31 @@ class VaultListCommand: CliktCommand(name = "list", help = "List configured OAut
             echo("%-3s %-20s ******".format(it.environment, it.clientID))
         }
     }
-
 }
 
-class VaultStoreCommand: CliktCommand(name = "store", help = "Store OAuth2 client credentials") {
-    private val password by option("--password", "-p", help="Password for protection of the Vault")
-    private val env by option("-e", "--env", help="Environment. Either tu, ru or pu").choice("tu", "ru", "pu")
+class VaultStoreCommand : CliktCommand(name = "store", help = "Store OAuth2 client credentials") {
+    private val password by option("--password", "-p", help = "Password for protection of the Vault")
+    private val env by option("-e", "--env", help = "Environment. Either tu, ru or pu").choice("tu", "ru", "pu")
         .prompt("Environment")
-    private val clientID by option("-c", "--client-id", help="OAuth2 ClientID")
+    private val clientID by option("-c", "--client-id", help = "OAuth2 ClientID")
         .prompt("OAuth2 ClientID")
-    private val secret by option("-s", "--secret", help="OAuth2 Client Secret")
+    private val secret by option("-s", "--secret", help = "OAuth2 Client Secret")
         .prompt("OAuth2 Client Secret", hideInput = true)
 
     override fun run() = catching {
         val vault = openOrCreateVault(password)
         vault.store(env, clientID, secret)
     }
-
 }
 
-class VaultExportCommand: CliktCommand(name = "export", help = "Export Vault to a file for backup or transfer.") {
-    private val password by option("--password", "-p", help="Password for protection of the Vault")
+class VaultExportCommand : CliktCommand(name = "export", help = "Export Vault to a file for backup or transfer.") {
+    private val password by option("--password", "-p", help = "Password for protection of the Vault")
     private val output by option("-o", "--output").path(canBeDir = false).required()
     private val transferPassword by option("-t", "--transfer-password")
         .prompt("Enter Vault transfer password", hideInput = true)
 
     override fun run() = catching {
-        logger.info { "Exporting Vault to $output"}
+        logger.info { "Exporting Vault to $output" }
         val transferVaultProvider = KeyStoreVaultProvider(customVaultPath = output)
         val transferVault = transferVaultProvider.open(transferPassword)
         val vault = openOrCreateVault(password)
@@ -98,19 +96,17 @@ class VaultExportCommand: CliktCommand(name = "export", help = "Export Vault to 
             logger.info { "Exporting ${it.environment}:${it.clientID}" }
             transferVault.store(it.environment, it.clientID, it.secret)
         }
-
     }
-
 }
 
-class VaultImportCommand: CliktCommand(name = "import", help = "Import credentials from another Vault") {
-    private val password by option("--password", "-p", help="Password for protection of the Vault")
+class VaultImportCommand : CliktCommand(name = "import", help = "Import credentials from another Vault") {
+    private val password by option("--password", "-p", help = "Password for protection of the Vault")
     private val input by option("-i", "--input").path(canBeDir = false, mustBeReadable = true).required()
     private val transferPassword by option("-t", "--transfer-password")
         .prompt("Enter TRANSFER Vault password", hideInput = true)
 
     override fun run() = catching {
-        logger.info { "Importing Vault from $input"}
+        logger.info { "Importing Vault from $input" }
         val transferVault = KeyStoreVaultProvider(customVaultPath = input).open(transferPassword)
         val vault = openOrCreateVault(password)
 
@@ -119,5 +115,4 @@ class VaultImportCommand: CliktCommand(name = "import", help = "Import credentia
             vault.store(it.environment, it.clientID, it.secret)
         }
     }
-
 }

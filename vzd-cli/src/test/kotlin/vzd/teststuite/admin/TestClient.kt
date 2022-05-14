@@ -1,6 +1,5 @@
 package vzd.teststuite.admin
 
-import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -17,7 +16,6 @@ private val logger = KotlinLogging.logger {}
 
 class TestClient {
     var client: Client? = null
-
 
     @BeforeTest
     fun setUp() {
@@ -50,7 +48,6 @@ class TestClient {
             runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID")) }
         assertEquals(1, loadedDirectoryEntry?.size)
         assertEquals(dn.uid, loadedDirectoryEntry?.first()?.directoryEntryBase?.dn?.uid)
-
     }
 
     @Test
@@ -70,10 +67,10 @@ class TestClient {
 
         val dn = runBlocking { client?.addDirectoryEntry(directoryEntry) }
         assertNotNull(dn)
-        logger.info { "Created directory entry: ${dn}" }
+        logger.info { "Created directory entry: $dn" }
 
         val updateDirectoryEntry = UpdateBaseDirectoryEntry(
-            //telematikID = "vzd-cli-123456890",
+            // telematikID = "vzd-cli-123456890",
             displayName = "Uniklinik Entenhausen (modified)",
             domainID = directoryEntry.directoryEntryBase!!.domainID,
             postalCode = "54321",
@@ -81,7 +78,5 @@ class TestClient {
         )
 
         runBlocking { client?.modifyDirectoryEntry(dn.uid, updateDirectoryEntry) }
-
     }
-
 }

@@ -10,10 +10,12 @@ import mu.KotlinLogging
 
 class DeleteCommand : CliktCommand(name = "delete", help = "Delete specified directory entries") {
     private val logger = KotlinLogging.logger {}
-    private val params: Map<String, String> by option("-p", "--param",
-        help = "Specify query parameters to find matching entries").associate()
+    private val params: Map<String, String> by option(
+        "-p", "--param",
+        help = "Specify query parameters to find matching entries"
+    ).associate()
 
-    //val force by option(help="Force delete").flag()
+    // val force by option(help="Force delete").flag()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
@@ -33,6 +35,5 @@ class DeleteCommand : CliktCommand(name = "delete", help = "Delete specified dir
                 }
             }
         }
-
     }
 }

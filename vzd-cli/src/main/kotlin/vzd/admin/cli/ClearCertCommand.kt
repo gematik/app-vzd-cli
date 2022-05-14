@@ -15,12 +15,16 @@ import kotlin.io.path.useLines
 
 class ClearCertCommand : CliktCommand(name = "clear-cert", help = "Clear all certificates of a given entry") {
     private val logger = KotlinLogging.logger {}
-    private val paramFile: Pair<String, String>? by option("-f", "--param-file",
-        help = "Read parameter values from file", metavar = "PARAM FILENAME").pair()
-    private val params: Map<String, String> by option("-p", "--param",
-        help = "Specify query parameters to find matching entries", metavar = "PARAM=VALUE").associate()
+    private val paramFile: Pair<String, String>? by option(
+        "-f", "--param-file",
+        help = "Read parameter values from file", metavar = "PARAM FILENAME"
+    ).pair()
+    private val params: Map<String, String> by option(
+        "-p", "--param",
+        help = "Specify query parameters to find matching entries", metavar = "PARAM=VALUE"
+    ).associate()
 
-    //private val force by option("-f", "--force").flag(default = false)
+    // private val force by option("-f", "--force").flag(default = false)
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
@@ -66,5 +70,4 @@ class ClearCertCommand : CliktCommand(name = "clear-cert", help = "Clear all cer
             runBlocking { context.client.deleteDirectoryEntryCertificate(it.dn?.uid!!, it.dn?.cn!!) }
         }
     }
-
 }

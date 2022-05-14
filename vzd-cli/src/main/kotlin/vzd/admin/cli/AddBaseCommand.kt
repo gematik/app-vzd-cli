@@ -40,12 +40,16 @@ fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<String, St
     }
 }
 
-class AddBaseCommand: CliktCommand(name="add-base", help="Add new directory entry") {
+class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory entry") {
     private val logger = KotlinLogging.logger {}
-    private val attrs: Map<String, String> by option("-s", "--set", metavar = "ATTR=VALUE",
-        help="Set the attribute value in BaseDirectoryEntry.").associate()
-    private val file: String? by option("--file", "-f", metavar = "FILENAME",
-        help="Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN")
+    private val attrs: Map<String, String> by option(
+        "-s", "--set", metavar = "ATTR=VALUE",
+        help = "Set the attribute value in BaseDirectoryEntry."
+    ).associate()
+    private val file: String? by option(
+        "--file", "-f", metavar = "FILENAME",
+        help = "Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN"
+    )
     private val context by requireObject<CommandContext>()
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (entry exists).").flag()
 
@@ -61,7 +65,7 @@ class AddBaseCommand: CliktCommand(name="add-base", help="Add new directory entr
         }
 
         val baseDirectoryEntry: BaseDirectoryEntry = data?.let {
-            when(context.outputFormat) {
+            when (context.outputFormat) {
                 OutputFormat.HUMAN, OutputFormat.YAML -> Yaml.decodeFromString(it)
                 OutputFormat.JSON -> Json.decodeFromString(it)
                 else -> throw CliktError("Unsupported format: ${context.outputFormat}")
@@ -79,17 +83,17 @@ class AddBaseCommand: CliktCommand(name="add-base", help="Add new directory entr
         logger.debug { "Creating new directory entry with telematikID: ${baseDirectoryEntry.telematikID}" }
 
         val result = try {
-            val dn = runBlocking {  context.client.addDirectoryEntry(CreateDirectoryEntry(baseDirectoryEntry)) }
+            val dn = runBlocking { context.client.addDirectoryEntry(CreateDirectoryEntry(baseDirectoryEntry)) }
             logger.info("Created new DirectoryEntry: ${dn.uid}")
 
             val query = mapOf("uid" to dn.uid)
-            runBlocking {  context.client.readDirectoryEntry(query) }
+            runBlocking { context.client.readDirectoryEntry(query) }
         } catch (e: VZDResponseException) {
             if (!ignore || e.response.status != HttpStatusCode.Conflict) {
                 throw e
             }
             logger.warn { "Entry with telematikID=${baseDirectoryEntry.telematikID} already exists. Ignoring conflict." }
-            runBlocking {  context.client.readDirectoryEntry(mapOf("telematikID" to baseDirectoryEntry.telematikID)) }
+            runBlocking { context.client.readDirectoryEntry(mapOf("telematikID" to baseDirectoryEntry.telematikID)) }
         }
 
         when (context.outputFormat) {
@@ -99,4 +103,3 @@ class AddBaseCommand: CliktCommand(name="add-base", help="Add new directory entr
         }
     }
 }
-

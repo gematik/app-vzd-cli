@@ -4,28 +4,20 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.kotest.core.spec.style.FeatureSpec
-import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
-import mu.KotlinLogging
-import vzd.admin.client.BaseDirectoryEntry
 import vzd.admin.client.Client
-import vzd.admin.client.DirectoryEntry
-import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
-import java.io.StringReader
 import java.io.StringWriter
 import java.math.BigDecimal
 
-class TestDump: FeatureSpec({
+class TestDump : FeatureSpec({
     var client: Client? = null
 
     beforeSpec {
-       client = createClient()
+        client = createClient()
     }
-
 
     feature("Herunteladen von großen Mengen von Einträgen als Stream") {
         scenario("Abfrage nach holder liefert alle Einträge des Kartenherausgebers") {
@@ -58,7 +50,7 @@ class TestDump: FeatureSpec({
                     reader.beginObject()
                     writer.beginObject()
                     var depth = 0
-                    while(reader.peek() != JsonToken.END_OBJECT || depth > 0) {
+                    while (reader.peek() != JsonToken.END_OBJECT || depth > 0) {
                         val token = reader.peek()
                         println(token)
                         when (token) {
@@ -90,26 +82,19 @@ class TestDump: FeatureSpec({
                             }
                             else -> reader.skipValue()
                         }
-
                     }
 
                     reader.endObject()
                     writer.endObject()
                     yield(strWriter.toString())
-
                 }
                 reader.endArray()
             }
-
-
 
             sequence.map {
                 println(it)
                 it
             }.count() shouldBe 3
-
         }
     }
-
-
 })

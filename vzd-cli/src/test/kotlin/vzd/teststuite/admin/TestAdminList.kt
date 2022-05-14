@@ -25,7 +25,6 @@ class TestAdminList : FeatureSpec({
             output shouldContain "5-SMC-B-Testkarte-883110000092568"
 
             output shouldContain "5-SMC-B-Testkarte-883110000092568"
-
         }
     }
 })
