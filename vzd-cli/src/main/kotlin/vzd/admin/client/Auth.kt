@@ -66,12 +66,18 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
 
         }
         val tokenResponse: TokenResponse = runBlocking {
-            authClient.submitForm(
+            var response = authClient.submitForm(
                 url = authURL,
                 formParameters = Parameters.build {
                     append("grant_type", "client_credentials")
                 }
-            ).body()
+            )
+
+            if (response.status != HttpStatusCode.OK) {
+                throw VZDResponseException(response, "Authentication failed: ${response.body<String>()}")
+            }
+
+            response.body()
         }
 
         return BearerTokens(tokenResponse.access_token, tokenResponse.refresh_token)

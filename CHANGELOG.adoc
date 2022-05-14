@@ -6,6 +6,7 @@
   - `vzd-cli admin dump create` erzeugt einen neuen dump
   - `vzd-cli admin dump ocsp` ergänzt für jeden Zertifikat aus dem Dump die OCSP Informationen
   - Falls ein Dump bereits die OCSP-Daten enthält, werden nur die fehlerhafte Zertifikate erneut geprpüft (status != GOOD)
+- neues Befehl: `admin login-cred`: erlaubt Anmelden mit Client-Credentials, angegeben über Kommandozeile oder Umgebungsvariablen
 - Kleine Anpassungen am CSV-Format
 - Upgrade ktor.io Version 2.0.1
 

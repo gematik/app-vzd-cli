@@ -26,6 +26,9 @@ val optimizedSerializersModule = SerializersModule {
     contextual(CertificateDataDERInfoSerializer)
 }
 
+val JsonPretty = Json { prettyPrint = true }
+
+
 /**
  * Output helper class für human, json, yaml and csv outputs
  */

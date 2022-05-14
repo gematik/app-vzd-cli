@@ -7,17 +7,11 @@ import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.client.network.sockets.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import mu.KotlinLogging
 import vzd.admin.client.*
 import vzd.admin.pki.PKIClient
-import java.util.*
 
 private val logger = KotlinLogging.logger {}
-private val JSON = Json { prettyPrint = true }
 
 /**
  * Must love Kotlin - create a simple try / catch function and use in all classes that throws these exceptions
@@ -169,7 +163,7 @@ class DirectoryAdministrationCli :
 
     init {
         subcommands(VaultCommand(), ConfigCommand(),
-            LoginCommand(), AuthenticateAdmin(),
+            LoginCommand(), LoginCredCommand(), AuthenticateAdmin(),
             Info(), ListCommand(), TempolateCommand(), AddBaseCommand(),
             LoadBaseCommand(), ModifyBaseDirectoryEntry(), ModifyBaseAttrCommand(), DeleteCommand(),
             ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
@@ -198,30 +192,4 @@ class Info : CliktCommand(name = "info", help = "Show information about the API"
         }
     }
 
-}
-
-class LoginCommand: CliktCommand(name = "login", help = "Login to OAuth2 Server and store token(s)") {
-    private val context by requireObject<CommandContext>()
-    private val password by option("--password", "-p", help="Password for protection of the Vault")
-        .prompt("Enter Vault Password", hideInput = true)
-
-    override fun run() = catching {
-        val provider = FileConfigProvider()
-        val envcfg = provider.config.environment(context.env) ?: throw CliktError("Environment is not configured: ${context.env}")
-        val vaultProvider = KeyStoreVaultProvider()
-        if (!vaultProvider.exists()) throw CliktError("Vault is not initialized. See vzd-cli admin vault --help")
-        val vault = vaultProvider.open(password)
-        val auth = ClientCredentialsAuthenticator(envcfg.authURL,
-            if (provider.config.httpProxy?.enabled == true || context.useProxy) provider.config.httpProxy?.proxyURL else null)
-        val secret = vault.get(context.env) ?: throw CliktError("Secret for env '${context.env}' not found in Vault:")
-        val authResponse = auth.authenticate(secret.clientID, secret.secret)
-        val tokens = provider.config.tokens ?: emptyMap()
-        provider.config.tokens = tokens + mapOf(context.env to TokenConfig(accessToken = authResponse.accessToken))
-        provider.save()
-        // show token as pretty json
-        val tokenParts = authResponse.accessToken.split(".")
-        val tokenBody = String(Base64.getUrlDecoder().decode(tokenParts[1]), Charsets.UTF_8)
-        val j: JsonObject = Json.decodeFromString(tokenBody)
-        echo(JSON.encodeToString(j))
-    }
 }

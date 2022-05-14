@@ -32,6 +32,7 @@ Commands:
   vault             Manage OAuth credentials in the Vault
   config            Manage configuration
   login             Login to OAuth2 Server and store token(s)
+  login-cred        Login using the client credentials  
   auth              Show current access token
   info              Show information about the API
   list              List directory entries
@@ -116,9 +117,9 @@ Befehle für Konfiguration des CLI
 vzd-cli admin config view
 ----
 
-=== `admin config`
+=== `admin login`
 
-Befehle für Konfiguration des CLI
+Anmelden beim OAuth2 Server mit Client-Credentials aus dem Vault.
 
 .In alle drei Umgebungen einloggen (vorausgesetzt alle drei ClientIDs sind über `admin vault` hinterlegt)
 [source,bash]
@@ -128,7 +129,24 @@ vzd-cli admin -e ru login
 vzd-cli admin -e pu login
 ----
 
-NOTE: Im Gegensatz zu Vault und `CLIENT_SECRETS`, werden die zeitlich befristete `ACCESS_TOKEN` unverschlüsselt im Ordner `$HOME/.telematik/` gespeichert
+NOTE: Im Gegensatz zu Vault und darin enthaltenen Client-Credentials, werden die zeitlich befristete `ACCESS_TOKEN` unverschlüsselt im Ordner `$HOME/.telematik/` gespeichert
+
+=== `admin login-cred`
+
+Anmelden beim OAuth2 Server mit explizit angegeben Client-Credemtials ()
+
+.Abmelden in der Referenzumgebung, Client-Credentials werden über Parameter übergeben
+[source,bash]
+----
+vzd-cli admin -e ru login-cred --client-id=myclient --secret=mysecret
+----
+
+.Abmelden in der Produktivumgebung, Client-Id wird über Parameter übergeben, Client-Secret wird aus der Umgebungsvariable `CLIENT_SECRET` ausgelesen.
+[source,bash]
+----
+export CLIENT_SECRET=mysecret
+vzd-cli admin -e ru login-cred --client-id=myclient
+----
 
 
 [#cmd-admin-info]
