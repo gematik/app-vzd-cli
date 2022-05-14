@@ -10,7 +10,7 @@ import vzd.admin.client.DirectoryEntry
 import vzd.admin.client.UserCertificate
 import vzd.admin.pki.CertificateDataDER
 
-class TempolateCommand : CliktCommand(
+class TemplateCommand : CliktCommand(
     name = "template",
     help = """Create template for a resource
      

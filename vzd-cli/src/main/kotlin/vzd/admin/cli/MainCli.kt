@@ -165,8 +165,8 @@ class DirectoryAdministrationCli :
         subcommands(
             VaultCommand(), ConfigCommand(),
             LoginCommand(), LoginCredCommand(), AuthenticateAdmin(),
-            Info(), ListCommand(), TempolateCommand(), AddBaseCommand(),
-            LoadBaseCommand(), ModifyBaseDirectoryEntry(), ModifyBaseAttrCommand(), DeleteCommand(),
+            Info(), ListCommand(), TemplateCommand(), AddBaseCommand(),
+            LoadBaseCommand(), ModifyBaseCommand(), ModifyBaseAttrCommand(), DeleteCommand(),
             ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
             CertInfoCommand(), DumpCommand()
         )

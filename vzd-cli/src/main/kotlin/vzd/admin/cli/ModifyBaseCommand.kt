@@ -16,7 +16,7 @@ import vzd.admin.client.DistinguishedName
 import vzd.admin.client.UpdateBaseDirectoryEntry
 import java.io.File
 
-class ModifyBaseDirectoryEntry : CliktCommand(name = "modify-base", help = "Modify single base directory entry") {
+class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify single base directory entry") {
     private val logger = KotlinLogging.logger {}
     private val file: String? by argument(
         "FILENAME",
