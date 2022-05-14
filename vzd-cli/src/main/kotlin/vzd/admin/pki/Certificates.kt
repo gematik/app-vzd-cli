@@ -74,7 +74,7 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 dateToString(certificate.notAfter),
                 admissionInfo,
                 base64String,
-                "ocspResponderURL"
+                ocspResponderURL
             )
 
         }
