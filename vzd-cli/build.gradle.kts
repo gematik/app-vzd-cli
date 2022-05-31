@@ -1,14 +1,18 @@
 val ktorVersion = "2.0.1"
-version = "0.15.2"
+version = "0.15.3"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     kotlin("jvm").version("1.6.10")
     kotlin("plugin.serialization").version("1.6.10")
     id("com.github.johnrengelman.shadow").version("7.1.2")
-    // id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+}
+
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    disabledRules.set(setOf("no-wildcard-imports"))
 }
 
 repositories {

@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
@@ -19,10 +20,11 @@ private val JSON = Json { ignoreUnknownKeys = true }
 class ModifyBaseAttrCommand :
     CliktCommand(name = "modify-base-attr", help = "Modify specific attributes of a base entry") {
     private val logger = KotlinLogging.logger {}
-    private val params: Map<String, String> by option(
+    private val customParams: Map<String, String> by option(
         "-p", "--param",
         help = "Specify query parameters to find matching entries"
     ).associate()
+    private val parameterOptions by ParameterOptions()
     private val attrs: Map<String, String> by option(
         "-s", "--set", metavar = "ATTR=VALUE",
         help = "Set the attribute value in BaseDirectoryEntry."
@@ -30,6 +32,7 @@ class ModifyBaseAttrCommand :
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
+        val params = parameterOptions.toMap() + customParams
 
         if (params.isEmpty()) {
             throw UsageError("Please specify at least one query parameter")

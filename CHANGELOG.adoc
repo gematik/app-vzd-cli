@@ -2,11 +2,41 @@
 
 == Version 0.15.x
 
+- Unterstüzung von VZD 3.1.0-14
 - `dump` Befehl wurde überarbeitet
   - `vzd-cli admin dump create` erzeugt einen neuen dump
   - `vzd-cli admin dump ocsp` ergänzt für jeden Zertifikat aus dem Dump die OCSP Informationen
   - Falls ein Dump bereits die OCSP-Daten enthält, werden nur die fehlerhafte Zertifikate erneut geprpüft (status != GOOD)
 - neues Befehl: `admin login-cred`: erlaubt Anmelden mit Client-Credentials, angegeben über Kommandozeile oder Umgebungsvariablen
+- Befehle unterstützen zusätzlich zu `-p` die explizite Optionen:
+```
+      --name TEXT
+      --uid TEXT
+      --givenName TEXT
+      --sn TEXT
+      --cn TEXT
+      --displayName TEXT
+      --streetAddress TEXT
+      --postalCode TEXT
+      --countryCode TEXT
+      --localityName TEXT
+      --stateOrProvinceName TEXT
+      --title TEXT
+      --organization TEXT
+      --otherName TEXT
+      -t, --telematikID TEXT
+      --specialization TEXT
+      --domainID TEXT
+      --holder TEXT
+      --personalEntry [true|false]
+      --dataFromAuthority [true|false]
+      --professionOID TEXT
+      --entryType INT
+      --maxKOMLEadr INT
+      --changeDateTimeFrom TEXT
+      --changeDateTimeTo TEXT
+      --baseEntryOnly [true|false]
+ ```
 - Kleine Anpassungen am CSV-Format
 - Upgrade ktor.io Version 2.0.1
 

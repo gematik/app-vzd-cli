@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
@@ -43,15 +44,16 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         "-f", "--param-file",
         help = "Read parameter values from file", metavar = "PARAM FILENAME"
     ).pair()
-    private val params: Map<String, String> by option(
+    private val customParams: Map<String, String> by option(
         "-p", "--param",
         metavar = "PARAM=VALUE",
         help = "Specify query parameters to find matching entries"
     ).associate()
+    private val parameterOptions by ParameterOptions()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
-
+        val params = parameterOptions.toMap() + customParams
         paramFile?.let { paramFile ->
             val file = Path(paramFile.second)
             if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")

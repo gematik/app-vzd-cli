@@ -27,6 +27,12 @@ fun catching(throwingBlock: () -> Unit = {}) {
         throw CliktError(e.message)
     } catch (e: ConnectTimeoutException) {
         throw CliktError("${e.message}. Try using proxy: vzd-cli admin -x ...")
+    } catch (e: io.ktor.http.parsing.ParseException) {
+        if (e.message.contains("Expected `=` after parameter key ''")) {
+            throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin login`.")
+        } else {
+            throw e
+        }
     } catch (e: IllegalStateException) {
         // dirty, but no other way atm
         if (e.message?.contains("Unsupported byte code, first byte is 0xfc") == true) {

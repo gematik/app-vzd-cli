@@ -3,6 +3,7 @@ package vzd.admin.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
@@ -10,15 +11,17 @@ import mu.KotlinLogging
 
 class DeleteCommand : CliktCommand(name = "delete", help = "Delete specified directory entries") {
     private val logger = KotlinLogging.logger {}
-    private val params: Map<String, String> by option(
+    private val customParams: Map<String, String> by option(
         "-p", "--param",
         help = "Specify query parameters to find matching entries"
     ).associate()
+    private val parameterOptions by ParameterOptions()
 
     // val force by option(help="Force delete").flag()
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
+        val params = parameterOptions.toMap() + customParams
         runBlocking {
             if (params.isEmpty()) {
                 throw UsageError("Specify at least one query parameter")

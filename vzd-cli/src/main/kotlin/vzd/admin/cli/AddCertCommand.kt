@@ -29,12 +29,13 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
     override fun run() = catching {
         files.forEach {
             val certB64 = Base64.toBase64String(it.inputStream().readBytes())
-            val userCertificate = UserCertificate(userCertificate = CertificateDataDER(certB64))
-            val certificateInfo = userCertificate.userCertificate!!.certificateInfo
+            val certDER = CertificateDataDER(certB64)
+
+            val userCertificate = UserCertificate(userCertificate = certDER, telematikID = certDER.certificateInfo.admissionStatement.registrationNumber)
             logger.info { "Adding Certificate ${Yaml.encodeToString(userCertificate.userCertificate?.certificateInfo)}" }
 
             val entries = runBlocking {
-                context.client.readDirectoryEntry(mapOf("telematikID" to certificateInfo.admissionStatement.registrationNumber))
+                context.client.readDirectoryEntry(mapOf("telematikID" to certDER.certificateInfo.admissionStatement.registrationNumber))
             }
 
             entries?.first()?.let {
@@ -53,7 +54,7 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
                     }
                 }
             }
-                ?: run { throw CliktError("Entry with telematikID ${certificateInfo.admissionStatement.registrationNumber} not found.") }
+                ?: run { throw CliktError("Entry with telematikID ${certDER.certificateInfo.admissionStatement.registrationNumber} not found.") }
         }
     }
 }

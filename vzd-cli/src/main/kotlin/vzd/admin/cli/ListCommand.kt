@@ -3,6 +3,7 @@ package vzd.admin.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -18,14 +19,16 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
         "-f", "--param-file",
         help = "Read parameter values from file", metavar = "PARAM FILENAME"
     ).pair()
-    private val params: Map<String, String> by option(
+    private val customParams: Map<String, String> by option(
         "-p", "--param",
         help = "Specify query parameters to find matching entries", metavar = "NAME=VALUE"
     ).associate()
+    private val parameterOptions by ParameterOptions()
     private val context by requireObject<CommandContext>()
     private val sync by option(help = "use Sync mode").flag()
 
     override fun run() = catching {
+        val params = parameterOptions.toMap() + customParams
         paramFile?.let { paramFile ->
             val file = Path(paramFile.second)
             if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
