@@ -19,7 +19,6 @@ import java.io.OutputStreamWriter
 import java.util.*
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
-import kotlin.io.path.bufferedWriter
 import kotlin.io.path.fileSize
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
@@ -49,13 +48,12 @@ class ToDumpCommand : CliktCommand(help = "Convert LDIF to NDJSON dump, same as 
                     "domain" -> Unit
                     "vzd-entry" -> {
                         val entry = toDirectoryEntry(ldapEntry)
-                        entries.put(entry.directoryEntryBase.dn!!.uid!!, entry)
+                        entries.put(entry.directoryEntryBase.dn!!.uid, entry)
                     }
                     "vzd-certificate" -> {
                         val entry = entries[Dn(ldapEntry.dn).getValue("uid")] ?: throw UsageError("Entry ist not available: ${ldapEntry.dn}")
                         val userCertificate = toUserCertificate(ldapEntry)
-                        entry.userCertificates = entry?.userCertificates?.plus(userCertificate) ?: listOf(userCertificate)
-                        logger.debug { "Added Certificate #${entry?.userCertificates?.size} to ${entry?.directoryEntryBase?.dn?.uid}" }
+                        entry.userCertificates = entry.userCertificates?.plus(userCertificate) ?: listOf(userCertificate)
                     }
                     "vzd-komle" -> {
                         val entry = entries[Dn(ldapEntry.dn).getValue("uid")] ?: throw UsageError("Entry ist not available: ${ldapEntry.dn}")
@@ -134,7 +132,13 @@ private fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry, ldapEntry: Lda
 }
 
 private fun toDirectoryEntry(ldapEntry: LdapEntry): DirectoryEntry {
-    val telematikID = ldapEntry.attributes.firstOrNull {it.name == "telematikID"}?.stringValue+"****" ?: "da=${ldapEntry.dn}"
+    val telematikID = ldapEntry.attributes.firstOrNull {it.name == "telematikID"}?.stringValue.let {
+        if (it != null) {
+            "$it****"
+        } else {
+            ldapEntry.dn
+        }
+    }
     val baseDirectoryEntry = BaseDirectoryEntry(telematikID)
     setAttributes(baseDirectoryEntry, ldapEntry)
     baseDirectoryEntry.telematikID = telematikID
@@ -152,13 +156,13 @@ private fun toUserCertificate(ldapEntry: LdapEntry): UserCertificate {
     )
 
     userCertificate.entryType = ldapEntry.getAttribute("entryType")?.stringValue
-    userCertificate.telematikID = ldapEntry.getAttribute("telematikID").stringValue + "****"
+    userCertificate.telematikID = (ldapEntry.getAttribute("telematikID").stringValue ?: "") + "****"
     userCertificate.professionOID = ldapEntry.getAttribute("professionOID")?.stringValues?.toList()
     userCertificate.usage = ldapEntry.getAttribute("usage")?.stringValues?.toList()
 
     userCertificate.userCertificate = CertificateDataDER(Base64.getEncoder().encodeToString("<hidden>".toByteArray()))
 
-    userCertificate.description = ldapEntry.getAttribute("usage")?.stringValue
+    userCertificate.description = ldapEntry.getAttribute("description")?.stringValue
 
     return userCertificate
 }

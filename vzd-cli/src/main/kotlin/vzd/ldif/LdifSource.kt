@@ -39,7 +39,7 @@ class LdifSource(val input: BufferedReader) {
             return null
         }
         return try {
-            Base64.getDecoder().decode(encoded!!)
+            Base64.getDecoder().decode(encoded)
             encoded
         } catch (e: java.lang.IllegalArgumentException) {
             null
