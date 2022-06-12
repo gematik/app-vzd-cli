@@ -36,7 +36,7 @@
       --changeDateTimeFrom TEXT
       --changeDateTimeTo TEXT
       --baseEntryOnly [true|false]
- ```
+```
 - Kleine Anpassungen am CSV-Format
 - Upgrade ktor.io Version 2.0.1
 

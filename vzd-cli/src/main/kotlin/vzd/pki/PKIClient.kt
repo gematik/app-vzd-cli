@@ -1,4 +1,4 @@
-package vzd.admin.pki
+package vzd.pki
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -98,7 +98,7 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
             builder.addRequest(certificateID)
             val ocspReq = builder.build()
 
-            logger.debug { "OCSP serialNumber: ${ocspReq.requestList[0].certID.serialNumber}, responder: $ocspResponderURL" }
+            logger.debug { "Verifying OCSP serialNumber: ${ocspReq.requestList[0].certID.serialNumber}, responder: $ocspResponderURL" }
             val response = httpClient.post(ocspResponderURL) {
                 headers {
                     append(HttpHeaders.ContentType, "application/ocsp-request")
@@ -110,6 +110,7 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
 
             val basicOcspResp = OCSPResp(body).responseObject as BasicOCSPResp
             val ocspResp = basicOcspResp.responses.first()
+
 
             val result = when (val certStatus = ocspResp.certStatus) {
                 CertificateStatus.GOOD -> {
@@ -128,10 +129,13 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
                     }
                     return OCSPResponse(OCSPResponseCertificateStatus.GOOD)
                 }
-                is UnknownStatus -> OCSPResponse(
-                    OCSPResponseCertificateStatus.UNKNOWN,
-                    "Certificate is unknown by the OCSP server"
-                )
+                is UnknownStatus -> {
+                    logger.info { "Certificate is unknown by the OCSP server subject='${eeCert.subjectDN}', serialNumber='${ocspReq.requestList[0].certID.serialNumber}', issuer='${issuerCert.subjectDN}'" }
+                    OCSPResponse(
+                        OCSPResponseCertificateStatus.UNKNOWN,
+                        "Certificate is unknown by the OCSP server"
+                    )
+                }
                 is RevokedStatus -> {
                     val reason = if (certStatus.hasRevocationReason()) certStatus.revocationReason else "none"
                     OCSPResponse(

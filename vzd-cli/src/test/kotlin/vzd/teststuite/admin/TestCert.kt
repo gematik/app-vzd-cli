@@ -12,6 +12,7 @@ import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.util.encoders.Base64
 import vzd.admin.cli.escape
 import vzd.admin.pki.*
+import vzd.pki.*
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 

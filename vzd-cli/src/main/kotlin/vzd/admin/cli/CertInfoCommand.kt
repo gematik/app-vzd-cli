@@ -9,7 +9,7 @@ import com.github.ajalt.clikt.parameters.types.path
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
-import vzd.admin.pki.CertificateDataDER
+import vzd.pki.CertificateDataDER
 import kotlin.io.path.inputStream
 
 class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of a certificate") {

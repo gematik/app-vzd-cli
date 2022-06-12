@@ -1,4 +1,4 @@
-package vzd.admin.pki
+package vzd.pki
 
 import io.ktor.client.*
 import io.ktor.client.call.*

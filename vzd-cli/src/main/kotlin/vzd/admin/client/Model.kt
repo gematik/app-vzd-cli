@@ -3,7 +3,7 @@ package vzd.admin.client
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import vzd.admin.pki.CertificateDataDER
+import vzd.pki.CertificateDataDER
 
 @Serializable
 @SerialName("Error")

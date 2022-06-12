@@ -15,7 +15,7 @@ import net.mamoe.yamlkt.Yaml
 import org.bouncycastle.util.encoders.Base64
 import vzd.admin.client.UserCertificate
 import vzd.admin.client.VZDResponseException
-import vzd.admin.pki.CertificateDataDER
+import vzd.pki.CertificateDataDER
 import kotlin.io.path.inputStream
 
 class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate to existing DirectoryEntry") {

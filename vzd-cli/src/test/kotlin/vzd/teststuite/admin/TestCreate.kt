@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 import mu.KotlinLogging
 import vzd.admin.client.*
-import vzd.admin.pki.CertificateDataDER
+import vzd.pki.CertificateDataDER
 
 class TestCreate : FeatureSpec({
     val logger = KotlinLogging.logger {}

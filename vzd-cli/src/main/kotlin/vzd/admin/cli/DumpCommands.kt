@@ -18,7 +18,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import vzd.admin.client.DirectoryEntry
-import vzd.admin.pki.OCSPResponseCertificateStatus
+import vzd.pki.OCSPResponseCertificateStatus
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.useLines
