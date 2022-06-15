@@ -264,7 +264,8 @@ vzd-cli admin add-cert 1-123123.der
 [source,bash]
 ----
 # Fügt alle Zertifikate aus dem aktuellen Ordner das VZD
-# TelematikID und BasisEintrag werden automatisch aus dem Zertifikat ermittelt (Admission Statement -> Registration Number)
+# TelematikID und BasisEintrag werden automatisch aus dem Zertifikat 
+# ermittelt (Admission Statement -> Registration Number)
 vzd-cli admin add-cert *.der
 ----
 
