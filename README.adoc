@@ -43,7 +43,8 @@ Commands:
   modify-base-attr  Modify specific attributes of a base entry
   delete            Delete specified directory entries
   list-cert         List certificates
-  add-cert          Add certificate to existing DirectoryEntry
+  
+  Add certificate to existing DirectoryEntry
   save-cert         Saves certificate to DER files
   delete-cert       Delete certificate
   clear-cert        Clear all certificates of a given entry
@@ -259,6 +260,15 @@ vzd-cli admin add-base -s telematikID=1-123123
 # Achtung: TelematikID beim Befehl admin add-base und im Zertifikat müssen identisch sein
 vzd-cli admin add-cert 1-123123.der
 ----
+
+[source,bash]
+----
+# Fügt alle Zertifikate aus dem aktuellen Ordner das VZD
+# TelematikID und BasisEintrag werden automatisch aus dem Zertifikat ermittelt (Admission Statement -> Registration Number)
+vzd-cli admin add-cert *.der
+----
+
+
 
 [#cmd-admin-clear-cert]
 === `admin clear-cert`
