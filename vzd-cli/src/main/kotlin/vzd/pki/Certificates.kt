@@ -36,7 +36,6 @@ public fun dateToString(date: Date): String {
     )
 }
 
-
 /**
  * Simple datatype for base64 encoded certificates to differentiate them from plain strings
  */
@@ -147,6 +146,7 @@ data class NameInfo(
     var cn: String? = null,
     var givenName: String? = null,
     var sn: String? = null,
+    var title: String? = null,
     var serialNumber: String? = null,
     var streetAddress: String? = null,
     var postalCode: String? = null,
@@ -159,6 +159,7 @@ data class NameInfo(
         this.cn = valueOf(rdns, BCStyle.CN)
         this.sn = valueOf(rdns, BCStyle.SURNAME)
         this.givenName = valueOf(rdns, BCStyle.GIVENNAME)
+        this.title = valueOf(rdns, BCStyle.T)
         this.serialNumber = valueOf(rdns, BCStyle.SERIALNUMBER)
         this.streetAddress = valueOf(rdns, BCStyle.STREET)
         this.postalCode = valueOf(rdns, BCStyle.POSTAL_CODE)

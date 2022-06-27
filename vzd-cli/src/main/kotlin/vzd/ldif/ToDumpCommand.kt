@@ -30,6 +30,7 @@ private val logger = KotlinLogging.logger {}
 
 private val jsonExtended = Json {
     serializersModule = customSerializersModule
+    encodeDefaults = true
 }
 
 class ToDumpCommand : CliktCommand(help = "Convert LDIF to NDJSON dump, same as produced by admin dump") {
@@ -53,7 +54,7 @@ class ToDumpCommand : CliktCommand(help = "Convert LDIF to NDJSON dump, same as 
                     "vzd-certificate" -> {
                         val entry = entries[Dn(ldapEntry.dn).getValue("uid")] ?: throw UsageError("Entry ist not available: ${ldapEntry.dn}")
                         val userCertificate = toUserCertificate(ldapEntry)
-                        entry.userCertificates = entry.userCertificates?.plus(userCertificate) ?: listOf(userCertificate)
+                        entry.userCertificates = (entry.userCertificates?.plus(userCertificate) ?: listOf(userCertificate))
                     }
                     "vzd-komle" -> {
                         val entry = entries[Dn(ldapEntry.dn).getValue("uid")] ?: throw UsageError("Entry ist not available: ${ldapEntry.dn}")
@@ -61,7 +62,7 @@ class ToDumpCommand : CliktCommand(help = "Convert LDIF to NDJSON dump, same as 
                     }
                     "vzd-fad" -> {
                         val entry = entries[Dn(ldapEntry.dn).getValue("uid")] ?: throw UsageError("Entry ist not available: ${ldapEntry.dn}")
-                        entry.fachdaten?.first()?.fad1 = entry.fachdaten?.first()?.fad1 ?: emptyList<FAD1>() .plus (toFAD1(ldapEntry))
+                        entry.fachdaten?.first()?.fad1 = (entry.fachdaten?.first()?.fad1 ?: emptyList() ).plus (toFAD1(ldapEntry))
                     }
 
                     else -> {
@@ -75,11 +76,13 @@ class ToDumpCommand : CliktCommand(help = "Convert LDIF to NDJSON dump, same as 
 
         val progressBar2 = ProgressBar("2/2: Write", entries.size.toLong())
         val out = BufferedWriter(OutputStreamWriter(GZIPOutputStream(destFile.outputStream())))
-        progressBar2.use {
-            entries.values.forEach { entry ->
-                progressBar2.stepBy(1)
-                out.write(jsonExtended.encodeToString(entry))
-                out.newLine()
+        out.use {
+            progressBar2.use {
+                entries.values.forEach { entry ->
+                    progressBar2.stepBy(1)
+                    out.write(jsonExtended.encodeToString(entry))
+                    out.newLine()
+                }
             }
         }
     }
@@ -160,7 +163,9 @@ private fun toUserCertificate(ldapEntry: LdapEntry): UserCertificate {
     userCertificate.professionOID = ldapEntry.getAttribute("professionOID")?.stringValues?.toList()
     userCertificate.usage = ldapEntry.getAttribute("usage")?.stringValues?.toList()
 
-    userCertificate.userCertificate = CertificateDataDER(Base64.getEncoder().encodeToString("<hidden>".toByteArray()))
+    ldapEntry.attributes.firstOrNull { it.name == "userCertificate" }?.let {
+        userCertificate.userCertificate = CertificateDataDER(Base64.getEncoder().encodeToString("<hidden>".toByteArray()))
+    }
 
     userCertificate.description = ldapEntry.getAttribute("description")?.stringValue
 

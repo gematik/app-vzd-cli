@@ -20,7 +20,9 @@ val DirectoryEntryCsvHeaders = listOf(
     "userCertificateSerial",
     "userCertificateOCSPStatus",
     "mailCount",
-    "mail"
+    "mail",
+    "FAD",
+    "specialization"
 )
 
 val DirectoryEntryOutputMapping = mapOf(
@@ -52,14 +54,17 @@ val DirectoryEntryOutputMapping = mapOf(
                     it.directoryEntryBase.postalCode,
                     it.directoryEntryBase.localityName,
                     it.directoryEntryBase.stateOrProvinceName,
-                    it.userCertificates?.firstOrNull()?.userCertificate?.certificateInfo?.subject ?: "",
-                    it.userCertificates?.firstOrNull()?.userCertificate?.certificateInfo?.issuer ?: "",
-                    it.userCertificates?.count { it.userCertificate != null },
+                    it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.firstOrNull()?.subject ?: "",
+                    it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.firstOrNull()?.issuer ?: "",
+                    it.userCertificates?.count { it.userCertificate != null } ?: 0,
                     it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.map { it.serialNumber.toString() }?.joinToString(),
                     it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.mapNotNull { it.ocspResponse?.status ?: "NONE" }?.joinToString(),
-                    it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.count(),
+                    it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.count() ?: 0,
                     it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
-                        ?.flatten()?.joinToString()
+                        ?.flatten()?.joinToString(),
+                    it.fachdaten?.let { it.mapNotNull { it.fad1 }.flatten().mapNotNull { it.dn.ou?.firstOrNull() }.joinToString() },
+                    it.directoryEntryBase.specialization?.mapNotNull { it }?.joinToString() ?: ""
+
                 )
             )
         }
