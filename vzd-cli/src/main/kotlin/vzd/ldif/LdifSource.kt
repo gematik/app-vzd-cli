@@ -6,9 +6,9 @@ import java.io.BufferedReader
 import java.io.StringReader
 import java.util.*
 
-private val BINARY_ENTY_REGEX = "(.*)::\\s(.*)".toRegex()
+private val BINARY_ENTRY_REGEX = "(.*)::\\s(.*)".toRegex()
 
-class LdifSource(val input: BufferedReader) {
+class LdifSource(private val input: BufferedReader) {
 
     fun useEntries(block: (LdapEntry, Long) -> Unit) {
 
@@ -16,18 +16,18 @@ class LdifSource(val input: BufferedReader) {
         val linesBuffer = mutableListOf<String>()
 
         while (line != null) {
-            BINARY_ENTY_REGEX.find(line)?.let {match ->
+            BINARY_ENTRY_REGEX.find(line)?.let { match ->
                 val encoded = match.groups[2]?.value
-                val fixed = decodable(encoded) ?: run { decodable(encoded+"=") }
-                line = "${match.groups[1]?.value}:: ${fixed}"
+                val fixed = decodable(encoded) ?: run { decodable("$encoded=") }
+                line = "${match.groups[1]?.value}:: $fixed"
             }
 
             if (line == "") {
-                var entryString = StringReader(linesBuffer.joinToString ("\n"))
+                val entryString = StringReader(linesBuffer.joinToString("\n"))
                 linesBuffer.clear()
                 val ldifReader = LdifReader(entryString)
                 val result = ldifReader.read()
-                block(result.entry, entryString.toString().length.toLong()+1L)
+                block(result.entry, entryString.toString().length.toLong() + 1L)
             }
             linesBuffer.add(line)
             line = input.readLine()
@@ -45,5 +45,4 @@ class LdifSource(val input: BufferedReader) {
             null
         }
     }
-
 }

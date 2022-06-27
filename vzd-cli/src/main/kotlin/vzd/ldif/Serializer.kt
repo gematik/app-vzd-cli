@@ -20,7 +20,7 @@ object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
     override fun serialize(encoder: Encoder, value: CertificateDataDER) {
         val surrogate = CertificateInfo(
             subject = HIDDEN_VALUE,
-            subjectInfo = NameInfo(cn=HIDDEN_VALUE),
+            subjectInfo = NameInfo(cn = HIDDEN_VALUE),
             issuer = HIDDEN_VALUE,
             signatureAlgorithm = HIDDEN_VALUE,
             publicKeyAlgorithm = HIDDEN_VALUE,
@@ -43,7 +43,6 @@ object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
         throw UnsupportedOperationException()
     }
 }
-
 
 val customSerializersModule = SerializersModule {
     contextual(CertificateDataDERInfoSerializer)

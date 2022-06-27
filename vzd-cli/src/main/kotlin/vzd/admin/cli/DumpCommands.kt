@@ -9,7 +9,6 @@ import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
-import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.path
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -132,8 +131,6 @@ class DumpSaveCert : CliktCommand(name = "save-cert", help = "Reads dump from ST
     private val destination by argument().path(mustExist = true, mustBeWritable = true, canBeFile = false)
 
     override fun run() = catching {
-        val semaphore = Semaphore(20)
-
         var entries = 0
         // initialize lazy variable before coroutines
         context.pkiClient.tsl
@@ -142,7 +139,7 @@ class DumpSaveCert : CliktCommand(name = "save-cert", help = "Reads dump from ST
                 System.`in`.bufferedReader().lineSequence().forEach { line ->
                     val entry: DirectoryEntry = jsonExtended.decodeFromString(line)
                     entries++
-                    entry.userCertificates?.mapNotNull{ it.userCertificate?.certificateInfo}?.forEach { certInfo ->
+                    entry.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.forEach { certInfo ->
                         val filename = "${certInfo.admissionStatement.registrationNumber.escape()}-${certInfo.serialNumber}.der"
                         val path = destination.resolve(filename)
                         path.writeBytes(Base64.decode(certInfo.certData))

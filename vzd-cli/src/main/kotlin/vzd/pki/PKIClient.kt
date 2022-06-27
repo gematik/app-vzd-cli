@@ -111,7 +111,6 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
             val basicOcspResp = OCSPResp(body).responseObject as BasicOCSPResp
             val ocspResp = basicOcspResp.responses.first()
 
-
             val result = when (val certStatus = ocspResp.certStatus) {
                 CertificateStatus.GOOD -> {
                     if (ocspResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash) == null) {

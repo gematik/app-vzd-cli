@@ -43,9 +43,9 @@ class ToDumpCommand : CliktCommand(help = "Convert LDIF to NDJSON dump, same as 
         val reader = LdifSource(BufferedReader(InputStreamReader(GZIPInputStream(sourceFile.inputStream()))))
 
         progressBar.use {
-            reader.useEntries {ldapEntry, bytesConsumed ->
+            reader.useEntries { ldapEntry, bytesConsumed ->
                 progressBar.stepBy(bytesConsumed)
-                when(ldapEntry.getAttribute("objectClass").stringValue) {
+                when (ldapEntry.getAttribute("objectClass").stringValue) {
                     "domain" -> Unit
                     "vzd-entry" -> {
                         val entry = toDirectoryEntry(ldapEntry)
@@ -58,16 +58,16 @@ class ToDumpCommand : CliktCommand(help = "Convert LDIF to NDJSON dump, same as 
                     }
                     "vzd-komle" -> {
                         val entry = entries[Dn(ldapEntry.dn).getValue("uid")] ?: throw UsageError("Entry ist not available: ${ldapEntry.dn}")
-                        entry.fachdaten = entry.fachdaten ?: emptyList<Fachdaten>() .plus(toFachdaten(ldapEntry))
+                        entry.fachdaten = entry.fachdaten ?: emptyList<Fachdaten>().plus(toFachdaten(ldapEntry))
                     }
                     "vzd-fad" -> {
                         val entry = entries[Dn(ldapEntry.dn).getValue("uid")] ?: throw UsageError("Entry ist not available: ${ldapEntry.dn}")
-                        entry.fachdaten?.first()?.fad1 = (entry.fachdaten?.first()?.fad1 ?: emptyList() ).plus (toFAD1(ldapEntry))
+                        entry.fachdaten?.first()?.fad1 = (entry.fachdaten?.first()?.fad1 ?: emptyList()).plus(toFAD1(ldapEntry))
                     }
 
                     else -> {
                         logger.debug { "Unknown entry: ${ldapEntry.getAttribute("objectClass").stringValue}, dn: ${ldapEntry.dn}" }
-                        //throw UsageError("Unknown entry: ${ldapEntry.getAttribute("objectClass").stringValue}, dn: ${ldapEntry.dn}")
+                        // throw UsageError("Unknown entry: ${ldapEntry.getAttribute("objectClass").stringValue}, dn: ${ldapEntry.dn}")
                     }
                 }
             }
@@ -88,7 +88,7 @@ class ToDumpCommand : CliktCommand(help = "Convert LDIF to NDJSON dump, same as 
     }
 }
 
-private fun propertyName(ldapAttrName: String ): String {
+private fun propertyName(ldapAttrName: String): String {
     return when (ldapAttrName) {
         "l" -> "localityName"
         "st" -> "stateOrProvinceName"
@@ -106,7 +106,7 @@ private fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry, ldapEntry: Lda
         }
 
         if (propertyName == "uid") {
-            baseDirectoryEntry.dn = DistinguishedName(uid=attr.stringValue, dc=listOf("vzd", "telematik"))
+            baseDirectoryEntry.dn = DistinguishedName(uid = attr.stringValue, dc = listOf("vzd", "telematik"))
             return@forEach
         }
 
@@ -115,7 +115,7 @@ private fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry, ldapEntry: Lda
             .firstOrNull() { it.name == propertyName }
 
         if (property == null) {
-            logger.error { "Unknown BaseDirectoryEntry property: ${propertyName}"}
+            logger.error { "Unknown BaseDirectoryEntry property: $propertyName" }
             return@forEach
         }
 
@@ -125,7 +125,7 @@ private fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry, ldapEntry: Lda
         } else if (property.returnType == typeOf<Int>() || property.returnType == typeOf<Int?>()) {
             property.setter.call(baseDirectoryEntry, attr.stringValue.toInt())
         } else if (property.returnType == typeOf<Boolean>() || property.returnType == typeOf<Boolean?>()) {
-            property.setter.call(baseDirectoryEntry, attr.stringValue.toBoolean() )
+            property.setter.call(baseDirectoryEntry, attr.stringValue.toBoolean())
         } else if (property.returnType == typeOf<List<String>>() || property.returnType == typeOf<List<String>?>()) {
             property.setter.call(baseDirectoryEntry, attr.stringValues)
         } else {
@@ -135,7 +135,7 @@ private fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry, ldapEntry: Lda
 }
 
 private fun toDirectoryEntry(ldapEntry: LdapEntry): DirectoryEntry {
-    val telematikID = ldapEntry.attributes.firstOrNull {it.name == "telematikID"}?.stringValue.let {
+    val telematikID = ldapEntry.attributes.firstOrNull { it.name == "telematikID" }?.stringValue.let {
         if (it != null) {
             "$it****"
         } else {
@@ -153,9 +153,9 @@ private fun toUserCertificate(ldapEntry: LdapEntry): UserCertificate {
 
     val dn = Dn(ldapEntry.dn)
     userCertificate.dn = DistinguishedName(
-        uid=dn.getValue("uid"),
-        dc=dn.getValues("dc").toList(),
-        cn=dn.getValue("cn"),
+        uid = dn.getValue("uid"),
+        dc = dn.getValues("dc").toList(),
+        cn = dn.getValue("cn"),
     )
 
     userCertificate.entryType = ldapEntry.getAttribute("entryType")?.stringValue
@@ -176,9 +176,9 @@ private fun toFachdaten(ldapEntry: LdapEntry): Fachdaten {
     val dn = Dn(ldapEntry.dn)
     val fachdten = Fachdaten(
         DistinguishedName(
-            uid=dn.getValue("uid"),
-            dc=dn.getValues("dc").toList(),
-            ou=dn.getValues("ou").toList()
+            uid = dn.getValue("uid"),
+            dc = dn.getValues("dc").toList(),
+            ou = dn.getValues("ou").toList()
         )
     )
     return fachdten
@@ -188,11 +188,11 @@ private fun toFAD1(ldapEntry: LdapEntry): FAD1 {
     val dn = Dn(ldapEntry.dn)
     val fad1 = FAD1(
         dn = DistinguishedName(
-            uid=dn.getValue("uid"),
-            dc=dn.getValues("dc").toList(),
-            ou=dn.getValues("ou").toList()
+            uid = dn.getValue("uid"),
+            dc = dn.getValues("dc").toList(),
+            ou = dn.getValues("ou").toList()
         ),
-        mail = ldapEntry.getAttribute("mail").stringValues?.map { "*****"+it }
+        mail = ldapEntry.getAttribute("mail").stringValues?.map { "*****" + it }
     )
     return fad1
 }

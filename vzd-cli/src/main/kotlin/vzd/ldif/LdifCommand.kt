@@ -1,10 +1,7 @@
 package vzd.ldif
 
-import com.github.ajalt.clikt.core.*
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.multiple
-import com.github.ajalt.clikt.parameters.types.path
-import vzd.admin.cli.*
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.subcommands
 
 const val HIDDEN_VALUE = "<hidden>"
 
