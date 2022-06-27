@@ -1,5 +1,5 @@
 val ktorVersion = "2.0.1"
-version = "0.15.3"
+version = "0.16.0"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -42,6 +42,9 @@ dependencies {
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+
+    implementation("org.ldaptive:ldaptive:2.1.1")
+    implementation("me.tongfei:progressbar:0.9.3")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     // testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

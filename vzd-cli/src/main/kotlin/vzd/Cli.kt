@@ -9,9 +9,11 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.github.ajalt.clikt.parameters.types.path
 import io.github.cdimascio.dotenv.dotenv
+import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.slf4j.LoggerFactory
 import vzd.admin.cli.DirectoryAdministrationCli
+import vzd.ldif.LdifCommand
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.absolutePathString
@@ -19,13 +21,15 @@ import kotlin.io.path.name
 
 private val logger = KotlinLogging.logger {}
 
+val JsonPretty = Json { prettyPrint = true }
+
 class Cli : CliktCommand(name = "vzd-cli") {
     private val verbosity by option("-v", help = "Display log, use -vv for even more details").counted()
     private val env by option(help = "specify env file", metavar = "FILENAME").path(canBeDir = false)
 
     init {
         versionOption(BuildConfig.APP_VERSION)
-        subcommands(DirectoryAdministrationCli())
+        subcommands(DirectoryAdministrationCli(), LdifCommand())
     }
 
     override fun run() {

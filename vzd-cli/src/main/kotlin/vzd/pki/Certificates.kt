@@ -1,4 +1,4 @@
-package vzd.admin.pki
+package vzd.pki
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -26,6 +26,17 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 /**
+ * Converts Date object to ISO String
+ */
+public fun dateToString(date: Date): String {
+    return DateTimeFormatter.ISO_DATE_TIME.format(
+        date.toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime()
+    )
+}
+
+/**
  * Simple datatype for base64 encoded certificates to differentiate them from plain strings
  */
 @Serializable(with = CertificateDataDERSerializer::class)
@@ -46,14 +57,6 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                     7 -> if (element) keyUsage.add("encipherOnly") // encipherOnly            (7)
                     8 -> if (element) keyUsage.add("decipherOnly") // decipherOnly            (8)
                 }
-            }
-
-            fun dateToString(date: Date): String {
-                return DateTimeFormatter.ISO_DATE_TIME.format(
-                    date.toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDateTime()
-                )
             }
 
             val admission = Admission(certificate)
@@ -143,6 +146,7 @@ data class NameInfo(
     var cn: String? = null,
     var givenName: String? = null,
     var sn: String? = null,
+    var title: String? = null,
     var serialNumber: String? = null,
     var streetAddress: String? = null,
     var postalCode: String? = null,
@@ -155,6 +159,7 @@ data class NameInfo(
         this.cn = valueOf(rdns, BCStyle.CN)
         this.sn = valueOf(rdns, BCStyle.SURNAME)
         this.givenName = valueOf(rdns, BCStyle.GIVENNAME)
+        this.title = valueOf(rdns, BCStyle.T)
         this.serialNumber = valueOf(rdns, BCStyle.SERIALNUMBER)
         this.streetAddress = valueOf(rdns, BCStyle.STREET)
         this.postalCode = valueOf(rdns, BCStyle.POSTAL_CODE)

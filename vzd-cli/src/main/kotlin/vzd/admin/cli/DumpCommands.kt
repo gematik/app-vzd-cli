@@ -4,11 +4,12 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
+import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
-import com.github.ajalt.clikt.parameters.types.file
+import com.github.ajalt.clikt.parameters.types.path
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -17,15 +18,18 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import org.bouncycastle.util.encoders.Base64
 import vzd.admin.client.DirectoryEntry
-import vzd.admin.pki.OCSPResponseCertificateStatus
+import vzd.pki.OCSPResponseCertificateStatus
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.useLines
+import kotlin.io.path.writeBytes
 import kotlin.system.measureTimeMillis
 
 private val jsonExtended = Json {
     serializersModule = optimizedSerializersModule
+    encodeDefaults = true
 }
 private val logger = KotlinLogging.logger {}
 
@@ -34,6 +38,7 @@ class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the da
         subcommands(
             DumpCreateCommand(),
             DumpOcspCommand(),
+            DumpSaveCert(),
         )
     }
 
@@ -114,6 +119,34 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
                             println(jsonExtended.encodeToString(entry))
                         }
                     }
+                }
+            }
+        }
+        logger.info { "Processed $entries entries in ${elapsed / 1000} seconds" }
+    }
+}
+
+class DumpSaveCert : CliktCommand(name = "save-cert", help = "Reads dump from STDIN and saves all X509 certificate to specified directory") {
+    private val context by requireObject<CommandContext>()
+    private val destination by argument().path(mustExist = true, mustBeWritable = true, canBeFile = false)
+
+    override fun run() = catching {
+        var entries = 0
+        // initialize lazy variable before coroutines
+        context.pkiClient.tsl
+        val elapsed = measureTimeMillis {
+            runBlocking {
+                System.`in`.bufferedReader().lineSequence().forEach { line ->
+                    val entry: DirectoryEntry = jsonExtended.decodeFromString(line)
+                    entries++
+                    entry.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.forEach { certInfo ->
+                        val filename = "${certInfo.admissionStatement.registrationNumber.escape()}-${certInfo.serialNumber}.der"
+                        val path = destination.resolve(filename)
+                        path.writeBytes(Base64.decode(certInfo.certData))
+                        logger.info { "Written certificate to file ${path.toRealPath()}" }
+                    }
+
+                    logger.debug { "Processing TelematikID: ${entry.directoryEntryBase.telematikID}" }
                 }
             }
         }

@@ -1,5 +1,13 @@
 = Changelog `vzd-cli`
 
+== Version 0.16.x
+- Neue Befehle unter `vzd-cli ldif`: Management der LDIF-Exporten
+- Dump Optimierungen
+- Neue Spalten im CSV-Output
+  - FAD - KIM Anbieter Kennung
+  - specialization
+- `vzd-cli admin cert-info` zeigt jetzt Title-Attribut (falls vorhanden)
+
 == Version 0.15.x
 
 - Unterstüzung von VZD 3.1.0-14
@@ -36,7 +44,7 @@
       --changeDateTimeFrom TEXT
       --changeDateTimeTo TEXT
       --baseEntryOnly [true|false]
- ```
+```
 - Kleine Anpassungen am CSV-Format
 - Upgrade ktor.io Version 2.0.1
 

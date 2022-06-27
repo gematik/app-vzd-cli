@@ -8,7 +8,7 @@ import com.github.ajalt.clikt.parameters.types.choice
 import vzd.admin.client.BaseDirectoryEntry
 import vzd.admin.client.DirectoryEntry
 import vzd.admin.client.UserCertificate
-import vzd.admin.pki.CertificateDataDER
+import vzd.pki.CertificateDataDER
 
 class TemplateCommand : CliktCommand(
     name = "template",

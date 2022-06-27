@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import mu.KotlinLogging
 import vzd.admin.client.*
-import vzd.admin.pki.PKIClient
+import vzd.pki.PKIClient
 
 private val logger = KotlinLogging.logger {}
 

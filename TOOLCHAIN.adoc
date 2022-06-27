@@ -7,9 +7,10 @@ Die gewünschte Versionsnummer in `vzd-cli/build.gradle.kts` setzen, z.B. 0.13.0
 === Build und Test
 [source,bash]
 ----
-gradle clean
+ktlint -F --disabled_rules=no-wildcard-imports
 gradle -q run --args="admin -e tu login"
 export TEST_ACCESS_TOKEN=$(gradle -q run --args="admin -e tu auth")
+gradle clean
 gradle build
 ----
 
