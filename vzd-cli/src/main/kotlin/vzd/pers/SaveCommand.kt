@@ -67,7 +67,7 @@ class SaveCommand : CliktCommand(name = "save", help = """Save data from SMC-B/H
     }
 
     private fun certoficates(antrag: Node): Sequence<CertificateDataDER> {
-        val certs = xpath.evaluate(".//Zertifikate", antrag, XPathConstants.NODESET) as NodeList
+        val certs = xpath.evaluate(".//Zertifikate[starts-with(CertificateSem, 'C.HCI.ENC')]", antrag, XPathConstants.NODESET) as NodeList
 
         return certs.asSequence().map { certNode ->
             val der = evalString("CertificateValue", certNode)
