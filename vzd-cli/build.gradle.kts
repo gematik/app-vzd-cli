@@ -1,5 +1,5 @@
 val ktorVersion = "2.0.1"
-version = "0.16.0"
+version = "0.17.0-wip"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
