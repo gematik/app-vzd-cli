@@ -1,7 +1,7 @@
 = Changelog `vzd-cli`
 
 == Version 0.17.x
-- Neue Befehle unter `vzd-cli pers`: Liest Basisdaten und Zertifikate aud den Peronalisierung-XML
+- Neue Befehle unter `vzd-cli pers`: Liest Basisdaten und Zertifikate aus den Peronalisierung-XML
 und schreibt diese in `vzd-cli` kompatiblen Format
 
 == Version 0.16.x
