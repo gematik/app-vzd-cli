@@ -14,7 +14,7 @@ import kotlin.io.path.inputStream
 
 class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of a certificate") {
     private val logger = KotlinLogging.logger {}
-    private val files by argument().path(mustBeReadable = true).multiple()
+    private val files by argument().path(mustBeReadable = true, canBeDir = false).multiple()
     private val context by requireObject<CommandContext>()
     override fun run() = catching {
         files.forEach {

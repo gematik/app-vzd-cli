@@ -3,6 +3,9 @@
 == Version 0.17.x
 - Neue Befehle unter `vzd-cli pers`: Liest Basisdaten und Zertifikate aus den Peronalisierung-XML
 und schreibt diese in `vzd-cli` kompatiblen Format
+- Unterstützung für Admin link:https://github.com/gematik/api-vzd/blob/I_Directory_Administration/1.8.1/src/openapi/DirectoryAdministration.yaml[API 1.8.1]
+- Kleine Bugfixes
+- Unterstützung von Paging
 
 == Version 0.16.x
 - Neue Befehle unter `vzd-cli ldif`: Management der LDIF-Exporten

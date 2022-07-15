@@ -9,6 +9,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    `maven-publish`
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
@@ -46,6 +47,8 @@ dependencies {
     implementation("org.ldaptive:ldaptive:2.1.1")
     implementation("me.tongfei:progressbar:0.9.3")
 
+    implementation("com.nimbusds:nimbus-jose-jwt:9.23")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     // testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.kotest:kotest-runner-junit5:5.1.0")
@@ -79,5 +82,17 @@ tasks {
 
     processResources {
         from(projectProps)
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "de.gematik"
+            artifactId = "vzd-cli"
+            version = version
+
+            from(components["java"])
+        }
     }
 }

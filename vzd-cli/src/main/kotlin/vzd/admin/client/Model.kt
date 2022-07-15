@@ -114,8 +114,13 @@ data class UserCertificate(
     @Contextual
     var userCertificate: CertificateDataDER? = null,
     var description: String? = null,
+    var active: Boolean? = null,
 )
-
+@Serializable
+data class KomLeData(
+    val mail: String,
+    val version: String,
+)
 @Serializable
 data class FAD1(
     @Contextual
@@ -123,6 +128,7 @@ data class FAD1(
     var mail: List<String>? = null,
     @SerialName("KOM-LE_Version")
     var komleVersion: String? = null,
+    var komLeData: List<KomLeData>? = null,
 )
 
 @Serializable

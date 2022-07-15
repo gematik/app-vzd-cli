@@ -59,6 +59,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
 
     override fun run() = catching {
         val params = parameterOptions.toMap() + customParams
+        logger.info { "Requesting entries for dump: $params" }
         paramFile?.let { paramFile ->
             val file = Path(paramFile.second)
             if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
