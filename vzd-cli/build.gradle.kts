@@ -89,13 +89,23 @@ application {
     mainClass.set("de.gematik.ti.directory.CliKt")
 }
 
-tasks.shadowDistZip {
-    archiveBaseName.set("vzd-cli")
-    from(fileTree("commands")).into("commands")
+tasks.register<Zip>("customDist") {
+    shouldRunAfter("build")
+    dependsOn("installShadowDist")
+    archiveBaseName.set("${project.name}")
+    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+    into("${project.name}-${project.version}/commands") {
+        from(layout.projectDirectory.dir("commands"))
+    }
+    into("${project.name}-${project.version}/") {
+        from(layout.buildDirectory.dir("install/vzd-cli-shadow"))
+    }
 }
+
 tasks.distZip.configure { enabled = false }
 tasks.distTar.configure { enabled = false }
 tasks.shadowDistTar.configure { enabled = false }
+tasks.shadowDistZip.configure { enabled = false }
 
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
@@ -115,6 +125,7 @@ tasks {
     processResources {
         from(projectProps)
     }
+
 }
 
 publishing {
