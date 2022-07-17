@@ -125,7 +125,6 @@ tasks {
     processResources {
         from(projectProps)
     }
-
 }
 
 publishing {
