@@ -90,7 +90,6 @@ application {
 }
 
 tasks.register<Zip>("customDist") {
-    shouldRunAfter("build")
     dependsOn("installShadowDist")
     archiveBaseName.set("${project.name}")
     destinationDirectory.set(layout.buildDirectory.dir("distributions"))
@@ -100,6 +99,10 @@ tasks.register<Zip>("customDist") {
     into("${project.name}-${project.version}/") {
         from(layout.buildDirectory.dir("install/vzd-cli-shadow"))
     }
+}
+
+tasks.named("build") {
+    finalizedBy("customDist")
 }
 
 tasks.distZip.configure { enabled = false }
