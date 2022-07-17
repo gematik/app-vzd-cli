@@ -86,10 +86,13 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("vzd.CliKt")
+    mainClass.set("de.gematik.ti.directory.CliKt")
 }
 
-tasks.shadowDistZip { archiveBaseName.set("vzd-cli") }
+tasks.shadowDistZip {
+    archiveBaseName.set("vzd-cli")
+    from(fileTree("commands")).into("commands")
+}
 tasks.distZip.configure { enabled = false }
 tasks.distTar.configure { enabled = false }
 tasks.shadowDistTar.configure { enabled = false }

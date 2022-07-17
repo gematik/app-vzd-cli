@@ -5,3 +5,5 @@ build
 bin
 .idea
 .DS_Store
+*.log
+vzd-cli/logs

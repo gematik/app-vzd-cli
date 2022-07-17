@@ -2,6 +2,9 @@ package de.gematik.ti.directory.admin.cli.compat
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.ConsoleAppender
+import ch.qos.logback.core.FileAppender
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.parameters.options.deprecated
@@ -12,6 +15,8 @@ import de.gematik.ti.epa.vzd.gem.Main
 import de.gematik.ti.epa.vzd.gem.exceptions.GemClientException
 import mu.KotlinLogging
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class CmdCommand : CliktCommand(name = "cmd", help = "Compatibility mode: support for VZDClient XML-commands") {
     private val logger = KotlinLogging.logger {}
@@ -38,6 +43,17 @@ class CmdCommand : CliktCommand(name = "cmd", help = "Compatibility mode: suppor
         val root: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 
         root.level = Level.DEBUG
+
+        val defaultAppender = root.getAppender("STDERR") as ConsoleAppender
+
+        val fileAppender = FileAppender<ILoggingEvent>()
+        fileAppender.encoder = defaultAppender.encoder
+        fileAppender.context = defaultAppender.context
+        fileAppender.isAppend = true
+        fileAppender.file = "logs/vzd-${DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now())}.log"
+        fileAppender.start()
+
+        root.addAppender(fileAppender)
 
         try {
             val args = mutableListOf<String>()

@@ -75,7 +75,7 @@ public final class ConfigHandler {
   private boolean getVersion = false;
   private long timeout = DEFAULT_TIMEOUT;
   private String logSummaryDirectory = System.getProperties().getProperty("l4j.logDir") == null ?
-      System.getProperties().getProperty("java.io.tmpdir") + "logs"
+      "logs"
       : System.getProperties().getProperty("l4j.logDir");
 
 

@@ -1,0 +1,16 @@
+base=https://vzdpflege-test.vzd.ti-dienste.de:9543
+retryingOAuth=https://auth-test.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token
+
+// This is the maximum
+maxExecutionsPerOperation=20
+// This is the maximum
+maxOperations=9
+
+// VPN Proxy
+proxyHost=192.168.110.10
+// WildClient Proxy
+-proxyHost=192.168.230.85
+proxyPort=3128
+
+// commands=src\main\resources\bspCommands.xml
+

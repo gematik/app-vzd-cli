@@ -7,11 +7,4 @@
             <telematikID>1-HBA-Testkarte-883110000218572</telematikID>
         </UserCertificate>
     </Command>
-<!--    <Command>-->
-<!--        <commandId>FakeTelematik</commandId>-->
-<!--        <name>readDirectoryEntries</name>-->
-<!--        <UserCertificate>-->
-<!--            <telematikID>SomeTelematikid</telematikID>-->
-<!--        </UserCertificate>-->
-<!--    </Command>-->
 </CommandList>
