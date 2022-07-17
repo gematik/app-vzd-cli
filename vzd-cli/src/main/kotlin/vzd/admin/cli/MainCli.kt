@@ -8,6 +8,7 @@ import io.ktor.client.network.sockets.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import mu.KotlinLogging
+import vzd.admin.cli.compat.CmdCommand
 import vzd.admin.client.*
 import vzd.pki.PKIClient
 
@@ -54,7 +55,7 @@ class CommandContext(
     val env: String,
     val useProxy: Boolean,
     val enableOcsp: Boolean,
-    var firstCommand: Boolean = true,
+    var firstCommand: Boolean = true
 ) {
 
     val client by lazy {
@@ -74,22 +75,27 @@ class DirectoryAdministrationCli :
         "--json" to OutputFormat.JSON,
         "--yaml" to OutputFormat.YAML,
         "--csv" to OutputFormat.CSV,
-        "--short" to OutputFormat.SHORT,
+        "--short" to OutputFormat.SHORT
     ).default(OutputFormat.HUMAN)
 
     private val env by option(
-        "-e", "--env",
+        "-e",
+        "--env",
         help = "Environment. Either tu, ru or pu. If not specified default env is used."
     )
         .choice("tu", "ru", "pu")
 
     private val enableOcsp: Boolean by option(
-        "-o", "--ocsp", help = "Validate certificates using OCSP"
+        "-o",
+        "--ocsp",
+        help = "Validate certificates using OCSP"
     )
         .flag()
 
     private val useProxy: Boolean? by option(
-        "--proxy-on", "-x", help = "Forces the use of the proxy, overrides the configuration"
+        "--proxy-on",
+        "-x",
+        help = "Forces the use of the proxy, overrides the configuration"
     )
         .flag("--proxy-off", "-X")
 
@@ -98,10 +104,8 @@ class DirectoryAdministrationCli :
         val clientEnv =
             env ?: provider.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
 
-        logger.info { "Using environment: $clientEnv" }
-
         val clientDelegate: () -> Client = {
-
+            logger.info { "Using environment: $clientEnv" }
             val envcfg =
                 provider.config.environment(clientEnv) ?: throw CliktError("Default environment not configired: $env")
 
@@ -174,7 +178,7 @@ class DirectoryAdministrationCli :
             Info(), ListCommand(), TemplateCommand(), AddBaseCommand(),
             LoadBaseCommand(), ModifyBaseCommand(), ModifyBaseAttrCommand(), DeleteCommand(),
             ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
-            CertInfoCommand(), DumpCommand()
+            CertInfoCommand(), DumpCommand(), CmdCommand()
         )
     }
 }

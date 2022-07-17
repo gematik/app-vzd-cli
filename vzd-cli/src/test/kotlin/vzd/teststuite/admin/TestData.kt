@@ -18,6 +18,6 @@ object TestData {
         organization = "Praxis Lilo Gräfin de BoerNOT-VALID",
         specialization = emptyList(),
         domainID = emptyList(),
-        holder = emptyList(),
+        holder = emptyList()
     )
 }

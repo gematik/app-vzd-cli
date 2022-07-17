@@ -12,7 +12,8 @@ import mu.KotlinLogging
 class DeleteCommand : CliktCommand(name = "delete", help = "Delete specified directory entries") {
     private val logger = KotlinLogging.logger {}
     private val customParams: Map<String, String> by option(
-        "-p", "--param",
+        "-p",
+        "--param",
         help = "Specify query parameters to find matching entries"
     ).associate()
     private val parameterOptions by ParameterOptions()

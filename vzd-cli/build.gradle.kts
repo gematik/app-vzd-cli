@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 val ktorVersion = "2.0.1"
 version = "0.17.0-wip"
 
@@ -19,6 +21,16 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "11"
+}
+
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "11"
+    targetCompatibility = "11"
+    options.compilerArgs.add("-Xlint:deprecation")
 }
 
 dependencies {
@@ -48,6 +60,21 @@ dependencies {
     implementation("me.tongfei:progressbar:0.9.3")
 
     implementation("com.nimbusds:nimbus-jose-jwt:9.23")
+
+    // compatibility
+    api("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0")
+    implementation("com.sun.xml.bind:jaxb-impl:4.0.0")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("org.apache.httpcomponents:httpclient:4.5.13")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    implementation("io.gsonfire:gson-fire:1.8.5")
+    implementation("io.swagger:swagger-annotations:1.6.6")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.9.8")
+    //implementation("commons-io:commons-io:2.5")
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
+
+    implementation("org.simpleframework:simple-xml:2.7.1")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     // testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

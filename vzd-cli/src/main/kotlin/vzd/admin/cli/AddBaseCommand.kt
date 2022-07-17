@@ -43,11 +43,15 @@ fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<String, St
 class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory entry") {
     private val logger = KotlinLogging.logger {}
     private val attrs: Map<String, String> by option(
-        "-s", "--set", metavar = "ATTR=VALUE",
+        "-s",
+        "--set",
+        metavar = "ATTR=VALUE",
         help = "Set the attribute value in BaseDirectoryEntry."
     ).associate()
     private val file: String? by option(
-        "--file", "-f", metavar = "FILENAME",
+        "--file",
+        "-f",
+        metavar = "FILENAME",
         help = "Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN"
     )
     private val context by requireObject<CommandContext>()

@@ -72,5 +72,5 @@ val DirectoryEntryOutputMapping = mapOf(
         if (value == null || value.isEmpty()) {
             Output.printCsv(listOf(query.toString(), "Not Found"))
         }
-    },
+    }
 )

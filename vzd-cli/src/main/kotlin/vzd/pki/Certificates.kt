@@ -152,7 +152,7 @@ data class NameInfo(
     var postalCode: String? = null,
     var localityName: String? = null,
     var stateOrProvinceName: String? = null,
-    var countryCode: String? = null,
+    var countryCode: String? = null
 ) {
     constructor(x500Name: X500Name) : this() {
         val rdns = x500Name.rdNs.map { it.typesAndValues.toList() }.flatten().toTypedArray()
@@ -186,7 +186,7 @@ data class AdmissionStatementInfo(
     val admissionAuthority: String,
     val professionItems: List<String>,
     val professionOids: List<String>,
-    val registrationNumber: String,
+    val registrationNumber: String
 )
 
 /**
@@ -206,7 +206,7 @@ data class CertificateInfo(
     val admissionStatement: AdmissionStatementInfo,
     val certData: String,
     val ocspReponderURL: String? = null,
-    var ocspResponse: OCSPResponse? = null,
+    var ocspResponse: OCSPResponse? = null
 )
 
 /**

@@ -11,7 +11,7 @@ val UserCertificateCsvHeaders = listOf(
     "subject",
     "notBefore",
     "notAfter",
-    "ocspResponse",
+    "ocspResponse"
 )
 
 val CertificateOutputMapping = mapOf(
@@ -46,5 +46,5 @@ val CertificateOutputMapping = mapOf(
         if (value == null || value.isEmpty()) {
             Output.printCsv(listOf(query.toString(), "Not Found"))
         }
-    },
+    }
 )

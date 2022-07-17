@@ -13,7 +13,8 @@ import net.mamoe.yamlkt.Yaml
 
 class LoadBaseCommand : CliktCommand(name = "load-base", help = "Load the base entry for editing.") {
     private val customParams: Map<String, String> by option(
-        "-p", "--param",
+        "-p",
+        "--param",
         help = "Specify query parameters to find matching entries"
     ).associate()
     private val parameterOptions by ParameterOptions()

@@ -16,12 +16,16 @@ import kotlin.io.path.useLines
 
 class ListCommand : CliktCommand(name = "list", help = "List directory entries") {
     private val paramFile: Pair<String, String>? by option(
-        "-f", "--param-file",
-        help = "Read parameter values from file", metavar = "PARAM FILENAME"
+        "-f",
+        "--param-file",
+        help = "Read parameter values from file",
+        metavar = "PARAM FILENAME"
     ).pair()
     private val customParams: Map<String, String> by option(
-        "-p", "--param",
-        help = "Specify query parameters to find matching entries", metavar = "NAME=VALUE"
+        "-p",
+        "--param",
+        help = "Specify query parameters to find matching entries",
+        metavar = "NAME=VALUE"
     ).associate()
     private val parameterOptions by ParameterOptions()
     private val context by requireObject<CommandContext>()

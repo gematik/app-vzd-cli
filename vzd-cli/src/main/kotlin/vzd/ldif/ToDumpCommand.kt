@@ -37,7 +37,6 @@ class ToDumpCommand : CliktCommand(help = "Convert LDIF to NDJSON dump, same as 
     private val sourceFile by argument().path(mustBeReadable = true)
     private val destFile by argument().path()
     override fun run() {
-
         val entries = mutableMapOf<String, DirectoryEntry>()
         val progressBar = ProgressBar("1/2 Parse", sourceFile.fileSize())
         val reader = LdifSource(BufferedReader(InputStreamReader(GZIPInputStream(sourceFile.inputStream()))))
@@ -155,7 +154,7 @@ private fun toUserCertificate(ldapEntry: LdapEntry): UserCertificate {
     userCertificate.dn = DistinguishedName(
         uid = dn.getValue("uid"),
         dc = dn.getValues("dc").toList(),
-        cn = dn.getValue("cn"),
+        cn = dn.getValue("cn")
     )
 
     userCertificate.entryType = ldapEntry.getAttribute("entryType")?.stringValue

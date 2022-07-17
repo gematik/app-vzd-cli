@@ -29,7 +29,7 @@ data class TokenResponse(
     val scope: String,
     val expires_in: Int,
     val refresh_expires_in: Int,
-    val refresh_token: String,
+    val refresh_token: String
 )
 
 class ClientCredentialsAuthenticator(private val authURL: String, private val httpProxyUrl: String?) {

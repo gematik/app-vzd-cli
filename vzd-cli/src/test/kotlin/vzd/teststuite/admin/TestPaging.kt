@@ -13,7 +13,13 @@ class TestPaging : FeatureSpec({
     feature("Suche nach Einträgen mit Paging") {
         scenario("Suche und finde mehr als 25 Eintröge in 5er Blocks") {
             // TODO: Server not implemented yes
-            //client?.readDirectoryEntryForSyncPaging(mapOf("telematikID" to "9-*"))
+            /*
+            client?.readDirectoryEntryForSyncPaging(mapOf(
+                "telematikID" to "9-*",
+                "size" to "5",
+                "cookie" to "",
+            ))
+             */
         }
     }
 

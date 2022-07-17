@@ -20,11 +20,14 @@ private val logger = KotlinLogging.logger {}
 
 class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certificate to DER files") {
     private val paramFile: Pair<String, String>? by option(
-        "-f", "--param-file",
-        help = "Read parameter values from file", metavar = "PARAM FILENAME"
+        "-f",
+        "--param-file",
+        help = "Read parameter values from file",
+        metavar = "PARAM FILENAME"
     ).pair()
     private val customParams: Map<String, String> by option(
-        "-p", "--param",
+        "-p",
+        "--param",
         help = "Specify query parameters to find matching entries"
     ).associate()
     private val parameterOptions by ParameterOptions()

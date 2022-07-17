@@ -22,7 +22,7 @@ class VaultCommand : CliktCommand(name = "vault", help = "Manage OAuth credentia
             VaultListCommand(),
             VaultStoreCommand(),
             VaultExportCommand(),
-            VaultImportCommand(),
+            VaultImportCommand()
         )
     }
 

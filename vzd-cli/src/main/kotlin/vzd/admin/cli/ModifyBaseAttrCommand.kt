@@ -21,12 +21,15 @@ class ModifyBaseAttrCommand :
     CliktCommand(name = "modify-base-attr", help = "Modify specific attributes of a base entry") {
     private val logger = KotlinLogging.logger {}
     private val customParams: Map<String, String> by option(
-        "-p", "--param",
+        "-p",
+        "--param",
         help = "Specify query parameters to find matching entries"
     ).associate()
     private val parameterOptions by ParameterOptions()
     private val attrs: Map<String, String> by option(
-        "-s", "--set", metavar = "ATTR=VALUE",
+        "-s",
+        "--set",
+        metavar = "ATTR=VALUE",
         help = "Set the attribute value in BaseDirectoryEntry."
     ).associate()
     private val context by requireObject<CommandContext>()

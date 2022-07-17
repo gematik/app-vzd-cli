@@ -59,7 +59,8 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
         return keyStore.aliases().asSequence().mapNotNull { alias ->
             pattern.matchEntire(alias)?.let {
                 Secret(
-                    it.groups[1]!!.value, it.groups[2]!!.value,
+                    it.groups[1]!!.value,
+                    it.groups[2]!!.value,
                     getSecret(alias)!!
                 )
             }
@@ -90,7 +91,6 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
     }
 
     fun get(environment: String): Secret? {
-
         val alias = keyStore.aliases().asSequence().find { it.startsWith("$serviceName:$environment") }
             ?: return null
 

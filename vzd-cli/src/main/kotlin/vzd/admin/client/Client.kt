@@ -1,8 +1,5 @@
 package vzd.admin.client
 
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
-import com.google.gson.stream.JsonWriter
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -25,9 +22,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
 import java.io.InputStreamReader
-import java.io.Reader
-import java.io.StringWriter
-import java.math.BigDecimal
 
 private val logger = KotlinLogging.logger {}
 
@@ -148,7 +142,6 @@ class Client(block: Configuration.() -> Unit = {}) {
         return response.body()
     }
 
-
     /**
      * Implements GET /v2/DirectoryEntriesSync (read_Directory_Entry_for_Sync_paging)
      */
@@ -168,7 +161,7 @@ class Client(block: Configuration.() -> Unit = {}) {
      */
     suspend fun readDirectoryEntry(
         parameters: Map<String, String>,
-        path: String = "/DirectoryEntries",
+        path: String = "/DirectoryEntries"
     ): List<DirectoryEntry>? {
         val response = http.get(path) {
             for (param in parameters.entries) {
@@ -195,9 +188,8 @@ class Client(block: Configuration.() -> Unit = {}) {
     suspend fun streamDirectoryEntries(
         parameters: Map<String, String>,
         path: String = "/DirectoryEntriesSync",
-        sink: (entry: DirectoryEntry) -> Unit,
+        sink: (entry: DirectoryEntry) -> Unit
     ) {
-
         // create custom client without automatic JSON parsing
         val httpClient = HttpClient(CIO) {
             engine {

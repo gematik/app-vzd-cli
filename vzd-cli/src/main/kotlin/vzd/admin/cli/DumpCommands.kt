@@ -38,7 +38,7 @@ class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the da
         subcommands(
             DumpCreateCommand(),
             DumpOcspCommand(),
-            DumpSaveCert(),
+            DumpSaveCert()
         )
     }
 
@@ -46,11 +46,14 @@ class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the da
 }
 class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetching the data from server") {
     private val paramFile: Pair<String, String>? by option(
-        "-f", "--param-file",
-        help = "Read parameter values from file", metavar = "PARAM FILENAME"
+        "-f",
+        "--param-file",
+        help = "Read parameter values from file",
+        metavar = "PARAM FILENAME"
     ).pair()
     private val customParams: Map<String, String> by option(
-        "-p", "--param",
+        "-p",
+        "--param",
         metavar = "PARAM=VALUE",
         help = "Specify query parameters to find matching entries"
     ).associate()

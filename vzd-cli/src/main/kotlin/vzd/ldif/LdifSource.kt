@@ -11,7 +11,6 @@ private val BINARY_ENTRY_REGEX = "(.*)::\\s(.*)".toRegex()
 class LdifSource(private val input: BufferedReader) {
 
     fun useEntries(block: (LdapEntry, Long) -> Unit) {
-
         var line = input.readLine()
         val linesBuffer = mutableListOf<String>()
 

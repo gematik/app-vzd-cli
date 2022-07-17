@@ -25,7 +25,6 @@ class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify sing
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
-
         val baseFromFile: BaseDirectoryEntry = file?.let {
             when (it) {
                 "-" -> generateSequence(::readLine).joinToString("\n")

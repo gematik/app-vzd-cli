@@ -32,7 +32,6 @@ class TestClient {
 
     @Test
     fun testCreateWithOnlyTelematikID() {
-
         val entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID")) }
         entries?.forEach {
             runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }

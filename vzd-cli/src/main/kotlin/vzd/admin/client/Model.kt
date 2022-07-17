@@ -9,20 +9,20 @@ import vzd.pki.CertificateDataDER
 @SerialName("Error")
 data class AttributeError(
     val attributeName: String? = null,
-    val attributeError: String? = null,
+    val attributeError: String? = null
 )
 
 @Serializable
 data class Contact(
     val name: String? = null,
     val url: String? = null,
-    val email: String? = null,
+    val email: String? = null
 )
 
 @Serializable
 data class License(
     val name: String?,
-    val url: String?,
+    val url: String?
 )
 
 @Serializable
@@ -32,7 +32,7 @@ data class InfoObject(
     val description: String? = null,
     val termsOfService: String? = null,
     val contact: Contact? = null,
-    val license: License? = null,
+    val license: License? = null
 )
 
 @Serializable
@@ -40,7 +40,7 @@ data class DistinguishedName(
     var uid: String,
     var dc: List<String>? = null,
     var ou: List<String>? = null,
-    var cn: String? = null,
+    var cn: String? = null
 )
 
 @Serializable
@@ -80,7 +80,7 @@ data class BaseDirectoryEntry(
     var changeDateTime: String? = null,
 
     // Internal
-    var maxKOMLEadr: Int? = null,
+    var maxKOMLEadr: Int? = null
 )
 
 @Serializable
@@ -100,7 +100,7 @@ data class UpdateBaseDirectoryEntry(
     var specialization: List<String>? = null,
     var domainID: List<String>? = null,
     var holder: List<String>? = null,
-    var maxKOMLEadr: Int? = null,
+    var maxKOMLEadr: Int? = null
 )
 
 @Serializable
@@ -114,13 +114,15 @@ data class UserCertificate(
     @Contextual
     var userCertificate: CertificateDataDER? = null,
     var description: String? = null,
-    var active: Boolean? = null,
+    var active: Boolean? = null
 )
+
 @Serializable
 data class KomLeData(
     val mail: String,
-    val version: String,
+    val version: String
 )
+
 @Serializable
 data class FAD1(
     @Contextual
@@ -128,7 +130,7 @@ data class FAD1(
     var mail: List<String>? = null,
     @SerialName("KOM-LE_Version")
     var komleVersion: String? = null,
-    var komLeData: List<KomLeData>? = null,
+    var komLeData: List<KomLeData>? = null
 )
 
 @Serializable
@@ -136,7 +138,7 @@ data class Fachdaten(
     @Contextual
     var dn: DistinguishedName,
     @SerialName("FAD1")
-    var fad1: List<FAD1>? = null,
+    var fad1: List<FAD1>? = null
 )
 
 @Serializable
@@ -145,12 +147,12 @@ data class DirectoryEntry(
     var directoryEntryBase: BaseDirectoryEntry,
     var userCertificates: List<UserCertificate>? = null,
     @SerialName("Fachdaten")
-    var fachdaten: List<Fachdaten>? = null,
+    var fachdaten: List<Fachdaten>? = null
 )
 
 @Serializable
 data class CreateDirectoryEntry(
     @SerialName("DirectoryEntryBase")
     var directoryEntryBase: BaseDirectoryEntry? = null,
-    var userCertificates: List<UserCertificate>? = null,
+    var userCertificates: List<UserCertificate>? = null
 )

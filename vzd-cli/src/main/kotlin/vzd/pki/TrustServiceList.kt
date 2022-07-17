@@ -56,7 +56,7 @@ data class TrustedServiceListCache(
     val tu: TrustedServiceList? = null,
     val ru: TrustedServiceList? = null,
     val pu: TrustedServiceList? = null,
-    val lastModified: Long = Instant.now().epochSecond,
+    val lastModified: Long = Instant.now().epochSecond
 ) {
     val caServices by lazy {
         val result = mutableListOf<CAService>()
@@ -71,7 +71,6 @@ data class TrustedServiceListCache(
         val cachePath = Path(System.getProperty("user.home"), ".telematik", "tsl-cache.yaml")
 
         fun load(): TrustedServiceListCache? {
-
             return if (!cachePath.toFile().exists()) {
                 null
             } else {

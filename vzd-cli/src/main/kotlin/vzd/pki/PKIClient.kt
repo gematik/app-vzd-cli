@@ -68,7 +68,7 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
             val cache = TrustedServiceListCache(
                 TSLLoader(httpClient).load(TrustEnvironment.TU),
                 TSLLoader(httpClient).load(TrustEnvironment.RU),
-                TSLLoader(httpClient).load(TrustEnvironment.PU),
+                TSLLoader(httpClient).load(TrustEnvironment.PU)
             )
             TrustedServiceListCache.save(cache)
             cache
@@ -81,7 +81,6 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
             return OCSPResponse(OCSPResponseCertificateStatus.ERROR, "Certificate has no OCSP URL")
         }
         try {
-
             val eeCert = eeCertDER.certificate
             logger.debug { "Looking for CA Certificate for ${eeCert.issuerDN}" }
             val issuerCert =
@@ -90,7 +89,8 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
             logger.info { "Verifying '${eeCert.subjectDN}' from '${issuerCert.subjectDN}' using OCSP Responder: '$ocspResponderURL'" }
 
             val certificateID = CertificateID(
-                digestCalculator, JcaX509CertificateHolder(issuerCert),
+                digestCalculator,
+                JcaX509CertificateHolder(issuerCert),
                 eeCert.serialNumber
             )
 
