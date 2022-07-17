@@ -120,8 +120,8 @@ tasks.test {
 
 tasks {
     val projectProps by registering(WriteProperties::class) {
-        outputFile = file("$buildDir/project.properties")
-        comment = "BuildConfig"
+        outputFile = file("$buildDir/vzd-cli.properties")
+        comment = "vzd-cli BuildConfig"
         property("project.version", project.version)
     }
 

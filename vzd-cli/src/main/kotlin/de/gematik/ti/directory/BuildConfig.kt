@@ -6,9 +6,9 @@ object BuildConfig {
     private val properties = Properties()
 
     init {
-        de.gematik.ti.directory.BuildConfig.properties.load(de.gematik.ti.directory.BuildConfig::class.java.getResource("/project.properties").openStream())
+        properties.load(BuildConfig::class.java.getResource("/vzd-cli.properties").openStream())
     }
 
     val APP_VERSION: String
-        get() = de.gematik.ti.directory.BuildConfig.properties["project.version"] as String
+        get() = properties["project.version"] as String
 }

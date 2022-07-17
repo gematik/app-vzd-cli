@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
@@ -102,7 +103,7 @@ public final class ConfigHandler {
   public static ConfigHandler init(String[] args) {
     if (configHandler == null) {
       configHandler = new ConfigHandler();
-      configHandler.clientVersion = getVersionFromManifestMf();
+      configHandler.clientVersion = getVersionFromProperties();
       for (int iIndex = 0; iIndex < args.length; iIndex++) {
         switch (args[iIndex]) {
           case "-p":
@@ -161,14 +162,14 @@ public final class ConfigHandler {
     return file.getAbsolutePath();
   }
 
-  private static String getVersionFromManifestMf() {
+  private static String getVersionFromProperties() {
+
+
     try {
-      JarFile jarFile = new JarFile(new File(ConfigHandler.class.getProtectionDomain()
-          .getCodeSource().getLocation().toURI()));
-      Manifest manifest = jarFile.getManifest();
-      jarFile.close();
-      return manifest.getMainAttributes().getValue("version");
-    } catch (IOException | URISyntaxException ex) {
+      Properties properties = new Properties();
+      properties.load(ConfigHandler.class.getResourceAsStream("/vzd-cli.properties"));
+      return properties.getProperty("project.version");
+    } catch (IOException ex) {
       LOG.trace(ex.getMessage());
       return "Version could not be found";
     }
