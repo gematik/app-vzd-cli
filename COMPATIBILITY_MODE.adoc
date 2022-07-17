@@ -2,8 +2,6 @@
 //:toc: auto
 :note-caption: Anmerkungen
 
-image::images/vzd-cli.gif[]
-
 `vzd-cli` 2.0 erlaubt die Ausführung der XML-Commands im Format des VZDClients 1.6. Die Konfigurationsdateien können ebenfalls komplett nachgenutzt werden. 
 
 == Installation
