@@ -16,9 +16,10 @@ Kompatibilitätsmodus basiert weitgehend auf dem Source Code von VZDClient 1.6, 
 
 Im Vergleich zu v1.6 wurden einige Konfigurationsparameter vereinfacht:
 
-1. Alle Logs werden in den Unterordner `logs` geschrieben
-2. Für jeden Tag wird eine neue Log-Datei erstellt vzd-YYYY-mm-DD.log
-3. Verbosity ist immer DEBUG
+- Alle Logs werden in den Unterordner `logs` geschrieben
+- Gleichzeitig werden die Logs auf der Console ausgegeben (STDERR)
+- Für jeden Tag wird eine neue Log-Datei erstellt vzd-YYYY-mm-DD.log
+- Verbosity ist immer DEBUG
 
 == Skripte
 
