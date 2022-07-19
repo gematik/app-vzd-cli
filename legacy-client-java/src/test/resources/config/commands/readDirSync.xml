@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>1</commandId>
+        <name>readDirectoryEntriesSync</name>
+        <telematikID>existingTelematikID</telematikID>
+    </Command>
+    <Command>
+        <commandId>2</commandId>
+        <name>readDirectoryEntriesSync</name>
+        <telematikID>200Entries</telematikID>
+    </Command>
+</CommandList>

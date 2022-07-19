@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>TestSuccess</commandId>
+        <name>readDirectoryEntryCertificate</name>
+        <dn>
+            <uid>UIdSuccess</uid>
+        </dn>
+        <UserCertificate>
+            <dn>
+                <uid>UIdSuccess</uid>
+            </dn>
+            <telematikID>1-HBA-Testkarte-883110000218572</telematikID>
+        </UserCertificate>
+    </Command>
+    <Command>
+        <commandId>TestFail</commandId>
+        <name>readDirectoryEntryCertificate</name>
+        <UserCertificate>
+            <dn>
+                <uid>UIdFail</uid>
+            </dn>
+            <telematikID>SomeTelematikid</telematikID>
+        </UserCertificate>
+    </Command>
+</CommandList>

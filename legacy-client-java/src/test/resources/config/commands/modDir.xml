@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>TestSuccess</commandId>
+        <name>modifyDirectoryEntries</name>
+        <dn>
+            <uid>469fd210-b2f8-4d8e-b7ef-c0434303c26d</uid>
+            <dc>Hallo hier ist ein Test</dc>
+        </dn>
+        <givenName>Hero</givenName>
+        <sn>Whut?</sn>
+        <streetAddress>Nirvana</streetAddress>
+        <postalCode>12345</postalCode>
+        <localityName>Luluhausen</localityName>
+        <stateOrProvinceName>Vereiniges Spaßhausen</stateOrProvinceName>
+        <cn>Thut</cn>
+        <displayName>Holla die Waldfee</displayName>
+        <title>Denk dir was eigenes lustiges aus</title>
+        <organization>Gagfabrik</organization>
+        <otherName>Hups I did it again</otherName>
+        <specialization>Spaßmachen</specialization>
+        <specialization>Malen</specialization>
+        <specialization>Lachen</specialization>
+        <specialization>Vereiern</specialization>
+        <domainID>Immer</domainID>
+        <domainID>noch</domainID>
+        <domainID>keinen</domainID>
+        <domainID>Schimmer</domainID>
+        <domainID>was</domainID>
+        <domainID>das</domainID>
+        <domainID>ist</domainID>
+    </Command>
+    <Command>
+        <commandId>ModNotExistentDoModifyTest</commandId>
+        <name>modifyDirectoryEntries</name>
+        <dn>
+            <uid>NotExistent</uid>
+        </dn>
+    </Command>
+    <Command>
+        <commandId>ModExistButNothingToChange</commandId>
+        <name>modifyDirectoryEntries</name>
+        <dn>
+            <uid>PassExistTest</uid>
+        </dn>
+    </Command>
+</CommandList>

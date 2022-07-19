@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <dn>
+            <uid>Blub</uid>
+        </dn>
+        <displayName>displayName</displayName>
+        <otherName>otherName</otherName>
+        <streetAddress>streetAddress</streetAddress>
+        <postalCode>postalCode</postalCode>
+        <localityName>localityName</localityName>
+        <stateOrProvinceName>stateOrProvinceName</stateOrProvinceName>
+        <title>title</title>
+        <organization>organization</organization>
+        <specialization>specialization</specialization>
+        <domainID>domainID</domainID>
+    </Command>
+    <Command>
+        <name>modifyDirectoryEntries</name>
+        <dn>
+            <uid>Blub2</uid>
+        </dn>
+        <displayName>displayName2</displayName>
+        <otherName>otherName2</otherName>
+        <streetAddress>streetAddress2</streetAddress>
+        <postalCode>postalCode2</postalCode>
+        <localityName>localityName2</localityName>
+        <stateOrProvinceName>stateOrProvinceName2</stateOrProvinceName>
+        <title>title2</title>
+        <organization>organization2</organization>
+        <specialization>specialization2</specialization>
+        <domainID>domainID2</domainID>
+    </Command>
+</CommandList>
