@@ -66,5 +66,7 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
             path.writeBytes(Base64.decode(it.userCertificate?.base64String))
             logger.info { "Written certificate to file ${path.toRealPath()}" }
         }
+
+        echo("Written ${result?.size} certificates to ${outputDir.toRealPath()}")
     }
 }

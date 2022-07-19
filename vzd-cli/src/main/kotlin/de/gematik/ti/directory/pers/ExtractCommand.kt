@@ -12,6 +12,7 @@ import de.gematik.ti.directory.admin.client.BaseDirectoryEntry
 import de.gematik.ti.directory.escape
 import de.gematik.ti.directory.pki.CertificateDataDER
 import kotlinx.serialization.encodeToString
+import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
@@ -33,7 +34,8 @@ fun NodeList.asSequence(): Sequence<Node> {
         .map { this.item(it) }
 }
 
-class SaveCommand : CliktCommand(name = "save", help = """Save data from SMC-B/HBA Exports""".trimMargin()) {
+class ExtractCommand : CliktCommand(name = "extract", help = """Extract data from SMC-B/HBA Exports""".trimMargin()) {
+    private val logger = KotlinLogging.logger {}
     private val sourceFiles by argument().path(mustBeReadable = true).multiple(required = true)
     private val outputDir by option("-o", "--output-dir", metavar = "OUTPUT_DIR", help = "Output directory for files")
         .path(mustExist = true, canBeFile = false)
@@ -47,7 +49,9 @@ class SaveCommand : CliktCommand(name = "save", help = """Save data from SMC-B/H
         sourceFiles.forEach { sourceFile ->
             val doc = documentBuilder.parse(sourceFile.toFile())
             // TODO: implement namespaces
-            val smcbs = xpath.evaluate("//SmcbAntragExport", doc, XPathConstants.NODESET) as NodeList
+            val smcbs = xpath.evaluate("//*[local-name(.)='SmcbAntragExport']", doc, XPathConstants.NODESET) as NodeList
+
+            logger.debug { "Processing ${smcbs.length} entries" }
 
             smcbs.forEach { antrag ->
                 val base = instituruinToBaseEntry(antrag)
@@ -67,7 +71,7 @@ class SaveCommand : CliktCommand(name = "save", help = """Save data from SMC-B/H
     }
 
     private fun certoficates(antrag: Node): Sequence<CertificateDataDER> {
-        val certs = xpath.evaluate(".//Zertifikate[starts-with(CertificateSem, 'C.HCI.ENC')]", antrag, XPathConstants.NODESET) as NodeList
+        val certs = xpath.evaluate(".//*[local-name(.)='Zertifikate'][starts-with(CertificateSem, 'C.HCI.ENC')]", antrag, XPathConstants.NODESET) as NodeList
 
         return certs.asSequence().map { certNode ->
             val der = evalString("CertificateValue", certNode)

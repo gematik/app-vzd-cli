@@ -9,7 +9,7 @@ class PersCommand : CliktCommand(name = "pers", help = """Process gematik SMC-B/
 
     init {
         subcommands(
-            SaveCommand()
+            ExtractCommand()
         )
     }
 }
