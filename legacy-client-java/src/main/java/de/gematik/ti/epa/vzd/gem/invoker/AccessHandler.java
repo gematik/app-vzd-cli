@@ -3,7 +3,6 @@ package de.gematik.ti.epa.vzd.gem.invoker;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.gematik.ti.epa.vzd.client.invoker.auth.HttpBasicAuth;
-import de.gematik.ti.epa.vzd.client.invoker.auth.OAuth;
 import de.gematik.ti.epa.vzd.gem.exceptions.GemClientException;
 import de.gematik.ti.epa.vzd.oauth2.URLConnectionClient;
 import org.apache.oltu.oauth2.client.OAuthClient;
@@ -24,11 +23,12 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.LocalDateTime;
 
-public class AccessHandler {
+public class AccessHandler implements TokenProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(AccessHandler.class);
-  private static AccessHandler tokenCreator;
-  private OAuth oAuth2Token;
+
+  private String accessToken;
+
   private LocalDateTime tokenvalidationDate;
   private HttpBasicAuth baseAuth;
 
@@ -36,13 +36,12 @@ public class AccessHandler {
     baseAuth = getHttpBasicAuthFromFile();
   }
 
-  public static AccessHandler getInstance() {
-    if (tokenCreator == null) {
-      tokenCreator = new AccessHandler();
-    }
-    return tokenCreator;
-  }
+  private String credentialPath;
 
+  AccessHandler(String credentialPath) {
+    this.credentialPath = credentialPath;
+  }
+  /*
   public OAuth getOAuth2Token() throws OAuthSystemException, OAuthProblemException {
     if (oAuth2Token == null) {
       oAuth2Token = getNewOAuth2Token();
@@ -50,7 +49,7 @@ public class AccessHandler {
     validateToken();
     return oAuth2Token;
   }
-
+*/
   /**
    * Requests an OAuth2 Token with Username and Password
    *
@@ -58,13 +57,14 @@ public class AccessHandler {
    * @throws OAuthSystemException
    * @throws OAuthProblemException
    */
-  private OAuth getNewOAuth2Token() throws OAuthProblemException, OAuthSystemException {
+  @Override
+  public String getAccessToken() throws OAuthProblemException, OAuthSystemException {
     LOG.debug("Trying to get new access token");
 
     OAuthClientRequest request = OAuthClientRequest
         .tokenLocation(ConfigHandler.getInstance().getRetryingOAuthPath())
-        .setClientId(baseAuth.getUsername())
-        .setClientSecret(baseAuth.getPassword())
+        .setClientId(getBaseAuth().getUsername())
+        .setClientSecret(getBaseAuth().getPassword())
         .setGrantType(GrantType.CLIENT_CREDENTIALS)
         .buildBodyMessage();
 
@@ -85,11 +85,10 @@ public class AccessHandler {
         .accessToken(request, OAuthJSONAccessTokenResponse.class);
 
     JsonObject jObj = new JsonParser().parse(oAuthResponse.getBody()).getAsJsonObject();
-    OAuth oAuth = new OAuth();
-    oAuth.setAccessToken(jObj.get("access_token").toString().replaceAll("\"", ""));
+    String accessToken = jObj.get("access_token").toString().replaceAll("\"", "");
     setTokenValidation(jObj.get("expires_in").toString());
     LOG.debug("Requesting new OAuth2 token successful");
-    return oAuth;
+    return accessToken;
   }
 
   /**
@@ -108,12 +107,12 @@ public class AccessHandler {
    *
    * @return
    */
-  private boolean validateToken() {
+  public boolean validateToken() {
     if (LocalDateTime.now().isBefore(tokenvalidationDate)) {
       return true;
     }
     try {
-      getNewOAuth2Token();
+      getAccessToken();
     } catch (OAuthProblemException | OAuthSystemException e) {
       throw new GemClientException("Requesting a new OAuth2 token failed.", e);
     }
@@ -135,7 +134,7 @@ public class AccessHandler {
   private HttpBasicAuth getHttpBasicAuthFromFile() {
     String client_id = "";
     String client_secret = "";
-    File file = new File(ConfigHandler.getInstance().getCredentialPath());
+    File file = new File(this.credentialPath);
 
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
       String line = br.readLine();
@@ -164,6 +163,5 @@ public class AccessHandler {
           "The named file on path " + file.getAbsolutePath() + " could not be accessed");
     }
   }
-
 
 }

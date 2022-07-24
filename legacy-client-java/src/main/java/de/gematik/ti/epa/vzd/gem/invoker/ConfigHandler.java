@@ -12,17 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
 /**
@@ -58,7 +51,6 @@ public final class ConfigHandler {
 
   private String configPath;
   private String basePath;
-  private String credentialPath;
   private String commandsPath;
   private String retryingOAuthPath;
   private String proxyHost;
@@ -81,6 +73,7 @@ public final class ConfigHandler {
       "logs"
       : System.getProperties().getProperty("l4j.logDir");
 
+  private TokenProvider tokenProvider;
 
   private ConfigHandler() {
   }
@@ -113,7 +106,7 @@ public final class ConfigHandler {
             configHandler.setParams(configHandler.configPath);
             break;
           case "-c":
-            configHandler.credentialPath = checkFilePath(args[iIndex + 1]);
+            configHandler.tokenProvider = new AccessHandler(checkFilePath(args[iIndex + 1]));
             break;
           case "-b":
             configHandler.commandsPath = checkFilePath(args[iIndex + 1]);
@@ -145,12 +138,14 @@ public final class ConfigHandler {
     if (configHandler.getVersion) {
       return configHandler;
     }
-    if (StringUtils.isBlank(configHandler.credentialPath) ||
-        StringUtils.isBlank(configHandler.configPath) ||
+    if (configHandler.tokenProvider == null) {
+      throw new GemClientException("CredentialPath is missing in parameters.");
+    }
+    if (StringUtils.isBlank(configHandler.configPath) ||
         StringUtils.isBlank(configHandler.commandsPath)) {
-      LOG.error("Either CredentialPath, ConfigPath or CommandsPath is missing.");
+      LOG.error("Either ConfigPath or CommandsPath is missing.");
       throw new GemClientException(
-          "Either CredentialPath, ConfigPath or CommandsPath is missing.");
+          "Either ConfigPath or CommandsPath is missing.");
     }
     LOG.debug("Configurations have been set");
     return configHandler;
@@ -325,10 +320,6 @@ public final class ConfigHandler {
     return configPath;
   }
 
-  public String getCredentialPath() {
-    return credentialPath;
-  }
-
   public String getBasePath() {
     return basePath;
   }
@@ -404,6 +395,8 @@ public final class ConfigHandler {
   public String getListType() {
     return listType;
   }
+
+  public TokenProvider getTokenProvider() { return tokenProvider; }
 
   // </editor-fold>
 }

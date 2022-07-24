@@ -1,8 +1,5 @@
 package de.gematik.ti.epa.vzd.gem.command.commandExecutions;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-
 import de.gematik.ti.epa.vzd.client.invoker.ApiException;
 import de.gematik.ti.epa.vzd.client.invoker.auth.OAuth;
 import de.gematik.ti.epa.vzd.gem.invoker.ConnectionPool;
@@ -12,6 +9,9 @@ import generated.CommandType;
 import generated.DistinguishedNameType;
 import generated.UserCertificateType;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class ExecutionBaseTest {
 
