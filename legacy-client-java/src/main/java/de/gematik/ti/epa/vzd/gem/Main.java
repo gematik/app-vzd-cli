@@ -14,19 +14,23 @@ import generated.CommandType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class  Main {
+public final class Main {
 
   private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
   public static void main(final String[] args) {
+    start(args, null);
+  }
+  public static void start(final String[] args, @Nullable ConfigHandler.PreConfig preConfig) {
     LOG.info("VZD-Client started");
     LOG.info(GemStringUtils.getPic());
-    ConfigHandler configHandler = ConfigHandler.init(args);
+    ConfigHandler configHandler = ConfigHandler.init(args, preConfig);
     if (configHandler.isGetVersion()) {
       LOG.info("You are currently using version " + configHandler.getClientVersion());
       return;

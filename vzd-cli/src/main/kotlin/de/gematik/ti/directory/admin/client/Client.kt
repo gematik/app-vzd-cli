@@ -146,7 +146,8 @@ class Client(block: Configuration.() -> Unit = {}) {
      * Implements GET /v2/DirectoryEntriesSync (read_Directory_Entry_for_Sync_paging)
      */
     suspend fun readDirectoryEntryForSyncPaging(parameters: Map<String, String>): List<DirectoryEntry>? {
-        return readDirectoryEntry(parameters, "/v2/DirectoryEntriesSync")
+        TODO("Not implemented")
+        //return readDirectoryEntry(parameters, "/v2/DirectoryEntriesSync")
     }
 
     /**

@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,9 @@ import java.util.stream.Collectors;
  * Implemented as singelton
  */
 public final class ConfigHandler {
+  public interface PreConfig {
+    public void preConfig(ConfigHandler configHandler);
+  }
 
   private static final Long DEFAULT_TIMEOUT = 120l;
 
@@ -96,8 +100,19 @@ public final class ConfigHandler {
    * @param args input parameter from commandline
    */
   public static ConfigHandler init(String[] args) {
+    return init(args, null);
+  }
+  /**
+   * Create an instance of a ConfigHandler while reading the commandline
+   *
+   * @param args input parameter from commandline
+   */
+  public static ConfigHandler init(String[] args, @Nullable PreConfig preConfig) {
     if (configHandler == null) {
       configHandler = new ConfigHandler();
+      if (preConfig != null) {
+        preConfig.preConfig(configHandler);
+      }
       configHandler.clientVersion = getVersionFromProperties();
       for (int iIndex = 0; iIndex < args.length; iIndex++) {
         switch (args[iIndex]) {
@@ -397,6 +412,25 @@ public final class ConfigHandler {
   }
 
   public TokenProvider getTokenProvider() { return tokenProvider; }
+  public void setBasePath(String basePath) {
+    this.basePath = basePath;
+  }
+
+  public void setProxyHost(String proxyHost) {
+    this.proxyHost = proxyHost;
+  }
+
+  public void setProxyPort(int proxyPort) {
+    this.proxyPort = proxyPort;
+  }
+
+  public void setTokenProvider(TokenProvider tokenProvider) {
+    this.tokenProvider = tokenProvider;
+  }
+
+  public void setCommandsPath(String commandsPath) {
+    this.commandsPath = commandsPath;
+  }
 
   // </editor-fold>
 }

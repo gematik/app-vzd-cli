@@ -21,6 +21,23 @@ Im Vergleich zu v1.6 wurden einige Konfigurationsparameter vereinfacht:
 - Für jeden Tag wird eine neue Log-Datei erstellt vzd-YYYY-mm-DD.log
 - Verbosity ist immer DEBUG
 
+== Konfiguration
+
+Die Konfiguration von VZDClient 1.6 kann unverändert nachgenutzt werden. 
+
+[source,bash]
+----
+vzd-cli admin cmd -p <CONFIG DATEI> -c <CREDENTIALS DATEI> -b <COMMANDS XML>
+----
+
+Wir empfehlen die Nutzung von `vzd-cli admin vault` für die Verwaltung und Schutz der Client-Credentials statt einer unverschlüsselten Credentials-Datei. 
+
+[source,bash]
+----
+vzd-cli admin -e <ru|tu|pu> login
+vzd-cli admin -e <ru|tu|pu> cmd -p <CONFIG DATEI> -b <COMMANDS XML>
+----
+
 == Skripte
 
 .Beispiel .bat-File für Windows

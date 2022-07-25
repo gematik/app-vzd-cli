@@ -15,6 +15,7 @@ import de.gematik.ti.epa.vzd.gem.command.commandExecutions.dto.BaseExecutionResu
 import de.gematik.ti.epa.vzd.gem.command.commandExecutions.dto.ExecutionResult;
 import de.gematik.ti.epa.vzd.gem.exceptions.CommandException;
 import de.gematik.ti.epa.vzd.gem.exceptions.GemClientException;
+import de.gematik.ti.epa.vzd.gem.invoker.AccessHandler;
 import de.gematik.ti.epa.vzd.gem.invoker.ConfigHandler;
 import de.gematik.ti.epa.vzd.gem.invoker.GemApiClient;
 import de.gematik.ti.epa.vzd.gem.invoker.IConnectionPool;
@@ -89,6 +90,9 @@ public abstract class ExecutionBase implements Callable<BaseExecutionResult> {
               "\n--- Command  " + command.getCommandId() + " end (Http status was: " + ex.getCode()
                   + ")---");
           LOG.error(sb.toString());
+          if (ex.getCode() == 401 && !AccessHandler.class.isInstance(ConfigHandler.getInstance().getTokenProvider())) {
+            LOG.error("OAuth2 Accesss Token is invalid. Please use `vzd-cli admin -e <ENV> login` to get a new token.");
+          }
           LogHelper.logCommand(execCommand, command, false);
           return false;
         } catch (Throwable ex) {

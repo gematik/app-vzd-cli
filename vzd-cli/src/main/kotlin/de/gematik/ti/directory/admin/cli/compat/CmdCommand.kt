@@ -7,19 +7,34 @@ import ch.qos.logback.core.ConsoleAppender
 import ch.qos.logback.core.FileAppender
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
+import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.deprecated
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import de.gematik.ti.directory.BuildConfig
+import de.gematik.ti.directory.admin.cli.CommandContext
 import de.gematik.ti.directory.admin.cli.catching
+import de.gematik.ti.epa.vzd.client.invoker.auth.OAuth
 import de.gematik.ti.epa.vzd.gem.Main
 import de.gematik.ti.epa.vzd.gem.exceptions.GemClientException
+import de.gematik.ti.epa.vzd.gem.invoker.TokenProvider
 import mu.KotlinLogging
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+class CliTokenProvider(private val oauth: OAuth): TokenProvider  {
+    constructor(accessToken: String) : this(OAuth()) {
+        this.oauth.accessToken = accessToken
+    }
+    override fun getOAuth2Token(): OAuth {
+        return oauth
+    }
+}
+
 class CmdCommand : CliktCommand(name = "cmd", help = "Compatibility mode: support for VZDClient XML-commands") {
     private val logger = KotlinLogging.logger {}
+    private val context by requireObject<CommandContext>()
     private val paramFile by option(
         "-p",
         "--params",
@@ -65,12 +80,16 @@ class CmdCommand : CliktCommand(name = "cmd", help = "Compatibility mode: suppor
                 args.add("-c")
                 args.add(credentialsFile.toString())
             }
-            commandsFile?.let {
-                args.add("-b")
-                args.add(commandsFile.toString())
-            }
+
             logger.info("Entering VZD-Client 1.6 compatibility mode")
-            Main.main(args.toTypedArray())
+            Main.start(args.toTypedArray()) {configHandler ->
+                commandsFile?.let {
+                    configHandler.commandsPath = it.toAbsolutePath().toString()
+                }
+                credentialsFile ?: run {
+                    configHandler.tokenProvider = CliTokenProvider(context.client.accessToken)
+                }
+            }
         } catch (e: GemClientException) {
             throw CliktError(e.message)
         }

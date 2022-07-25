@@ -7,7 +7,6 @@ package de.gematik.ti.epa.vzd.gem.invoker;
 import de.gematik.ti.epa.vzd.client.invoker.ApiClient;
 import de.gematik.ti.epa.vzd.client.invoker.JSON;
 import de.gematik.ti.epa.vzd.client.invoker.auth.Authentication;
-import de.gematik.ti.epa.vzd.client.invoker.auth.OAuth;
 import de.gematik.ti.epa.vzd.client.invoker.auth.OAuthFlow;
 import de.gematik.ti.epa.vzd.client.invoker.auth.RetryingOAuth;
 import de.gematik.ti.epa.vzd.gem.exceptions.GemClientException;
@@ -111,9 +110,7 @@ public class GemApiClient extends ApiClient implements AutoCloseable {
         .put("HttpBasicAuth", AccessHandler.getInstance().getBaseAuth());
      */
     try {
-      OAuth oauth = new OAuth();
-      oauth.setAccessToken(ConfigHandler.getInstance().getTokenProvider().getAccessToken());
-      authentications.put("OAuth", oauth);
+      authentications.put("OAuth", ConfigHandler.getInstance().getTokenProvider().getOAuth2Token());
     } catch (OAuthSystemException | OAuthProblemException e) {
       LOG.error("Error while getting Token");
       throw new ExceptionInInitializerError("Error while getting Token");
@@ -125,7 +122,7 @@ public class GemApiClient extends ApiClient implements AutoCloseable {
    */
   public void validateToken() {
     try {
-      ConfigHandler.getInstance().getTokenProvider().validateToken();
+      ConfigHandler.getInstance().getTokenProvider().getOAuth2Token();
     } catch (OAuthSystemException | OAuthProblemException e) {
       LOG.error("Error while refreshing OAuthToken");
       throw new GemClientException("Error while refreshing OAuthToken");
