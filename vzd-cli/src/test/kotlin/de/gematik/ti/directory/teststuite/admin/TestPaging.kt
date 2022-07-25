@@ -1,10 +1,7 @@
 package de.gematik.ti.directory.teststuite.admin
 
 import de.gematik.ti.directory.admin.client.Client
-import de.gematik.ti.directory.admin.client.VZDResponseException
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FeatureSpec
-import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 
 class TestPaging : FeatureSpec({

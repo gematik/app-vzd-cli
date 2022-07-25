@@ -26,7 +26,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:4.5.1")
 }
 
-
 tasks.withType<JavaCompile> {
     sourceCompatibility = "11"
     targetCompatibility = "11"
@@ -37,4 +36,3 @@ tasks.test {
     include("**/UnitTestsuite.class")
     include("**/IntegrationTestsuite.class")
 }
-

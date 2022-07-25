@@ -11,7 +11,6 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.deprecated
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
-import de.gematik.ti.directory.BuildConfig
 import de.gematik.ti.directory.admin.cli.CommandContext
 import de.gematik.ti.directory.admin.cli.catching
 import de.gematik.ti.epa.vzd.client.invoker.auth.OAuth
@@ -23,7 +22,7 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class CliTokenProvider(private val oauth: OAuth): TokenProvider  {
+class CliTokenProvider(private val oauth: OAuth) : TokenProvider {
     constructor(accessToken: String) : this(OAuth()) {
         this.oauth.accessToken = accessToken
     }
@@ -82,7 +81,7 @@ class CmdCommand : CliktCommand(name = "cmd", help = "Compatibility mode: suppor
             }
 
             logger.info("Entering VZD-Client 1.6 compatibility mode")
-            Main.start(args.toTypedArray()) {configHandler ->
+            Main.start(args.toTypedArray()) { configHandler ->
                 commandsFile?.let {
                     configHandler.commandsPath = it.toAbsolutePath().toString()
                 }
