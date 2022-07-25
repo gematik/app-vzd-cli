@@ -73,7 +73,7 @@ Den Zugang bekommt man von der gematik.
 .Einen neuen Vault für die Geheimnisse erstellen
 [source,bash]
 ----
-vzd-cli admin vault reset
+vzd-cli admin vault purge
 ----
 
 .Client Credentials für die jeweiligen Umgebungen hinterlegen
