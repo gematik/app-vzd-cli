@@ -31,8 +31,8 @@ class ParameterOptions : OptionGroup(name = "Query parameters") {
     val professionOID by option("--professionOID")
     val entryType by option("--entryType").int()
     val maxKOMLEadr by option("--maxKOMLEadr").int()
-    val changeDateTimeFrom by option("--changeDateTimeFrom")
-    val changeDateTimeTo by option("--changeDateTimeTo")
+    val changeDateTimeFrom by option("--changeDateTimeFrom", metavar = "ISODATE")
+    val changeDateTimeTo by option("--changeDateTimeTo", metavar = "ISODATE")
     val baseEntryOnly by option("--baseEntryOnly").choice("true", "false")
 
     fun toMap(): Map<String, String> {

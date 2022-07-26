@@ -8,12 +8,10 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.pki.CertificateDataDER
 import kotlinx.coroutines.runBlocking
-import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
 import kotlin.io.path.inputStream
 
 class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of a certificate") {
-    private val logger = KotlinLogging.logger {}
     private val files by argument().path(mustBeReadable = true, canBeDir = false).multiple()
     private val context by requireObject<CommandContext>()
     override fun run() = catching {
