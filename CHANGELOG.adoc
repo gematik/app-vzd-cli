@@ -4,6 +4,7 @@
 - Kompatibilitätsmodus zur VZDClient 1.6. Befehl `vzd-cli admin cmd`
 - Neue Befehle unter `vzd-cli pers`: verarbeitet die Basisdaten und Zertifikate aus den Peronalisierung-XML (TSP-Schnittstelle exports)
 und schreibt diese in `vzd-cli` kompatiblen Format
+- Neues Befehl `vzd-cli admin delete-cert`: Löschen der Zertifikate
 - Unterstützung für Admin API 1.8.1 https://github.com/gematik/api-vzd/blob/I_Directory_Administration/1.8.1/src/openapi/DirectoryAdministration.yaml
 - Kleine Bugfixes
 
