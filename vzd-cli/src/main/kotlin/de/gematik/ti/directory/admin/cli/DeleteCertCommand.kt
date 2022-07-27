@@ -82,7 +82,7 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
                 true
             }
             if (!matches) {
-                echo("Skipping certificate: ${cert.serialNumber}")
+                echo("Skipping certificate: ${cert.serialNumber} ${cert.subjectInfo.serialNumber ?: ""}")
                 return@certLoop
             }
             logger.debug { "Deleting certificate: $certText" }
