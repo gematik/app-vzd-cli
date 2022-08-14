@@ -7,8 +7,10 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
+import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.client.DirectoryEntry
 import de.gematik.ti.directory.escape
@@ -20,12 +22,10 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import me.tongfei.progressbar.ProgressBar
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
-import kotlin.io.path.Path
-import kotlin.io.path.exists
-import kotlin.io.path.useLines
-import kotlin.io.path.writeBytes
+import kotlin.io.path.*
 import kotlin.system.measureTimeMillis
 
 private val jsonExtended = Json {
@@ -58,6 +58,9 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         metavar = "PARAM=VALUE",
         help = "Specify query parameters to find matching entries"
     ).associate()
+    private val cursorSize by option("-c", "--cursor-size", help = "Size of the cursor per HTTP Request")
+        .int().default(-1)
+    private val expectedTotal by option("-e", "--expected-count", help = "Expected total count of entries. Used only for cosmetics to display the progressbar.").int().default(-1)
     private val parameterOptions by ParameterOptions()
     private val context by requireObject<CommandContext>()
 
@@ -77,19 +80,54 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         }
     }
 
-    private fun runQuery(params: Map<String, String>) {
+    fun runQuery(params: Map<String, String>) {
+        if (cursorSize > 0) {
+            runQueryWithPaging(params)
+        } else {
+            runQueryWithoutPaging(params)
+        }
+    }
+
+    private fun expandOcspStatus(entry: DirectoryEntry) {
+        if (context.enableOcsp) {
+            entry.userCertificates?.mapNotNull { it.userCertificate }?.forEach {
+                it.certificateInfo.ocspResponse = runBlocking { context.pkiClient.ocsp(it) }
+            }
+        }
+    }
+
+    private fun runQueryWithoutPaging(params: Map<String, String>) {
         var entries = 0
         val elapsed = measureTimeMillis {
             runBlocking {
                 context.client.streamDirectoryEntries(params) { entry ->
-                    if (context.enableOcsp) {
-                        entry.userCertificates?.mapNotNull { it.userCertificate }?.forEach {
-                            it.certificateInfo.ocspResponse = runBlocking { context.pkiClient.ocsp(it) }
-                        }
-                    }
+                    expandOcspStatus(entry)
                     logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
                     println(jsonExtended.encodeToString(entry))
                     entries++
+                }
+            }
+        }
+        logger.info { "Dumped $entries entries in ${elapsed / 1000} seconds" }
+    }
+    private fun runQueryWithPaging(params: Map<String, String>) {
+        var entries = 0
+        val semaphore = Semaphore(20)
+        val elapsed = measureTimeMillis {
+            val progressBar = ProgressBar("Query $params", expectedTotal.toLong())
+            progressBar.use {
+                runBlocking {
+                    context.client.streamDirectoryEntriesPaging(params, cursorSize) { entry ->
+                        launch {
+                            semaphore.withPermit {
+                                expandOcspStatus(entry)
+                                logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
+                                println(jsonExtended.encodeToString(entry))
+                                progressBar.step()
+                                entries++
+                            }
+                        }
+                    }
                 }
             }
         }

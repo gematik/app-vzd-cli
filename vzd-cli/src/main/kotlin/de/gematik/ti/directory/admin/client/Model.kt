@@ -156,3 +156,15 @@ data class CreateDirectoryEntry(
     var directoryEntryBase: BaseDirectoryEntry? = null,
     var userCertificates: List<UserCertificate>? = null
 )
+
+@Serializable
+data class SearchControlValue(
+    var size: Int,
+    var cookie: String
+)
+
+@Serializable
+data class ReadDirectoryEntryForSyncResponse(
+    var searchControlValue: SearchControlValue,
+    var directoryEntries: List<DirectoryEntry>
+)

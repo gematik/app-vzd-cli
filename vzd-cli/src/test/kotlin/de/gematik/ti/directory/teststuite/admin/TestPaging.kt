@@ -1,7 +1,9 @@
 package de.gematik.ti.directory.teststuite.admin
 
 import de.gematik.ti.directory.admin.client.Client
+import io.kotest.common.runBlocking
 import io.kotest.core.spec.style.FeatureSpec
+import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 
 class TestPaging : FeatureSpec({
@@ -12,19 +14,24 @@ class TestPaging : FeatureSpec({
     }
 
     feature("Suche nach Einträgen mit Paging") {
-        scenario("Suche und finde mehr als 25 Einträge in 5er Blocks") {
-            /*
-            val exception = shouldThrow<VZDResponseException> {
-                client?.readDirectoryEntryForSyncPaging(
+        scenario("Suche und finde mehr als 3 Einträge in 3er Blocks") {
+            runBlocking {
+                val withOutPaging = client?.readDirectoryEntryForSync(
                     mapOf(
-                        "telematikID" to "9-*",
-                        "size" to "5",
-                        "cookie" to ""
+                        "telematikID" to "9-*"
                     )
-                )
+                )?.size
+                var withPaging = 0
+                client?.streamDirectoryEntriesPaging(
+                    mapOf(
+                        "telematikID" to "9-*"
+                    ),
+                    3
+                ) {
+                    withPaging++
+                }
+                withPaging shouldBe withOutPaging
             }
-            exception.response.status shouldBe HttpStatusCode.NotImplemented
-             */
         }
     }
 

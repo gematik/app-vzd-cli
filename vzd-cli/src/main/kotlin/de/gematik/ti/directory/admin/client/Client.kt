@@ -15,6 +15,8 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -143,14 +145,6 @@ class Client(block: Configuration.() -> Unit = {}) {
     }
 
     /**
-     * Implements GET /v2/DirectoryEntriesSync (read_Directory_Entry_for_Sync_paging)
-     */
-    suspend fun readDirectoryEntryForSyncPaging(parameters: Map<String, String>): List<DirectoryEntry>? {
-        TODO("Not implemented")
-        // return readDirectoryEntry(parameters, "/v2/DirectoryEntriesSync")
-    }
-
-    /**
      * Implements GET /DirectoryEntriesSync (read_Directory_Entry_for_Sync)
      */
     suspend fun readDirectoryEntryForSync(parameters: Map<String, String>): List<DirectoryEntry>? {
@@ -243,6 +237,45 @@ class Client(block: Configuration.() -> Unit = {}) {
                 }
             }
         }
+    }
+
+    /**
+     * Implements GET /v2/DirectoryEntriesSync (read_Directory_Entry_for_Sync_paging)
+     */
+    suspend fun streamDirectoryEntriesPaging(
+        parameters: Map<String, String>,
+        cursorSize: Int = 100,
+        sink: (entry: DirectoryEntry) -> Unit
+    ) {
+        var cookie: String? = null
+        coroutineScope {
+            do {
+                logger.info { "Requesting $cursorSize entries, cookie: '$cookie'" }
+                val syncResponse = fetchNextEntries(parameters, cursorSize, cookie)
+                logger.info { "Got ${syncResponse.directoryEntries.size} entries, new cookie: '${syncResponse.searchControlValue.cookie}'" }
+                launch {
+                    syncResponse.directoryEntries.forEach { sink(it) }
+                }
+                cookie = syncResponse.searchControlValue.cookie
+            } while (cookie != null && cookie != "")
+        }
+    }
+
+    private suspend fun fetchNextEntries(parameters: Map<String, String>, cursorSize: Int, cookie: String?): ReadDirectoryEntryForSyncResponse {
+        val response = http.get("/v2/DirectoryEntriesSync") {
+            for (param in parameters.entries) {
+                parameter(param.key, param.value)
+            }
+            parameter("size", cursorSize)
+            if (cookie != null) {
+                parameter("cookie", cookie)
+            }
+        }
+        if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.NotFound) {
+            throw VZDResponseException(response, "Unable to get entries")
+        }
+
+        return response.body()
     }
 
     /**
