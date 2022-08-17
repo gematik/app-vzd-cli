@@ -1,0 +1,58 @@
+= 🗂️ ♻️ 🕙 `vzd-cli`: Kompatibilitätsmodus mit VZDClient 1.6
+//:toc: auto
+:note-caption: Anmerkungen
+
+`vzd-cli` 2.0 erlaubt die Ausführung der XML-Commands im Format des VZDClients 1.6. Die Konfigurationsdateien können ebenfalls komplett nachgenutzt werden. 
+
+== Installation
+
+1. Download link:https://github.com/spilikin/app-vzd-cli/releases[Latest Release] von `vzd-cli` von github.
+2. `vzd-cli-<VERSION>.zip` extrahieren 
+3. Beispiele für Commands und Konfigurationen befinden sich im Unterordner `commands` 
+
+== Anmerkungen
+
+Kompatibilitätsmodus basiert weitgehend auf dem Source Code von VZDClient 1.6, es kann daher identisches Verhalten erwartet werden. 
+
+Im Vergleich zu v1.6 wurden einige Konfigurationsparameter vereinfacht:
+
+- Alle Logs werden in den Unterordner `logs` geschrieben
+- Gleichzeitig werden die Logs auf der Console ausgegeben (STDERR)
+- Für jeden Tag wird eine neue Log-Datei erstellt vzd-YYYY-mm-DD.log
+- Verbosity ist immer DEBUG
+
+== Konfiguration
+
+Die Konfiguration von VZDClient 1.6 kann unverändert nachgenutzt werden. 
+
+[source,bash]
+----
+vzd-cli admin cmd -p <CONFIG DATEI> -c <CREDENTIALS DATEI> -b <COMMANDS XML>
+----
+
+Wir empfehlen die Nutzung von `vzd-cli admin vault` für die Verwaltung und Schutz der Client-Credentials statt einer unverschlüsselten Credentials-Datei. 
+
+[source,bash]
+----
+vzd-cli admin -e <ru|tu|pu> login
+vzd-cli admin -e <ru|tu|pu> cmd -p <CONFIG DATEI> -b <COMMANDS XML>
+----
+
+== Skripte
+
+.Beispiel .bat-File für Windows
+[source,bat]
+----
+set APP_BASE=..
+CALL %APP_BASE%\bin\vzd-cli admin cmd -p config_ru.txt -c credentials_ru.txt -b bspReadCommand.xml
+pause
+----
+
+.Beispiel .sh-File für Linux und Mac
+[source,bat]
+----
+#!/bin/bash
+$(dirname $0)/../bin/vzd-cli admin cmd -p config_ru.txt -c credentials_ru.txt -b bspReadCommand.xml
+echo Drücken Sie eine beliebige Taste . . .
+read -rn1
+----

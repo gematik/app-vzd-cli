@@ -1,0 +1,7 @@
+base=http://[::1]:8080/OAuth2Token
+retryingOAuth=https://to.be.defined/oauth/token
+commands=src\test\resources\config\Commands.xml
+proxyPort=1234
+proxyHost=testHost.de
+maxExecutionsPerOperation=2
+maxOperations=2

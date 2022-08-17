@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <name>modifyDirectoryEntryCertificate</name>
+        <UserCertificate>
+            <entryType>1</entryType>
+            <professionOID>Profession</professionOID>
+            <usage>KOM-LE</usage>
+            <userCertificate></userCertificate>
+            <description>SomeDescription</description>
+            <telematikID>1-HBA-Testkarte-883110000218572</telematikID>
+            <dn>
+                <uid>b3ae5fe3-19d6-47de-90ca-364108e4f54d</uid>
+                <dc>vzd</dc>
+                <ou>Test</ou>
+                <ou>SomeOtherTest</ou>
+                <cn>31c1f2ac-cd2c-44ae-aade-a745fc1412f1</cn>
+            </dn>
+        </UserCertificate>
+    </Command>
+</CommandList>

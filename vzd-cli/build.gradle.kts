@@ -1,5 +1,7 @@
-val ktorVersion = "2.0.1"
-version = "0.16.0"
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+val ktorVersion = "2.0.3"
+version = "2.0.0-beta1"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -9,6 +11,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    `maven-publish`
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
@@ -20,7 +23,12 @@ repositories {
     mavenCentral()
 }
 
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "11"
+}
+
 dependencies {
+    implementation(project(":legacy-client-java"))
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
@@ -46,6 +54,8 @@ dependencies {
     implementation("org.ldaptive:ldaptive:2.1.1")
     implementation("me.tongfei:progressbar:0.9.3")
 
+    // implementation("com.nimbusds:nimbus-jose-jwt:9.23")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     // testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.kotest:kotest-runner-junit5:5.1.0")
@@ -54,13 +64,29 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("vzd.CliKt")
+    mainClass.set("de.gematik.ti.directory.CliKt")
 }
 
-tasks.shadowDistZip { archiveBaseName.set("vzd-cli") }
+tasks.register<Zip>("customDist") {
+    dependsOn("installShadowDist")
+    archiveBaseName.set("${project.name}")
+    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+    into("${project.name}-${project.version}/commands") {
+        from(layout.projectDirectory.dir("commands"))
+    }
+    into("${project.name}-${project.version}/") {
+        from(layout.buildDirectory.dir("install/vzd-cli-shadow"))
+    }
+}
+
+tasks.named("build") {
+    finalizedBy("customDist")
+}
+
 tasks.distZip.configure { enabled = false }
 tasks.distTar.configure { enabled = false }
 tasks.shadowDistTar.configure { enabled = false }
+tasks.shadowDistZip.configure { enabled = false }
 
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
@@ -72,12 +98,24 @@ tasks.test {
 
 tasks {
     val projectProps by registering(WriteProperties::class) {
-        outputFile = file("$buildDir/project.properties")
-        comment = "BuildConfig"
+        outputFile = file("$buildDir/vzd-cli.properties")
+        comment = "vzd-cli BuildConfig"
         property("project.version", project.version)
     }
 
     processResources {
         from(projectProps)
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "de.gematik"
+            artifactId = "vzd-cli"
+            version = version
+
+            from(components["java"])
+        }
     }
 }

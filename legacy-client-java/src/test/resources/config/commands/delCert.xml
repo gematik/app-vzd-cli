@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>TestSuccess</commandId>
+        <name>deleteDirectoryEntryCertificate</name>
+        <UserCertificate>
+            <dn>
+                <cn>e6483730-6788-4e4b-8ac2-19e858dbae64</cn>
+                <uid>fdb30aad-5f37-4af6-970a-1d4c643ce36a</uid>
+            </dn>
+            <telematikID>1-HBA-Testkarte-883110000218572</telematikID>
+        </UserCertificate>
+    </Command>
+    <Command>
+        <commandId>TestFail</commandId>
+        <name>deleteDirectoryEntryCertificate</name>
+        <UserCertificate>
+            <dn>
+                <cn>noValidCn</cn>
+                <uid>fdb30aad-5f37-4af6-970a-1d4c643ce36a</uid>
+            </dn>
+            <telematikID>1-HBA-Testkarte-883110000218572</telematikID>
+        </UserCertificate>
+    </Command>
+</CommandList>

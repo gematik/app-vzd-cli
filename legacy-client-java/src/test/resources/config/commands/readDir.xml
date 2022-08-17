@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>1</commandId>
+        <name>readDirectoryEntries</name>
+        <dn>
+            <uid>469fd210-b2f8-4d8e-b7ef-c0434303c26d</uid>
+        </dn>
+    </Command>
+    <Command>
+        <commandId>2</commandId>
+        <name>readDirectoryEntries</name>
+        <dn>
+            <uid>failUid</uid>
+        </dn>
+    </Command>
+    <Command>
+        <commandId>3</commandId>
+        <name>readDirectoryEntries</name>
+        <UserCertificate>
+            <telematikID>SomeNotExistingTelematikID</telematikID>
+        </UserCertificate>
+    </Command>
+</CommandList>

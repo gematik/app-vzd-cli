@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>TestSuccess</commandId>
+        <name>addDirectoryEntryCertificate</name>
+        <dn>
+            <uid>SuccessUId</uid>
+        </dn>
+        <UserCertificate>
+            <telematikID>SuccessTelematikId</telematikID>
+            <usage>ePA</usage>
+            <userCertificate>
+                MIIFHjCCBAagAwIBAgIHA+5BCCCEfTANBgkqhkiG9w0BAQsFADCBmjELMAkGA1UEBhMCREUxHzAdBgNVBAoMFmdlbWF0aWsgR21iSCBOT1QtVkFMSUQxRjBEBgNVBAsMPUhCQS1xQ0EgZGVyIFRlbGVtYXRpa2luZnJhc3RydWt0dXIgbWl0IEFuYmlldGVyYWtrcmVkaXRpZXJ1bmcxIjAgBgNVBAMMGUdFTS5IQkEtcUNBNTpQTiBURVNULU9OTFkwHhcNMjAwNTEzMDAwMDAwWhcNMjUwNTEyMjM1OTU5WjBtMQswCQYDVQQGEwJERTFeMA0GA1UEKgwGTWFydGluMA8GA1UEBAwIR2VpYsO2bGwwGwYDVQQFExQ4MDI3Njg4MzExMDAwMDIxODU3MjAfBgNVBAMMGE1hcnRpbiBHZWliw7ZsbFRFU1QtT05MWTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMPTJsw7AHirJcBnS8Jbuf6pjBasQTH7NTcNUDyyOwh35QUdCWgO83kbipxv8yJLrF6Rgb5qw2hbNEsUiNsrwuwn/CF65HiyXMajbNo1etAb23sWHeQt2XLuInJGuT9oM8VWh5rfVTbQL+Bp2VbeoEoqyMLufojL3S/Hal2HDIEd5OWiiTr3i5ECLZX9iHOe8+9c0Q8X1AjeISQLCyuJ3iR67UCpSQBUaMiJaaiVzKaf6kNeRBsAvX78pThkv1oTT7apoQ9l3+x1yjhfF5BQXrigD78W7SYLdRYP/40xj5PUAMD73Cfwij/c4VcqowDRBctRZtP1OyU9FZ6+lgaogoMCAwEAAaOCAZMwggGPMB0GA1UdDgQWBBQTf/qksNlSX3Q1RAcuoXKWLlsZRjA5BgNVHSAEMjAwMAkGByqCFABMBEgwCQYHBACL7EABAjAKBggqghQATASBETAMBgorBgEEAYLNMwEBMCIGCCsGAQUFBwEDBBYwFDAIBgYEAI5GAQEwCAYGBACORgEEMA4GA1UdDwEB/wQEAwIGQDA4BggrBgEFBQcBAQQsMCowKAYIKwYBBQUHMAGGHGh0dHA6Ly9laGNhLmdlbWF0aWsuZGUvb2NzcC8wDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBShOjUzorMhCb0AWpKm55d2xFD7tzAbBgkrBgEEAcBtAwUEDjAMBgorBgEEAcBtAwUBMHkGBSskCAMDBHAwbqQoMCYxCzAJBgNVBAYTAkRFMRcwFQYDVQQKDA5nZW1hdGlrIEJlcmxpbjBCMEAwPjA8MA4MDMOEcnp0aW4vQXJ6dDAJBgcqghQATAQeEx8xLUhCQS1UZXN0a2FydGUtODgzMTEwMDAwMjE4NTcyMA0GCSqGSIb3DQEBCwUAA4IBAQA6wy8SHuB3O2m9xT5WZU7krCBbTjAqVpK8Prmq/eqCXp0c7JHp8tZMiflEzckO01divk9FvtsDEHjwnTEFKYrquPbU9BBsfcLM2u/NugWLqhc6DlH/cxfjhL/e5wgFcBKhJ0UC/3mLCO9EImsuS8qMMBvh4giY/BdHLM7xHZWHxAnknieqSFoutLmFbSSV8ggW1sxPKVGKfh1QYOL1cDz8MbOUKnMTKQGFTSwiJ4lfPq7TkevCBlGYvZQPlodL8xTVWcJLhTjuoLuWcrmkMe/aF4WKd4MwMsmHhgGN4yV2YY56D3L6OV/Np0UJ7A918E9E7iLqLkyVKJcCRTltk+35
+            </userCertificate>
+            <description>crazyStuff</description>
+        </UserCertificate>
+    </Command>
+    <Command>
+        <commandId>TestFail</commandId>
+        <name>addDirectoryEntryCertificate</name>
+        <dn>
+            <uid>SuccessUId</uid>
+        </dn>
+        <UserCertificate>
+            <telematikID>TelematikId</telematikID>
+            <usage>ePA</usage>
+            <userCertificate>
+                does not fit to TelematikId
+            </userCertificate>
+            <description>crazyStuff</description>
+        </UserCertificate>
+    </Command>
+</CommandList>

@@ -4,13 +4,16 @@
 
 image::images/vzd-cli.gif[]
 
-`vzd-cli` wurde in Vorbereitung der Migration des gematik Verzeichnisdienstes (VZD) von LDAP nach FHIR entwickelt. Über ein modernes CLI (Command Line Interface) können neue und alte Schnittstellen des VZD genutzt werden.
+`vzd-cli` 2.0 wurde in Vorbereitung der Migration des gematik Verzeichnisdienstes (VZD) von LDAP nach FHIR entwickelt. Über ein modernes CLI (Command Line Interface) können neue und alte Schnittstellen des VZD genutzt werden.
+
+`vzd-cli` enthält ein link:COMPATIBILITY_MODE.adoc[Kompatibilitätsmodus zur VZDClient 1.6] um bereits vorhandene Konfigurationen und Skripte nachnutzen zu können. 
 
 == Installation
 
 1. Download link:https://github.com/spilikin/app-vzd-cli/releases[Latest Release] von `vzd-cli` von github.
 2. ``vzd-cli-<VERSION>.zip`` extrahieren 
 3. Die Skripte in bin/ benutzen um `vzd-cli` zu starten
+3a. Zur Kompatibilität zur Version 1.6 s. Skripte unter `commands/``
 
 [source]
 ----
@@ -115,7 +118,25 @@ Befehle für Konfiguration des CLI
 .Aktuelle Konfiguration anzeigen
 [source,bash]
 ----
-vzd-cli admin config view
+vzd-cli admin config get
+----
+
+.Konfigurationsparameter ändern
+[source,bash]
+----
+vzd-cli admin config set httpProxy.proxyURL http://example.com:8080
+----
+
+Folgende Konfigurationsparameter können geändert werden (s. `vzd-cli admin config set --help`)
+
+* `currentEnvironment` - Name der Standardumgebung, wenn `-e / --environment` nicht spezifiziert wird. Möglicher werte: `ru`, `tu`, `pu`.
+* `httpProxy.enabled` - wenn `true`, wird Proxy-Server bei allen Anfragen genutzt. Wenn `false` werden HTTP-Requests direkt ohne Proxy durchgeführt, es sei dem `-x / --proxy` Option gesetzt ist.
+* `httpProxy.proxyURL`: URL des HTTP-Proxy Servers ggf. mit Port, z.B.: `http://192.168.0.1:8080`
+
+.Konfiguration zurücksetzen
+[source,bash]
+----
+vzd-cli admin config reset
 ----
 
 === `admin login`
@@ -293,12 +314,31 @@ WARNING: Nicht implementiert. Bitte `admin clear-cert` verwenden.
 
 Löscht einen X509-Zertifikat.
 
-[#cmd-admin-dump-create]
+[#cmd-admin-cmd]
+=== `admin cmd`
+
+Aktiviert link:COMPATIBILITY_MODE.adoc[Kompatibilitätsmodus zur VZDClient 1.6]
+
+----
+Usage: vzd-cli admin cmd [OPTIONS]
+
+  Compatibility mode: support for VZDClient XML-commands
+
+Options:
+  -p, --params CONF_FILE       Configuration file containing the config
+                               parameters
+  -c, --cred CREDENTIALS_FILE  File containing the access credentials
+                               (deprecated)
+  -b, --batch COMMANDS_FILE    XML file containing the commands
+  -h, --help                   Show this message and exit
+----
+
+[#cmd-dump-create]
 === `admin dump create`
 
 Lädt große Mengen von Einträgen und schreibt sie in `STDOUT`, eine Zeile per Eintrag als JSON. So erzeugte Dumps können durch weitere Tools verarbeitet werden, z.B. https://gnupg.org[GnuPG] oder https://github.com/antonmedv/fx[FX].
 
-[#cmd-admin-dump-ocsp]
+[#cmd-dump-ocsp]
 === `admin dump ocsp`
 
 Ließt die Einträga aus STDIN, stellt für jeden gefundenen Zertifikat eine OCSP-Abfrage.
