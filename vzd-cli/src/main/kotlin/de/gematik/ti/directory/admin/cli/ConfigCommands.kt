@@ -38,9 +38,9 @@ val SET_PROPERTIES = mapOf<String, (Config, String) -> Unit>(
         config.currentEnvironment = value
     },
     "httpProxy.proxyURL" to { config: Config, value: String ->
-        config.httpProxy?.proxyURL = URL(value).toString()
+        config.httpProxy.proxyURL = URL(value).toString()
     },
-    "httpProxy.enabled" to { config: Config, value: String -> config.httpProxy?.enabled = value.toBoolean() }
+    "httpProxy.enabled" to { config: Config, value: String -> config.httpProxy.enabled = value.toBoolean() }
 )
 
 class ConfigSetCommand : CliktCommand(

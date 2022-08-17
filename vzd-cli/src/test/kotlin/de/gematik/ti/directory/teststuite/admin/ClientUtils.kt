@@ -18,8 +18,8 @@ fun createClient(): Client {
     return Client {
         apiURL = tucfg.apiURL
         accessToken = dotenv.get("TEST_ACCESS_TOKEN") ?: throw RuntimeException("Environment variable 'TEST_ACCESS_TOKEN' must be set.")
-        if (provider.config.httpProxy?.enabled == true) {
-            httpProxyURL = provider.config.httpProxy?.proxyURL
+        if (provider.config.httpProxy.enabled == true) {
+            httpProxyURL = provider.config.httpProxy.proxyURL
         }
     }
 }
