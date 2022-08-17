@@ -4,9 +4,13 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.deprecated
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.client.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.client.CreateDirectoryEntry
 import de.gematik.ti.directory.admin.client.VZDResponseException
@@ -48,22 +52,27 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
         metavar = "ATTR=VALUE",
         help = "Set the attribute value in BaseDirectoryEntry."
     ).associate()
-    private val file: String? by option(
+    private val deprecatedFile: String? by option(
         "--file",
         "-f",
         metavar = "FILENAME",
-        help = "Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN"
-    )
+        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN"
+    ).deprecated("WARINING: -f / --file ist deprecated. Use argument without option instead.")
+    private val inputFile by argument(
+        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN"
+    ).path(mustExist = true, canBeDir = false, mustBeReadable = true).optional()
     private val context by requireObject<CommandContext>()
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (entry exists).").flag()
 
     override fun run() = catching {
-        val data = if (file != null && file == "-") {
+        val input = inputFile ?: deprecatedFile
+
+        val data = if (input != null && input == "-") {
             logger.debug { "Loading from STDIN" }
             generateSequence(::readLine).joinToString("\n")
-        } else if (file != null) {
-            logger.debug { "Loading file: $file" }
-            File(file.toString()).readText(Charsets.UTF_8)
+        } else if (input != null) {
+            logger.debug { "Loading file: $input" }
+            File(input.toString()).readText(Charsets.UTF_8)
         } else {
             null
         }
