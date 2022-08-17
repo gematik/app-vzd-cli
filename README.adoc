@@ -115,16 +115,10 @@ vzd-cli admin vault list
 
 Befehle für Konfiguration des CLI
 
-.Aktuelle Konfiguration anzeigen
+.*Aktuelle Konfiguration anzeigen*
 [source,bash]
 ----
 vzd-cli admin config get
-----
-
-.Konfigurationsparameter ändern
-[source,bash]
-----
-vzd-cli admin config set httpProxy.proxyURL "http://example.com:8080"
 ----
 
 Folgende Konfigurationsparameter können geändert werden (s. `vzd-cli admin config set --help`)
@@ -133,7 +127,14 @@ Folgende Konfigurationsparameter können geändert werden (s. `vzd-cli admin con
 * `httpProxy.enabled` - wenn `true`, wird Proxy-Server bei allen Anfragen genutzt. Wenn `false` werden HTTP-Requests direkt ohne Proxy durchgeführt, es sei dem `-x / --proxy` Option gesetzt ist.
 * `httpProxy.proxyURL`: URL des HTTP-Proxy Servers ggf. mit Port, z.B.: `http://192.168.0.1:8080`
 
-.Konfiguration zurücksetzen
+.*Konfigurationsparameter ändern*
+[source,bash]
+----
+vzd-cli admin config set httpProxy.proxyURL "http://example.com:8080"
+vzd-cli admin config set httpProxy.enabled true
+----
+
+.*Konfiguration zurücksetzen*
 [source,bash]
 ----
 vzd-cli admin config reset
