@@ -1,0 +1,82 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="CommandList" type="CommandListType"/>
+
+    <xs:complexType name="CommandListType">
+        <xs:sequence>
+            <xs:element name="Command" type="CommandType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CommandType">
+        <xs:sequence>
+            <xs:element name="commandId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+
+            <xs:element name="dn" type="DistinguishedNameType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="givenName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="sn" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="cn" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="displayName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="streetAddress" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="postalCode" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="countryCode" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="localityName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="stateOrProvinceName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="organization" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="otherName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="telematikID" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="telematikIDSubStr" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="specialization" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="domainID" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="holder" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="maxKOMLEadr" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="personalEntry" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="dataFromAuthority" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="professionOID" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="entryType" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="changeDateTime" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="baseEntryOnly" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="UserCertificate" type="UserCertificateType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="Fachdaten" type="FachdatenType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DistinguishedNameType">
+        <xs:sequence>
+            <xs:element name="cn" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="uid" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="dc" type="xs:string" minOccurs="0" maxOccurs="2"/>
+            <xs:element name="ou" type="xs:string" minOccurs="0" maxOccurs="2"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="UserCertificateType">
+        <xs:sequence>
+            <xs:element name="dn" type="DistinguishedNameType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="entryType" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="telematikID" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="professionOID" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="usage" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="userCertificate" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="FachdatenType">
+        <xs:sequence>
+            <xs:element name="dn" type="DistinguishedNameType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="fad1" type="FAD1Type" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="FAD1Type">
+        <xs:sequence>
+            <xs:element name="dn" type="DistinguishedNameType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="mail" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>TestSuccess</commandId>
+        <name>deleteDirectoryEntries</name>
+        <dn>
+            <uid>d0752991-d822-48a5-aba9-9af73cbe8f1c</uid>
+        </dn>
+    </Command>
+    <Command>
+        <commandId>TestFail</commandId>
+        <name>deleteDirectoryEntries</name>
+        <dn>
+            <uid>failUid</uid>
+        </dn>
+    </Command>
+</CommandList>

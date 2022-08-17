@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>DELETE TEST</commandId>
+        <name>deleteDirectoryEntryCertificate</name>
+        <UserCertificate>
+            <dn>
+                <cn>e2049cec-6579-405b-a4e2-79a6434e73b4</cn>
+                <uid>4398f89e-881a-46eb-8be2-5543128934dc</uid>
+            </dn>
+        </UserCertificate>
+    </Command>
+</CommandList>

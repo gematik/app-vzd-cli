@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>RealTelematikId</commandId>
+        <name>deleteDirectoryEntries</name>
+        <dn>
+            <uid>4fa211f0-e2a2-490e-aa72-948cc9fe292c</uid>
+        </dn>
+    </Command>
+    <!--    <Command>-->
+    <!--        <commandId>FakeTelematikId</commandId>-->
+    <!--        <name>deleteDirectoryEntries</name>-->
+    <!--        <dn>-->
+    <!--            <uid>ab57a84b-4a11-4406-8329-34f457ea00a1</uid>-->
+    <!--        </dn>-->
+    <!--    </Command>-->
+</CommandList>

@@ -1,0 +1,3 @@
+base=http://127.0.0.1:4041
+retryingOAuth=http://127.0.0.1:4041/oauth/token
+logSummaryDirectory=./build/testlog

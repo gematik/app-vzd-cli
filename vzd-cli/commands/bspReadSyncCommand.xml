@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>1</commandId>
+        <name>readDirectoryEntriesSync</name>
+        <countryCode>DE</countryCode>
+        <baseEntryOnly>true</baseEntryOnly>
+    </Command>
+</CommandList>

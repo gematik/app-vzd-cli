@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommandList>
+    <Command>
+        <commandId>RealTelematik</commandId>
+        <name>readDirectoryEntries</name>
+        <UserCertificate>
+            <telematikID>1-HBA-Testkarte-883110000218572</telematikID>
+        </UserCertificate>
+    </Command>
+</CommandList>
