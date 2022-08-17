@@ -65,7 +65,7 @@ data class Config(
     var environments: Map<String, EnvironmentConfig>,
     var currentEnvironment: String?,
     var httpProxy: HttpProxyConfig,
-    var tokens: Map<String, TokenConfig>? = null,
+    var tokens: Map<String, TokenConfig>? = null
 ) {
     fun environment(name: String? = null) = environments.get(name ?: currentEnvironment)
 }
