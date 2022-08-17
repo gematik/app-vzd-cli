@@ -115,7 +115,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         val semaphore = Semaphore(20)
         val elapsed = measureTimeMillis {
             val progressBar = ProgressBar("Query $params", expectedTotal.toLong())
-            progressBar.use {
+            try {
                 runBlocking {
                     context.client.streamDirectoryEntriesPaging(params, cursorSize) { entry ->
                         launch {
@@ -129,6 +129,9 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
                         }
                     }
                 }
+            } finally {
+                progressBar.maxHint(progressBar.current)
+                progressBar.close()
             }
         }
         logger.info { "Dumped $entries entries in ${elapsed / 1000} seconds" }
