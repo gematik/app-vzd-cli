@@ -111,8 +111,8 @@ class DirectoryAdministrationCli :
 
             var clientApiURL = envcfg.apiURL
             var clientAccessToken = provider.config.tokens?.get(clientEnv)?.accessToken
-            var clientHttpProxyURL = provider.config.httpProxy?.proxyURL
-            var clientHttpProxyEnabled = provider.config.httpProxy?.enabled
+            var clientHttpProxyURL = provider.config.httpProxy.proxyURL
+            var clientHttpProxyEnabled = provider.config.httpProxy.enabled
 
             dotenv.get("ADMIN_API_URL", null)?.let {
                 logger.error { "ADMIN_API_URL is deprecated, use admin config instead" }
@@ -154,7 +154,7 @@ class DirectoryAdministrationCli :
             Client {
                 apiURL = clientApiURL
                 accessToken = clientAccessToken!!
-                if (clientHttpProxyEnabled == true) {
+                if (clientHttpProxyEnabled) {
                     httpProxyURL = clientHttpProxyURL
                 }
             }
@@ -162,8 +162,8 @@ class DirectoryAdministrationCli :
 
         val pkiClientDelegate: () -> PKIClient = {
             PKIClient {
-                if (provider.config.httpProxy?.enabled == true || useProxy == true) {
-                    httpProxyURL = provider.config.httpProxy?.proxyURL
+                if (provider.config.httpProxy.enabled || useProxy == true) {
+                    httpProxyURL = provider.config.httpProxy.proxyURL
                 }
             }
         }

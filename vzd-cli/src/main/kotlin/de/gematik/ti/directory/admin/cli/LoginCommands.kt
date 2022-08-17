@@ -21,7 +21,7 @@ private fun doLogin(context: CommandContext, clientID: String, clientSecret: Str
     if (!vaultProvider.exists()) throw CliktError("Vault is not initialized. See vzd-cli admin vault --help")
     val auth = ClientCredentialsAuthenticator(
         envcfg.authURL,
-        if (provider.config.httpProxy?.enabled == true || context.useProxy) provider.config.httpProxy?.proxyURL else null
+        if (provider.config.httpProxy.enabled || context.useProxy) provider.config.httpProxy.proxyURL else null
     )
     val authResponse = auth.authenticate(clientID, clientSecret)
     val tokens = provider.config.tokens ?: emptyMap()
