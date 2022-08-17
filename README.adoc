@@ -124,7 +124,7 @@ vzd-cli admin config get
 .Konfigurationsparameter ändern
 [source,bash]
 ----
-vzd-cli admin config set httpProxy.proxyURL http://example.com:8080
+vzd-cli admin config set httpProxy.proxyURL "http://example.com:8080"
 ----
 
 Folgende Konfigurationsparameter können geändert werden (s. `vzd-cli admin config set --help`)
