@@ -6,6 +6,8 @@
 und schreibt diese in `vzd-cli` kompatiblen Format
 - Neues Befehl `vzd-cli admin delete-cert`: Löschen der Zertifikate
 - Unterstützung für Admin API 1.8.1 https://github.com/gematik/api-vzd/blob/I_Directory_Administration/1.8.1/src/openapi/DirectoryAdministration.yaml
+- Unterstützung von Paging in `vzd-cli admin dump crate` über `--cusror-size` Parameter
+- Anpassung der Konfiguration über `vzd-cli admin config set`
 - Kleine Bugfixes
 
 
