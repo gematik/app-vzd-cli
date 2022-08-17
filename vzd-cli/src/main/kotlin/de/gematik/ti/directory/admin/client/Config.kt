@@ -64,8 +64,8 @@ val DefaultConfig = Config(
 data class Config(
     var environments: Map<String, EnvironmentConfig>,
     var currentEnvironment: String?,
+    var httpProxy: HttpProxyConfig,
     var tokens: Map<String, TokenConfig>? = null,
-    var httpProxy: HttpProxyConfig? = null
 ) {
     fun environment(name: String? = null) = environments.get(name ?: currentEnvironment)
 }
