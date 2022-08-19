@@ -2,11 +2,11 @@
 
 == Version 2.0.0
 - Kompatibilitätsmodus zur VZDClient 1.6. Befehl `vzd-cli admin cmd`
-- Neue Befehle unter `vzd-cli pers`: verarbeitet die Basisdaten und Zertifikate aus den Peronalisierung-XML (TSP-Schnittstelle exports)
+- Neue Befehle unter `vzd-cli pers`: verarbeitet die Basisdaten und Zertifikate aus den Peronalisierung-XML(TSP-Schnittstelle exports)
 und schreibt diese in `vzd-cli` kompatiblen Format
 - Neues Befehl `vzd-cli admin delete-cert`: Löschen der Zertifikate
 - Unterstützung für Admin API 1.8.1 https://github.com/gematik/api-vzd/blob/I_Directory_Administration/1.8.1/src/openapi/DirectoryAdministration.yaml
-- Unterstützung von Paging in `vzd-cli admin dump crate` über `--cusror-size` Parameter
+- Unterstützung von Paging in `vzd-cli admin dump create` über `-c / --cursor-size` und `-e / --expected-count`
 - Anpassung der Konfiguration über `vzd-cli admin config set`
 - Kleine Bugfixes
 
