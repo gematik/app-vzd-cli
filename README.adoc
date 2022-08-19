@@ -124,7 +124,7 @@ vzd-cli admin config get
 Folgende Konfigurationsparameter können geändert werden (s. `vzd-cli admin config set --help`)
 
 * `currentEnvironment` - Name der Standardumgebung, wenn `-e / --environment` nicht spezifiziert wird. Mögliche Werte: `ru`, `tu`, `pu`.
-* `httpProxy.enabled` - wenn `true`, wird Proxy-Server bei allen Anfragen genutzt. Wenn `false` werden HTTP-Requests direkt ohne Proxy durchgeführt, es sei dem `-x / --proxy` Option gesetzt ist.
+* `httpProxy.enabled` - wenn `true`, wird Proxy-Server bei allen Anfragen genutzt. Wenn `false` werden HTTP-Requests direkt ohne Proxy durchgeführt, es sei dem `-x / --proxy-on` Option gesetzt ist.
 * `httpProxy.proxyURL`: URL des HTTP-Proxy Servers ggf. mit Port, z.B.: `http://192.168.0.1:8080`
 
 .*Konfigurationsparameter ändern*
