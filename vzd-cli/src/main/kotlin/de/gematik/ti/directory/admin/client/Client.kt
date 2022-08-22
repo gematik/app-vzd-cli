@@ -138,7 +138,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         val response = http.delete("/DirectoryEntries/$uid") {}
 
         if (response.status != HttpStatusCode.OK) {
-            throw VZDResponseException(response, "Unable to delete directory entry: ${response.body<String>()}")
+            throw VZDResponseException(response, "Unable to delete directory entry")
         }
 
         return response.body()
@@ -300,7 +300,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         }
 
         if (response.status != HttpStatusCode.OK) {
-            throw VZDResponseException(response, "Unable to modify entry: ${response.body<String>()}")
+            throw VZDResponseException(response, "Unable to modify entry")
         }
 
         return response.body()
@@ -316,7 +316,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         }
 
         if (response.status != HttpStatusCode.Created) {
-            throw VZDResponseException(response, "Unable to modify entry: ${response.body<String>()}")
+            throw VZDResponseException(response, "Unable to modify entry")
         }
 
         return response.body()
