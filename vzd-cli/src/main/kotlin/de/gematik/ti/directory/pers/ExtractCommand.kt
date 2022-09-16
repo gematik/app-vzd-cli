@@ -16,6 +16,7 @@ import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
+import org.w3c.dom.Text
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
@@ -34,7 +35,7 @@ fun NodeList.asSequence(): Sequence<Node> {
         .map { this.item(it) }
 }
 
-class ExtractCommand : CliktCommand(name = "extract", help = """Extract data from SMC-B/HBA Exports""".trimMargin()) {
+class ExtractCommand : CliktCommand(name = "extract", help = """Extract data from SMC-B/HBA Exports and ObjectSystem files""".trimMargin()) {
     private val logger = KotlinLogging.logger {}
     private val sourceFiles by argument().path(mustBeReadable = true).multiple(required = true)
     private val outputDir by option("-o", "--output-dir", metavar = "OUTPUT_DIR", help = "Output directory for files")
@@ -54,23 +55,69 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
             logger.debug { "Processing ${smcbs.length} entries" }
 
             smcbs.forEach { antrag ->
-                val base = instituruinToBaseEntry(antrag)
-                val jsonPath = outputDir.resolve("${base.telematikID.escape()}.json")
-                jsonPath.writeText(JsonPretty.encodeToString(base))
-                val yamlPath = outputDir.resolve("${base.telematikID.escape()}.yaml")
-                yamlPath.writeText(YamlPretty.encodeToString(base))
+                val base = institutionToBaseEntry(antrag)
+                writeBaseEntry(base)
                 echo("${base.telematikID}: ${base.displayName}")
-                certoficates(antrag).forEach { cert ->
-                    echo("└── ${cert.certificateInfo.serialNumber}")
-                    val filenameBase = "${cert.certificateInfo.admissionStatement.registrationNumber.escape()}-${cert.certificateInfo.serialNumber}"
-                    outputDir.resolve("$filenameBase.der").writeBytes(Base64.decode(cert.base64String))
-                    outputDir.resolve("$filenameBase.certinfo.yaml").writeText(YamlPretty.encodeToString(cert.certificateInfo))
+                certificates(antrag).forEach { cert ->
+                    writeCert(cert)
                 }
+            }
+
+            // gematik card file
+            val objects = xpath.evaluate(
+                "//child[@id='EF.C.HCI.ENC.R2048' or @id='EF.C.HCI.ENC.E256']/attributes/attribute[@id='body']/text()",
+                doc,
+                XPathConstants.NODESET
+            ) as NodeList
+
+            var firstCert = true
+
+            objects.forEach { node ->
+                val hex = (node as Text).textContent
+                val cert = CertificateDataDER(Base64.toBase64String(hex.hexStringToByteArray()))
+
+                if (firstCert) {
+                    val base = baseEntryFromCert(cert)
+                    writeBaseEntry(base)
+                    echo("${base.telematikID}: ${base.displayName}")
+                    firstCert = false
+                }
+
+                writeCert(cert)
             }
         }
     }
 
-    private fun certoficates(antrag: Node): Sequence<CertificateDataDER> {
+    private fun writeBaseEntry(base: BaseDirectoryEntry) {
+        val jsonPath = outputDir.resolve("${base.telematikID.escape()}.json")
+        jsonPath.writeText(JsonPretty.encodeToString(base))
+        val yamlPath = outputDir.resolve("${base.telematikID.escape()}.yaml")
+        yamlPath.writeText(YamlPretty.encodeToString(base))
+    }
+
+    private fun baseEntryFromCert(cert: CertificateDataDER): BaseDirectoryEntry {
+        val base = BaseDirectoryEntry(cert.certificateInfo.admissionStatement.registrationNumber)
+        base.displayName = cert.certificateInfo.subjectInfo.cn
+        base.givenName = cert.certificateInfo.subjectInfo.givenName
+        base.sn = cert.certificateInfo.subjectInfo.sn
+
+        base.countryCode = cert.certificateInfo.subjectInfo.countryCode
+        base.stateOrProvinceName = cert.certificateInfo.subjectInfo.stateOrProvinceName
+        base.postalCode = cert.certificateInfo.subjectInfo.postalCode
+        base.localityName = cert.certificateInfo.subjectInfo.localityName
+        base.streetAddress = cert.certificateInfo.subjectInfo.streetAddress
+        return base
+    }
+
+    private fun writeCert(cert: CertificateDataDER) {
+        echo("└── ${cert.certificateInfo.serialNumber}")
+        val filenameBase =
+            "${cert.certificateInfo.admissionStatement.registrationNumber.escape()}-${cert.certificateInfo.serialNumber}"
+        outputDir.resolve("$filenameBase.der").writeBytes(Base64.decode(cert.base64String))
+        outputDir.resolve("$filenameBase.certinfo.yaml").writeText(YamlPretty.encodeToString(cert.certificateInfo))
+    }
+
+    private fun certificates(antrag: Node): Sequence<CertificateDataDER> {
         val certs = xpath.evaluate(".//*[local-name(.)='Zertifikate'][starts-with(CertificateSem, 'C.HCI.ENC')]", antrag, XPathConstants.NODESET) as NodeList
 
         return certs.asSequence().map { certNode ->
@@ -79,7 +126,7 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
         }
     }
 
-    private fun instituruinToBaseEntry(antrag: Node): BaseDirectoryEntry {
+    private fun institutionToBaseEntry(antrag: Node): BaseDirectoryEntry {
         val base = BaseDirectoryEntry(xpath.evaluate("Institution/TelematikID", antrag))
         base.displayName = evalString("Institution/InstName", antrag)
         base.streetAddress = evalString("Institution/Anschrift/StrassenAdresse/Strasse", antrag) + " " + evalString("Institution/Anschrift/StrassenAdresse/Hausnummer", antrag)
@@ -92,4 +139,20 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
     private fun evalString(xpathExpr: String, node: Node): String {
         return xpath.evaluate(xpathExpr, node).trim()
     }
+}
+
+private val HEX_CHARS = "0123456789ABCDEF"
+
+fun String.hexStringToByteArray(): ByteArray {
+    val result = ByteArray(length / 2)
+
+    for (i in 0 until length step 2) {
+        val firstIndex = HEX_CHARS.indexOf(this[i])
+        val secondIndex = HEX_CHARS.indexOf(this[i + 1])
+
+        val octet = firstIndex.shl(4).or(secondIndex)
+        result.set(i.shr(1), octet.toByte())
+    }
+
+    return result
 }
