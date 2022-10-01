@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorVersion = "2.0.3"
-version = "2.0.0"
+version = "2.1.0a1"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -45,6 +45,12 @@ dependencies {
     implementation("net.mamoe.yamlkt:yamlkt:0.10.2")
     implementation("com.google.code.gson:gson:2.9.0")
 
+    // server
+    implementation("io.ktor:ktor-server-core:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-server-locations:$ktorVersion")
+
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0")
 
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
@@ -64,7 +70,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("de.gematik.ti.directory.CliKt")
+    mainClass.set("de.gematik.ti.directory.cli.CliKt")
 }
 
 tasks.register<Zip>("customDist") {

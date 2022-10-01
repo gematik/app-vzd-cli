@@ -1,7 +1,7 @@
 package de.gematik.ti.directory.teststuite.admin
 
-import de.gematik.ti.directory.admin.client.DefaultConfig
-import de.gematik.ti.directory.admin.client.FileConfigProvider
+import de.gematik.ti.directory.admin.DefaultConfig
+import de.gematik.ti.directory.admin.FileConfigProvider
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe

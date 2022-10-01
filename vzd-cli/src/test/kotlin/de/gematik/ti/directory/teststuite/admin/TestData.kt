@@ -1,6 +1,6 @@
 package de.gematik.ti.directory.teststuite.admin
 
-import de.gematik.ti.directory.admin.client.BaseDirectoryEntry
+import de.gematik.ti.directory.admin.BaseDirectoryEntry
 
 object TestData {
     val telematikID = "1-SMC-B-Testkarte-883110000117035"

@@ -1,6 +1,6 @@
 package de.gematik.ti.directory.teststuite.admin
 
-import de.gematik.ti.directory.Cli
+import de.gematik.ti.directory.cli.Cli
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream

@@ -1,6 +1,6 @@
 package de.gematik.ti.directory.teststuite.admin
 
-import de.gematik.ti.directory.admin.client.DirectoryEntry
+import de.gematik.ti.directory.admin.DirectoryEntry
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain

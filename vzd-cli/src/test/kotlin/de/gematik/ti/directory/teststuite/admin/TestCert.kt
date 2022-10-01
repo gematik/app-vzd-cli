@@ -1,7 +1,7 @@
 package de.gematik.ti.directory.teststuite.admin
 
-import de.gematik.ti.directory.escape
-import de.gematik.ti.directory.pki.*
+import de.gematik.ti.directory.cli.escape
+import de.gematik.ti.directory.util.*
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe

@@ -3,7 +3,7 @@ package de.gematik.ti.directory.teststuite.admin
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import de.gematik.ti.directory.admin.client.Client
+import de.gematik.ti.directory.admin.Client
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.json.Json

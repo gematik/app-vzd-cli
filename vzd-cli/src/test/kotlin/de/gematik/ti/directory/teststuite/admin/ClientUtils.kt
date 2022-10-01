@@ -2,8 +2,8 @@ package de.gematik.ti.directory.teststuite.admin
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import de.gematik.ti.directory.admin.client.Client
-import de.gematik.ti.directory.admin.client.FileConfigProvider
+import de.gematik.ti.directory.admin.Client
+import de.gematik.ti.directory.admin.FileConfigProvider
 import io.github.cdimascio.dotenv.dotenv
 import org.slf4j.LoggerFactory
 
