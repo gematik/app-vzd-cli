@@ -11,8 +11,8 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.deprecated
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
-import de.gematik.ti.directory.admin.cli.CommandContext
-import de.gematik.ti.directory.admin.cli.catching
+import de.gematik.ti.directory.cli.admin.CommandContext
+import de.gematik.ti.directory.cli.admin.catching
 import de.gematik.ti.epa.vzd.client.invoker.auth.OAuth
 import de.gematik.ti.epa.vzd.gem.Main
 import de.gematik.ti.epa.vzd.gem.exceptions.GemClientException

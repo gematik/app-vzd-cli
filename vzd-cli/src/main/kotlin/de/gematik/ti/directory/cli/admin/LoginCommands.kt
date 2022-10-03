@@ -6,11 +6,11 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
-import de.gematik.ti.directory.cli.JsonPretty
 import de.gematik.ti.directory.admin.ClientCredentialsAuthenticator
 import de.gematik.ti.directory.admin.FileConfigProvider
-import de.gematik.ti.directory.admin.KeyStoreVaultProvider
 import de.gematik.ti.directory.admin.TokenConfig
+import de.gematik.ti.directory.cli.JsonPretty
+import de.gematik.ti.directory.util.KeyStoreVaultProvider
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

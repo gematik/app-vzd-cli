@@ -1,4 +1,3 @@
 package de.gematik.ti.directory.apo
 
-class Config {
-}
+class Config

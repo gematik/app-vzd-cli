@@ -18,16 +18,12 @@ import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
 import java.io.InputStreamReader
-
-private val logger = KotlinLogging.logger {}
 
 private val JSON = Json {
     ignoreUnknownKeys = true
@@ -59,6 +55,7 @@ class VZDResponseException(response: HttpResponse, message: String) : ResponseEx
  * @see <a href="https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml">Directory Administration Open API</a>
  */
 class Client(block: Configuration.() -> Unit = {}) {
+    val logger = KotlinLogging.logger {}
     class Configuration {
         var apiURL = ""
         var accessToken = ""
@@ -152,7 +149,7 @@ class Client(block: Configuration.() -> Unit = {}) {
     suspend fun readDirectoryEntryV2(
         parameters: Map<String, String>,
         cursorSize: Int = 100,
-        cookie: String? = null,
+        cookie: String? = null
     ): ReadDirectoryEntryForSyncResponse? {
         return fetchNextEntries(parameters, cursorSize, cookie)
     }
@@ -364,55 +361,6 @@ class Client(block: Configuration.() -> Unit = {}) {
 
         if (response.status != HttpStatusCode.OK) {
             throw VZDResponseException(response, "Unable to delete entry $certificateEntryID")
-        }
-    }
-
-    suspend fun search(query: String, attributes: List<String> = listOf("telematikID", "displayName")): List<DirectoryEntry> {
-        var tokens = query.split(" ").filter { it != "" }.map {
-            if (it.contains("*")) {
-                it
-            } else {
-                "*$it*"
-            }
-        }.toMutableList()
-
-        repeat(attributes.size - tokens.size) {
-            tokens.add("")
-        }
-
-        val semaphore = Semaphore(3)
-        val entries = mutableListOf<DirectoryEntry>()
-        var permutations = mutableSetOf<Map<String, String>>()
-
-        logger.info { tokens.permutations() }
-
-        tokens.permutations().forEach { tokensVariant ->
-            val params = attributes.withIndex().map {
-                it.value to tokensVariant.getOrElse(it.index) { "" }
-            }.filter { it.second != "" }.toMap()
-            permutations.add(params)
-        }
-
-        runBlocking {
-            permutations.forEach() {params ->
-                launch {
-                    semaphore.withPermit {
-                        logger.info { params }
-                        val result = readDirectoryEntryV2(params + Pair("baseEntryOnly", "true"), 20)
-                        entries.addAll(result?.directoryEntries ?: emptyList())
-                    }
-                }
-
-            }
-        }
-
-        return entries
-    }
-}
-fun <T> List<T>.permutations(): Set<List<T>> = if(isEmpty()) setOf(emptyList()) else  mutableSetOf<List<T>>().also{ result ->
-    for(i in this.indices){
-        (this - this[i]).permutations().forEach{
-            result.add(it + this[i])
         }
     }
 }

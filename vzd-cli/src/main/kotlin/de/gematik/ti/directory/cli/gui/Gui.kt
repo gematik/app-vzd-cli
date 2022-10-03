@@ -6,15 +6,21 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
 import de.gematik.ti.directory.admin.Client
 import de.gematik.ti.directory.admin.FileConfigProvider
+import de.gematik.ti.directory.admin.quickSearch
 import io.ktor.http.*
+import io.ktor.http.parsing.*
+import io.ktor.resources.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
-import io.ktor.server.locations.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.resources.*
+import io.ktor.server.resources.Resources
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with GUI""".trimMargin()) {
@@ -22,26 +28,28 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
 
     override fun run() {
         embeddedServer(Netty, port = port, host = "0.0.0.0") {
-            install(Locations)
+            install(Resources)
             install(ContentNegotiation) {
-                json(Json {
-                    prettyPrint = true
-                    isLenient = true
-                })
+                json(
+                    Json {
+                        prettyPrint = true
+                        isLenient = true
+                    }
+                )
             }
-            configureRouting()
             configureSearchRouting()
+
+            install(StatusPages) {
+                exception<ParseException> { call, cause ->
+                    call.respondText(text = "401: Unauthorized (token expired)" , status = HttpStatusCode.Unauthorized)
+                }
+            }
         }.start(wait = true)
         echo("Listening server at: $port")
-
     }
-
 }
-
-
-
-
-@Location("/{env}/search")
+@Resource("/{env}/search")
+@Serializable
 data class Search(val env: String, val q: String)
 
 fun downstreamClient(env: String): Client {
@@ -58,12 +66,12 @@ fun downstreamClient(env: String): Client {
 }
 
 fun Application.configureSearchRouting() {
-    routing() {
+    routing {  }() {
         route("api") {
             route("admin") {
                 get<Search> { search ->
                     val client = downstreamClient(search.env)
-                    call.respond(client.search(search.q))
+                    call.respond(client.quickSearch(search.q))
                 }
                 get("{env}/DirectoryEntry/{telematikID}") {
                     val client = downstreamClient(call.parameters.get("env")!!)
@@ -79,7 +87,7 @@ fun Application.configureSearchRouting() {
 }
 
 fun Application.configureRouting() {
-    routing () {
+    routing() {
         route("api") {
             get("config") {
                 val provider = FileConfigProvider()

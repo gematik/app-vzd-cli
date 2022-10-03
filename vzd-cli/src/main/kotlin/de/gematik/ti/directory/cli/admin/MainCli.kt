@@ -4,10 +4,9 @@ import com.github.ajalt.clikt.core.*
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
 import de.gematik.ti.directory.admin.*
-import de.gematik.ti.directory.admin.cli.compat.CmdCommand
-import de.gematik.ti.directory.admin.client.*
-import de.gematik.ti.directory.client.admin.client.*
+import de.gematik.ti.directory.cli.admin.compat.CmdCommand
 import de.gematik.ti.directory.util.PKIClient
+import de.gematik.ti.directory.util.VaultException
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.client.network.sockets.*
 import kotlinx.coroutines.runBlocking
@@ -180,7 +179,7 @@ class DirectoryAdministrationCli :
             Info(), ListCommand(), TemplateCommand(), AddBaseCommand(),
             LoadBaseCommand(), ModifyBaseCommand(), ModifyBaseAttrCommand(), DeleteCommand(),
             ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
-            CertInfoCommand(), DumpCommand(), CmdCommand()
+            CertInfoCommand(), DumpCommand(), CmdCommand(), QuickSearchCommand()
         )
     }
 }

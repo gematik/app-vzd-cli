@@ -6,9 +6,9 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
+import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.cli.JsonPretty
 import de.gematik.ti.directory.cli.YamlPretty
-import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.cli.escape
 import de.gematik.ti.directory.util.CertificateDataDER
 import kotlinx.serialization.encodeToString

@@ -1,12 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.0.3"
 version = "2.1.0a1"
 
+val ktorVersion = "2.1.2"
+val kotestVersion = "5.4.2"
+
 plugins {
-    // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    kotlin("jvm").version("1.6.10")
-    kotlin("plugin.serialization").version("1.6.10")
+    id("org.jetbrains.kotlin.jvm") version "1.6.21"
+    kotlin("plugin.serialization").version("1.6.21")
     id("com.github.johnrengelman.shadow").version("7.1.2")
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     // Apply the application plugin to add support for building a CLI application in Java.
@@ -28,6 +29,9 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
+    implementation("org.apache.opennlp:opennlp-tools:2.0.0")
+    implementation("org.apache.opennlp:opennlp-uima:2.0.0")
+
     implementation(project(":legacy-client-java"))
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -49,9 +53,10 @@ dependencies {
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-server-locations:$ktorVersion")
+    implementation("io.ktor:ktor-server-resources:$ktorVersion")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
 
-    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0")
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.6.0")
 
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
@@ -63,9 +68,8 @@ dependencies {
     // implementation("com.nimbusds:nimbus-jose-jwt:9.23")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    // testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("io.kotest:kotest-runner-junit5:5.1.0")
-    testImplementation("io.kotest:kotest-assertions-core:5.1.0")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
 }
 
 application {

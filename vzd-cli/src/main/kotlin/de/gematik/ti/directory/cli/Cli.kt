@@ -8,7 +8,7 @@ import com.github.ajalt.clikt.parameters.options.counted
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.github.ajalt.clikt.parameters.types.path
-import de.gematik.ti.directory.admin.cli.DirectoryAdministrationCli
+import de.gematik.ti.directory.cli.admin.DirectoryAdministrationCli
 import de.gematik.ti.directory.cli.gui.GuiCommand
 import de.gematik.ti.directory.cli.ldif.LdifCommand
 import de.gematik.ti.directory.cli.pers.PersCommand
