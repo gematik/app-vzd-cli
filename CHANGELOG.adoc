@@ -1,5 +1,11 @@
 = Changelog `vzd-cli`
 
+== Version 2.1.0
+- `vzd-cli admin login` wurde komplett überarbeitet
+- `vzd-cli admin auth` wurde als `vzd-cli admin token` reimplementiert
+- Neues Befehl: `vzd-cli admin search`: schnelle, intuitive Suche nach Einträgen
+- Neuer Ausgabeformat: `--table`, eine ASCII Tabelle
+
 == Version 2.0.0
 - Kompatibilitätsmodus zur VZDClient 1.6. Befehl `vzd-cli admin cmd`
 - Neue Befehle unter `vzd-cli pers`: verarbeitet die Basisdaten und Zertifikate aus den Peronalisierung-XML(TSP-Schnittstelle exports)

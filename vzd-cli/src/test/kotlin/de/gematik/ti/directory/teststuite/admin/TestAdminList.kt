@@ -9,9 +9,9 @@ import kotlinx.serialization.json.Json
 
 class TestAdminList : FeatureSpec({
     feature("admin list") {
-        scenario("Befehl 'admin list' ohne parameter liefert beliebige Liste von 101 Einträgen") {
-            val output = runCLI(listOf("admin", "--env=tu", "--short", "list"))
-            output.split("\n").size shouldBe 101
+        scenario("Befehl 'admin list' ohne parameter liefert beliebige Liste von 100 Einträgen") {
+            val output = runCLI(listOf("admin", "--env=tu", "list", "--table"))
+            output.trim().split("\n").size shouldBe 104
         }
         scenario("Befehl 'admin list -p telematikID=5-SMC-B-Testkarte-883110000092568' liefert Bonifatiuskrankenhaus als JSON") {
             val output =

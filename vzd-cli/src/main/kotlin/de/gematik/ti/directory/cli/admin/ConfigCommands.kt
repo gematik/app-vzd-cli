@@ -8,11 +8,8 @@ import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.types.choice
 import de.gematik.ti.directory.admin.Config
 import de.gematik.ti.directory.admin.FileConfigProvider
-import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import java.net.URL
-
-private val logger = KotlinLogging.logger {}
 
 private val YAML = Yaml { encodeDefaultValues = false }
 
@@ -32,7 +29,7 @@ class ConfigResetCommand : CliktCommand(name = "reset", help = "Reset configurat
     }
 }
 
-val SET_PROPERTIES = mapOf<String, (Config, String) -> Unit>(
+val SET_PROPERTIES = mapOf(
     "currentEnvironment" to { config: Config, value: String ->
         if (!config.environments.containsKey(value)) throw CliktError("Invalid environment name: $value")
         config.currentEnvironment = value
@@ -57,12 +54,11 @@ class ConfigSetCommand : CliktCommand(
         val provider = FileConfigProvider()
         property(provider.config, value)
         provider.save()
-        provider.config.tokens = null
         echo(YAML.encodeToString(provider.config))
     }
 }
 
-val GET_PROPERTIES = mapOf<String, (Config) -> Any?>(
+val GET_PROPERTIES = mapOf(
     "environments" to { config: Config -> config.environments },
     "currentEnvironment" to { config: Config -> config.currentEnvironment },
     "httpProxy" to { config: Config -> config.httpProxy },
@@ -81,10 +77,7 @@ class ConfigGetCommand : CliktCommand(
     private val property by argument().choice(GET_PROPERTIES).optional()
     override fun run() {
         val provider = FileConfigProvider()
-
-        provider.config.tokens = null
         val value = property?.let { it(provider.config) } ?: provider.config
-
         echo(YAML.encodeToString(value))
     }
 }

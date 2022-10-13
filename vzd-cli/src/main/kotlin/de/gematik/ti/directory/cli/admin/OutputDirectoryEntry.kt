@@ -2,6 +2,7 @@ package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.cli.escape
+import hu.vissy.texttable.dsl.tableFormatter
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -58,20 +59,57 @@ val DirectoryEntryOutputMapping = mapOf(
                     it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.firstOrNull()?.subject ?: "",
                     it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.firstOrNull()?.issuer ?: "",
                     it.userCertificates?.count { it.userCertificate != null } ?: 0,
-                    it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.map { it.serialNumber.toString() }?.joinToString(),
-                    it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.mapNotNull { it.ocspResponse?.status ?: "NONE" }?.joinToString(),
+                    it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.map { it.serialNumber }?.joinToString(),
+                    it.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.map { it.ocspResponse?.status ?: "NONE" }?.joinToString(),
                     it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.count() ?: 0,
                     it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
                         ?.flatten()?.joinToString(),
                     it.fachdaten?.let { it.mapNotNull { it.fad1 }.flatten().mapNotNull { it.dn.ou?.firstOrNull() }.joinToString() },
-                    it.directoryEntryBase.specialization?.mapNotNull { it }?.joinToString() ?: ""
+                    it.directoryEntryBase.specialization?.map { it }?.joinToString() ?: ""
 
                 )
             )
         }
 
-        if (value == null || value.isEmpty()) {
+        if (value.isNullOrEmpty()) {
             Output.printCsv(listOf(query.toString(), "Not Found"))
         }
+    },
+
+    OutputFormat.TABLE to { _: Map<String, String>, value: List<DirectoryEntry>? ->
+        val formatter = tableFormatter<DirectoryEntry> {
+
+            stateless<String>("TelematikID") {
+                extractor { directoryEntry ->
+                    directoryEntry.directoryEntryBase.telematikID
+                }
+            }
+
+            stateless<String>("Name") {
+                extractor { directoryEntry ->
+                    directoryEntry.directoryEntryBase.displayName
+                }
+                cellFormatter {
+                    maxWidth = 24
+                }
+            }
+
+            stateless<String>("Address") {
+                extractor { directoryEntry ->
+                    buildString {
+                        append(directoryEntry.directoryEntryBase.streetAddress ?: "n/a")
+                        append(" ")
+                        append(directoryEntry.directoryEntryBase.postalCode ?: "n/a")
+                        append(" ")
+                        append(directoryEntry.directoryEntryBase.localityName ?: "n/a")
+                    }
+                }
+                cellFormatter {
+                    maxWidth = 40
+                }
+            }
+        }
+        println(formatter.apply(value))
     }
+
 )

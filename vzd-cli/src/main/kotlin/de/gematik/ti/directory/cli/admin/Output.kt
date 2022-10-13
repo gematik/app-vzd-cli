@@ -12,6 +12,9 @@ import java.io.ByteArrayOutputStream
 val optimizedSerializersModule = SerializersModule {
     contextual(CertificateDataDERInfoSerializer)
 }
+enum class OutputFormat {
+    HUMAN, JSON, YAML, CSV, SHORT, TABLE
+}
 
 /**
  * Output helper class für human, json, yaml and csv outputs

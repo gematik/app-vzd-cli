@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.types.choice
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.admin.compat.CmdCommand
 import de.gematik.ti.directory.util.PKIClient
+import de.gematik.ti.directory.util.TokenStore
 import de.gematik.ti.directory.util.VaultException
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.client.network.sockets.*
@@ -45,14 +46,10 @@ fun catching(throwingBlock: () -> Unit = {}) {
     }
 }
 
-enum class OutputFormat {
-    HUMAN, JSON, YAML, CSV, SHORT
-}
-
 class CommandContext(
     private val clientDelegate: () -> Client,
     private val pkiClientDelegate: () -> PKIClient,
-    val outputFormat: OutputFormat,
+    var outputFormat: OutputFormat,
     val env: String,
     val useProxy: Boolean,
     val enableOcsp: Boolean,
@@ -76,8 +73,11 @@ class DirectoryAdministrationCli :
         "--json" to OutputFormat.JSON,
         "--yaml" to OutputFormat.YAML,
         "--csv" to OutputFormat.CSV,
-        "--short" to OutputFormat.SHORT
-    ).default(OutputFormat.HUMAN)
+        "--short" to OutputFormat.TABLE,
+        "--table" to OutputFormat.TABLE
+    )
+        .default(OutputFormat.HUMAN)
+        .deprecated("DEPRECATED: Specify the format on specific sub-command.")
 
     private val env by option(
         "-e",
@@ -85,6 +85,7 @@ class DirectoryAdministrationCli :
         help = "Environment. Either tu, ru or pu. If not specified default env is used."
     )
         .choice("tu", "ru", "pu")
+        .deprecated("DEPRECATED: Switch environment globally using vzd-cli admin login <ENV>")
 
     private val enableOcsp: Boolean by option(
         "-o",
@@ -102,6 +103,7 @@ class DirectoryAdministrationCli :
 
     override fun run() = catching {
         val provider = FileConfigProvider()
+        val tokenStore = TokenStore()
         val clientEnv =
             env ?: provider.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
 
@@ -110,51 +112,19 @@ class DirectoryAdministrationCli :
             val envcfg =
                 provider.config.environment(clientEnv) ?: throw CliktError("Default environment not configired: $env")
 
-            var clientApiURL = envcfg.apiURL
-            var clientAccessToken = provider.config.tokens?.get(clientEnv)?.accessToken
-            var clientHttpProxyURL = provider.config.httpProxy.proxyURL
+            val clientApiURL = envcfg.apiURL
+            val clientAccessToken = tokenStore.accessTokenFor(envcfg.apiURL)
+                ?: throw CliktError("You are not logged in. Use 'vzd-cli admin login $clientEnv'")
+            val clientHttpProxyURL = provider.config.httpProxy.proxyURL
             var clientHttpProxyEnabled = provider.config.httpProxy.enabled
 
-            dotenv.get("ADMIN_API_URL", null)?.let {
-                logger.error { "ADMIN_API_URL is deprecated, use admin config instead" }
-                clientApiURL = it
-            }
-            dotenv.get("HTTP_PROXY_URL", null)?.let {
-                logger.error { "HTTP_PROXY_URL is deprecated, use 'vzd-cli admin config' instead" }
-                clientHttpProxyURL = it
-                clientHttpProxyEnabled = true
-            }
             if (useProxy == true) {
                 clientHttpProxyEnabled = true
-            }
-            dotenv.get("ADMIN_ACCESS_TOKEN", null)?.let {
-                logger.error { "ADMIN_ACCESS_TOKEN is deprecated, use 'vzd-cli admin config' instead" }
-                clientAccessToken = it
-            }
-
-            if (clientAccessToken == null) {
-                dotenv.get("ADMIN_CLIENT_SECRET", null)?.let {
-                    logger.error { "ADMIN_CLIENT_SECRET is deprecated, use 'vzd-cli admin vault' instead" }
-                    val auth = ClientCredentialsAuthenticator(
-                        dotenv["ADMIN_AUTH_URL"] ?: throw UsageError("Environment variable ADMIN_AUTH_URL is not set"),
-                        dotenv.get("HTTP_PROXY_URL", null)
-                    )
-                    val authResponse = auth.authenticate(
-                        dotenv["ADMIN_CLIENT_ID"]
-                            ?: throw UsageError("Environment variable ADMIN_CLIENT_ID is not set"),
-                        dotenv["ADMIN_CLIENT_SECRET"]
-                    )
-                    clientAccessToken = authResponse.accessToken
-                }
-            }
-
-            if (clientAccessToken == null) {
-                throw CliktError("You are not logged in. Use 'vzd-cli admin -e $clientEnv login'")
             }
 
             Client {
                 apiURL = clientApiURL
-                accessToken = clientAccessToken!!
+                accessToken = clientAccessToken
                 if (clientHttpProxyEnabled) {
                     httpProxyURL = clientHttpProxyURL
                 }
@@ -175,20 +145,12 @@ class DirectoryAdministrationCli :
     init {
         subcommands(
             VaultCommand(), ConfigCommand(),
-            LoginCommand(), LoginCredCommand(), AuthenticateAdmin(),
+            LoginCommand(), LoginCredCommand(), TokenCommand(),
             Info(), ListCommand(), TemplateCommand(), AddBaseCommand(),
             LoadBaseCommand(), ModifyBaseCommand(), ModifyBaseAttrCommand(), DeleteCommand(),
             ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
-            CertInfoCommand(), DumpCommand(), CmdCommand(), QuickSearchCommand()
+            CertInfoCommand(), DumpCommand(), CmdCommand(), SearchCommand()
         )
-    }
-}
-
-class AuthenticateAdmin : CliktCommand(name = "auth", help = "Show current access token") {
-    private val context by requireObject<CommandContext>()
-
-    override fun run() = catching {
-        echo(context.client.accessToken)
     }
 }
 
@@ -197,10 +159,6 @@ class Info : CliktCommand(name = "info", help = "Show information about the API"
 
     override fun run() = catching {
         val info = runBlocking { context.client.getInfo() }
-        when (context.outputFormat) {
-            OutputFormat.JSON -> Output.printJson(info)
-            OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(info)
-            else -> throw UsageError("Info is not available for format: ${context.outputFormat}")
-        }
+        Output.printHuman(info)
     }
 }

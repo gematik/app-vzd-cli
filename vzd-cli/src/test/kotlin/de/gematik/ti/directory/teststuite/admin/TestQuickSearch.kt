@@ -20,7 +20,7 @@ class TestQuickSearch : FeatureSpec({
         scenario("Search by localityName") {
             runBlocking {
                 val result = client?.quickSearch("Berlin")
-                result?.size ?: 0 shouldBeGreaterThan  10
+                result?.size ?: 0 shouldBeGreaterThan 10
             }
         }
         scenario("Search by displayName and locationName") {
@@ -32,7 +32,7 @@ class TestQuickSearch : FeatureSpec({
         scenario("Search by postalCode") {
             runBlocking {
                 val result = client?.quickSearch("12526") ?: emptyList()
-                result.size ?: 0 shouldBeGreaterThan  1
+                result.size ?: 0 shouldBeGreaterThan 1
                 result.first().directoryEntryBase.postalCode shouldBe "12526"
             }
         }
@@ -50,10 +50,8 @@ class TestQuickSearch : FeatureSpec({
                 val result = client?.quickSearch("Bad Tölz St. Vincenz") ?: emptyList()
                 result.size shouldBeGreaterThan 0
                 result.first().directoryEntryBase.localityName shouldBe "Bad Tölz"
-                result.first().directoryEntryBase.displayName shouldContain  "St. Vincenz"
+                result.first().directoryEntryBase.displayName shouldContain "St. Vincenz"
             }
         }
-
     }
-
 })

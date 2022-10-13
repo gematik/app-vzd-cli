@@ -64,6 +64,8 @@ dependencies {
 
     implementation("org.ldaptive:ldaptive:2.1.1")
     implementation("me.tongfei:progressbar:0.9.3")
+    implementation("hu.vissy.plain-text-table:ptt-kotlin:1.1.7")
+    implementation("hu.vissy.plain-text-table:ptt-core:3.0.0")
 
     // implementation("com.nimbusds:nimbus-jose-jwt:9.23")
 
@@ -79,7 +81,7 @@ application {
 
 tasks.register<Zip>("customDist") {
     dependsOn("installShadowDist")
-    archiveBaseName.set("${project.name}")
+    archiveBaseName.set(project.name)
     destinationDirectory.set(layout.buildDirectory.dir("distributions"))
     into("${project.name}-${project.version}/commands") {
         from(layout.projectDirectory.dir("commands"))

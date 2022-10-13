@@ -4,10 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
-import com.github.ajalt.clikt.parameters.options.associate
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.pair
+import com.github.ajalt.clikt.parameters.options.*
 import de.gematik.ti.directory.admin.DirectoryEntry
 import kotlinx.coroutines.runBlocking
 import kotlin.io.path.Path
@@ -15,6 +12,14 @@ import kotlin.io.path.exists
 import kotlin.io.path.useLines
 
 class ListCommand : CliktCommand(name = "list", help = "List directory entries") {
+    private val outputFormat by option().switch(
+        "--human" to OutputFormat.HUMAN,
+        "--json" to OutputFormat.JSON,
+        "--yaml" to OutputFormat.YAML,
+        "--csv" to OutputFormat.CSV,
+        "--table" to OutputFormat.TABLE
+    )
+
     private val paramFile: Pair<String, String>? by option(
         "-f",
         "--param-file",
@@ -32,6 +37,7 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
     private val sync by option(help = "use Sync mode").flag()
 
     override fun run() = catching {
+        context.outputFormat = outputFormat ?: context.outputFormat
         val params = parameterOptions.toMap() + customParams
         paramFile?.let { paramFile ->
             val file = Path(paramFile.second)

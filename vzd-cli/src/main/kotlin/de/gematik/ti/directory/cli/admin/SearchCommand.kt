@@ -8,7 +8,7 @@ import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.admin.quickSearch
 import kotlinx.coroutines.runBlocking
 
-class QuickSearchCommand : CliktCommand(name = "search", help = "Search for directory entries") {
+class SearchCommand : CliktCommand(name = "search", help = "Search for directory entries") {
     private val arguments by argument().multiple()
     private val context by requireObject<CommandContext>()
 
@@ -18,12 +18,6 @@ class QuickSearchCommand : CliktCommand(name = "search", help = "Search for dire
             context.client.quickSearch(query)
         }
 
-        if (result.size > 3) {
-            DirectoryEntryOutputMapping[OutputFormat.SHORT]?.invoke(mapOf("query" to query), result)
-        } else if (result.isNotEmpty()) {
-            DirectoryEntryOutputMapping[OutputFormat.HUMAN]?.invoke(mapOf("query" to query), result)
-        }
-
+        DirectoryEntryOutputMapping[OutputFormat.TABLE]?.invoke(mapOf("query" to query), result)
     }
-
 }

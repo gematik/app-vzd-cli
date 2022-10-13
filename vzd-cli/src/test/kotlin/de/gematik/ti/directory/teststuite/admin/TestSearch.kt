@@ -1,28 +1,16 @@
 package de.gematik.ti.directory.teststuite.admin
 
 import de.gematik.ti.directory.admin.Client
-import io.kotest.common.runBlocking
 import io.kotest.core.spec.style.FeatureSpec
-import opennlp.tools.namefind.NameFinderME
-import opennlp.tools.namefind.NameSampleDataStream
-import opennlp.tools.namefind.TokenNameFinderFactory
-import opennlp.tools.namefind.TokenNameFinderModel
-import opennlp.tools.tokenize.TokenizerME
-import opennlp.tools.tokenize.TokenizerModel
-import opennlp.tools.util.CollectionObjectStream
-import opennlp.tools.util.TrainingParameters
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 
 class TestSearch : FeatureSpec({
     var client: Client? = null
 
-    //val GIVEN_NAMES = File("ml/data/given_names.csv").readLines()
-    //val FAMILYNAMES = File("ml/data/family_names.csv").readLines()
+    // val GIVEN_NAMES = File("ml/data/given_names.csv").readLines()
+    // val FAMILYNAMES = File("ml/data/family_names.csv").readLines()
 
     beforeSpec {
-        //client = createClient()
+        // client = createClient()
     }
 /*
     feature("Train the models") {
