@@ -6,7 +6,6 @@ import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
-import de.gematik.ti.directory.admin.DistinguishedName
 import de.gematik.ti.directory.admin.UpdateBaseDirectoryEntry
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
@@ -39,7 +38,6 @@ class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify sing
         } ?: run { throw CliktError("Unable to load base entry from file") }
 
         val dn = baseFromFile.dn ?: run {
-            DistinguishedName(uid = "123")
             val telematikID = baseFromFile.telematikID
             runBlocking { context.client.readDirectoryEntry(mapOf("telematikID" to telematikID)) }?.first()?.directoryEntryBase?.dn
                 ?: throw CliktError("Entry with telematikID=$telematikID not found")

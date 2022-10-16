@@ -149,7 +149,7 @@ class DirectoryAdministrationCli :
             Info(), ListCommand(), TemplateCommand(), AddBaseCommand(),
             LoadBaseCommand(), ModifyBaseCommand(), ModifyBaseAttrCommand(), DeleteCommand(),
             ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
-            CertInfoCommand(), DumpCommand(), CmdCommand(), SearchCommand()
+            CertInfoCommand(), DumpCommand(), CmdCommand(), SearchCommand(), EditBaseCommand()
         )
     }
 }
