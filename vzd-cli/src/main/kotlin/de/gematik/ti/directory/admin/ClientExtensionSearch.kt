@@ -131,7 +131,7 @@ suspend fun Client.quickSearch(query: String): List<DirectoryEntry> {
 
     val entries = mutableListOf<DirectoryEntry>()
 
-    val result = readDirectoryEntryV2(searchParams + Pair("baseEntryOnly", "true"), 25)
+    val result = readDirectoryEntryV2(searchParams + Pair("baseEntryOnly", "true"), 100)
     entries.addAll(result?.directoryEntries ?: emptyList())
 
     return entries

@@ -79,18 +79,28 @@ val DirectoryEntryOutputMapping = mapOf(
     OutputFormat.TABLE to { _: Map<String, String>, value: List<DirectoryEntry>? ->
         val formatter = tableFormatter<DirectoryEntry> {
 
-            stateless<String>("TelematikID") {
+            labeled<String>("TelematikID", "Gesamt") {
                 extractor { directoryEntry ->
                     directoryEntry.directoryEntryBase.telematikID
                 }
             }
 
-            stateless<String>("Name") {
-                extractor { directoryEntry ->
+            class State(var count: Int = 0)
+            stateful<String, State>("Name") {
+                initState { State() }
+                extractor { directoryEntry, state ->
+                    state.count += 1
                     directoryEntry.directoryEntryBase.displayName
                 }
                 cellFormatter {
                     maxWidth = 24
+                }
+                aggregator { _, state ->
+                    if (state.count > 99) {
+                        "99+"
+                    } else {
+                        state.count.toString()
+                    }
                 }
             }
 
@@ -108,6 +118,8 @@ val DirectoryEntryOutputMapping = mapOf(
                     maxWidth = 40
                 }
             }
+
+            showAggregation = true
         }
         println(formatter.apply(value))
     }

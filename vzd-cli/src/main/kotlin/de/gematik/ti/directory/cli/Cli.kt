@@ -7,20 +7,16 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.counted
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
-import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.cli.admin.DirectoryAdministrationCli
 import de.gematik.ti.directory.cli.gui.GuiCommand
 import de.gematik.ti.directory.cli.ldif.LdifCommand
 import de.gematik.ti.directory.cli.pers.PersCommand
-import io.github.cdimascio.dotenv.dotenv
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import org.slf4j.LoggerFactory
-import kotlin.io.path.Path
-import kotlin.io.path.absolute
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.name
+import java.nio.file.attribute.PosixFilePermission
+import kotlin.io.path.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -29,11 +25,21 @@ val YamlPretty = Yaml { encodeDefaultValues = false }
 
 class Cli : CliktCommand(name = "vzd-cli") {
     private val verbosity by option("-v", help = "Display log, use -vv for even more details").counted()
-    private val env by option(help = "specify env file", metavar = "FILENAME").path(canBeDir = false)
 
     init {
         versionOption(BuildConfig.APP_VERSION)
         subcommands(DirectoryAdministrationCli(), LdifCommand(), PersCommand(), GuiCommand())
+        val configDir = Path(System.getProperty("user.home"), ".telematik")
+        if (!configDir.toFile().exists()) {
+            configDir.absolute().toFile().mkdirs()
+        }
+        configDir.setPosixFilePermissions(
+            setOf(
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OWNER_EXECUTE
+            )
+        )
     }
 
     override fun run() {
@@ -44,18 +50,6 @@ class Cli : CliktCommand(name = "vzd-cli") {
             root.level = Level.DEBUG
         } else {
             root.level = Level.ERROR
-        }
-
-        currentContext.obj = dotenv {
-            if (env != null) {
-                val path = Path(env.toString().replaceFirst("~", System.getProperty("user.home"))).absolute()
-                logger.debug { "Loading environment from ${path.absolutePathString()}" }
-                directory = path.parent.absolutePathString()
-                filename = path.fileName.name
-                ignoreIfMissing = false
-            } else {
-                ignoreIfMissing = true
-            }
         }
     }
 }

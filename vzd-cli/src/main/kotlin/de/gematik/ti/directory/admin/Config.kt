@@ -66,13 +66,8 @@ data class Config(
     var currentEnvironment: String?,
     var httpProxy: HttpProxyConfig
 ) {
-    fun environment(name: String? = null) = environments.get(name ?: currentEnvironment)
+    fun environment(name: String? = null) = environments.get(name ?: currentEnvironment) ?: throw ConfigException("Unknown environment: $name")
 }
-
-@Serializable
-data class TokenConfig(
-    var accessToken: String?
-)
 
 @Serializable
 data class EnvironmentConfig(
@@ -85,3 +80,5 @@ data class HttpProxyConfig(
     var proxyURL: String,
     var enabled: Boolean = true
 )
+
+class ConfigException(message: String, cause: Throwable? = null) : Exception(message, cause)

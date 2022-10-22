@@ -32,7 +32,7 @@ class TestQuickSearch : FeatureSpec({
         scenario("Search by postalCode") {
             runBlocking {
                 val result = client?.quickSearch("12526") ?: emptyList()
-                result.size ?: 0 shouldBeGreaterThan 1
+                result.size shouldBeGreaterThan 1
                 result.first().directoryEntryBase.postalCode shouldBe "12526"
             }
         }

@@ -30,7 +30,7 @@ private val JSON = Json {
     prettyPrint = true
 }
 
-class VZDResponseException(response: HttpResponse, message: String) : ResponseException(response, message) {
+class AdminResponseException(response: HttpResponse, message: String) : ResponseException(response, message) {
 
     val details: String
         get() {
@@ -42,7 +42,7 @@ class VZDResponseException(response: HttpResponse, message: String) : ResponseEx
             }
 
             val body: String? = if (reason == null) runBlocking { response.body() } else null
-            if (body != null && body.isNotEmpty()) {
+            if (!body.isNullOrEmpty()) {
                 details += " Body: $body"
             }
 
@@ -124,7 +124,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         }
 
         if (response.status != HttpStatusCode.Created) {
-            throw VZDResponseException(response, "Unable to create directory entry: ${response.status.description} ${response.status.description}")
+            throw AdminResponseException(response, "Unable to create directory entry: ${response.status.description} ${response.status.description}")
         }
 
         return response.body()
@@ -137,7 +137,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         val response = http.delete("/DirectoryEntries/$uid") {}
 
         if (response.status != HttpStatusCode.OK) {
-            throw VZDResponseException(response, "Unable to delete directory entry")
+            throw AdminResponseException(response, "Unable to delete directory entry")
         }
 
         return response.body()
@@ -180,7 +180,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         }
 
         if (response.status != HttpStatusCode.OK) {
-            throw VZDResponseException(response, "Unable to get entries")
+            throw AdminResponseException(response, "Unable to get entries")
         }
 
         return response.body()
@@ -222,7 +222,7 @@ class Client(block: Configuration.() -> Unit = {}) {
 
             defaultRequest {
                 url(config.apiURL)
-                headers.set("Accept", "application/json")
+                headers["Accept"] = "application/json"
             }
         }
         httpClient.prepareGet(path) {
@@ -231,7 +231,7 @@ class Client(block: Configuration.() -> Unit = {}) {
             }
         }.execute { response ->
             if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.NotFound) {
-                throw VZDResponseException(response, "Unable to get entries")
+                throw AdminResponseException(response, "Unable to get entries")
             }
             val channel: ByteReadChannel = response.body()
             jsonArraySequence(InputStreamReader(channel.toInputStream())).forEach {
@@ -241,8 +241,8 @@ class Client(block: Configuration.() -> Unit = {}) {
                     val json: JsonObject = JSON.decodeFromString(it)
                     logger.error {
                         "Unable to process Entry with uid=${
-                        json.get("DirectoryEntryBase")?.jsonObject?.get("dn")?.jsonObject?.get("uid")
-                        }, telematikID=${json.get("DirectoryEntryBase")?.jsonObject?.get("telematikID")}"
+                        json["DirectoryEntryBase"]?.jsonObject?.get("dn")?.jsonObject?.get("uid")
+                        }, telematikID=${json["DirectoryEntryBase"]?.jsonObject?.get("telematikID")}"
                     }
                 }
             }
@@ -283,7 +283,7 @@ class Client(block: Configuration.() -> Unit = {}) {
             }
         }
         if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.NotFound) {
-            throw VZDResponseException(response, "Unable to get entries")
+            throw AdminResponseException(response, "Unable to get entries")
         } else if (response.status == HttpStatusCode.NotFound) {
             return null
         }
@@ -297,7 +297,7 @@ class Client(block: Configuration.() -> Unit = {}) {
     suspend fun getInfo(): InfoObject {
         val response = http.get("/")
         if (response.status != HttpStatusCode.OK) {
-            throw VZDResponseException(response, "Unable to get info}")
+            throw AdminResponseException(response, "Unable to get info}")
         }
 
         return response.body()
@@ -313,7 +313,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         }
 
         if (response.status != HttpStatusCode.OK) {
-            throw VZDResponseException(response, "Unable to modify entry")
+            throw AdminResponseException(response, "Unable to modify entry")
         }
 
         return response.body()
@@ -329,7 +329,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         }
 
         if (response.status != HttpStatusCode.Created) {
-            throw VZDResponseException(response, "Unable to modify entry")
+            throw AdminResponseException(response, "Unable to modify entry")
         }
 
         return response.body()
@@ -360,7 +360,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         val response = http.delete("/DirectoryEntries/$uid/Certificates/$certificateEntryID")
 
         if (response.status != HttpStatusCode.OK) {
-            throw VZDResponseException(response, "Unable to delete entry $certificateEntryID")
+            throw AdminResponseException(response, "Unable to delete entry $certificateEntryID")
         }
     }
 }

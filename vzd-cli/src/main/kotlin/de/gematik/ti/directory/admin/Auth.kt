@@ -73,7 +73,7 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
             )
 
             if (response.status != HttpStatusCode.OK) {
-                throw VZDResponseException(response, "Authentication failed: ${response.body<String>()}")
+                throw AdminResponseException(response, "Authentication failed: ${response.body<String>()}")
             }
 
             response.body()

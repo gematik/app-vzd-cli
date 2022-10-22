@@ -60,7 +60,7 @@ class VaultListCommand : CliktCommand(name = "list", help = "List configured OAu
         echo("Env ClientID             Secret")
         echo("=== ==================== ======")
         vault.list().forEach {
-            echo("%-3s %-20s ******".format(it.environment, it.clientID))
+            echo("%-3s %-20s ******".format(it.variant, it.name))
         }
     }
 }
@@ -93,8 +93,8 @@ class VaultExportCommand : CliktCommand(name = "export", help = "Export Vault to
         val vault = openOrCreateVault(password)
 
         vault.list().forEach {
-            logger.info { "Exporting ${it.environment}:${it.clientID}" }
-            transferVault.store(it.environment, it.clientID, it.secret)
+            logger.info { "Exporting ${it.variant}:${it.name}" }
+            transferVault.store(it.variant, it.name, it.secret)
         }
     }
 }
@@ -111,8 +111,8 @@ class VaultImportCommand : CliktCommand(name = "import", help = "Import credenti
         val vault = openOrCreateVault(password)
 
         transferVault.list().forEach {
-            logger.debug { "Import ${it.environment}:${it.clientID}" }
-            vault.store(it.environment, it.clientID, it.secret)
+            logger.debug { "Import ${it.variant}:${it.name}" }
+            vault.store(it.variant, it.name, it.secret)
         }
     }
 }

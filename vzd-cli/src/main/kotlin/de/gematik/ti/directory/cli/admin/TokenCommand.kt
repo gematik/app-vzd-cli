@@ -14,8 +14,8 @@ class TokenCommand : CliktCommand(name = "token", help = "Show access token") {
     override fun run() = catching {
         val config = FileConfigProvider().config
 
-        val envConfig = config.environment(env) ?: throw CliktError("Environment not configured")
+        val envConfig = config.environment(env)
 
-        echo(TokenStore().accessTokenFor(envConfig.apiURL) ?: throw CliktError("No token available for environment: ${env ?: config.currentEnvironment}"))
+        echo(TokenStore().accessTokenFor(envConfig.apiURL)?.accessToken ?: throw CliktError("No token available for environment: ${env ?: config.currentEnvironment}"))
     }
 }

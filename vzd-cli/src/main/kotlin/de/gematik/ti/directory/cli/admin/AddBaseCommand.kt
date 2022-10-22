@@ -11,9 +11,9 @@ import com.github.ajalt.clikt.parameters.options.deprecated
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.CreateDirectoryEntry
-import de.gematik.ti.directory.admin.VZDResponseException
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
@@ -101,7 +101,7 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
 
             val query = mapOf("uid" to dn.uid)
             runBlocking { context.client.readDirectoryEntry(query) }
-        } catch (e: VZDResponseException) {
+        } catch (e: AdminResponseException) {
             if (!ignore || e.response.status != HttpStatusCode.Conflict) {
                 throw e
             }

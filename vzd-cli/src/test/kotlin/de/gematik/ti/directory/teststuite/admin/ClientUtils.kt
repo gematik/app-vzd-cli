@@ -11,7 +11,7 @@ fun createClient(): Client {
     root.level = Level.DEBUG
 
     val provider = FileConfigProvider()
-    val tucfg = provider.config.environment("tu") ?: throw IllegalStateException()
+    val tucfg = provider.config.environment("tu")
 
     return Client {
         apiURL = tucfg.apiURL

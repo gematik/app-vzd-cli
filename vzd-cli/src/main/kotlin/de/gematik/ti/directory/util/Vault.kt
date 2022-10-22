@@ -10,7 +10,7 @@ import kotlin.io.path.*
 
 private val logger = KotlinLogging.logger {}
 
-data class Secret(var environment: String, var clientID: String, var secret: String)
+data class Secret(var variant: String, var name: String, var secret: String)
 
 private const val DEFAULT_SERVICE_NAME = "urn:gematik:directory:admin"
 

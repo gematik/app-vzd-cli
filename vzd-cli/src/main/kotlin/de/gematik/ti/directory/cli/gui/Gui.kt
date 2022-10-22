@@ -5,10 +5,7 @@ import com.github.ajalt.clikt.output.TermUi
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
-import de.gematik.ti.directory.admin.Client
-import de.gematik.ti.directory.admin.FileConfigProvider
-import de.gematik.ti.directory.admin.quickSearch
-import de.gematik.ti.directory.util.TokenStore
+import de.gematik.ti.directory.bff.directoryModule
 import io.ktor.http.*
 import io.ktor.http.parsing.*
 import io.ktor.resources.*
@@ -32,7 +29,6 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
 
     override fun run() {
         embeddedServer(Netty, port = port, host = "127.0.0.1") {
-            install(Resources)
             install(ContentNegotiation) {
                 json(
                     Json {
@@ -41,14 +37,14 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
                     }
                 )
             }
-            configureSearchRouting()
+            install(Resources)
 
-            install(StatusPages) {
-                exception<ParseException> { call, cause ->
-                    call.respondText(text = "401: Unauthorized (token expired)", status = HttpStatusCode.Unauthorized)
-                }
-            }
-            environment.monitor.subscribe(ApplicationStarted) { application ->
+            directoryModule()
+
+            // configureSearchRouting()
+
+
+            environment.monitor.subscribe(ApplicationStarted) {
                 TermUi.echo("Starting server at: http://127.0.0.1:$port")
                 val url = "http://127.0.0.1:$port/api/admin/config"
                 val os = System.getProperty("os.name").lowercase()
@@ -58,9 +54,9 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
                         try {
                             URL(url).openConnection()
                             if (os.contains("win")) {
-                                Runtime.getRuntime().exec("start $url")
+                                // Runtime.getRuntime().exec("start $url")
                             } else if (os.contains("mac")) {
-                                Runtime.getRuntime().exec("open $url")
+                                // Runtime.getRuntime().exec("open $url")
                             } else {
                                 echo("Open the following URL in your web browser: $url")
                             }
@@ -75,30 +71,12 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
     }
 }
 
-@Resource("/{env}/search")
-@Serializable
-data class SearchResource(val env: String, val q: String)
 
-@Resource("/{env}/DirectoryEntry/{telematikID}")
-@Serializable
-data class DirectoryEntryResource(val env: String, val telematikID: String)
 
-fun downstreamClient(env: String): Client {
-    val config = FileConfigProvider().config
-    val tokenStore = TokenStore()
-    val envConfig = config.environment(env) ?: throw Exception("Unknown environment: $env")
-    val client = Client() {
-        apiURL = envConfig.apiURL
-        accessToken = tokenStore.accessTokenFor(envConfig.apiURL) ?: throw Exception("Token : $env")
-        if (config.httpProxy.enabled) {
-            httpProxyURL = config.httpProxy.proxyURL
-        }
-    }
-    return client
-}
+/*
 
 fun Application.configureSearchRouting() {
-    routing { }() {
+    routing() {
         route("api") {
             route("admin") {
                 get("config") {
@@ -122,3 +100,4 @@ fun Application.configureSearchRouting() {
         }
     }
 }
+ */

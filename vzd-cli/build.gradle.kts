@@ -1,3 +1,4 @@
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 version = "2.1.0a1"
@@ -39,7 +40,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.github.microutils:kotlin-logging:2.1.21")
     implementation("ch.qos.logback:logback-classic:1.2.9")
-    implementation("io.github.cdimascio:dotenv-kotlin:6.2.2")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
@@ -55,6 +55,8 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-resources:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-server-sessions:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth:$ktorVersion")
 
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.6.0")
 
@@ -66,8 +68,6 @@ dependencies {
     implementation("me.tongfei:progressbar:0.9.3")
     implementation("hu.vissy.plain-text-table:ptt-kotlin:1.1.7")
     implementation("hu.vissy.plain-text-table:ptt-core:3.0.0")
-
-    // implementation("com.nimbusds:nimbus-jose-jwt:9.23")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
@@ -130,4 +130,12 @@ publishing {
             from(components["java"])
         }
     }
+}
+
+tasks.register<JavaExec>("serve") {
+    mainClass.set("de.gematik.ti.directory.bff.TestServerKt")
+    // mainClass.set("de.gematik.ti.directory.cli.CliKt")
+    // args = listOf("gui")
+    classpath = sourceSets["test"].runtimeClasspath
+    jvmArgs = listOf("-Dio.ktor.development=true")
 }

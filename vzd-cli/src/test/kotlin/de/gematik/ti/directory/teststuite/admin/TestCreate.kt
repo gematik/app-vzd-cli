@@ -39,7 +39,7 @@ class TestCreate : FeatureSpec({
             val entry = CreateDirectoryEntry()
             entry.directoryEntryBase = BaseDirectoryEntry("1-" + TestCreate::class.qualifiedName!!)
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
-            shouldThrow<VZDResponseException> {
+            shouldThrow<AdminResponseException> {
                 client?.addDirectoryEntry(entry)
             }
         }

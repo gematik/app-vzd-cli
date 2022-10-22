@@ -8,8 +8,8 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.admin.UserCertificate
-import de.gematik.ti.directory.admin.VZDResponseException
 import de.gematik.ti.directory.util.CertificateDataDER
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
@@ -46,7 +46,7 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
                             it.directoryEntryBase.dn?.uid!!,
                             userCertificate
                         )
-                    } catch (e: VZDResponseException) {
+                    } catch (e: AdminResponseException) {
                         if (!ignore || e.response.status != HttpStatusCode.Conflict) {
                             throw e
                         }

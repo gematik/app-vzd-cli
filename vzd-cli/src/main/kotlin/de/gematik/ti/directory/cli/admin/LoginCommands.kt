@@ -2,64 +2,39 @@ package de.gematik.ti.directory.cli.admin
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
+import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.output.TermUi
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
-import com.github.ajalt.clikt.parameters.types.choice
-import de.gematik.ti.directory.admin.ClientCredentialsAuthenticator
-import de.gematik.ti.directory.admin.FileConfigProvider
-import de.gematik.ti.directory.util.TokenStore
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
+import com.github.ajalt.clikt.parameters.types.enum
+import de.gematik.ti.directory.admin.AdminEnvironment
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 import java.util.*
 
-private fun doLogin(env: String, overrideProxy: Boolean?, clientID: String, clientSecret: String) {
-    val provider = FileConfigProvider()
-    val envcfg = provider.config.environment(env) ?: throw CliktError("Environment is not configured: $env")
-    provider.config.currentEnvironment = env
+private fun doLogin(context: CommandContext, env: AdminEnvironment, overrideProxy: Boolean?, clientID: String, clientSecret: String) {
 
-    provider.config.httpProxy.enabled = when (overrideProxy) {
-        true -> {
-            true
-        }
-        false -> {
-            false
-        }
-        else -> {
-            provider.config.httpProxy.enabled
-        }
-    }
+    context.adminAPI.config.currentEnvironment = env.title
+    context.adminAPI.config.httpProxy.enabled = overrideProxy ?: context.adminAPI.config.httpProxy.enabled
+    context.adminAPI.updateConfig()
 
-    provider.save()
-
-    val auth = ClientCredentialsAuthenticator(
-        envcfg.authURL,
-        if (provider.config.httpProxy.enabled) provider.config.httpProxy.proxyURL else null
-    )
-    val authResponse = auth.authenticate(clientID, clientSecret)
-
-    val tokenStore = TokenStore()
-    tokenStore.addAccessToken(envcfg.apiURL, authResponse.accessToken)
-    val tokenParts = authResponse.accessToken.split(".")
-    val tokenBody = String(Base64.getUrlDecoder().decode(tokenParts[1]), Charsets.UTF_8)
-    val claims: JsonObject = Json.decodeFromString(tokenBody)
+    val claims = context.adminAPI.login(env, clientID, clientSecret)
 
     TermUi.echo("Login successful. Environment set to: $env")
 
-    claims.get("exp")?.jsonPrimitive?.int?.let {
+    claims["exp"]?.jsonPrimitive?.int?.let {
         val expDate = Date(it.toLong() * 1000)
         TermUi.echo("Token valid until $expDate")
     }
 }
 
 class LoginCommand : CliktCommand(name = "login", help = "Login to OAuth2 Server and store token(s)") {
-    private val env by argument().choice("ru", "tu", "pu")
+    private val context by requireObject<CommandContext>()
+    private val env by argument().enum<AdminEnvironment>(ignoreCase = true, key = { it.title })
     private val overrideProxy: Boolean? by option(
         "-x",
         "--proxy-on",
@@ -72,13 +47,14 @@ class LoginCommand : CliktCommand(name = "login", help = "Login to OAuth2 Server
 
     override fun run() = catching {
         val vault = vaultProvider.open(password)
-        val secret = vault.get(env) ?: throw CliktError("Secret for env '$env' not found in Vault:")
-        doLogin(env, overrideProxy, secret.clientID, secret.secret)
+        val secret = vault.get(env.title) ?: throw CliktError("Secret for env '$env' not found in Vault")
+        doLogin(context, env, overrideProxy, secret.name, secret.secret)
     }
 }
 
 class LoginCredCommand : CliktCommand(name = "login-cred", help = "Login using the client credentials") {
-    private val env by argument().choice("ru", "tu", "pu")
+    private val context by requireObject<CommandContext>()
+    private val env by argument().enum<AdminEnvironment>(ignoreCase = true, key = { it.title })
     private val overrideProxy: Boolean? by option(
         "-x",
         "--proxy-on",
@@ -89,6 +65,6 @@ class LoginCredCommand : CliktCommand(name = "login-cred", help = "Login using t
     private val clientSecret by option("--secret", "-s", help = "OAuth2 client secret", envvar = "CLIENT_SECRET").required()
 
     override fun run() = catching {
-        doLogin(env, overrideProxy, clientId, clientSecret)
+        doLogin(context, env, overrideProxy, clientId, clientSecret)
     }
 }

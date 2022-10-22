@@ -5,10 +5,9 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.admin.compat.CmdCommand
+import de.gematik.ti.directory.util.GenericDirectoryExceptionException
 import de.gematik.ti.directory.util.PKIClient
-import de.gematik.ti.directory.util.TokenStore
 import de.gematik.ti.directory.util.VaultException
-import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.client.network.sockets.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
@@ -22,7 +21,9 @@ private val logger = KotlinLogging.logger {}
 fun catching(throwingBlock: () -> Unit = {}) {
     try {
         throwingBlock()
-    } catch (e: VZDResponseException) {
+    } catch (e: GenericDirectoryExceptionException) {
+        throw CliktError(e.message)
+    } catch (e: AdminResponseException) {
         throw CliktError(e.details)
     } catch (e: SerializationException) {
         throw CliktError(e.message)
@@ -47,27 +48,27 @@ fun catching(throwingBlock: () -> Unit = {}) {
 }
 
 class CommandContext(
-    private val clientDelegate: () -> Client,
-    private val pkiClientDelegate: () -> PKIClient,
+    private val clientDelegate: CommandContext.() -> Client,
+    private val pkiClientDelegate: CommandContext.() -> PKIClient,
     var outputFormat: OutputFormat,
-    val env: String,
-    val useProxy: Boolean,
+    val env: AdminEnvironment,
     val enableOcsp: Boolean,
     var firstCommand: Boolean = true
 ) {
 
+    val adminAPI = AdminAPI()
+
     val client by lazy {
-        clientDelegate.invoke()
+        clientDelegate.invoke(this)
     }
 
     val pkiClient by lazy {
-        pkiClientDelegate.invoke()
+        pkiClientDelegate.invoke(this)
     }
 }
 
 class DirectoryAdministrationCli :
     CliktCommand(name = "admin", help = """CLI for DirectoryAdministration API""".trimMargin()) {
-    private val dotenv by requireObject<Dotenv>()
     private val outputFormat by option().switch(
         "--human" to OutputFormat.HUMAN,
         "--json" to OutputFormat.JSON,
@@ -103,35 +104,17 @@ class DirectoryAdministrationCli :
 
     override fun run() = catching {
         val provider = FileConfigProvider()
-        val tokenStore = TokenStore()
-        val clientEnv =
+        val clientEnvStr =
             env ?: provider.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
 
-        val clientDelegate: () -> Client = {
+        val clientEnv = AdminEnvironment.valueOf(clientEnvStr.uppercase())
+
+        val clientDelegate: CommandContext.() -> Client = {
             logger.info { "Using environment: $clientEnv" }
-            val envcfg =
-                provider.config.environment(clientEnv) ?: throw CliktError("Default environment not configired: $env")
-
-            val clientApiURL = envcfg.apiURL
-            val clientAccessToken = tokenStore.accessTokenFor(envcfg.apiURL)
-                ?: throw CliktError("You are not logged in. Use 'vzd-cli admin login $clientEnv'")
-            val clientHttpProxyURL = provider.config.httpProxy.proxyURL
-            var clientHttpProxyEnabled = provider.config.httpProxy.enabled
-
-            if (useProxy == true) {
-                clientHttpProxyEnabled = true
-            }
-
-            Client {
-                apiURL = clientApiURL
-                accessToken = clientAccessToken
-                if (clientHttpProxyEnabled) {
-                    httpProxyURL = clientHttpProxyURL
-                }
-            }
+            adminAPI.createClient(clientEnv)
         }
 
-        val pkiClientDelegate: () -> PKIClient = {
+        val pkiClientDelegate: CommandContext.() -> PKIClient = {
             PKIClient {
                 if (provider.config.httpProxy.enabled || useProxy == true) {
                     httpProxyURL = provider.config.httpProxy.proxyURL
@@ -139,7 +122,7 @@ class DirectoryAdministrationCli :
             }
         }
 
-        currentContext.obj = CommandContext(clientDelegate, pkiClientDelegate, outputFormat, clientEnv, useProxy == true, enableOcsp)
+        currentContext.obj = CommandContext(clientDelegate, pkiClientDelegate, outputFormat, clientEnv, enableOcsp)
     }
 
     init {
