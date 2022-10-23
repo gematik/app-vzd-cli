@@ -36,7 +36,6 @@ fun Application.directoryModule() {
     routing {
         route("api") {
             vaultRoute()
-            statusRoute()
             adminRoutes()
         }
     }

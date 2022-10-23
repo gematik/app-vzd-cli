@@ -22,7 +22,7 @@ data class AdminEnvironmentStatus(
 )
 
 @Serializable
-data class AdminInfo(
+data class AdminStatus(
     val config: Config,
     val environmentStatus: List<AdminEnvironmentStatus>
 )
@@ -55,7 +55,7 @@ class AdminAPI {
 
     val config by lazy { loadConfig() }
 
-    suspend fun info(includeBackendInfo: Boolean = false): AdminInfo {
+    suspend fun status(includeBackendInfo: Boolean = false): AdminStatus {
         // force reload from file in case smth changed in between the requests
         val tokenStore = TokenStore()
         val config = loadConfig()
@@ -77,7 +77,7 @@ class AdminAPI {
             )
 
         }
-        return AdminInfo(
+        return AdminStatus(
             config,
             envInfoList
         )

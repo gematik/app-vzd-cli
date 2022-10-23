@@ -190,7 +190,7 @@ data class AdmissionStatementInfo(
 )
 
 /**
- * Textual information about the C509 Certificate
+ * Textual information about the X509 Certificate
  */
 @Serializable
 data class CertificateInfo(
