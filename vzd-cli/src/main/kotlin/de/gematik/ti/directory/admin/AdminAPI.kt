@@ -42,15 +42,13 @@ class AdminAPI() {
         return client
     }
 
-    fun loadConfig() = FileConfigProvider().config
-    fun saveConfig(config: Config) {
+    private fun loadConfig() = FileConfigProvider().config
+
+    fun updateConfig() {
         val configProvider = FileConfigProvider()
         configProvider.config = config
         configProvider.save()
         logger.info { "Configuration updated" }
-    }
-    fun updateConfig() {
-        saveConfig(config)
     }
 
     val config by lazy { loadConfig() }
