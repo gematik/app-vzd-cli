@@ -29,7 +29,6 @@ class Admin {
         @Resource("entry/{telematikID}")
         @Serializable
         data class Entry(val parent: Env, val telematikID: String)
-
     }
 }
 

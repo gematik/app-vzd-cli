@@ -1,0 +1,18 @@
+<ibm-modal
+  [open]="open"
+  (overlaySelected)="closeModal()">
+  <ibm-modal-header (closeSelect)="closeModal()">Token hinzufügen</ibm-modal-header>
+  <section class="bx--modal-content">
+    <ibm-label>
+      Token
+      <input
+        ibmText
+        [(ngModel)]="token"
+      >
+    </ibm-label>
+  </section>
+  <ibm-modal-footer>
+    <button class="bx--btn bx--btn--secondary" (click)="closeModal()">Abbrechen</button>
+    <button class="bx--btn bx--btn--primary" modal-primary-focus (click)="addToken()">OK</button>
+  </ibm-modal-footer>
+</ibm-modal>

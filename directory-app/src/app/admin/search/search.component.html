@@ -1,0 +1,53 @@
+<div ibmRow>
+  <div ibmCol [columnNumbers]="{'lg': 16}">
+    <ibm-breadcrumb>
+      <ibm-breadcrumb-item>
+        <a [routerLink]="['../search']">Suche</a>
+      </ibm-breadcrumb-item>
+    </ibm-breadcrumb>
+    
+  </div>
+</div>
+<div ibmRow>
+  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+  <div ibmCol [columnNumbers]="{'lg': 8}">
+    <div ibmRow>
+      <div ibmCol [columnNumbers]="{'lg': 16}">
+        <h1 class="SearchHeadline">Suchen</h1>
+        <h2 class="SearchSubheadline">Praxis-, Apotheken- und Personensuche für das Gesundheitssystem</h2>
+      </div>
+    </div>
+    <div ibmRow>
+        <ibm-search 
+          [(ngModel)]="queryString"
+          class="SearchField" 
+          [size]="'xl'" 
+          ibmCol 
+          [columnNumbers]="{'lg': 12}"
+          (search)="onSearch()"
+          placeholder="Name, Ort, PLZ oder TelematikID">
+        </ibm-search>
+        <button
+          (click)="onSearch()"
+          ibmCol 
+          [columnNumbers]="{'lg': 4}" 
+          [ibmButton]="'primary'"
+          class="SearchButton"
+        >Suchen</button>
+    </div>
+  </div>
+  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+</div>
+
+
+
+<!--
+<div class="SearchFrame">
+  <div class="SearchHeadline">Suchen</div>
+  <div class="SearchSubheadline">Praxis-, Apotheken- und Personensuche für das Gesundheitssystem</div>
+  <ibm-label class="SearchField">
+    <input ibmText>
+  </ibm-label>
+  <button class="SearchButton" [ibmButton]="'primary'" >Suchen</button>
+</div>
+-->

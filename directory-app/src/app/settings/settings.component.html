@@ -1,0 +1,57 @@
+<div ibmRow>
+  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+  <div ibmCol [columnNumbers]="{'lg': 8}">
+    <div ibmRow>
+      <div ibmCol [columnNumbers]="{'lg': 16}">
+        <h1 class="Headline">Einstellungen</h1>
+        <h2 class="Info"></h2>
+      </div>
+    </div>
+    <div>
+      <button 
+        [ibmButton]="'tertiary'"
+        (click)="onAddToken()"
+      >
+        <svg class="bx--btn__icon" ibmIcon="add" size="16"></svg>
+        <span class="bx--assistive-text">Icon description</span>
+        Token hinzufügen
+      </button>
+        &nbsp;
+      <button
+        [ibmButton]="'tertiary'"
+      >
+        <svg class="bx--btn__icon" ibmIcon="settings" size="16"></svg>
+        Tresor öffnen
+      </button>
+    </div>
+
+    <div class="TilesContainer">
+      <ibm-tile>
+        <h2>Admin API</h2>
+        <div ibmRow>
+          <svg ibmIcon="error--filled"></svg> Produktiv
+        </div>
+        <div ibmRow>
+            <svg ibmIcon="warning--filled"></svg> Referenz
+        </div>
+        <div ibmRow>
+          <svg ibmIcon="checkmark--filled"></svg> Test
+      </div>
+    </ibm-tile>
+      <ibm-tile>
+        <h2>ApoVZD API</h2>
+      </ibm-tile>
+      <ibm-tile>
+        <h2>FHIR Directory Search API</h2>
+      </ibm-tile>
+      <ibm-tile>
+        <h2>HTTP Proxy</h2>
+      </ibm-tile>
+    </div>
+    <div>
+    </div>
+  </div>
+  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+</div>
+
+<ibm-placeholder></ibm-placeholder>

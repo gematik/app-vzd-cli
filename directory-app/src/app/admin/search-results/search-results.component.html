@@ -1,0 +1,77 @@
+<div ibmRow>
+  <div ibmCol [columnNumbers]="{'lg': 16}">
+    <ibm-breadcrumb [noTrailingSlash]="true">
+      <ibm-breadcrumb-item>
+        <a [routerLink]="['../search']">Suche</a>
+      </ibm-breadcrumb-item>
+      <ibm-breadcrumb-item>
+        Suchergebinsse
+      </ibm-breadcrumb-item>
+    </ibm-breadcrumb>
+  </div>
+</div>
+
+<div ibmRow>
+  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+  <div ibmCol [columnNumbers]="{'lg': 8}">
+    <div ibmRow>
+    </div>
+    <div ibmRow>
+        <ibm-search 
+          [(ngModel)]="queryString"
+          class="SearchField" 
+          [size]="'xl'" 
+          ibmCol 
+          [columnNumbers]="{'lg': 12}"
+          placeholder="Name, Ort, PLZ oder TelematikID"
+          (search)="onSearch()"
+          (clear)="onClear()"
+        >  
+        </ibm-search>
+        <button
+          (click)="onSearch()"
+          ibmCol 
+          [columnNumbers]="{'lg': 4}" 
+          [ibmButton]="'primary'"
+          class="SearchButton"
+        >Suchen</button>
+    </div>
+  </div>
+  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+</div>
+
+<ng-template #addressTemplate let-data="data">
+  <div>{{data.streetAddress}}</div>
+  <div>{{data.postalCode}} {{data.localityName}}</div>
+</ng-template>
+
+<ng-template #expandedTemplate let-data="data">
+  <div>{{data.telematikID}}</div>
+</ng-template>
+
+<div ibmRow>
+  <div ibmCol [columnNumbers]="{'lg': 2}"></div>
+  <ibm-table-container class="SearchResulttContainer" ibmCol [columnNumbers]="{'lg': 12}">
+    <ibm-table-header>
+      <h4 ibmTableHeaderTitle>Title</h4>
+      <p ibmTableHeaderDescription>Description</p>
+    </ibm-table-header>
+    <ibm-table
+			[model]="model"
+			size="lg"
+			[sortable]="true"
+			[showSelectionColumn]="false"
+			[stickyHeader]="false"
+			[striped]="false"
+			[isDataGrid]="false">
+		</ibm-table>
+		<ibm-pagination [model]="model" (selectPage)="selectPage($event)"></ibm-pagination>
+
+  </ibm-table-container>
+  
+</div>
+
+
+
+<ibm-loading *ngIf="loading" [isActive]="true" [size]="'normal'" [overlay]="true"></ibm-loading>
+

@@ -29,20 +29,7 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
 
     override fun run() {
         embeddedServer(Netty, port = port, host = "127.0.0.1") {
-            install(ContentNegotiation) {
-                json(
-                    Json {
-                        prettyPrint = true
-                        isLenient = true
-                    }
-                )
-            }
-            install(Resources)
-
             directoryModule()
-
-            // configureSearchRouting()
-
 
             environment.monitor.subscribe(ApplicationStarted) {
                 TermUi.echo("Starting server at: http://127.0.0.1:$port")
@@ -54,9 +41,9 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
                         try {
                             URL(url).openConnection()
                             if (os.contains("win")) {
-                                // Runtime.getRuntime().exec("start $url")
+                                Runtime.getRuntime().exec("start $url")
                             } else if (os.contains("mac")) {
-                                // Runtime.getRuntime().exec("open $url")
+                                Runtime.getRuntime().exec("open $url")
                             } else {
                                 echo("Open the following URL in your web browser: $url")
                             }
