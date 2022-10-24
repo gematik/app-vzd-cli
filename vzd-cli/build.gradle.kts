@@ -1,7 +1,7 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-version = "2.1.0a1"
+version = "2.1.0a2"
 
 val ktorVersion = "2.1.2"
 val kotestVersion = "5.4.2"

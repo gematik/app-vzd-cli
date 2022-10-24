@@ -129,10 +129,11 @@ class DirectoryAdministrationCli :
         subcommands(
             VaultCommand(), ConfigCommand(),
             LoginCommand(), LoginCredCommand(), TokenCommand(),
-            Info(), ListCommand(), TemplateCommand(), AddBaseCommand(),
-            LoadBaseCommand(), ModifyBaseCommand(), ModifyBaseAttrCommand(), DeleteCommand(),
+            Info(), ListCommand(), TemplateCommand(),
+            AddBaseCommand(), LoadBaseCommand(), EditBaseCommand(),
+            ModifyBaseCommand(), ModifyBaseAttrCommand(), DeleteCommand(),
             ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
-            CertInfoCommand(), DumpCommand(), CmdCommand(), SearchCommand(), EditBaseCommand()
+            CertInfoCommand(), DumpCommand(), CmdCommand(), SearchCommand(),
         )
     }
 }

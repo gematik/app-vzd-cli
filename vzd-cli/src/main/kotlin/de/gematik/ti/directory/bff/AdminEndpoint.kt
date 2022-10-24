@@ -3,8 +3,6 @@ package de.gematik.ti.directory.bff
 import de.gematik.ti.directory.admin.AdminEnvironment
 import de.gematik.ti.directory.admin.quickSearch
 import de.gematik.ti.directory.admin.readDirectoryEntryByTelematikID
-import de.gematik.ti.directory.bff.AdminAPIKey
-import de.gematik.ti.directory.bff.Outcome
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -19,13 +17,16 @@ class Admin {
     @Serializable
     @Resource("status")
     class Status(val parent: Admin = Admin())
+
     @Serializable
     @Resource("{envTitle}")
     class Env(val parent: Admin = Admin(), private val envTitle: String) {
         val env get() = AdminEnvironment.valueOf(envTitle.uppercase())
+
         @Serializable
         @Resource("search")
         class Search(val parent: Env, val q: String)
+
         @Resource("entry/{telematikID}")
         @Serializable
         data class Entry(val parent: Env, val telematikID: String)
@@ -33,7 +34,6 @@ class Admin {
 }
 
 fun Route.adminRoutes() {
-
     get<Admin.Status> {
         val adminAPI = application.attributes[AdminAPIKey]
         call.respond(adminAPI.status())

@@ -55,7 +55,6 @@ fun Application.directoryModule() {
             call.respondText(text = "401: Unauthorized", status = HttpStatusCode.Unauthorized)
         }
     }
-
 }
 
 @Serializable

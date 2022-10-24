@@ -27,7 +27,7 @@ data class AdminStatus(
     val environmentStatus: List<AdminEnvironmentStatus>
 )
 
-class AdminAPI {
+class AdminAPI() {
 
     fun createClient(env: AdminEnvironment): Client {
         val tokenStore = TokenStore()
@@ -45,7 +45,7 @@ class AdminAPI {
     fun loadConfig() = FileConfigProvider().config
     fun saveConfig(config: Config) {
         val configProvider = FileConfigProvider()
-        FileConfigProvider().config = config
+        configProvider.config = config
         configProvider.save()
         logger.info { "Configuration updated" }
     }
@@ -75,7 +75,6 @@ class AdminAPI {
                 tokenStore.claimsFor(it.value.apiURL),
                 backendInfo
             )
-
         }
         return AdminStatus(
             config,

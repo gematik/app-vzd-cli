@@ -11,13 +11,11 @@ import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import de.gematik.ti.directory.admin.AdminEnvironment
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 import java.util.*
 
 private fun doLogin(context: CommandContext, env: AdminEnvironment, overrideProxy: Boolean?, clientID: String, clientSecret: String) {
-
     context.adminAPI.config.currentEnvironment = env.title
     context.adminAPI.config.httpProxy.enabled = overrideProxy ?: context.adminAPI.config.httpProxy.enabled
     context.adminAPI.updateConfig()
