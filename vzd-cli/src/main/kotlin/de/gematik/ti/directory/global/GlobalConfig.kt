@@ -16,9 +16,9 @@ class GlobalConfig(
     var httpProxy: HttpProxyConfig
 )
 
-class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<GlobalConfig>(
+internal class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<GlobalConfig>(
     "directory-global.yaml",
-    { GlobalConfig(HttpProxyConfig("foo", false)) },
+    { GlobalConfig(HttpProxyConfig(proxyURL = "http://192.168.110.10:3128/", enabled = false)) },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
     customConfigPath
 )

@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.types.path
+import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.util.CertificateDataDER
 import kotlinx.coroutines.runBlocking
 import org.bouncycastle.util.encoders.Base64
@@ -21,7 +22,7 @@ class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of
             val certificateInfo = userCertificate.certificateInfo
 
             if (context.enableOcsp) {
-                certificateInfo.ocspResponse = runBlocking { context.pkiClient.ocsp(userCertificate) }
+                certificateInfo.ocspResponse = runBlocking { context.adminAPI.globalAPI.pkiClient.ocsp(userCertificate) }
             }
 
             when (context.outputFormat) {

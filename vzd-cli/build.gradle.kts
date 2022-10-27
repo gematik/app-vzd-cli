@@ -4,11 +4,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 version = "2.1.0a2"
 
 val ktorVersion = "2.1.2"
-val kotestVersion = "5.4.2"
+val kotestVersion = "5.5.2"
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.6.21"
-    kotlin("plugin.serialization").version("1.6.21")
+    id("org.jetbrains.kotlin.jvm") version "1.7.20"
+    kotlin("plugin.serialization").version("1.7.20")
     id("com.github.johnrengelman.shadow").version("7.1.2")
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     // Apply the application plugin to add support for building a CLI application in Java.
@@ -46,7 +46,7 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("net.mamoe.yamlkt:yamlkt:0.10.2")
+    implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
     implementation("com.google.code.gson:gson:2.9.0")
 
     // server

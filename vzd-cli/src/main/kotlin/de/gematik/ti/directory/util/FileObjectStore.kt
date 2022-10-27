@@ -1,11 +1,13 @@
 package de.gematik.ti.directory.util
 
+import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
+private val logger = KotlinLogging.logger {}
 private val YAML = Yaml { encodeDefaultValues = false }
 
 /**

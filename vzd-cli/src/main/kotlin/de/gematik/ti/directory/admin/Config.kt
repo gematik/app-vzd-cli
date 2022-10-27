@@ -1,16 +1,14 @@
 package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.global.HttpProxyConfig
 import de.gematik.ti.directory.util.FileObjectStore
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import net.mamoe.yamlkt.Yaml
 import java.nio.file.Path
-import kotlin.io.path.Path
 
 private val YAML = Yaml { encodeDefaultValues = false }
 
-class FileConfigProvider(customConfigPath: Path? = null) : FileObjectStore<Config>(
+internal class FileConfigStore(customConfigPath: Path? = null) : FileObjectStore<Config>(
     "directory-admin.yaml",
     {
         Config(
@@ -29,10 +27,6 @@ class FileConfigProvider(customConfigPath: Path? = null) : FileObjectStore<Confi
                 )
             ),
             currentEnvironment = "ru",
-            httpProxy = HttpProxyConfig(
-                proxyURL = "http://192.168.110.10:3128/",
-                enabled = false
-            )
         )
     },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
@@ -46,7 +40,6 @@ class FileConfigProvider(customConfigPath: Path? = null) : FileObjectStore<Confi
 data class Config(
     val environments: Map<String, EnvironmentConfig>,
     var currentEnvironment: String?,
-    var httpProxy: HttpProxyConfig
 ) {
     fun environment(name: String? = null) = environments.get(name ?: currentEnvironment) ?: throw ConfigException("Unknown environment: $name")
 }

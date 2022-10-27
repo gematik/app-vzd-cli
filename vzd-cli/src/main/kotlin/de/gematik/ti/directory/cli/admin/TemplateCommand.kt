@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.types.choice
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.admin.UserCertificate
+import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.util.CertificateDataDER
 
 class TemplateCommand : CliktCommand(

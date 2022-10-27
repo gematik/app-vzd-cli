@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.UpdateBaseDirectoryEntry
+import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString

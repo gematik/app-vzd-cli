@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.*
 import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 import kotlin.io.path.Path
 import kotlin.io.path.exists

@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+          "type": "gradle",
+          "name": "Continous build",
+          "tasks": ["compileKotlin"],
+          "args": ["-t"],
+        },
+
+    ]
+}

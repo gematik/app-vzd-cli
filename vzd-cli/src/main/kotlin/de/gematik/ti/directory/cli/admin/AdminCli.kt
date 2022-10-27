@@ -5,6 +5,8 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.admin.compat.CmdCommand
+import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.global.GlobalAPI
 import de.gematik.ti.directory.util.GenericDirectoryExceptionException
 import de.gematik.ti.directory.util.PKIClient
 import de.gematik.ti.directory.util.VaultException
@@ -15,56 +17,21 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-/**
- * Must love Kotlin - create a simple try / catch function and use in all classes that throws these exceptions
- */
-fun catching(throwingBlock: () -> Unit = {}) {
-    try {
-        throwingBlock()
-    } catch (e: GenericDirectoryExceptionException) {
-        throw CliktError(e.message)
-    } catch (e: AdminResponseException) {
-        throw CliktError(e.details)
-    } catch (e: SerializationException) {
-        throw CliktError(e.message)
-    } catch (e: VaultException) {
-        throw CliktError(e.message)
-    } catch (e: ConnectTimeoutException) {
-        throw CliktError("${e.message}. Try using proxy: vzd-cli admin -x ...")
-    } catch (e: io.ktor.http.parsing.ParseException) {
-        if (e.message.contains("Expected `=` after parameter key ''")) {
-            throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin login`.")
-        } else {
-            throw e
-        }
-    } catch (e: IllegalStateException) {
-        // dirty, but no other way atm
-        if (e.message?.contains("Unsupported byte code, first byte is 0xfc") == true) {
-            throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin login`.")
-        } else {
-            throw e
-        }
-    }
-}
-
 class CommandContext(
+    val adminAPI: AdminAPI,
     private val clientDelegate: CommandContext.() -> Client,
-    private val pkiClientDelegate: CommandContext.() -> PKIClient,
     var outputFormat: OutputFormat,
     val env: AdminEnvironment,
     val enableOcsp: Boolean,
     var firstCommand: Boolean = true
 ) {
 
-    val adminAPI = AdminAPI()
-
     val client by lazy {
         clientDelegate.invoke(this)
     }
 
-    val pkiClient by lazy {
-        pkiClientDelegate.invoke(this)
-    }
+    val pkiClient get() = adminAPI.globalAPI.pkiClient
+
 }
 
 class DirectoryAdministrationCli :
@@ -94,6 +61,7 @@ class DirectoryAdministrationCli :
         help = "Validate certificates using OCSP"
     )
         .flag()
+        .deprecated("Use ")
 
     private val useProxy: Boolean? by option(
         "--proxy-on",
@@ -103,9 +71,9 @@ class DirectoryAdministrationCli :
         .flag("--proxy-off", "-X")
 
     override fun run() = catching {
-        val provider = FileConfigProvider()
+        val adminAPI = AdminAPI(GlobalAPI())
         val clientEnvStr =
-            env ?: provider.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
+            env ?: adminAPI.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
 
         val clientEnv = AdminEnvironment.valueOf(clientEnvStr.uppercase())
 
@@ -114,15 +82,7 @@ class DirectoryAdministrationCli :
             adminAPI.createClient(clientEnv)
         }
 
-        val pkiClientDelegate: CommandContext.() -> PKIClient = {
-            PKIClient {
-                if (provider.config.httpProxy.enabled || useProxy == true) {
-                    httpProxyURL = provider.config.httpProxy.proxyURL
-                }
-            }
-        }
-
-        currentContext.obj = CommandContext(clientDelegate, pkiClientDelegate, outputFormat, clientEnv, enableOcsp)
+        currentContext.obj = CommandContext(adminAPI, clientDelegate, outputFormat, clientEnv, enableOcsp)
     }
 
     init {

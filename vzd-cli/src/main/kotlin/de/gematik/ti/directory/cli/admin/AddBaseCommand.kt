@@ -14,6 +14,7 @@ import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.CreateDirectoryEntry
+import de.gematik.ti.directory.cli.catching
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString

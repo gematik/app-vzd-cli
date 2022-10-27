@@ -1,5 +1,8 @@
 package de.gematik.ti.directory.admin
 
+import de.gematik.ti.directory.global.GlobalAPI
+import de.gematik.ti.directory.global.GlobalConfig
+import de.gematik.ti.directory.global.GlobalConfigFileStore
 import de.gematik.ti.directory.util.DirectoryAuthException
 import de.gematik.ti.directory.util.TokenStore
 import kotlinx.serialization.Serializable
@@ -27,7 +30,7 @@ data class AdminStatus(
     val environmentStatus: List<AdminEnvironmentStatus>
 )
 
-class AdminAPI() {
+class AdminAPI(val globalAPI: GlobalAPI) {
 
     fun createClient(env: AdminEnvironment): Client {
         val tokenStore = TokenStore()
@@ -35,21 +38,27 @@ class AdminAPI() {
         val client = Client {
             apiURL = envConfig.apiURL
             accessToken = tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: ${env.title}")
-            if (config.httpProxy.enabled) {
-                httpProxyURL = config.httpProxy.proxyURL
+            if (globalAPI.config.httpProxy.enabled) {
+                httpProxyURL = globalAPI.config.httpProxy.proxyURL
             }
         }
         return client
     }
 
-    private fun loadConfig() = FileConfigProvider().config
+    private fun loadConfig() = FileConfigStore().config
 
     fun updateConfig() {
-        val configProvider = FileConfigProvider()
-        configProvider.config = config
-        configProvider.save()
+        val store = FileConfigStore()
+        store.config = config
+        store.save()
         logger.info { "Configuration updated" }
     }
+
+    fun resetConfig() : Config {
+        val store = FileConfigStore()
+        return store.reset()
+    }
+
 
     val config by lazy { loadConfig() }
 
@@ -90,7 +99,7 @@ class AdminAPI() {
 
         val auth = ClientCredentialsAuthenticator(
             envcfg.authURL,
-            if (config.httpProxy.enabled) config.httpProxy.proxyURL else null
+            if (globalAPI.config.httpProxy.enabled) globalAPI.config.httpProxy.proxyURL else null
         )
         val authResponse = auth.authenticate(clientID, clientSecret)
 

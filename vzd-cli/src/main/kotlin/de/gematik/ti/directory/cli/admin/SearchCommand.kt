@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.admin.quickSearch
+import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 
 class SearchCommand : CliktCommand(name = "search", help = "Search for directory entries") {

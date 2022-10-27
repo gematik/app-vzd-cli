@@ -19,7 +19,7 @@ private const val GRACE_PERIOD_MILLIS = -300000
 class TokenStoreItem(var url: String, var accessToken: String)
 
 class TokenStore(customConfigPath: Path? = null) : FileObjectStore<List<TokenStoreItem>>(
-    "directory-global.yaml",
+    "directory-tokens.yaml",
     { emptyList() },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
     customConfigPath

@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
+import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import kotlin.io.path.Path

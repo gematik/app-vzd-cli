@@ -23,7 +23,7 @@ Usage: vzd-cli admin [OPTIONS] COMMAND [ARGS]...
 
 Options:
   --human, --json, --yaml, --csv, --short
-  -e, --env [tu|ru|pu]             Environment. Either tu, ru or pu. If not
+  -e, --env [tu|ru|pu]             Environment. Either tu, ru or pu. xIf not
                                    specified default env is used.
   -o, --ocsp                       Validate certificates using OCSP
   -x, --proxy-on / -X, --proxy-off

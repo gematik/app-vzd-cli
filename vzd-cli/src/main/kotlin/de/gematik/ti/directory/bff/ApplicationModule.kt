@@ -1,6 +1,7 @@
 package de.gematik.ti.directory.bff
 
 import de.gematik.ti.directory.admin.AdminAPI
+import de.gematik.ti.directory.global.GlobalAPI
 import de.gematik.ti.directory.util.DirectoryAuthException
 import io.ktor.http.*
 import io.ktor.http.parsing.*
@@ -32,7 +33,7 @@ fun Application.directoryModule() {
     }
     install(Resources)
 
-    attributes.put(AdminAPIKey, AdminAPI())
+    attributes.put(AdminAPIKey, AdminAPI(GlobalAPI()))
 
     routing {
         route("api") {

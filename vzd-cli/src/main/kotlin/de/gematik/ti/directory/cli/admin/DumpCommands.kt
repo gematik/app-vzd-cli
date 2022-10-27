@@ -13,6 +13,7 @@ import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.cli.escape
 import de.gematik.ti.directory.util.OCSPResponseCertificateStatus
 import kotlinx.coroutines.launch
@@ -64,7 +65,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
     private val parameterOptions by ParameterOptions()
     private val context by requireObject<CommandContext>()
 
-    override fun run() = catching {
+    override fun run() = catching() {
         val params = parameterOptions.toMap() + customParams
         logger.info { "Requesting entries for dump: $params" }
         paramFile?.let { paramFile ->
