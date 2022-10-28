@@ -1,13 +1,11 @@
-package de.gematik.ti.directory.cli.admin
+package de.gematik.ti.directory.apo
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.types.choice
-import de.gematik.ti.directory.admin.Config
 import de.gematik.ti.directory.cli.catching
 import net.mamoe.yamlkt.Yaml
 
@@ -22,17 +20,19 @@ class ConfigCommand : CliktCommand(name = "config", help = "Manage configuration
 }
 
 class ConfigResetCommand : CliktCommand(name = "reset", help = "Reset configuration to defaults") {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<ApoCliContext>()
     override fun run() = catching {
-        val config = context.adminAPI.resetConfig()
-        echo(YAML.encodeToString(config))
+        val newConfig = context.apoAPI.resetConfig()
+        echo(YAML.encodeToString(newConfig))
     }
 }
 
 val SET_PROPERTIES = mapOf(
-    "currentEnvironment" to { config: Config, value: String ->
-        if (!config.environments.containsKey(value)) throw CliktError("Invalid environment name: $value")
-        config.currentEnvironment = value
+    "apiKeys.test" to { config: ApoConfig, value: String ->
+        config.apiKeys = config.apiKeys + Pair("test", value)
+    },
+    "apiKeys.prod" to { config: ApoConfig, value: String ->
+        config.apiKeys = config.apiKeys + Pair("prod", value)
     }
 )
 
@@ -44,20 +44,24 @@ class ConfigSetCommand : CliktCommand(
             ```
             """
 ) {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<ApoCliContext>()
     private val property by argument().choice(SET_PROPERTIES)
     private val value by argument()
     override fun run() {
-        val config = context.adminAPI.config
+        val config = context.apoAPI.config
         property(config, value)
-        context.adminAPI.updateConfig()
+        context.apoAPI.updateConfig()
         echo(YAML.encodeToString(config))
     }
 }
 
 val GET_PROPERTIES = mapOf(
-    "environments" to { config: Config -> config.environments },
-    "currentEnvironment" to { config: Config -> config.currentEnvironment }
+    "emvironments" to { config: ApoConfig -> config.environments },
+    "emvironments.test" to { config: ApoConfig -> config.environments["test"] },
+    "emvironments.prod" to { config: ApoConfig -> config.environments["prod"] },
+    "apiKeys" to { config: ApoConfig -> config.apiKeys },
+    "apiKeys.test" to { config: ApoConfig -> config.apiKeys["test"] },
+    "apiKeys.prod" to { config: ApoConfig -> config.apiKeys["prod"] }
 )
 
 class ConfigGetCommand : CliktCommand(
@@ -68,10 +72,10 @@ class ConfigGetCommand : CliktCommand(
             ```
             """
 ) {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<ApoCliContext>()
     private val property by argument().choice(GET_PROPERTIES).optional()
     override fun run() {
-        val config = context.adminAPI.config
+        val config = context.apoAPI.config
         val value = property?.let { it(config) } ?: config
         echo(YAML.encodeToString(value))
     }

@@ -1,8 +1,6 @@
 package de.gematik.ti.directory.admin
 
 import de.gematik.ti.directory.global.GlobalAPI
-import de.gematik.ti.directory.global.GlobalConfig
-import de.gematik.ti.directory.global.GlobalConfigFileStore
 import de.gematik.ti.directory.util.DirectoryAuthException
 import de.gematik.ti.directory.util.TokenStore
 import kotlinx.serialization.Serializable
@@ -45,20 +43,19 @@ class AdminAPI(val globalAPI: GlobalAPI) {
         return client
     }
 
-    private fun loadConfig() = FileConfigStore().config
+    private fun loadConfig() = AdminConfigFileStore().config
 
     fun updateConfig() {
-        val store = FileConfigStore()
+        val store = AdminConfigFileStore()
         store.config = config
         store.save()
         logger.info { "Configuration updated" }
     }
 
-    fun resetConfig() : Config {
-        val store = FileConfigStore()
+    fun resetConfig(): Config {
+        val store = AdminConfigFileStore()
         return store.reset()
     }
-
 
     val config by lazy { loadConfig() }
 

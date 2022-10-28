@@ -7,12 +7,7 @@ import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.admin.compat.CmdCommand
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.global.GlobalAPI
-import de.gematik.ti.directory.util.GenericDirectoryExceptionException
-import de.gematik.ti.directory.util.PKIClient
-import de.gematik.ti.directory.util.VaultException
-import io.ktor.client.network.sockets.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.SerializationException
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -31,7 +26,6 @@ class CommandContext(
     }
 
     val pkiClient get() = adminAPI.globalAPI.pkiClient
-
 }
 
 class DirectoryAdministrationCli :
@@ -93,7 +87,7 @@ class DirectoryAdministrationCli :
             AddBaseCommand(), LoadBaseCommand(), EditBaseCommand(),
             ModifyBaseCommand(), ModifyBaseAttrCommand(), DeleteCommand(),
             ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
-            CertInfoCommand(), DumpCommand(), CmdCommand(), SearchCommand(),
+            CertInfoCommand(), DumpCommand(), CmdCommand(), SearchCommand()
         )
     }
 }

@@ -12,7 +12,7 @@ class GlobalAPI {
         store.value = config
         store.save()
     }
-    fun resetConfig() : GlobalConfig {
+    fun resetConfig(): GlobalConfig {
         val store = GlobalConfigFileStore()
         return store.reset()
     }

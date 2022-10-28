@@ -5,12 +5,13 @@ version = "2.1.0a2"
 
 val ktorVersion = "2.1.2"
 val kotestVersion = "5.5.2"
+val hapiVersion = "6.1.3"
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.7.20"
     kotlin("plugin.serialization").version("1.7.20")
     id("com.github.johnrengelman.shadow").version("7.1.2")
-    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
     // Apply the application plugin to add support for building a CLI application in Java.
     application
     `maven-publish`
@@ -30,9 +31,6 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
-    implementation("org.apache.opennlp:opennlp-tools:2.0.0")
-    implementation("org.apache.opennlp:opennlp-uima:2.0.0")
-
     implementation(project(":legacy-client-java"))
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -49,6 +47,17 @@ dependencies {
     implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
     implementation("com.google.code.gson:gson:2.9.0")
 
+    implementation("ca.uhn.hapi.fhir:hapi-fhir-base:$hapiVersion")
+    implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiVersion")
+
+    implementation("org.ldaptive:ldaptive:2.1.1")
+    implementation("me.tongfei:progressbar:0.9.3")
+    implementation("hu.vissy.plain-text-table:ptt-kotlin:1.1.7")
+    implementation("hu.vissy.plain-text-table:ptt-core:3.0.0")
+
+    // implementation("org.apache.opennlp:opennlp-tools:2.0.0")
+    // implementation("org.apache.opennlp:opennlp-uima:2.0.0")
+
     // server
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
@@ -63,11 +72,6 @@ dependencies {
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-
-    implementation("org.ldaptive:ldaptive:2.1.1")
-    implementation("me.tongfei:progressbar:0.9.3")
-    implementation("hu.vissy.plain-text-table:ptt-kotlin:1.1.7")
-    implementation("hu.vissy.plain-text-table:ptt-core:3.0.0")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")

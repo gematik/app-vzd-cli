@@ -11,11 +11,12 @@ import com.github.ajalt.clikt.parameters.options.counted
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import de.gematik.ti.directory.admin.AdminResponseException
+import de.gematik.ti.directory.apo.ApoCli
 import de.gematik.ti.directory.cli.admin.DirectoryAdministrationCli
 import de.gematik.ti.directory.cli.gui.GuiCommand
 import de.gematik.ti.directory.cli.ldif.LdifCommand
 import de.gematik.ti.directory.cli.pers.PersCommand
-import de.gematik.ti.directory.util.GenericDirectoryExceptionException
+import de.gematik.ti.directory.util.DirectoryException
 import de.gematik.ti.directory.util.VaultException
 import io.ktor.client.network.sockets.*
 import kotlinx.serialization.SerializationException
@@ -37,7 +38,7 @@ val YamlPretty = Yaml { encodeDefaultValues = false }
 fun catching(throwingBlock: () -> Unit = {}) {
     try {
         throwingBlock()
-    } catch (e: GenericDirectoryExceptionException) {
+    } catch (e: DirectoryException) {
         throw CliktError(e.message)
     } catch (e: AdminResponseException) {
         throw CliktError(e.details)
@@ -65,7 +66,8 @@ fun catching(throwingBlock: () -> Unit = {}) {
 }
 class Cli : CliktCommand(name = "vzd-cli") {
     init {
-        context { helpFormatter = CliktHelpFormatter(
+        context {
+            helpFormatter = CliktHelpFormatter(
                 requiredOptionMarker = "*",
                 showDefaultValues = true
             )
@@ -76,7 +78,13 @@ class Cli : CliktCommand(name = "vzd-cli") {
 
     init {
         versionOption(BuildConfig.APP_VERSION)
-        subcommands(DirectoryAdministrationCli(), LdifCommand(), PersCommand(), GuiCommand())
+        subcommands(
+            DirectoryAdministrationCli(),
+            ApoCli(),
+            GuiCommand(),
+            LdifCommand(),
+            PersCommand()
+        )
         val configDir = Path(System.getProperty("user.home"), ".telematik")
         if (!configDir.toFile().exists()) {
             configDir.absolute().toFile().mkdirs()

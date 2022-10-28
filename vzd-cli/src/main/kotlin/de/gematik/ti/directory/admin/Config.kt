@@ -8,7 +8,7 @@ import java.nio.file.Path
 
 private val YAML = Yaml { encodeDefaultValues = false }
 
-internal class FileConfigStore(customConfigPath: Path? = null) : FileObjectStore<Config>(
+internal class AdminConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<Config>(
     "directory-admin.yaml",
     {
         Config(
@@ -26,7 +26,7 @@ internal class FileConfigStore(customConfigPath: Path? = null) : FileObjectStore
                     apiURL = "https://vzdpflege.vzd.ti-dienste.de:9543"
                 )
             ),
-            currentEnvironment = "ru",
+            currentEnvironment = "ru"
         )
     },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
@@ -39,7 +39,7 @@ internal class FileConfigStore(customConfigPath: Path? = null) : FileObjectStore
 @Serializable
 data class Config(
     val environments: Map<String, EnvironmentConfig>,
-    var currentEnvironment: String?,
+    var currentEnvironment: String?
 ) {
     fun environment(name: String? = null) = environments.get(name ?: currentEnvironment) ?: throw ConfigException("Unknown environment: $name")
 }

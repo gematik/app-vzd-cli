@@ -104,7 +104,7 @@ val DirectoryEntryOutputMapping = mapOf(
                 }
             }
 
-            stateless<String>("Address") {
+            stateless("Address") {
                 extractor { directoryEntry ->
                     buildString {
                         append(directoryEntry.directoryEntryBase.streetAddress ?: "n/a")

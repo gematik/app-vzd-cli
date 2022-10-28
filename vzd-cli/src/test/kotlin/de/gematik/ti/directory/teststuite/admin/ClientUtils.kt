@@ -14,7 +14,6 @@ fun createClient(): Client {
     val adminAPI = AdminAPI(GlobalAPI())
     val tucfg = adminAPI.config.environment("tu")
 
-
     return Client {
         apiURL = tucfg.apiURL
         accessToken = System.getenv()["TEST_ACCESS_TOKEN"] ?: throw RuntimeException("Environment variable 'TEST_ACCESS_TOKEN' must be set.")
