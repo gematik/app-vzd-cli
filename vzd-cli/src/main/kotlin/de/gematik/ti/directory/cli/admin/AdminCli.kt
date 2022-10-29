@@ -55,7 +55,7 @@ class DirectoryAdministrationCli :
         help = "Validate certificates using OCSP"
     )
         .flag()
-        .deprecated("Use ")
+        .deprecated("Use --ocsp in particular sub-commands")
 
     private val useProxy: Boolean? by option(
         "--proxy-on",
@@ -81,13 +81,30 @@ class DirectoryAdministrationCli :
 
     init {
         subcommands(
-            VaultCommand(), ConfigCommand(),
-            LoginCommand(), LoginCredCommand(), TokenCommand(),
-            Info(), ListCommand(), TemplateCommand(),
-            AddBaseCommand(), LoadBaseCommand(), EditBaseCommand(),
-            ModifyBaseCommand(), ModifyBaseAttrCommand(), DeleteCommand(),
-            ListCertCommand(), AddCertCommand(), SaveCertCommand(), DeleteCertCommand(), ClearCertCommand(),
-            CertInfoCommand(), DumpCommand(), CmdCommand(), SearchCommand()
+            VaultCommand(),
+            ConfigCommand(),
+            LoginCommand(),
+            LoginCredCommand(),
+            TokenCommand(),
+            Info(),
+            SearchCommand(),
+            ShowCommand(),
+            ListCommand(),
+            TemplateCommand(),
+            AddBaseCommand(),
+            LoadBaseCommand(),
+            EditBaseCommand(),
+            ModifyBaseCommand(),
+            ModifyBaseAttrCommand(),
+            DeleteCommand(),
+            ListCertCommand(),
+            AddCertCommand(),
+            SaveCertCommand(),
+            DeleteCertCommand(),
+            ClearCertCommand(),
+            CertInfoCommand(),
+            DumpCommand(),
+            CmdCommand(),
         )
     }
 }

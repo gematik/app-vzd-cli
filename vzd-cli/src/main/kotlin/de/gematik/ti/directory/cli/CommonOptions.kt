@@ -13,5 +13,11 @@ class ProxyOptions : OptionGroup("Proxy options") {
         .flag("--proxy-off", "-X")
 }
 
-// TODO
-class CommonOptions : OptionGroup("Standard Options:")
+class OcspOptions : OptionGroup("OCSP options") {
+    val enableOcsp: Boolean by option(
+        "-o",
+        "--ocsp",
+        help = "Validate certificates using OCSP"
+    )
+        .flag()
+}

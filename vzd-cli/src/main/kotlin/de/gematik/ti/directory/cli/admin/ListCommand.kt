@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.*
 import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 import kotlin.io.path.Path
@@ -36,6 +37,7 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
     private val parameterOptions by ParameterOptions()
     private val context by requireObject<CommandContext>()
     private val sync by option(help = "use Sync mode").flag()
+    private val ocspOptions by OcspOptions()
 
     override fun run() = catching {
         context.outputFormat = outputFormat ?: context.outputFormat
@@ -68,14 +70,8 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
             }
         }
 
-        if (context.enableOcsp) {
-            result?.mapNotNull { it.userCertificates }
-                ?.flatten()
-                ?.mapNotNull { it.userCertificate }
-                ?.forEach {
-                    val ocspResponse = runBlocking { context.pkiClient.ocsp(it) }
-                    it.certificateInfo.ocspResponse = ocspResponse
-                }
+        if (ocspOptions.enableOcsp) {
+            runBlocking { context.adminAPI.expandOCSPStatus(result) }
         }
 
         DirectoryEntryOutputMapping[context.outputFormat]?.invoke(params, result)

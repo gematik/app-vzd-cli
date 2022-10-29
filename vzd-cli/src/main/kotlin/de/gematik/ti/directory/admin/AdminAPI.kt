@@ -1,8 +1,11 @@
 package de.gematik.ti.directory.admin
 
 import de.gematik.ti.directory.global.GlobalAPI
+import de.gematik.ti.directory.util.CertificateDataDER
 import de.gematik.ti.directory.util.DirectoryAuthException
+import de.gematik.ti.directory.util.OCSPResponse
 import de.gematik.ti.directory.util.TokenStore
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import mu.KotlinLogging
@@ -104,5 +107,18 @@ class AdminAPI(val globalAPI: GlobalAPI) {
 
         logger.info { "Login successful: env:$env , clientID:$clientID" }
         return tokenStore.claimsFor(envcfg.apiURL)!!
+    }
+
+    suspend fun expandOCSPStatus(entries: List<DirectoryEntry>?) {
+        entries?.mapNotNull { it.userCertificates }
+            ?.flatten()
+            ?.mapNotNull { it.userCertificate }
+            ?.forEach {
+                it.certificateInfo.ocspResponse = verifyCertificate(it)
+            }
+    }
+
+    suspend fun verifyCertificate(cert: CertificateDataDER) : OCSPResponse {
+        return  globalAPI.pkiClient.ocsp(cert)
     }
 }

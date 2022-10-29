@@ -1,8 +1,9 @@
 = Changelog `vzd-cli`
 
 == Version 2.1.0
+- Neu: ApoVZD Unterstützung über `vzd-cli apo`
 - `vzd-cli admin login` wurde komplett überarbeitet
-- `vzd-cli admin auth` wurde als `vzd-cli admin token` reimplementiert
+- `vzd-cli admin token` ersetzt `vzd-cli admin auth`
 - Neuer Befehl: `vzd-cli admin search`: schnelle, intuitive Suche nach Einträgen
 - Neuer Befehl: `vzd-cli admin edit-base`: editieren eines Basiseintrags in einem Text-Editor
 - Neuer Ausgabeformat: `--table`, eine ASCII Tabelle
