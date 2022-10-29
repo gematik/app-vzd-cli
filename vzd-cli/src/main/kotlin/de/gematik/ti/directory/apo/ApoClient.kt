@@ -1,7 +1,6 @@
 package de.gematik.ti.directory.apo
 
 import ca.uhn.fhir.context.FhirContext
-import com.fasterxml.jackson.databind.ObjectMapper
 import de.gematik.ti.directory.util.DirectoryException
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -89,8 +88,10 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = parser.parseResource(Bundle::class.java, body)
-        val location = (bundle.entry.firstOrNull()?.resource
-            ?: throw DirectoryException("Pharmacy with TelematikID '$telematikID' not found")) as Location
+        val location = (
+            bundle.entry.firstOrNull()?.resource
+                ?: throw DirectoryException("Pharmacy with TelematikID '$telematikID' not found")
+            ) as Location
 // parse JSON
         return Pair(body, location)
     }

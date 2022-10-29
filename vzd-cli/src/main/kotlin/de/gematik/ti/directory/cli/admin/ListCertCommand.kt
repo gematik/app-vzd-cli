@@ -8,6 +8,8 @@ import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
+import com.github.ajalt.clikt.parameters.options.switch
+import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -18,6 +20,14 @@ import kotlin.io.path.useLines
 private val logger = KotlinLogging.logger {}
 
 class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificates") {
+    private val context by requireObject<CommandContext>()
+    private val outputFormat by option().switch(
+        "--human" to OutputFormat.HUMAN,
+        "--json" to OutputFormat.JSON,
+        "--yaml" to OutputFormat.YAML,
+        "--csv" to OutputFormat.CSV,
+        "--table" to OutputFormat.TABLE
+    )
     private val paramFile: Pair<String, String>? by option(
         "-f",
         "--param-file",
@@ -30,7 +40,7 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
         help = "Specify query parameters to find matching entries"
     ).associate()
     private val parameterOptions by ParameterOptions()
-    private val context by requireObject<CommandContext>()
+    private val ocspOptions by OcspOptions()
 
     override fun run() = catching {
         val params = parameterOptions.toMap() + customParams
@@ -48,6 +58,7 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
     }
 
     private fun runQuery(params: Map<String, String>) {
+        context.outputFormat = outputFormat ?: context.outputFormat
         if (params.isEmpty()) {
             throw UsageError("Specify at least one query parameter")
         }
@@ -61,7 +72,7 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
             }
         }
 
-        if (context.enableOcsp) {
+        if (ocspOptions.enableOcsp) {
             result?.forEach {
                 it.userCertificate?.let {
                     val ocspResponse = runBlocking { context.pkiClient.ocsp(it) }

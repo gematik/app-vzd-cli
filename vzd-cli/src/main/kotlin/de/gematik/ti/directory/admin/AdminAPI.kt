@@ -5,7 +5,6 @@ import de.gematik.ti.directory.util.CertificateDataDER
 import de.gematik.ti.directory.util.DirectoryAuthException
 import de.gematik.ti.directory.util.OCSPResponse
 import de.gematik.ti.directory.util.TokenStore
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import mu.KotlinLogging
@@ -118,7 +117,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
             }
     }
 
-    suspend fun verifyCertificate(cert: CertificateDataDER) : OCSPResponse {
-        return  globalAPI.pkiClient.ocsp(cert)
+    suspend fun verifyCertificate(cert: CertificateDataDER): OCSPResponse {
+        return globalAPI.pkiClient.ocsp(cert)
     }
 }

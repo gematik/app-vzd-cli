@@ -14,6 +14,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.useLines
 
 class ListCommand : CliktCommand(name = "list", help = "List directory entries") {
+    private val context by requireObject<CommandContext>()
     private val outputFormat by option().switch(
         "--human" to OutputFormat.HUMAN,
         "--json" to OutputFormat.JSON,
@@ -35,7 +36,6 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
         metavar = "NAME=VALUE"
     ).associate()
     private val parameterOptions by ParameterOptions()
-    private val context by requireObject<CommandContext>()
     private val sync by option(help = "use Sync mode").flag()
     private val ocspOptions by OcspOptions()
 

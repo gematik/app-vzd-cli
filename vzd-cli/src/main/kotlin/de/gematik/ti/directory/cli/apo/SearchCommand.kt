@@ -25,7 +25,6 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for pharmacie
         }
 
         val formatter = tableFormatter<Location> {
-
             labeled("TelematikID", "Gesamt") {
                 extractor { location ->
                     location.identifier.firstOrNull {
@@ -70,6 +69,6 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for pharmacie
 
             showAggregation = true
         }
-        println(formatter.apply(bundle.entry.mapNotNull{it.resource}.filterIsInstance<Location>()))
+        println(formatter.apply(bundle.entry.mapNotNull { it.resource }.filterIsInstance<Location>()))
     }
 }

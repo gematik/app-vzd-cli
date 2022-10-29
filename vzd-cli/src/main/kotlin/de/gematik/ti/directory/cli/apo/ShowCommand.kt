@@ -17,7 +17,7 @@ private val JSON = Json {
     prettyPrint = true
 }
 
-class ShowCommand : CliktCommand (name="show", help = "Show all information about an entry"){
+class ShowCommand : CliktCommand(name = "show", help = "Show all information about an entry") {
     private val context by requireObject<ApoCliContext>()
     private val id by argument()
 

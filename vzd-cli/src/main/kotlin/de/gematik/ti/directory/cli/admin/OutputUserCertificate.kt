@@ -1,6 +1,11 @@
 package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.UserCertificate
+import de.gematik.ti.directory.util.CertificateDataDER
+import hu.vissy.texttable.dsl.tableFormatter
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 val UserCertificateCsvHeaders = listOf(
     "query",
@@ -43,8 +48,70 @@ val CertificateOutputMapping = mapOf(
             )
         }
 
-        if (value == null || value.isEmpty()) {
+        if (value.isNullOrEmpty()) {
             Output.printCsv(listOf(query.toString(), "Not Found"))
         }
-    }
+    },
+    OutputFormat.TABLE to { _: Map<String, String>, value: List<UserCertificate>? ->
+        val formatter = tableFormatter<CertificateDataDER> {
+
+            labeled("Serial", "Gesamt") {
+                extractor { cert ->
+                    cert.certificateInfo.serialNumber
+                }
+                cellFormatter {
+                    maxWidth = 24
+                }
+
+            }
+
+            class State(var count: Int = 0)
+            stateful<String, State>("Alg") {
+                initState { State() }
+                extractor { cert, state ->
+                    state.count += 1
+                    cert.certificateInfo.publicKeyAlgorithm
+                }
+                cellFormatter {
+                    maxWidth = 3
+                }
+                aggregator { _, state ->
+                    if (state.count > 99) {
+                        "99+"
+                    } else {
+                        state.count.toString()
+                    }
+                }
+            }
+
+            labeled("Subject") {
+                extractor { cert ->
+                    cert.certificateInfo.subjectInfo.cn
+                }
+                cellFormatter {
+                    maxWidth = 30
+                }
+
+            }
+
+            labeled("OCSP") {
+                extractor { cert ->
+                    cert.certificateInfo.ocspResponse?.status
+                }
+            }
+
+            labeled("Not After") {
+                extractor { cert ->
+                    runCatching {
+                        LocalDateTime.parse(cert.certificateInfo.notAfter).toLocalDate()
+                    }.getOrNull()
+
+                }
+            }
+
+            showAggregation = true
+        }
+
+        println(formatter.apply(value?.mapNotNull { it.userCertificate } ?: emptyList<CertificateDataDER>()))
+    },
 )

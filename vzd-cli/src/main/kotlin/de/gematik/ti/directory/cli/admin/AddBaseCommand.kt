@@ -88,7 +88,6 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
             val telematikID: String = attrs["telematikID"] ?: throw UsageError("Option --set telematikID=<VALUE> or --file is required")
             BaseDirectoryEntry(
                 telematikID = telematikID,
-                domainID = listOf("vzd-cli")
             )
         }
 

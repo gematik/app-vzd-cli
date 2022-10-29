@@ -5,7 +5,9 @@ import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.switch
 import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
@@ -20,6 +22,10 @@ class LoadBaseCommand : CliktCommand(name = "load-base", help = "Load the base e
     ).associate()
     private val parameterOptions by ParameterOptions()
     private val context by requireObject<CommandContext>()
+    private val format by option().switch(
+        "--json" to OutputFormat.JSON,
+        "--yaml" to OutputFormat.YAML
+    ).default(OutputFormat.YAML)
 
     private val json = Json {
         prettyPrint = true
@@ -40,10 +46,10 @@ class LoadBaseCommand : CliktCommand(name = "load-base", help = "Load the base e
             throw UsageError("The query must return exactly one value. Got: ${result?.size}")
         }
 
-        when (context.outputFormat) {
+        when (format) {
             OutputFormat.JSON -> println(json.encodeToString(result.first().directoryEntryBase))
             OutputFormat.HUMAN, OutputFormat.YAML -> println(yaml.encodeToString(result.first().directoryEntryBase))
-            else -> throw UsageError("Cant load for editing in for format: ${context.outputFormat}")
+            else -> throw UsageError("Unable to load for editing in for format: $format")
         }
     }
 }

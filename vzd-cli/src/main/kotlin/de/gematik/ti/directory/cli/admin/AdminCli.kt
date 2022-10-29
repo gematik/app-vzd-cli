@@ -104,7 +104,7 @@ class DirectoryAdministrationCli :
             ClearCertCommand(),
             CertInfoCommand(),
             DumpCommand(),
-            CmdCommand(),
+            CmdCommand()
         )
     }
 }
