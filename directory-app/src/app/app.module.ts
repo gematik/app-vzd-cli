@@ -10,12 +10,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SettingsComponent } from './settings/settings.component';
 import { AddTokenComponent } from './settings/add-token/add-token.component';
+import { MainComponent } from './main/main.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SettingsComponent,
-    AddTokenComponent
+    AddTokenComponent,
+    MainComponent,
   ],
   imports: [
     // angular imports

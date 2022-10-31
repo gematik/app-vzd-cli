@@ -15,6 +15,7 @@ import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.cli.escape
+import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
 import de.gematik.ti.directory.util.OCSPResponseCertificateStatus
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -23,6 +24,8 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import me.tongfei.progressbar.ProgressBar
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
@@ -30,7 +33,9 @@ import kotlin.io.path.*
 import kotlin.system.measureTimeMillis
 
 private val jsonExtended = Json {
-    serializersModule = optimizedSerializersModule
+    serializersModule = SerializersModule {
+        contextual(ExtendedCertificateDataDERSerializer)
+    }
     encodeDefaults = true
 }
 private val logger = KotlinLogging.logger {}

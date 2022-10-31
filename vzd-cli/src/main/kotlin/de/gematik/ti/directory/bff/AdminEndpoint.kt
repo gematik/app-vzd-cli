@@ -1,8 +1,7 @@
+@file:UseSerializers(DirectoryEntryExtensionSerializer::class)
 package de.gematik.ti.directory.bff
 
-import de.gematik.ti.directory.admin.AdminEnvironment
-import de.gematik.ti.directory.admin.quickSearch
-import de.gematik.ti.directory.admin.readDirectoryEntryByTelematikID
+import de.gematik.ti.directory.admin.*
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -10,6 +9,7 @@ import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 
 @Serializable
 @Resource("admin")

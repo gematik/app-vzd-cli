@@ -28,7 +28,7 @@ import java.util.*
 /**
  * Converts Date object to ISO String
  */
-public fun dateToString(date: Date): String {
+fun dateToString(date: Date): String {
     return DateTimeFormatter.ISO_DATE_TIME.format(
         date.toInstant()
             .atZone(ZoneId.systemDefault())
@@ -124,7 +124,7 @@ object CertificateDataDERSerializer : KSerializer<CertificateDataDER> {
 /**
  * Special Serializer to display the textual summary of the X509Certificate
  */
-object CertificateDataDERInfoSerializer : KSerializer<CertificateDataDER> {
+object ExtendedCertificateDataDERSerializer : KSerializer<CertificateDataDER> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: CertificateDataDER) {

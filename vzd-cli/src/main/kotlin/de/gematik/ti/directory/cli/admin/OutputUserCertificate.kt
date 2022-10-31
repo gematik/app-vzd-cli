@@ -3,9 +3,7 @@ package de.gematik.ti.directory.cli.admin
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.util.CertificateDataDER
 import hu.vissy.texttable.dsl.tableFormatter
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.OffsetDateTime
 
 val UserCertificateCsvHeaders = listOf(
     "query",

@@ -8,14 +8,12 @@ import { map, Observable } from 'rxjs';
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit {
-  env: Observable<string>
   queryString = ""
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     ) { 
-    this.env = route.params.pipe(map(p => p["env"]));
   }
 
   ngOnInit(): void {

@@ -1,0 +1,24 @@
+<div ibmRow>
+    <div ibmCol [columnNumbers]="{'lg': 16}">
+        <ibm-breadcrumb>
+            <ibm-breadcrumb-item>
+                <a [routerLink]="['../../search']">Suche</a>
+            </ibm-breadcrumb-item>
+            <ibm-breadcrumb-item *ngIf="queryString">
+                <a [routerLink]="['../../search-results', {'q': queryString}]">Suchergebnise</a>
+            </ibm-breadcrumb-item>
+        </ibm-breadcrumb>   
+    </div>
+</div>
+<div ibmRow>
+    <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+    <div ibmCol [columnNumbers]="{'lg': 8}">
+        <div ibmRow *ngIf="entry">
+            <div ibmCol [columnNumbers]="{'lg': 16}">
+                <h1>{{entry.DirectoryEntryBase.displayName}}</h1>
+            </div>
+        </div>
+    </div>
+    <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+</div>
+  

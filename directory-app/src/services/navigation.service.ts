@@ -29,7 +29,7 @@ export class NavigationService {
     return this.adminBackend.getStatus().pipe(map((status) => {
       return status.environmentStatus.map((envStatus) => {
         if (envStatus.accessTokenClaims != null) {
-          return <NavigationLink>{title: labels[envStatus.env], route: `/admin/${envStatus.env}/search`}
+          return <NavigationLink>{title: labels[envStatus.env], route: `/admin/${envStatus.env}`}
         } 
         return null
       }).filter( (x): x is NavigationLink => x != null ).reverse()

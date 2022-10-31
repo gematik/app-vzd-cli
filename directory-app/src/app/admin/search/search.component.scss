@@ -1,3 +1,10 @@
+.logo {
+  position: absolute;
+  width: 131px;
+  height: 24px;
+  left: 40px;
+  bottom: 40px;
+}
 
 .SearchHeadline {
 /* Suchen */
@@ -40,7 +47,7 @@ margin-bottom: 28px;
 
 .SearchButton {
 height: 48px;
-
+max-width: unset;
 /* Interactive/$interactive-01 */
 background: #010E52;
 border-radius: 0px;

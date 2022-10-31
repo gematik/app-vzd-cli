@@ -62,7 +62,7 @@ class TestCert : FeatureSpec({
         scenario("Load TSL from the internet") {
             val tsl = TrustedServiceListCache(pu = TSLLoader(httpClient).load(TrustEnvironment.PU))
             tsl.caServices.forEach {
-                localLogger.debug { it.caCertificate.certificate.subjectDN.name }
+                localLogger.debug { it.caCertificate.certificate.subjectX500Principal.name }
             }
 
             val ca = tsl.caServices.first { it.env == TrustEnvironment.PU && it.name == "CN=D-Trust.SMCB-CA3,OU=Institution des Gesundheitswesens-CA der Telematikinfrastruktur,O=D-TRUST GmbH,C=DE" }

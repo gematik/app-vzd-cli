@@ -14,11 +14,11 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for directory
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
-        val query = arguments.joinToString(" ")
+        val queryString = arguments.joinToString(" ")
         val result: List<DirectoryEntry> = runBlocking {
-            context.client.quickSearch(query)
+            context.client.quickSearch(queryString).directoryEntries
         }
 
-        DirectoryEntryOutputMapping[OutputFormat.TABLE]?.invoke(mapOf("query" to query), result)
+        DirectoryEntryOutputMapping[OutputFormat.TABLE]?.invoke(mapOf("query" to queryString), result)
     }
 }

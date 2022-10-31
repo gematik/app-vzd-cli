@@ -1,8 +1,18 @@
 package de.gematik.ti.directory.admin
 
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+
 private val RE_POSTAL_CODE = Regex("^[0-9]{5}\$")
 private val RE_TELEMATIK_ID = Regex("^[0-9]{1,2}-.*$")
 private val RE_DOMAIN_ID = Regex("^[0-9]{6,}")
+
+@Serializable
+data class SearchResults(
+    val searchQuery: String,
+    @Contextual
+    val directoryEntries: List<DirectoryEntry>
+)
 
 enum class TokenType {
     Plain,
@@ -96,14 +106,14 @@ object Tokenizer {
     }
 }
 
-suspend fun Client.quickSearch(query: String): List<DirectoryEntry> {
-    logger.debug { "QuickSearch query: $query" }
+suspend fun Client.quickSearch(queryString: String): SearchResults {
+    logger.debug { "QuickSearch query: $queryString" }
 
     var reducedQuery = mutableListOf<String>()
 
     val searchParams = mutableMapOf<String, String>()
 
-    Tokenizer.tokenize(query).forEach { token ->
+    Tokenizer.tokenize(queryString).forEach { token ->
         when (token.type) {
             TokenType.TelematikID -> {
                 searchParams["telematikID"] = token.value.trailingAsterisk()
@@ -134,5 +144,5 @@ suspend fun Client.quickSearch(query: String): List<DirectoryEntry> {
     val result = readDirectoryEntryV2(searchParams + Pair("baseEntryOnly", "true"), 100)
     entries.addAll(result?.directoryEntries ?: emptyList())
 
-    return entries
+    return SearchResults(queryString, entries)
 }

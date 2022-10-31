@@ -114,37 +114,59 @@ export interface BaseDirectoryEntry {
 }
 
 export interface UserCertificate {
-    
-    dn?: DistinguishedName
-    entryType?: string
-    telematikID?: string
-    professionOID?: [string]
-    usage?: [string]
-    
-    userCertificate?: CertificateInfo
-    description?: string
-    active?: boolean
+  dn?: DistinguishedName
+  entryType?: string
+  telematikID?: string
+  professionOID?: [string]
+  usage?: [string]
+  
+  userCertificate?: CertificateInfo
+  description?: string
+  active?: boolean
 }
 
 export interface KomLeData {
-    mail: string
-    version: string
+  mail: string
+  version: string
 }
 
 export interface FAD1 {
-    dn: DistinguishedName
-    mail?: [string]
-    "KOM-LE_Version"?: string
-    komLeData?: [KomLeData]
+  dn: DistinguishedName
+  mail?: [string]
+  "KOM-LE_Version"?: string
+  komLeData?: [KomLeData]
 }
 
 export interface Fachdaten {   
-    dn: DistinguishedName
-    "FAD1": [FAD1]
+  dn: DistinguishedName
+  "FAD1": [FAD1]
+}
+
+export enum DirectoryEntryKind {
+  Arzt,
+  Arztpraxis,
+  Zahnarzt,
+  Zahnarztpraxis,
+  Apotheke,
+  Apotheker,
+  Psychotherapeut,
+  Krankenhaus,
+  GKV,
+  HBAGematik,
+  SMCBGematik,
+  HBAeGBR,
+  SMCBeGBR,
+  Weitere
 }
 
 export interface DirectoryEntry {
-    "DirectoryEntryBase": BaseDirectoryEntry
-    userCertificates?: [UserCertificate]
-    "Fachdaten"?: [Fachdaten]
+  "DirectoryEntryBase": BaseDirectoryEntry
+  userCertificates?: [UserCertificate]
+  "Fachdaten"?: [Fachdaten]
+  kind: DirectoryEntryKind
+}
+
+export interface SearchResults {
+  queryString: string
+  directoryEntries: [DirectoryEntry]
 }

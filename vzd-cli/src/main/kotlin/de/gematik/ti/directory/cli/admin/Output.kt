@@ -1,7 +1,7 @@
 package de.gematik.ti.directory.cli.admin
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
-import de.gematik.ti.directory.util.CertificateDataDERInfoSerializer
+import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -9,8 +9,9 @@ import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
 import java.io.ByteArrayOutputStream
 
-val optimizedSerializersModule = SerializersModule {
-    contextual(CertificateDataDERInfoSerializer)
+@Deprecated("Global module does not make a lot of sense")
+private val optimizedSerializersModule = SerializersModule {
+    contextual(ExtendedCertificateDataDERSerializer)
 }
 enum class OutputFormat {
     HUMAN, JSON, YAML, CSV, SHORT, TABLE

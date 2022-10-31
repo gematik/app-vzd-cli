@@ -49,7 +49,7 @@ data class BaseDirectoryEntry(
     var telematikID: String,
     var domainID: List<String>? = null,
     // TODO: YAML decode is not working when I add this
-    // @Contextual
+    @Contextual
     var dn: DistinguishedName? = null,
 
     // Names

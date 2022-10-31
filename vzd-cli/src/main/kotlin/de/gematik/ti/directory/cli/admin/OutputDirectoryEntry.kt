@@ -1,10 +1,16 @@
 package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.admin.DirectoryEntryExtensionSerializer
 import de.gematik.ti.directory.cli.escape
+import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
 import hu.vissy.texttable.dsl.tableFormatter
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
+import net.mamoe.yamlkt.Yaml
 
 val DirectoryEntryCsvHeaders = listOf(
     "query",
@@ -27,8 +33,21 @@ val DirectoryEntryCsvHeaders = listOf(
     "specialization"
 )
 
+val HumanDirectoryEntrySerializersModule = SerializersModule {
+    contextual(ExtendedCertificateDataDERSerializer)
+}
+
+var HumanDirectoryEntry = Yaml {
+    encodeDefaultValues = false
+    serializersModule = HumanDirectoryEntrySerializersModule
+}
+
 val DirectoryEntryOutputMapping = mapOf(
-    OutputFormat.HUMAN to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printHuman(value) },
+    OutputFormat.HUMAN to { _: Map<String, String>, value: List<DirectoryEntry>? ->
+        value?.let {
+            println(HumanDirectoryEntry.encodeToString(ListSerializer(DirectoryEntryExtensionSerializer), it))
+        }
+    },
     OutputFormat.YAML to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYaml(value) },
     OutputFormat.JSON to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJson(value) },
     OutputFormat.SHORT to { _: Map<String, String>, value: List<DirectoryEntry>? ->

@@ -15,6 +15,7 @@ export class SettingsComponent implements OnInit {
     protected navigationService: NavigationService) { }
 
   ngOnInit(): void {
+    console.log("Init")
   }
 
   onAddToken() {

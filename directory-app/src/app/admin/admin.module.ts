@@ -10,11 +10,13 @@ import { CarbonModule } from '../../carbon.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { SearchResultsComponent } from './search-results/search-results.component';
 import { SearchComponent } from './search/search.component';
+import { DirectoryEntryComponent } from './directory-entry/directory-entry.component';
 
 @NgModule({
   declarations: [
     SearchResultsComponent,
     SearchComponent,
+    DirectoryEntryComponent,
   ],
   imports: [
     // angular imports

@@ -1,8 +1,10 @@
 package de.gematik.ti.directory.bff
 
 import de.gematik.ti.directory.admin.AdminAPI
+import de.gematik.ti.directory.admin.DirectoryEntryExtensionSerializer
 import de.gematik.ti.directory.global.GlobalAPI
 import de.gematik.ti.directory.util.DirectoryAuthException
+import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
 import io.ktor.http.*
 import io.ktor.http.parsing.*
 import io.ktor.serialization.kotlinx.json.*
@@ -15,7 +17,10 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 
 val AdminAPIKey = AttributeKey<AdminAPI>("AdminAPI")
 
@@ -28,6 +33,11 @@ fun Application.directoryModule() {
             Json {
                 prettyPrint = true
                 isLenient = true
+                serializersModule = SerializersModule {
+                    contextual(ExtendedCertificateDataDERSerializer)
+                    contextual(DirectoryEntryExtensionSerializer)
+                    contextual(ListSerializer(DirectoryEntryExtensionSerializer))
+                }
             }
         )
     }
