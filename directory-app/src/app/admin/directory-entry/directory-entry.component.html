@@ -10,14 +10,76 @@
         </ibm-breadcrumb>   
     </div>
 </div>
-<div ibmRow>
+<div ibmRow *ngIf="entry">
     <div ibmCol [columnNumbers]="{'lg': 4}"></div>
     <div ibmCol [columnNumbers]="{'lg': 8}">
-        <div ibmRow *ngIf="entry">
-            <div ibmCol [columnNumbers]="{'lg': 16}">
+        <div ibmRow>
+            <div ibmCol>
                 <h1>{{entry.DirectoryEntryBase.displayName}}</h1>
             </div>
         </div>
+        <ibm-tabs [isNavigation]="true">
+            <ibm-tab heading="Allgemein">
+                <h2>{{entry.kind}}</h2>
+                
+                <ibm-label
+        			[warn]="false"
+			        [warnText]="'Etwas ist nicht in Ordnung'">
+                    Anzeige name
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.DirectoryEntryBase.displayName"
+                        readonly="true"
+                    >
+                </ibm-label>
+                
+                <ibm-label>
+                    TelematikID
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.DirectoryEntryBase.telematikID"
+                        readonly="true"
+                    >
+                </ibm-label> 
+
+                <ibm-label>
+                    Adresse
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.DirectoryEntryBase.streetAddress"
+                        readonly="true"
+                    >
+                </ibm-label> 
+
+                <div ibmRow>
+                <ibm-label 
+                    ibmCol
+                    [columnNumbers]="{'lg': 11}"
+                >
+                    Ort
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.DirectoryEntryBase.localityName"
+                        readonly="true"
+                    >
+                </ibm-label>
+                <ibm-label 
+                    ibmCol
+                    [columnNumbers]="{'lg': 5}"
+                >
+                    PLZ
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.DirectoryEntryBase.postalCode"
+                        readonly="true"
+                    >
+                </ibm-label>
+                </div>
+            </ibm-tab>
+            <ibm-tab heading="Rohdaten">
+                <pre><code>{{rawData}}</code></pre>
+            </ibm-tab>
+        </ibm-tabs>
     </div>
     <div ibmCol [columnNumbers]="{'lg': 4}"></div>
 </div>

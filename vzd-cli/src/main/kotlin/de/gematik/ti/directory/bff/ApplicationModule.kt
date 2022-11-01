@@ -5,6 +5,7 @@ import de.gematik.ti.directory.admin.DirectoryEntryExtensionSerializer
 import de.gematik.ti.directory.global.GlobalAPI
 import de.gematik.ti.directory.util.DirectoryAuthException
 import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
+import de.gematik.ti.directory.util.VaultException
 import io.ktor.http.*
 import io.ktor.http.parsing.*
 import io.ktor.serialization.kotlinx.json.*
@@ -73,6 +74,9 @@ fun Application.directoryModule() {
         exception<ParseException> { call, _ ->
             call.respondText(text = "401: Unauthorized", status = HttpStatusCode.Unauthorized)
         }
+        exception<VaultException> { call, _ ->
+            call.respondText(text = "401: Unauthorized", status = HttpStatusCode.Unauthorized)
+        }
         exception<DirectoryAuthException> { call, _ ->
             call.respondText(text = "401: Unauthorized", status = HttpStatusCode.Unauthorized)
         }
@@ -80,4 +84,12 @@ fun Application.directoryModule() {
 }
 
 @Serializable
-data class Outcome(val message: String)
+data class Outcome(val code: String, val message: String)
+
+val ApplicationCall.adminAPI: AdminAPI get() {
+    return application.attributes[AdminAPIKey]
+}
+
+val ApplicationCall.globalAPI: GlobalAPI get() {
+    return application.attributes[GlobalAPIKey]
+}

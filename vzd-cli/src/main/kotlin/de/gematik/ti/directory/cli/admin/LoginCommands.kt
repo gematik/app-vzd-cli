@@ -21,7 +21,7 @@ private fun doLogin(context: CommandContext, env: AdminEnvironment, overrideProx
     context.adminAPI.globalAPI.config.httpProxy.enabled = overrideProxy ?: context.adminAPI.globalAPI.config.httpProxy.enabled
     context.adminAPI.globalAPI.updateConfig()
 
-    context.adminAPI.config.currentEnvironment = env.title
+    context.adminAPI.config.currentEnvironment = env.lowercase()
     context.adminAPI.updateConfig()
 
     val claims = context.adminAPI.login(env, clientID, clientSecret)
@@ -36,22 +36,22 @@ private fun doLogin(context: CommandContext, env: AdminEnvironment, overrideProx
 
 class LoginCommand : CliktCommand(name = "login", help = "Login to OAuth2 Server and store token(s)") {
     private val context by requireObject<CommandContext>()
-    private val env by argument().enum<AdminEnvironment>(ignoreCase = true, key = { it.title })
+    private val env by argument().enum<AdminEnvironment>(ignoreCase = true, key = { it.lowercase() })
     private val proxyOptions by ProxyOptions()
 
     private val password by option("--password", "-p", help = "Password for protection of the Vault")
         .prompt("Enter Vault Password", hideInput = true)
 
     override fun run() = catching {
-        val vault = vaultProvider.open(password)
-        val secret = vault.get(env.title) ?: throw CliktError("Secret for env '$env' not found in Vault")
+        val vault = context.adminAPI.openVault(password)
+        val secret = vault.get(env.lowercase()) ?: throw CliktError("Secret for env '$env' not found in Vault")
         doLogin(context, env, proxyOptions.enableProxy, secret.name, secret.secret)
     }
 }
 
 class LoginCredCommand : CliktCommand(name = "login-cred", help = "Login using the client credentials") {
     private val context by requireObject<CommandContext>()
-    private val env by argument().enum<AdminEnvironment>(ignoreCase = true, key = { it.title })
+    private val env by argument().enum<AdminEnvironment>(ignoreCase = true, key = { it.lowercase() })
     private val proxyOptions by ProxyOptions()
     private val clientId by option("-c", "--client-id", help = "OAuth2 client id", envvar = "CLIENT_ID").required()
     private val clientSecret by option("-s", "--secret", help = "OAuth2 client secret", envvar = "CLIENT_SECRET").required()

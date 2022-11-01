@@ -9,7 +9,6 @@ import { CarbonModule } from '../carbon.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SettingsComponent } from './settings/settings.component';
-import { AddTokenComponent } from './settings/add-token/add-token.component';
 import { MainComponent } from './main/main.component';
 import { AdminModule } from './admin/admin.module';
 
@@ -17,7 +16,6 @@ import { AdminModule } from './admin/admin.module';
   declarations: [
     AppComponent,
     SettingsComponent,
-    AddTokenComponent,
     MainComponent,
   ],
   imports: [

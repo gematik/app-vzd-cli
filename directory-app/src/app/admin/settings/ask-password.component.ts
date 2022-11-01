@@ -3,11 +3,10 @@ import { BaseModal, ModalButtonType, ModalService } from 'carbon-components-angu
 import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'app-add-token',
-  templateUrl: './add-token.component.html',
-  styleUrls: ['./add-token.component.scss']
+  selector: 'admin-settings-ask-password',
+  template: `<p>Password, please</p>`,
 })
-export class AddTokenComponent extends BaseModal {
+export class AskPasswordComponent extends BaseModal {
   public token: string = ""
 
   constructor(

@@ -29,9 +29,9 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
                         try {
                             URL(url).openConnection()
                             if (os.contains("win")) {
-                                Runtime.getRuntime().exec("start $url")
+                                Runtime.getRuntime().exec(arrayOf("start", url))
                             } else if (os.contains("mac")) {
-                                Runtime.getRuntime().exec("open $url")
+                                Runtime.getRuntime().exec(arrayOf("open", url))
                             } else {
                                 echo("Open the following URL in your web browser: $url")
                             }

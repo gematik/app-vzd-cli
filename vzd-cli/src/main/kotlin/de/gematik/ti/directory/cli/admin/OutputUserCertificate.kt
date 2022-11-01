@@ -60,7 +60,6 @@ val CertificateOutputMapping = mapOf(
                 cellFormatter {
                     maxWidth = 24
                 }
-
             }
 
             class State(var count: Int = 0)
@@ -89,7 +88,6 @@ val CertificateOutputMapping = mapOf(
                 cellFormatter {
                     maxWidth = 30
                 }
-
             }
 
             labeled("OCSP") {
@@ -103,7 +101,6 @@ val CertificateOutputMapping = mapOf(
                     runCatching {
                         LocalDateTime.parse(cert.certificateInfo.notAfter).toLocalDate()
                     }.getOrNull()
-
                 }
             }
 
@@ -111,5 +108,5 @@ val CertificateOutputMapping = mapOf(
         }
 
         println(formatter.apply(value?.mapNotNull { it.userCertificate } ?: emptyList<CertificateDataDER>()))
-    },
+    }
 )

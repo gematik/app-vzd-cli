@@ -20,7 +20,7 @@ data class DirectoryEntryExtension(
     var userCertificates: List<UserCertificate>? = null,
     @SerialName("Fachdaten")
     var fachdaten: List<Fachdaten>? = null,
-    var kind: DirectoryEntryKind,
+    var kind: DirectoryEntryKind
 )
 
 object DirectoryEntryExtensionSerializer : KSerializer<DirectoryEntry> {
@@ -46,4 +46,3 @@ object DirectoryEntryExtensionSerializer : KSerializer<DirectoryEntry> {
         )
     }
 }
-

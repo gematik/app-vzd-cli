@@ -53,7 +53,7 @@ main {
 }
 
 .success {
-  fill: #42be65;
+  fill: #198038;
 }
 
 .warning {
@@ -61,5 +61,21 @@ main {
 }
 
 .error {
-  fill: #fa4d56;
+  fill: #da1e28;
+}
+
+h1 {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 54px;
+}
+
+h2 {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
 }

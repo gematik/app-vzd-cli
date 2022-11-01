@@ -4,7 +4,7 @@ import { AdminBackendService } from 'src/services/admin/admin-backend.service';
 import { DirectoryEntry } from 'src/services/admin/admin.model';
 
 @Component({
-  selector: 'admin-directory-entry',
+  selector: 'app-admin-directory-entry',
   templateUrl: './directory-entry.component.html',
   styleUrls: ['./directory-entry.component.scss']
 })
@@ -12,6 +12,7 @@ export class DirectoryEntryComponent implements OnInit {
   env!: string
   queryString: string | null = null
   entry?: DirectoryEntry
+  get rawData(): string { return JSON.stringify(this.entry, null, 2)}
 
   constructor(
     private router: Router,

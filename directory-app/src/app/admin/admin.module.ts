@@ -12,6 +12,7 @@ import { SearchResultsComponent } from './search-results/search-results.componen
 import { SearchComponent } from './search/search.component';
 import { DirectoryEntryComponent } from './directory-entry/directory-entry.component';
 import { SettingsComponent } from './settings/settings.component';
+import { AskPasswordComponent } from './settings/ask-password/ask-password.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { SettingsComponent } from './settings/settings.component';
     SearchComponent,
     DirectoryEntryComponent,
     SettingsComponent,
+    AskPasswordComponent,
   ],
   imports: [
     // angular imports

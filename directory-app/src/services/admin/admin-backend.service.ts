@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, firstValueFrom, interval, map, Observable, of, tap } from 'rxjs';
-import { MessageService } from '../message.service';
-import { AdminStatus, DirectoryEntry, SearchResults } from './admin.model';
+import { firstValueFrom, Observable } from 'rxjs';
+import { AdminStatus, DirectoryEntry, Outcome, SearchResults } from './admin.model';
 
 // TODO: how does one provide labels in Angular?
 const labels: Record<string, string> = {
@@ -33,12 +32,18 @@ export class AdminBackendService {
   get status$() : Observable<AdminStatus> {
     const self = this
     return new Observable(function subscribe(subscriber) {
+      var lastValue = JSON.stringify(self.adminStatus)
       if (self.adminStatus != undefined) {
+        lastValue = lastValue
         subscriber.next(self.adminStatus)
       }
       const id = setInterval(() => {
         if (self.adminStatus != undefined) {
-          subscriber.next(self.adminStatus)
+          const json = JSON.stringify(self.adminStatus) 
+          if (json != lastValue) {
+            lastValue = json
+            subscriber.next(self.adminStatus)
+          }
         }
       }, 500);
     });
@@ -59,6 +64,18 @@ export class AdminBackendService {
       this.http.get<SearchResults> (
         `/api/admin/${env}/search`, 
         { params: {"q": queryString} }
+      )
+    )
+  }
+
+  loginUsingVault(env: string, vaultPassword: string) {
+    return firstValueFrom(
+      this.http.post<Outcome>(
+        `/api/admin/login`,
+        {
+          env: env.toUpperCase(),
+          vaultPassword: vaultPassword
+        }
       )
     )
   }

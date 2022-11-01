@@ -1,13 +1,27 @@
 <div class="notification-container"></div>
-
-<div ibmRow *ngFor="let env of statusModel">
+<div ibmRow class="row">
+    <div ibmCol>
+        <ibm-inline-loading
+            [state]="loadingState"
+            loadingText="Anmeldung läuft"
+            successText="Anmeldung erfolgreich"
+            errorText="Anmeldung Fehler">
+        </ibm-inline-loading>
+    </div>
+</div>
+<div ibmRow *ngFor="let env of statusModel" class="row">
     <div ibmCol>
         <p><svg [ibmIcon]="env.iconName" [class]="env.iconClass"></svg> {{env.title}}</p>
     </div>
     <div ibmCol>
+        <p *ngIf="env.status === 'success'">
+            <a [routerLink]="['/admin', env.env]">Gehe zu</a>
+        </p>
         <button
+        *ngIf="env.status === 'error'"
         size="sm" 
-        [ibmButton]="'tertiary'"
+        ibmButton="tertiary"
+        (click)="onLogin(env.env)"
         >
         <svg class="bx--btn__icon" ibmIcon="add" size="16"></svg>
         Login

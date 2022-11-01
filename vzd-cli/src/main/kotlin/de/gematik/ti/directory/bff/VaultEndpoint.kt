@@ -34,9 +34,9 @@ fun Route.vaultRoute() {
                 adminAPI.login(AdminEnvironment.valueOf(secret.variant.uppercase()), secret.name, secret.secret)
             }
 
-            call.respond(Outcome("Used vault to login to: ${vault.list().map { it.variant }.joinToString()}"))
+            call.respond(Outcome("", "Used vault to login to: ${vault.list().map { it.variant }.joinToString()}"))
         } catch (e: VaultException) {
-            call.respond(status = HttpStatusCode.Forbidden, Outcome("Unauthorised"))
+            call.respond(status = HttpStatusCode.Forbidden, Outcome("Unauthorised", ""))
         }
     }
 }

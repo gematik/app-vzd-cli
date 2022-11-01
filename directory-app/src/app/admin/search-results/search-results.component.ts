@@ -6,7 +6,7 @@ import { BaseDirectoryEntry } from 'src/services/admin/admin.model';
 import { AdminBackendService } from '../../../services/admin/admin-backend.service';
 
 @Component({
-  selector: 'app-search-results',
+  selector: 'app-admin-search-results',
   templateUrl: './search-results.component.html',
   styleUrls: ['./search-results.component.scss']
 })

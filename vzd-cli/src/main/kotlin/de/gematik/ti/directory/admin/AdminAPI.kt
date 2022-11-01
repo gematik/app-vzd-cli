@@ -1,20 +1,21 @@
 package de.gematik.ti.directory.admin
 
 import de.gematik.ti.directory.global.GlobalAPI
-import de.gematik.ti.directory.util.CertificateDataDER
-import de.gematik.ti.directory.util.DirectoryAuthException
-import de.gematik.ti.directory.util.OCSPResponse
-import de.gematik.ti.directory.util.TokenStore
+import de.gematik.ti.directory.util.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-enum class AdminEnvironment(val title: String) {
-    RU("ru"),
-    TU("tu"),
-    PU("pu")
+enum class AdminEnvironment {
+    RU,
+    TU,
+    PU;
+
+    fun lowercase(): String {
+        return toString().lowercase()
+    }
 }
 
 @Serializable
@@ -34,10 +35,10 @@ class AdminAPI(val globalAPI: GlobalAPI) {
 
     fun createClient(env: AdminEnvironment): Client {
         val tokenStore = TokenStore()
-        val envConfig = config.environment(env.title)
+        val envConfig = config.environment(env.lowercase())
         val client = Client {
             apiURL = envConfig.apiURL
-            accessToken = tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: ${env.title}")
+            accessToken = tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
             if (globalAPI.config.httpProxy.enabled) {
                 httpProxyURL = globalAPI.config.httpProxy.proxyURL
             }
@@ -60,6 +61,9 @@ class AdminAPI(val globalAPI: GlobalAPI) {
     }
 
     val config by lazy { loadConfig() }
+    fun openVault(vaultPassword: String): KeyStoreVault {
+        return KeyStoreVaultProvider().open(vaultPassword)
+    }
 
     suspend fun status(includeBackendInfo: Boolean = false): AdminStatus {
         // force reload from file in case smth changed in between the requests
@@ -89,7 +93,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
     }
 
     fun environmentConfig(env: AdminEnvironment): EnvironmentConfig {
-        return config.environment(env.title)
+        return config.environment(env.lowercase())
     }
 
     fun login(env: AdminEnvironment, clientID: String, clientSecret: String): JsonObject {

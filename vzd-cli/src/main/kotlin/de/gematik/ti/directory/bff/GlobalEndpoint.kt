@@ -20,10 +20,8 @@ class Global {
 }
 
 fun Route.globalRoutes() {
-
     get<Global.Config> {
         val globalAPI = application.attributes[GlobalAPIKey]
         call.respond(globalAPI.config)
     }
-
 }

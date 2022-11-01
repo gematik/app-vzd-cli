@@ -15,6 +15,8 @@ import {
   TableModule,
   PaginationModule,
   NotificationModule,
+  InlineLoadingModule,
+  CodeSnippetModule,
 } from 'carbon-components-angular';
 
 @NgModule({
@@ -34,6 +36,8 @@ import {
     TableModule,
     PaginationModule,
     NotificationModule,
+    InlineLoadingModule,
+    CodeSnippetModule,
   ]
 })
 export class CarbonModule {}

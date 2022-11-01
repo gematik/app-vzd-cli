@@ -170,3 +170,8 @@ export interface SearchResults {
   queryString: string
   directoryEntries: [DirectoryEntry]
 }
+
+export interface Outcome {
+  code: string
+  message: string
+}

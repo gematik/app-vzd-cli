@@ -1,16 +1,8 @@
-h1 {
-    /* Titel */
+h2 {
+    margin-bottom: 1.5em;
+}
 
-    width: 602px;
-    height: 54px;
-
-    /* h1 */
-    font-family: 'IBM Plex Sans';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 36px;
-    line-height: 54px;
-    /* identical to box height, or 150% */
-
-    color: #161616;
+ibm-label {
+    margin-bottom: 1em;
+    width: unset;
 }
