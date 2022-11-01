@@ -82,11 +82,11 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
         }
         try {
             val eeCert = eeCertDER.certificate
-            logger.debug { "Looking for CA Certificate for ${eeCert.issuerDN}" }
+            logger.debug { "Looking for CA Certificate for ${eeCert.issuerX500Principal}" }
             val issuerCert =
-                tsl.caServices.first { it.caCertificate.certificate.subjectDN == eeCert.issuerDN }.caCertificate.certificate
+                tsl.caServices.first { it.caCertificate.certificate.subjectX500Principal == eeCert.issuerX500Principal }.caCertificate.certificate
 
-            logger.info { "Verifying '${eeCert.subjectDN}' from '${issuerCert.subjectDN}' using OCSP Responder: '$ocspResponderURL'" }
+            logger.info { "Verifying '${eeCert.subjectX500Principal}' from '${issuerCert.subjectX500Principal}' using OCSP Responder: '$ocspResponderURL'" }
 
             val certificateID = CertificateID(
                 digestCalculator,
@@ -129,7 +129,7 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
                     return OCSPResponse(OCSPResponseCertificateStatus.GOOD)
                 }
                 is UnknownStatus -> {
-                    logger.info { "Certificate is unknown by the OCSP server subject='${eeCert.subjectDN}', serialNumber='${ocspReq.requestList[0].certID.serialNumber}', issuer='${issuerCert.subjectDN}'" }
+                    logger.info { "Certificate is unknown by the OCSP server subject='${eeCert.subjectX500Principal}', serialNumber='${ocspReq.requestList[0].certID.serialNumber}', issuer='${issuerCert.subjectX500Principal}'" }
                     OCSPResponse(
                         OCSPResponseCertificateStatus.UNKNOWN,
                         "Certificate is unknown by the OCSP server"

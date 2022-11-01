@@ -68,8 +68,8 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
             )
 
             CertificateInfo(
-                certificate.subjectDN.name,
-                NameInfo(X500Name(certificate.subjectDN.name)),
+                certificate.subjectX500Principal.name,
+                NameInfo(X500Name(certificate.subjectX500Principal.name)),
                 certificate.issuerX500Principal.name,
                 certificate.sigAlgName,
                 certificate.publicKey.algorithm,
