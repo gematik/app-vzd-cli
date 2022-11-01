@@ -23,6 +23,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 
 val AdminAPIKey = AttributeKey<AdminAPI>("AdminAPI")
+val GlobalAPIKey = AttributeKey<GlobalAPI>("GlobalAPI")
 
 /**
  * Backend for Frontend module for Directory BFF (Backend for Frontend)
@@ -43,12 +44,22 @@ fun Application.directoryModule() {
     }
     install(Resources)
 
-    attributes.put(AdminAPIKey, AdminAPI(GlobalAPI()))
+    val globalAPI = GlobalAPI()
+    val adminAPI = AdminAPI(globalAPI)
+    attributes.put(GlobalAPIKey, globalAPI)
+    attributes.put(AdminAPIKey, adminAPI)
 
     routing {
         route("api") {
+            globalRoutes()
             vaultRoute()
             adminRoutes()
+        }
+
+        route("api/{...}") {
+            handle {
+                call.respond(HttpStatusCode.NotFound)
+            }
         }
 
         singlePageApplication {

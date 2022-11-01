@@ -1,0 +1,16 @@
+<div class="notification-container"></div>
+
+<div ibmRow *ngFor="let env of statusModel">
+    <div ibmCol>
+        <p><svg [ibmIcon]="env.iconName" [class]="env.iconClass"></svg> {{env.title}}</p>
+    </div>
+    <div ibmCol>
+        <button
+        size="sm" 
+        [ibmButton]="'tertiary'"
+        >
+        <svg class="bx--btn__icon" ibmIcon="add" size="16"></svg>
+        Login
+        </button>
+    </div>
+</div>

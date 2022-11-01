@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { NavigationService } from 'src/services/navigation.service';
 
 @Component({
@@ -14,15 +15,13 @@ export class MainComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.navigationService.getAdminMenuLinks()
-      .subscribe(links => {
+    firstValueFrom(this.navigationService.adminMenuLinks$)
+      .then(links => {
         if (links.length > 0) {
           this.router.navigate([links[0].route])
         } else {
           this.router.navigate(["settings"])
         }
-      });
-
+      })
   }
-
 }

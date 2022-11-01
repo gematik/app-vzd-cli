@@ -2,26 +2,32 @@
   <div ibmCol [columnNumbers]="{'lg': 4}"></div>
   <div ibmCol [columnNumbers]="{'lg': 8}">
     <div ibmRow>
-      <div ibmCol [columnNumbers]="{'lg': 16}">
+      <div ibmCol>
         <h1 class="Headline">Einstellungen</h1>
         <h2 class="Info"></h2>
       </div>
     </div>
+    <div ibmRow>
+      <div ibmCol>
+        <ibm-tabs [followFocus]="true" [isNavigation]="true" [cacheActive]="false">
+          <ibm-tab heading="Administration">
+            <admin-settings></admin-settings>
+          </ibm-tab>
+          <ibm-tab heading="Proxy"></ibm-tab>
+        </ibm-tabs>
+      </div>
+    </div>
+
+
     <div>
       <button 
-        [ibmButton]="'tertiary'"
+        ibmButton="tertiary"
+        size="sm"
         (click)="onAddToken()"
       >
         <svg class="bx--btn__icon" ibmIcon="add" size="16"></svg>
         <span class="bx--assistive-text">Icon description</span>
         Token hinzufügen
-      </button>
-        &nbsp;
-      <button
-        [ibmButton]="'tertiary'"
-      >
-        <svg class="bx--btn__icon" ibmIcon="settings" size="16"></svg>
-        Tresor öffnen
       </button>
     </div>
 

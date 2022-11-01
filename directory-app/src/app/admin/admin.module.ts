@@ -11,12 +11,14 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { SearchResultsComponent } from './search-results/search-results.component';
 import { SearchComponent } from './search/search.component';
 import { DirectoryEntryComponent } from './directory-entry/directory-entry.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   declarations: [
     SearchResultsComponent,
     SearchComponent,
     DirectoryEntryComponent,
+    SettingsComponent,
   ],
   imports: [
     // angular imports
@@ -27,6 +29,9 @@ import { DirectoryEntryComponent } from './directory-entry/directory-entry.compo
     CarbonModule,
     // local imports
     AdminRoutingModule,
+  ],
+  exports: [
+    SettingsComponent
   ]
 })
 export class AdminModule { }

@@ -27,9 +27,7 @@ main {
   letter-spacing: 0.16px;
   
   /* Interactive/$interactive-01 */
-  color: #010E52;
-  
-  margin-top: 48px;
+  color: #010E52;  
 }
   
 .Info {
@@ -48,4 +46,20 @@ main {
   color: #161616;
   
   margin-bottom: 28px;
+}
+
+.info {
+  fill: #4589ff;
+}
+
+.success {
+  fill: #42be65;
+}
+
+.warning {
+  fill: #f1c21b;
+}
+
+.error {
+  fill: #fa4d56;
 }

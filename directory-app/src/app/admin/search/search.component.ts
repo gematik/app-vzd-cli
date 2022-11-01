@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { map, Observable } from 'rxjs';
 
 @Component({
-  selector: 'app-search',
+  selector: 'admin-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })

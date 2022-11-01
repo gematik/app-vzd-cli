@@ -18,8 +18,7 @@ export class AppComponent implements OnInit {
 
   }
 
-  public adminMenuLinks: NavigationLink[] = [
-  ]
+  public adminMenuLinks: NavigationLink[] = []
 
   public isActive(link: string) {
     return this.router.url.startsWith(link)
@@ -27,7 +26,7 @@ export class AppComponent implements OnInit {
 
   public ngOnInit(): void {
     this.titleService.setTitle("Directory")
-    this.navigationService.getAdminMenuLinks()
+    this.navigationService.adminMenuLinks$
       .subscribe(links => {
         this.adminMenuLinks = links
       });

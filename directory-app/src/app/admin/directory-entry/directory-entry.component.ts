@@ -4,7 +4,7 @@ import { AdminBackendService } from 'src/services/admin/admin-backend.service';
 import { DirectoryEntry } from 'src/services/admin/admin.model';
 
 @Component({
-  selector: 'app-directory-entry',
+  selector: 'admin-directory-entry',
   templateUrl: './directory-entry.component.html',
   styleUrls: ['./directory-entry.component.scss']
 })

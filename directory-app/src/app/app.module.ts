@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { SettingsComponent } from './settings/settings.component';
 import { AddTokenComponent } from './settings/add-token/add-token.component';
 import { MainComponent } from './main/main.component';
+import { AdminModule } from './admin/admin.module';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { MainComponent } from './main/main.component';
     CarbonModule,
     // local imports
     AppRoutingModule,
+    AdminModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

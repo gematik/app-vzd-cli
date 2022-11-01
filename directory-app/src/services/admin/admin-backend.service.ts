@@ -1,25 +1,60 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
+import { catchError, firstValueFrom, interval, map, Observable, of, tap } from 'rxjs';
 import { MessageService } from '../message.service';
 import { AdminStatus, DirectoryEntry, SearchResults } from './admin.model';
+
+// TODO: how does one provide labels in Angular?
+const labels: Record<string, string> = {
+  "ru": "Referenzumgebung",
+  "tu": "Testumgebung",
+  "pu": "Produktivumgebung"
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminBackendService {
+  private adminStatus: AdminStatus | undefined
 
   constructor(
     private http: HttpClient,
-    private messagingService: MessageService,   
   ) { 
+    const self = this
+
+    this.getStatus().then( adminStatus => {
+      this.adminStatus = adminStatus
+      setInterval( () => {
+        this.getStatus().then( adminStatus => this.adminStatus = adminStatus)
+      }, 1000)
+    })
+  }
+
+  get status$() : Observable<AdminStatus> {
+    const self = this
+    return new Observable(function subscribe(subscriber) {
+      if (self.adminStatus != undefined) {
+        subscriber.next(self.adminStatus)
+      }
+      const id = setInterval(() => {
+        if (self.adminStatus != undefined) {
+          subscriber.next(self.adminStatus)
+        }
+      }, 500);
+    });
   }
 
   getStatus() {
-    return this.http.get<AdminStatus>('/api/admin/status')
+    return firstValueFrom(
+      this.http.get<AdminStatus>('/api/admin/status')
+    )
   }
 
-  search(env: string, queryString: string) : Promise<SearchResults> {
+  getEnvLabel(env: string) {
+    return labels[env]
+  }
+
+  search(env: string, queryString: string) {
     return firstValueFrom(
       this.http.get<SearchResults> (
         `/api/admin/${env}/search`, 

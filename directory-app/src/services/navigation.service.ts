@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {  map, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { AdminBackendService } from './admin/admin-backend.service';
 
 export interface NavigationLink {
@@ -7,33 +7,26 @@ export interface NavigationLink {
   route: string
 }
 
-// TODO: how does one provide labels in Angular?
-const labels: Record<string, string> = {
-  "ru": "Referenzumgebung",
-  "tu": "Testumgebung",
-  "pu": "Produktivumgebung"
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class NavigationService {
+  public adminMenuLinks$: Observable<NavigationLink[]>
 
   constructor(
     private adminBackend: AdminBackendService
   ) { 
-    
-  }
-
-  getAdminMenuLinks(): Observable<NavigationLink[]> {
-    return this.adminBackend.getStatus().pipe(map((status) => {
-      return status.environmentStatus.map((envStatus) => {
-        if (envStatus.accessTokenClaims != null) {
-          return <NavigationLink>{title: labels[envStatus.env], route: `/admin/${envStatus.env}`}
-        } 
-        return null
-      }).filter( (x): x is NavigationLink => x != null ).reverse()
-    }))    
+    const self = this
+    this.adminMenuLinks$ = this.adminBackend.status$.pipe(
+      map( adminStatus => {
+        return adminStatus.environmentStatus.map((envStatus) => {
+          if (envStatus.accessTokenClaims != null) {
+            return <NavigationLink>{title: this.adminBackend.getEnvLabel(envStatus.env), route: `/admin/${envStatus.env}`}
+          } 
+          return null
+        }).filter( (x): x is NavigationLink => x != null ).reverse()
+      })
+    )
   }
   
 }

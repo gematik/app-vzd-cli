@@ -29,7 +29,7 @@ export class SearchResultsComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private backend: AdminBackendService
+    private adminBackend: AdminBackendService
   ) { 
 
   }
@@ -50,7 +50,7 @@ export class SearchResultsComponent implements OnInit {
 
   search() {
     this.loading = true
-    this.backend.search(this.env, this.queryString).then(searchResult => {
+    this.adminBackend.search(this.env, this.queryString).then(searchResult => {
       this.rows = searchResult.directoryEntries.map( (entry) => {
         entry.DirectoryEntryBase.displayName = entry.DirectoryEntryBase?.displayName?.replace("TEST-ONLY", "")
         entry.DirectoryEntryBase.displayName = entry.DirectoryEntryBase?.displayName?.replace("NOT-VALID", "")
