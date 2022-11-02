@@ -18,6 +18,7 @@ import {
   InlineLoadingModule,
   CodeSnippetModule,
   StructuredListModule,
+  AccordionModule,
 } from 'carbon-components-angular';
 
 @NgModule({
@@ -40,6 +41,7 @@ import {
     InlineLoadingModule,
     CodeSnippetModule,
     StructuredListModule,
+    AccordionModule,
   ]
 })
 export class CarbonModule {}
