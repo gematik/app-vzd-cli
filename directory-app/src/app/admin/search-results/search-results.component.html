@@ -67,8 +67,7 @@
 
   <ibm-table-container class="SearchResulttContainer" ibmCol [columnNumbers]="{'lg': 12}">
     <ibm-table
-      [skeleton]="loading"
-      [model]="loading ? skeletonModel : model"
+      [model]="model"
 			size="lg"
 			[sortable]="true"
 			[showSelectionColumn]="false"

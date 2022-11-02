@@ -69,6 +69,12 @@ export class SearchResultsComponent implements OnInit {
           }),
         ]
       })
+      if (this.rows.length == 1) {
+        this.router.navigate(
+          ["entry", this.rows[0][0].expandedData.telematikID, {"q": this.queryString}],
+          { relativeTo: this.route.parent }
+        )
+      }
       this.model.pageLength = 10
       this.model.totalDataLength = this.rows.length
       this.selectPage(1);
@@ -77,7 +83,7 @@ export class SearchResultsComponent implements OnInit {
     .catch(e => {
       const httpError = e as HttpErrorResponse
       if (httpError?.status == 401) {
-        //this.router.navigate(["/settings"])
+        this.router.navigate(["/settings"])
       }
       this.loading = false
       this.errorMessage = e.message

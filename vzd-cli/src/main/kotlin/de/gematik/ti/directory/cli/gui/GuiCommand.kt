@@ -21,7 +21,7 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
 
             environment.monitor.subscribe(ApplicationStarted) {
                 TermUi.echo("Starting server at: http://127.0.0.1:$port")
-                val url = "http://127.0.0.1:$port/api/admin/config"
+                val url = "http://127.0.0.1:$port/"
                 val os = System.getProperty("os.name").lowercase()
                 launch {
                     repeat(10) {

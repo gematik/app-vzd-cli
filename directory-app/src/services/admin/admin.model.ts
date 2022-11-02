@@ -117,8 +117,8 @@ export interface UserCertificate {
   dn?: DistinguishedName
   entryType?: string
   telematikID?: string
-  professionOID?: [string]
-  usage?: [string]
+  professionOID?: string[]
+  usage?: string[]
   
   userCertificate?: CertificateInfo
   description?: string
@@ -132,14 +132,14 @@ export interface KomLeData {
 
 export interface FAD1 {
   dn: DistinguishedName
-  mail?: [string]
+  mail?: string[]
   "KOM-LE_Version"?: string
   komLeData?: [KomLeData]
 }
 
 export interface Fachdaten {   
   dn: DistinguishedName
-  "FAD1": [FAD1]
+  "FAD1": FAD1[]
 }
 
 export enum DirectoryEntryKind {
@@ -161,8 +161,8 @@ export enum DirectoryEntryKind {
 
 export interface DirectoryEntry {
   "DirectoryEntryBase": BaseDirectoryEntry
-  userCertificates?: [UserCertificate]
-  "Fachdaten"?: [Fachdaten]
+  userCertificates?: UserCertificate[]
+  "Fachdaten"?: Fachdaten[]
   kind: DirectoryEntryKind
 }
 
