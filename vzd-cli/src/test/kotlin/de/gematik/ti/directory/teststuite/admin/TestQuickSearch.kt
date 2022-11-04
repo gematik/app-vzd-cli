@@ -1,6 +1,8 @@
 package de.gematik.ti.directory.teststuite.admin
 
 import de.gematik.ti.directory.admin.Client
+import de.gematik.ti.directory.admin.TokenType
+import de.gematik.ti.directory.admin.Tokenizer
 import de.gematik.ti.directory.admin.quickSearch
 import io.kotest.common.runBlocking
 import io.kotest.core.spec.style.FeatureSpec
@@ -13,6 +15,18 @@ class TestQuickSearch : FeatureSpec({
 
     beforeSpec {
         client = createClient()
+    }
+
+    feature("Tokenizer is able to detect multi-word locality") {
+        scenario("Support for 3 words localities") {
+            val tokens = Tokenizer.tokenize("Frankfurt am Main")
+            tokens.size shouldBe 1
+            tokens[0].type shouldBe TokenType.LocalityName
+        }
+        scenario("Tokenize by locality, which is present als plain name and name with additions") {
+            val tokens = Tokenizer.tokenize("Herzberg am Hartz")
+            println(tokens.map { "${it.type}=${it.value}" })
+        }
     }
 
     feature("Quick Search") {

@@ -95,9 +95,17 @@ object Tokenizer {
         consumeLocalityName(strings, 0, 2)?.let {
             return it
         }
+        consumeLocalityName(strings, 0, 3)?.let {
+            return it
+        }
+        // shift to position 1 and try all odd strings
         consumeLocalityName(strings, 1, 2)?.let {
             return it
         }
+        consumeLocalityName(strings, 1, 3)?.let {
+            return it
+        }
+        // final try with one word localities
         consumeLocalityName(strings, 0, 1)?.let {
             return it
         }
