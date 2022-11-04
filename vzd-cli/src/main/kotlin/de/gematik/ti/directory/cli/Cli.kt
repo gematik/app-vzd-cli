@@ -13,9 +13,11 @@ import com.github.ajalt.clikt.parameters.options.versionOption
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.apo.ApoCli
 import de.gematik.ti.directory.cli.admin.DirectoryAdministrationCli
+import de.gematik.ti.directory.cli.global.GlobalCommand
 import de.gematik.ti.directory.cli.gui.GuiCommand
 import de.gematik.ti.directory.cli.ldif.LdifCommand
 import de.gematik.ti.directory.cli.pers.PersCommand
+import de.gematik.ti.directory.global.GlobalConfig
 import de.gematik.ti.directory.util.DirectoryException
 import de.gematik.ti.directory.util.VaultException
 import io.ktor.client.network.sockets.*
@@ -79,6 +81,7 @@ class Cli : CliktCommand(name = "vzd-cli") {
     init {
         versionOption(BuildConfig.APP_VERSION)
         subcommands(
+            GlobalCommand(),
             DirectoryAdministrationCli(),
             ApoCli(),
             GuiCommand(),

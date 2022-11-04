@@ -33,7 +33,8 @@ val SET_PROPERTIES = mapOf(
     "httpProxy.proxyURL" to { config: GlobalConfig, value: String ->
         config.httpProxy.proxyURL = URL(value).toString()
     },
-    "httpProxy.enabled" to { config: GlobalConfig, value: String -> config.httpProxy.enabled = value.toBoolean() }
+    "httpProxy.enabled" to { config: GlobalConfig, value: String -> config.httpProxy.enabled = value.toBoolean() },
+    "updates.preReleasesEnabled" to { config: GlobalConfig, value: String -> config.updates.preReleasesEnabled = value.toBoolean()}
 )
 
 class ConfigSetCommand : CliktCommand(
@@ -48,7 +49,7 @@ class ConfigSetCommand : CliktCommand(
     private val value by argument()
     override fun run() {
         val globalAPI = GlobalAPI()
-        val config = globalAPI.loadConfig()
+        val config = globalAPI.config
         property(config, value)
         globalAPI.updateConfig()
         echo(YAML.encodeToString(config))
@@ -58,7 +59,8 @@ class ConfigSetCommand : CliktCommand(
 val GET_PROPERTIES = mapOf(
     "httpProxy" to { config: GlobalConfig -> config.httpProxy },
     "httpProxy.proxyURL" to { config: GlobalConfig -> config.httpProxy.proxyURL },
-    "httpProxy.enabled" to { config: GlobalConfig -> config.httpProxy.enabled }
+    "httpProxy.enabled" to { config: GlobalConfig -> config.httpProxy.enabled },
+    "updates" to { config: GlobalConfig -> config.updates }
 )
 
 class ConfigGetCommand : CliktCommand(

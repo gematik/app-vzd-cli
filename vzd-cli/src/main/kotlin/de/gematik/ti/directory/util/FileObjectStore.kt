@@ -29,7 +29,13 @@ open class FileObjectStore<T>(
             value = defaultValue.invoke()
             save()
         } else {
-            value = deserialize.invoke(YAML, path.readText())
+            try {
+                value = deserialize.invoke(YAML, path.readText())
+            } catch (e: Exception) {
+                logger.error { "Error loading the YAML file" }
+                logger.error { e }
+                value = defaultValue()
+            }
         }
     }
 
