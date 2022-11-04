@@ -1,9 +1,14 @@
 package de.gematik.ti.directory.cli.admin
 
-import com.github.ajalt.clikt.core.*
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
+import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
-import de.gematik.ti.directory.admin.*
+import de.gematik.ti.directory.admin.AdminAPI
+import de.gematik.ti.directory.admin.AdminEnvironment
+import de.gematik.ti.directory.admin.Client
 import de.gematik.ti.directory.cli.admin.compat.CmdCommand
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.global.GlobalAPI
@@ -86,7 +91,7 @@ class DirectoryAdministrationCli :
             LoginCommand(),
             LoginCredCommand(),
             TokenCommand(),
-            Info(),
+            Status(),
             SearchCommand(),
             ShowCommand(),
             ListCommand(),
@@ -109,11 +114,12 @@ class DirectoryAdministrationCli :
     }
 }
 
-class Info : CliktCommand(name = "info", help = "Show information about the API") {
+class Status : CliktCommand(name = "status", help = "Show information about the API") {
     private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
-        val info = runBlocking { context.client.getInfo() }
-        Output.printHuman(info)
+        runBlocking {
+            Output.printYaml(context.adminAPI.status(true))
+        }
     }
 }

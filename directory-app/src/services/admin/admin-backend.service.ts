@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { AdminStatus, DirectoryEntry, Outcome, SearchResults } from './admin.model';
+import { AdminStatus, DirectoryEntry, DirectoryEntryKind, Outcome, SearchResults } from './admin.model';
 
 // TODO: how does one provide labels in Angular?
 const labels: Record<string, string> = {
@@ -87,4 +87,31 @@ export class AdminBackendService {
       )
     )
   }
+
+  getEntryKindColor(entry: DirectoryEntry) : string {
+    switch(entry.kind) {
+
+      case DirectoryEntryKind.Arzt:
+        return "magenta"
+      case DirectoryEntryKind.Arztpraxis:
+          return "blue"
+      case DirectoryEntryKind.Zahnarzt:
+        return "red"
+      case DirectoryEntryKind.Zahnarztpraxis:
+          return "teal"
+      case DirectoryEntryKind.Psychotherapeut:
+        return "magenta"
+      case DirectoryEntryKind.Krankenhaus:
+          return "cyan"
+      case DirectoryEntryKind.Apotheke: 
+        return "purple"
+      default:
+        return "warm-gray"
+    }
+  }
+
+  getEntryKindTitle(entry: DirectoryEntry) : string {
+    return entry.kind.toString()
+  }
+
 }

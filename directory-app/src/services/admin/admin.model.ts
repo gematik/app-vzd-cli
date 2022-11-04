@@ -143,20 +143,20 @@ export interface Fachdaten {
 }
 
 export enum DirectoryEntryKind {
-  Arzt,
-  Arztpraxis,
-  Zahnarzt,
-  Zahnarztpraxis,
-  Apotheke,
-  Apotheker,
-  Psychotherapeut,
-  Krankenhaus,
-  GKV,
-  HBAGematik,
-  SMCBGematik,
-  HBAeGBR,
-  SMCBeGBR,
-  Weitere
+  Arzt = "Arzt",
+  Arztpraxis = "Arztpraxis",
+  Zahnarzt = "Zahnarzt",
+  Zahnarztpraxis = "Zahnarztpraxis",
+  Apotheke = "Apotheke",
+  Apotheker = "Apotheker",
+  Psychotherapeut = "Psychotherapeut",
+  Krankenhaus = "Krankenhaus",
+  GKV = "GKV",
+  HBAGematik = "HBAGematik",
+  SMCBGematik = "SMCBGematik",
+  HBAeGBR = "HBAeGBR",
+  SMCBeGBR = "SMCBeGBR",
+  Weitere = "Weitere"
 }
 
 export interface DirectoryEntry {

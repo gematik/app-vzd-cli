@@ -18,12 +18,8 @@ import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
-import java.io.InputStreamReader
 
 private val JSON = Json {
     ignoreUnknownKeys = true
@@ -184,69 +180,6 @@ class Client(block: Configuration.() -> Unit = {}) {
         }
 
         return response.body()
-    }
-
-    /**
-     * Queries the server using `GET /DirectoryEntries` and returns a stream of DirectoryEntry objects.
-     * Allows processing of large amount of entries without loading all of them in RAM.
-     */
-    suspend fun streamDirectoryEntries(
-        parameters: Map<String, String>,
-        path: String = "/DirectoryEntriesSync",
-        sink: (entry: DirectoryEntry) -> Unit
-    ) {
-        // create custom client without automatic JSON parsing
-        val httpClient = HttpClient(CIO) {
-            engine {
-                config.httpProxyURL?.let {
-                    logger.debug { "Using proxy: $it" }
-                    proxy = ProxyBuilder.http(it)
-                }
-            }
-
-            install(HttpTimeout) {
-                requestTimeoutMillis = 1000 * 60 * 60
-            }
-            expectSuccess = false
-
-            install(Auth) {
-                bearer {
-                    sendWithoutRequest {
-                        true
-                    }
-                    loadTokens {
-                        BearerTokens(config.accessToken, "")
-                    }
-                }
-            }
-
-            defaultRequest {
-                url(config.apiURL)
-                headers["Accept"] = "application/json"
-            }
-        }
-        httpClient.prepareGet(path) {
-            for (param in parameters.entries) {
-                parameter(param.key, param.value)
-            }
-        }.execute { response ->
-            if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.NotFound) {
-                throw AdminResponseException(response, "Unable to get entries")
-            }
-            val channel: ByteReadChannel = response.body()
-            jsonArraySequence(InputStreamReader(channel.toInputStream())).forEach {
-                try {
-                    sink(JSON.decodeFromString(it))
-                } catch (e: Exception) {
-                    val json: JsonObject = JSON.decodeFromString(it)
-                    logger.error {
-                        "Unable to process Entry with uid=${
-                        json["DirectoryEntryBase"]?.jsonObject?.get("dn")?.jsonObject?.get("uid")
-                        }, telematikID=${json["DirectoryEntryBase"]?.jsonObject?.get("telematikID")}"
-                    }
-                }
-            }
-        }
     }
 
     /**

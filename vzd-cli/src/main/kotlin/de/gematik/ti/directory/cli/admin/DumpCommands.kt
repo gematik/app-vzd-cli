@@ -65,7 +65,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         help = "Specify query parameters to find matching entries"
     ).associate()
     private val cursorSize by option("-c", "--cursor-size", help = "Size of the cursor per HTTP Request")
-        .int().default(-1)
+        .int().default(500)
     private val expectedTotal by option("-e", "--expected-count", help = "Expected total count of entries. Used only for cosmetics to display the progressbar.").int().default(-1)
     private val parameterOptions by ParameterOptions()
     private val context by requireObject<CommandContext>()
@@ -87,11 +87,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
     }
 
     fun runQuery(params: Map<String, String>) {
-        if (cursorSize > 0) {
-            runQueryWithPaging(params)
-        } else {
-            runQueryWithoutPaging(params)
-        }
+        runQueryWithPaging(params)
     }
 
     private fun expandOcspStatus(entry: DirectoryEntry) {
@@ -102,20 +98,6 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         }
     }
 
-    private fun runQueryWithoutPaging(params: Map<String, String>) {
-        var entries = 0
-        val elapsed = measureTimeMillis {
-            runBlocking {
-                context.client.streamDirectoryEntries(params) { entry ->
-                    expandOcspStatus(entry)
-                    logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
-                    println(jsonExtended.encodeToString(entry))
-                    entries++
-                }
-            }
-        }
-        logger.info { "Dumped $entries entries in ${elapsed / 1000} seconds" }
-    }
     private fun runQueryWithPaging(params: Map<String, String>) {
         var entries = 0
         val semaphore = Semaphore(20)

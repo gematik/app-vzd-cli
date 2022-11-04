@@ -25,6 +25,9 @@ export class SearchResultsComponent implements OnInit {
   @ViewChild("addressTemplate", { static: false })
   // @ts-ignore
 	protected addressTemplate: TemplateRef<any>;
+  @ViewChild("tagTemplate", { static: false })
+  // @ts-ignore
+	protected tagTemplate: TemplateRef<any>;
 
   constructor(
     private router: Router,
@@ -61,7 +64,8 @@ export class SearchResultsComponent implements OnInit {
             expandedTemplate: this.expandedTemplate,
           }),
           new TableItem({
-            data: entry.kind,
+            data: { color: this.adminBackend.getEntryKindColor(entry), text: this.adminBackend.getEntryKindTitle(entry) },
+            template: this.tagTemplate,
           }),
           new TableItem({
             data: entry.DirectoryEntryBase,

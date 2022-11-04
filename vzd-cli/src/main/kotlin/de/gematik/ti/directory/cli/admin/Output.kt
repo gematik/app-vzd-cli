@@ -21,10 +21,6 @@ enum class OutputFormat {
  * Output helper class für human, json, yaml and csv outputs
  */
 object Output {
-    private val yamlOptimized = Yaml {
-        serializersModule = optimizedSerializersModule
-        encodeDefaultValues = false
-    }
     private val yaml = Yaml {
         encodeDefaultValues = false
     }
@@ -35,9 +31,9 @@ object Output {
         delimiter = ';'
     }
 
-    fun printHuman(value: Any?) {
+    private fun printHuman(value: Any?) {
         value?.let {
-            println(yamlOptimized.encodeToString(value))
+            println(yaml.encodeToString(value))
         }
     }
 

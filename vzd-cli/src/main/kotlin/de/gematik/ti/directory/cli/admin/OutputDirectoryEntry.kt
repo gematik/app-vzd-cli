@@ -37,7 +37,7 @@ val HumanDirectoryEntrySerializersModule = SerializersModule {
     contextual(ExtendedCertificateDataDERSerializer)
 }
 
-var HumanDirectoryEntry = Yaml {
+private var HumanDirectoryEntry = Yaml {
     encodeDefaultValues = false
     serializersModule = HumanDirectoryEntrySerializersModule
 }

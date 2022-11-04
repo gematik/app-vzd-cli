@@ -1,7 +1,8 @@
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-version = "2.1.0a3"
+version = "2.1.0a4"
 
 val ktorVersion = "2.1.2"
 val kotestVersion = "5.5.2"
@@ -35,30 +36,43 @@ dependencies {
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    // implementation("org.jetbrains.kotlin:kotlin-reflect")
+    // Kotlin logging wrapper
     implementation("io.github.microutils:kotlin-logging:2.1.21")
+    // logback logging backend
     implementation("ch.qos.logback:logback-classic:1.2.9")
+    // Ktor client libraties
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    // YAML support for kotlinx serialisation
     implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
-    implementation("com.google.code.gson:gson:2.9.0")
 
+    // CSV support
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.6.0")
+
+    // HAPI-FHIR Model classes
     implementation("ca.uhn.hapi.fhir:hapi-fhir-base:$hapiVersion")
     implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiVersion")
 
+    // LDIF processing
     implementation("org.ldaptive:ldaptive:2.1.1")
+
+    // Text-GUI: Progressbar
     implementation("me.tongfei:progressbar:0.9.3")
+    // Text-GUI: Text Tables
     implementation("hu.vissy.plain-text-table:ptt-kotlin:1.1.7")
     implementation("hu.vissy.plain-text-table:ptt-core:3.0.0")
 
+    // OpenNLP - natural text prcessor
     // implementation("org.apache.opennlp:opennlp-tools:2.0.0")
     // implementation("org.apache.opennlp:opennlp-uima:2.0.0")
 
-    // server
+    // Ktor server (for GUI BFF)
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
@@ -67,12 +81,14 @@ dependencies {
     implementation("io.ktor:ktor-server-sessions:$ktorVersion")
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
 
-    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.6.0")
-
+    // Clikt library for creating nice CLI
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
+
+    // Bouncy castle fpr crypto and certificates processing
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
 
+    // test libraries
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
@@ -87,12 +103,19 @@ tasks.register<Zip>("customDist") {
     dependsOn("installShadowDist")
     archiveBaseName.set(project.name)
     destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+
     into("${project.name}-${project.version}/commands") {
-        from(layout.projectDirectory.dir("commands"))
+        from(layout.projectDirectory.dir("../legacy-client-java/commands"))
     }
+
     into("${project.name}-${project.version}/") {
         from(layout.buildDirectory.dir("install/vzd-cli-shadow"))
     }
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    minimize()
+    archiveVersion.set("")
 }
 
 tasks.named("build") {

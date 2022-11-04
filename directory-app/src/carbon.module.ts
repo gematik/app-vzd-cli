@@ -19,6 +19,7 @@ import {
   CodeSnippetModule,
   StructuredListModule,
   AccordionModule,
+  TagModule,
 } from 'carbon-components-angular';
 
 @NgModule({
@@ -42,6 +43,7 @@ import {
     CodeSnippetModule,
     StructuredListModule,
     AccordionModule,
+    TagModule,
   ]
 })
 export class CarbonModule {}

@@ -3,6 +3,7 @@ package de.gematik.ti.directory.cli.admin
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.util.CertificateDataDER
 import hu.vissy.texttable.dsl.tableFormatter
+import net.mamoe.yamlkt.Yaml
 import java.time.LocalDateTime
 
 val UserCertificateCsvHeaders = listOf(
@@ -17,8 +18,17 @@ val UserCertificateCsvHeaders = listOf(
     "ocspResponse"
 )
 
+private var HumanCertificateOutput = Yaml {
+    encodeDefaultValues = false
+    serializersModule = HumanDirectoryEntrySerializersModule
+}
+
 val CertificateOutputMapping = mapOf(
-    OutputFormat.HUMAN to { _: Map<String, String>, value: List<UserCertificate>? -> Output.printHuman(value) },
+    OutputFormat.HUMAN to { _: Map<String, String>, value: List<UserCertificate>? ->
+        {
+            println(HumanCertificateOutput.encodeToString(value))
+        }
+    },
     OutputFormat.YAML to { _: Map<String, String>, value: List<UserCertificate>? -> Output.printYaml(value) },
     OutputFormat.JSON to { _: Map<String, String>, value: List<UserCertificate>? -> Output.printJson(value) },
     OutputFormat.SHORT to { _: Map<String, String>, value: List<UserCertificate>? ->
