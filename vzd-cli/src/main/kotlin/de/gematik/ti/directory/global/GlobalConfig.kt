@@ -9,7 +9,7 @@ import java.nio.file.Path
 @Serializable
 data class HttpProxyConfig(
     var proxyURL: String,
-    var enabled: Boolean,
+    var enabled: Boolean
 )
 
 @Serializable
@@ -39,7 +39,7 @@ internal class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjec
                 preReleasesEnabled = false,
                 lastCheck = -1,
                 latestRelease = BuildConfig.APP_VERSION
-            ),
+            )
         )
     },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },

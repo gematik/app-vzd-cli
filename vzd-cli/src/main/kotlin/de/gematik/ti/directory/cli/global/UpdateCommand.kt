@@ -3,7 +3,6 @@ package de.gematik.ti.directory.cli.global
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
-import com.github.ajalt.clikt.parameters.arguments.optional
 import de.gematik.ti.directory.cli.BuildConfig
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.global.GlobalAPI
@@ -27,17 +26,20 @@ class UpdateCommand : CliktCommand(name = "update", help = "Updates this softwar
             version
         }
 
-        val progressBar = ProgressBar("Downloading $updateToVersion", -1)
+        var progressBar: ProgressBar? = null
         try {
             runBlocking {
                 globalAPI.selfUpdate(updateToVersion) { bytesSentTotal, contentLength ->
-                    progressBar.maxHint(contentLength/1000)
-                    progressBar.stepTo(bytesSentTotal/1000)
+                    if (progressBar == null) {
+                        progressBar = ProgressBar("Downloading $updateToVersion", contentLength / 1000)
+                    }
+                    progressBar?.maxHint(contentLength / 1000)
+                    progressBar?.stepTo(bytesSentTotal / 1000)
                 }
             }
         } finally {
-            progressBar.maxHint(progressBar.current)
-            progressBar.close()
+            progressBar?.maxHint(progressBar?.current ?: 0)
+            progressBar?.close()
         }
     }
 }
