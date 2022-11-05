@@ -3,7 +3,6 @@ package de.gematik.ti.directory.admin
 import de.gematik.ti.directory.global.GlobalAPI
 import de.gematik.ti.directory.util.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -21,13 +20,12 @@ enum class AdminEnvironment {
 @Serializable
 data class AdminEnvironmentStatus(
     val env: String,
-    val accessTokenClaims: JsonObject?,
+    val accessTokenClaims: Map<String, String>?,
     val backendInfo: InfoObject?
 )
 
 @Serializable
 data class AdminStatus(
-    val config: Config,
     val environmentStatus: List<AdminEnvironmentStatus>
 )
 
@@ -87,7 +85,6 @@ class AdminAPI(val globalAPI: GlobalAPI) {
             )
         }
         return AdminStatus(
-            config,
             envInfoList
         )
     }
@@ -96,7 +93,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
         return config.environment(env.lowercase())
     }
 
-    fun login(env: AdminEnvironment, clientID: String, clientSecret: String): JsonObject {
+    fun login(env: AdminEnvironment, clientID: String, clientSecret: String): Map<String, String> {
         val tokenStore = TokenStore()
         val envcfg = environmentConfig(env)
 

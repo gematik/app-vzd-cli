@@ -13,8 +13,6 @@ import com.github.ajalt.clikt.parameters.types.enum
 import de.gematik.ti.directory.admin.AdminEnvironment
 import de.gematik.ti.directory.cli.ProxyOptions
 import de.gematik.ti.directory.cli.catching
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
 import java.util.*
 
 private fun doLogin(context: CommandContext, env: AdminEnvironment, overrideProxy: Boolean?, clientID: String, clientSecret: String) {
@@ -28,8 +26,8 @@ private fun doLogin(context: CommandContext, env: AdminEnvironment, overrideProx
 
     TermUi.echo("Login successful. Environment set to: $env")
 
-    claims["exp"]?.jsonPrimitive?.int?.let {
-        val expDate = Date(it.toLong() * 1000)
+    claims["exp"]?.toLong()?.let {
+        val expDate = Date(it * 1000)
         TermUi.echo("Token valid until $expDate")
     }
 }

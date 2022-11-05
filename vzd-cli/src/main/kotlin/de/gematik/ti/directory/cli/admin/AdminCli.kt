@@ -91,7 +91,7 @@ class DirectoryAdministrationCli :
             LoginCommand(),
             LoginCredCommand(),
             TokenCommand(),
-            Status(),
+            StatusCommand(),
             SearchCommand(),
             ShowCommand(),
             ListCommand(),
@@ -111,15 +111,5 @@ class DirectoryAdministrationCli :
             DumpCommand(),
             CmdCommand()
         )
-    }
-}
-
-class Status : CliktCommand(name = "status", help = "Show information about the API") {
-    private val context by requireObject<CommandContext>()
-
-    override fun run() = catching {
-        runBlocking {
-            Output.printYaml(context.adminAPI.status(true))
-        }
     }
 }

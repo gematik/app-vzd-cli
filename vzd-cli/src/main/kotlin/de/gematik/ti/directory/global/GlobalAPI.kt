@@ -92,7 +92,15 @@ class GlobalAPI {
         if (version < "2.1.0") {
             throw DirectoryException("Updates only supported from version 2.1.0")
         }
-        val appHome = Path(Cli::class.java.protectionDomain.codeSource.location.file).parent.parent
+
+        logger.debug { "Trying to determine APP_HOME" }
+
+        var appHome = runCatching {
+            Path(Cli::class.java.protectionDomain.codeSource.location.file).parent.parent
+        }.recover {
+            Path(Cli::class.java.protectionDomain.codeSource.location.file.substring(1)).parent.parent
+        }.getOrThrow()
+
         logger.info { "Updating app in $appHome" }
 
         val updateUrl = "https://github.com/gematik/app-vzd-cli/releases/download/$version/vzd-cli-$version.zip"
@@ -133,7 +141,11 @@ class GlobalAPI {
             }
         }
 
-        jarFile.moveTo(Path(appHome.absolutePathString(), "lib", "vzd-cli-all.jar"), true)
+        try {
+            jarFile.moveTo(Path(appHome.absolutePathString(), "lib", "vzd-cli-all.jar"), true)
+        } catch (e: Throwable) {
+            // if this fails, the start script will rename this file on next run
+        }
 
         zipFile.deleteExisting()
     }

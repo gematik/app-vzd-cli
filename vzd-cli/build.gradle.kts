@@ -59,8 +59,8 @@ dependencies {
     implementation("ca.uhn.hapi.fhir:hapi-fhir-base:$hapiVersion")
     implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiVersion")
 
-    // LDIF processing
-    implementation("org.ldaptive:ldaptive:2.1.1")
+    // LDAP/LDIF processing
+    // implementation("org.ldaptive:ldaptive:2.1.1")
 
     // Text-GUI: Progressbar
     implementation("me.tongfei:progressbar:0.9.3")
@@ -114,8 +114,15 @@ tasks.register<Zip>("customDist") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-    minimize()
+    minimize {
+        exclude(dependency("org.bouncycastle:.*:.*"))
+    }
     archiveVersion.set("")
+}
+
+tasks.named<CreateStartScripts>("startShadowScripts") {
+    val generator = windowsStartScriptGenerator as TemplateBasedScriptGenerator
+    generator.template = project.resources.text.fromFile("startScriptTemplates/windowsStartScript.txt")
 }
 
 tasks.named("build") {

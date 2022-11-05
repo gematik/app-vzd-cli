@@ -35,17 +35,20 @@ class TokenStore(customConfigPath: Path? = null) : FileObjectStore<List<TokenSto
         save()
     }
 
-    fun claimsFor(url: String): JsonObject? {
+    fun claimsFor(url: String): Map<String, String>? {
         accessTokenFor(url)?.let { item ->
             return tokenToClaims(item.accessToken)
         }
         return null
     }
 
-    private fun tokenToClaims(token: String): JsonObject {
+    private fun tokenToClaims(token: String): Map<String, String> {
         val tokenParts = token.split(".")
         val tokenBody = String(Base64.getUrlDecoder().decode(tokenParts[1]), Charsets.UTF_8)
-        return Json.decodeFromString(tokenBody)
+        val jsonObject = Json.decodeFromString<JsonObject>(tokenBody)
+        return jsonObject.map { entry ->
+            Pair(entry.key, entry.value.jsonPrimitive.content)
+        }.toMap()
     }
 
     fun removeExpired() {
@@ -53,7 +56,7 @@ class TokenStore(customConfigPath: Path? = null) : FileObjectStore<List<TokenSto
         val validItems = value.filter { item ->
             try {
                 val claims = tokenToClaims(item.accessToken)
-                claims["exp"]?.jsonPrimitive?.long?.let {
+                claims["exp"]?.toLong()?.let {
                     (it * 1000) + GRACE_PERIOD_MILLIS >= now
                 } ?: false
             } catch (e: Exception) {
