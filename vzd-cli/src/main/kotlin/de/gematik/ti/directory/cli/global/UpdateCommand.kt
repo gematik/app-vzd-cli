@@ -41,6 +41,5 @@ class UpdateCommand : CliktCommand(name = "update", help = "Updates this softwar
             progressBar?.maxHint(progressBar?.current ?: 0)
             progressBar?.close()
         }
-
     }
 }

@@ -1,6 +1,5 @@
 package de.gematik.ti.directory.global
 
-import de.gematik.ti.directory.cli.BuildConfig
 import de.gematik.ti.directory.cli.Cli
 import de.gematik.ti.directory.util.DirectoryException
 import de.gematik.ti.directory.util.PKIClient
@@ -20,7 +19,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import mu.KotlinLogging
 import java.time.Instant
 import java.util.zip.ZipFile
@@ -34,10 +32,10 @@ data class Release(
     @SerialName("prerelease")
     val preRelease: Boolean,
     @SerialName("published_at")
-    val publishedAt: String,
+    val publishedAt: String
 )
 
-const val GITHUB_RELEASES_URL="https://api.github.com/repos/gematik/app-vzd-cli/releases"
+const val GITHUB_RELEASES_URL = "https://api.github.com/repos/gematik/app-vzd-cli/releases"
 
 private val JSON = Json {
     ignoreUnknownKeys = true
@@ -68,7 +66,7 @@ class GlobalAPI {
 
         val latestRelease = if (config.updates.preReleasesEnabled) {
             releases.first()
-        } else  {
+        } else {
             releases.first { it.preRelease == false }
         }
 
