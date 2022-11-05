@@ -4,15 +4,10 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
-import de.gematik.ti.directory.apo.ApoCliContext
-import de.gematik.ti.directory.apo.ApoInstance
 import de.gematik.ti.directory.cli.catching
 import hu.vissy.texttable.dsl.tableFormatter
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 import org.hl7.fhir.r4.model.Location
-
-private val JSON = Json { prettyPrint = true }
 
 class SearchCommand : CliktCommand(name = "search", help = "Search for pharmacies in ApoVZD") {
     private val context by requireObject<ApoInstanceCliContext>()

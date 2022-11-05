@@ -7,14 +7,12 @@ import de.gematik.ti.directory.apo.ApoAPI
 import de.gematik.ti.directory.apo.ApoCliContext
 import de.gematik.ti.directory.apo.ApoClient
 import de.gematik.ti.directory.apo.ApoInstance
-import de.gematik.ti.directory.global.GlobalAPI
 
 class ApoInstanceCliContext(
     val apoAPI: ApoAPI,
     val instance: ApoInstance,
     val client: ApoClient,
 )
-
 
 class InstanceCommands(inst: ApoInstance) : CliktCommand(name = inst.lowercase(), help = """Commands for ${inst.lowercase()} instance""".trimMargin()) {
     private val context by requireObject<ApoCliContext>()

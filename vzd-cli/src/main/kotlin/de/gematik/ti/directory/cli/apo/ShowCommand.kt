@@ -3,7 +3,6 @@ package de.gematik.ti.directory.cli.apo
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
-import de.gematik.ti.directory.apo.ApoCliContext
 import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
