@@ -14,7 +14,6 @@ import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.apo.ApoCli
 import de.gematik.ti.directory.cli.admin.DirectoryAdministrationCli
 import de.gematik.ti.directory.cli.global.ConfigCommand
-import de.gematik.ti.directory.cli.global.ConfigGetCommand
 import de.gematik.ti.directory.cli.global.UpdateCommand
 import de.gematik.ti.directory.cli.gui.GuiCommand
 import de.gematik.ti.directory.cli.pers.PersCommand
@@ -23,15 +22,12 @@ import de.gematik.ti.directory.util.VaultException
 import io.ktor.client.network.sockets.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import org.slf4j.LoggerFactory
 import java.nio.file.attribute.PosixFilePermission
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.setPosixFilePermissions
-
-private val logger = KotlinLogging.logger {}
 
 val JsonPretty = Json { prettyPrint = true }
 val YamlPretty = Yaml { encodeDefaultValues = false }

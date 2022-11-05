@@ -2,7 +2,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-version = "2.1.0alpha1"
+version = "2.1.0-alpha2"
 
 val ktorVersion = "2.1.2"
 val kotestVersion = "5.5.2"
@@ -106,6 +106,10 @@ tasks.register<Zip>("customDist") {
 
     into("${project.name}-${project.version}/commands") {
         from(layout.projectDirectory.dir("../legacy-client-java/commands"))
+    }
+
+    into("${project.name}-${project.version}/bin") {
+        from(layout.projectDirectory.dir("additionalScripts"))
     }
 
     into("${project.name}-${project.version}/") {
