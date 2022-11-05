@@ -1,6 +1,7 @@
 package de.gematik.ti.directory.cli.gui
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.output.TermUi
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -39,7 +40,11 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
                                 logger.debug { "URL connection successful. Opening the Webbrowser." }
                                 if (os.contains("win")) {
                                     logger.debug { "Opening browser on windows." }
-                                    Runtime.getRuntime().exec(arrayOf("start", url))
+                                    try {
+                                        Runtime.getRuntime().exec(arrayOf("rundll32", "url.dll,FileProtocolHandler", url))
+                                    } catch (e: Throwable) {
+                                        throw CliktError(e.toString())
+                                    }
                                 } else if (os.contains("mac")) {
                                     logger.debug { "Opening browser on a mac." }
                                     Runtime.getRuntime().exec(arrayOf("open", url))

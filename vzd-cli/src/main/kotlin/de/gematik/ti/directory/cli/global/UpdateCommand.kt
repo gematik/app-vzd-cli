@@ -31,10 +31,10 @@ class UpdateCommand : CliktCommand(name = "update", help = "Updates this softwar
             runBlocking {
                 globalAPI.installVersion(updateToVersion) { bytesSentTotal, contentLength ->
                     if (progressBar == null) {
-                        progressBar = ProgressBar("Downloading $updateToVersion", contentLength / 1000)
+                        progressBar = ProgressBar(updateToVersion, contentLength / 1024 / 1024)
                     }
-                    progressBar?.maxHint(contentLength / 1000)
-                    progressBar?.stepTo(bytesSentTotal / 1000)
+                    progressBar?.maxHint(contentLength / 1024 / 1024)
+                    progressBar?.stepTo(bytesSentTotal / 1024 / 1024)
                 }
             }
         } finally {
