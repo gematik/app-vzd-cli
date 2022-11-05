@@ -12,7 +12,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.apo.ApoCli
-import de.gematik.ti.directory.cli.admin.DirectoryAdministrationCli
+import de.gematik.ti.directory.cli.admin.AdminCli
 import de.gematik.ti.directory.cli.global.ConfigCommand
 import de.gematik.ti.directory.cli.global.UpdateCommand
 import de.gematik.ti.directory.cli.gui.GuiCommand
@@ -81,7 +81,7 @@ class Cli : CliktCommand(name = "vzd-cli") {
         subcommands(
             ConfigCommand(),
             UpdateCommand(),
-            DirectoryAdministrationCli(),
+            AdminCli(),
             ApoCli(),
             GuiCommand(),
             PersCommand()

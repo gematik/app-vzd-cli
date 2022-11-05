@@ -85,8 +85,9 @@
                             <ibm-list-column>{{kimAddress?.mail}}</ibm-list-column>
                             <ibm-list-column>{{kimAddress?.provider}}</ibm-list-column>
                         </ibm-list-row>
-                        <ibm-list-row *ngIf="kimAddressList?.length == 0">
+                        <ibm-list-row *ngIf="kimAddressList == undefined || kimAddressList?.length == 0">
                             <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg> Keine KIM-Adressen</ibm-list-column>
+                            <ibm-list-column></ibm-list-column>
                         </ibm-list-row>
                     </ibm-structured-list>           
                 </div>
@@ -110,9 +111,13 @@
                             <ibm-list-column>{{cert.notBefore}}</ibm-list-column>
                             <ibm-list-column>{{cert.notAfter}}</ibm-list-column>
                         </ibm-list-row>
-                        <ibm-list-row *ngIf="userCertificateList.length == 0">
-                            <ibm-list-column><svg ibmIcon="error--filled" class="error"></svg></ibm-list-column>
+                        <ibm-list-row *ngIf="userCertificateList == undefined || userCertificateList.length == 0">
+                            <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
                             <ibm-list-column>Keine Zertifikate</ibm-list-column>
+                            <ibm-list-column></ibm-list-column>
+                            <ibm-list-column></ibm-list-column>
+                            <ibm-list-column></ibm-list-column>
+                            <ibm-list-column></ibm-list-column>
                         </ibm-list-row>
                     </ibm-structured-list>           
                 </div>

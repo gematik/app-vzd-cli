@@ -36,7 +36,7 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
                             Thread.sleep(250)
                             try {
                                 logger.debug { "Trying to connect to $url" }
-                                URL(url).openConnection()
+                                URL(url).openConnection().getInputStream().readBytes()
                                 logger.debug { "URL connection successful. Opening the Webbrowser." }
                                 if (os.contains("win")) {
                                     logger.debug { "Opening browser on windows." }

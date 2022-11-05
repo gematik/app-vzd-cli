@@ -31,7 +31,7 @@ class CommandContext(
     val pkiClient get() = adminAPI.globalAPI.pkiClient
 }
 
-class DirectoryAdministrationCli :
+class AdminCli :
     CliktCommand(name = "admin", help = """CLI for DirectoryAdministration API""".trimMargin()) {
     private val outputFormat by option().switch(
         "--human" to OutputFormat.HUMAN,
@@ -72,7 +72,7 @@ class DirectoryAdministrationCli :
         val clientEnvStr =
             env ?: adminAPI.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
 
-        val clientEnv = AdminEnvironment.valueOf(clientEnvStr.uppercase())
+        val clientEnv = AdminEnvironment.valueOf(clientEnvStr.lowercase())
 
         val clientDelegate: CommandContext.() -> Client = {
             logger.info { "Using environment: $clientEnv" }

@@ -18,12 +18,11 @@ private val JSON = Json {
 }
 
 class ShowCommand : CliktCommand(name = "show", help = "Show all information about an entry") {
-    private val context by requireObject<ApoCliContext>()
+    private val context by requireObject<ApoInstanceCliContext>()
     private val id by argument()
 
     override fun run() = catching {
-        val client = context.apoAPI.createClient("test")
-        val jsonString = runBlocking { client.getLocationByTelamatikID(id) }
+        val jsonString = runBlocking { context.client.getLocationByTelamatikID(id) }
         val jsonObject = JSON.decodeFromString<JsonObject>(jsonString.first)
         echo(JSON.encodeToString(jsonObject["entry"]?.jsonArray?.first()?.jsonObject?.get("resource")))
     }

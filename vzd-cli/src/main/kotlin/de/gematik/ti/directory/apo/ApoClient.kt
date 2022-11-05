@@ -1,6 +1,7 @@
 package de.gematik.ti.directory.apo
 
 import ca.uhn.fhir.context.FhirContext
+import de.gematik.ti.directory.util.DirectoryAuthException
 import de.gematik.ti.directory.util.DirectoryException
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -10,9 +11,12 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import org.hl7.fhir.r4.hapi.ctx.FhirR4
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Location
 
@@ -72,7 +76,12 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
             url("Location")
             parameter("name", queryString)
         }
+        if (response.status == HttpStatusCode.Forbidden) {
+            throw DirectoryAuthException("Invalid API-Key for ${response.request.url}. Use `vzd-cli apo config` to configure API-Keys.")
+        }
         val body = response.body<String>()
+        // do this so that ShadowJar knows what classes to include
+        FhirR4()
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = parser.parseResource(Bundle::class.java, body)

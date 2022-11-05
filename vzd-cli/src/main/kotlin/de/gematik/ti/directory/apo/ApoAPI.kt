@@ -2,14 +2,18 @@ package de.gematik.ti.directory.apo
 
 import de.gematik.ti.directory.global.GlobalAPI
 import de.gematik.ti.directory.util.DirectoryException
-import io.ktor.client.*
-import io.ktor.client.engine.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
+
+enum class ApoInstance {
+    test,
+    prod;
+
+    fun lowercase(): String {
+        return toString().lowercase()
+    }
+}
 
 class ApoAPI(val globalAPI: GlobalAPI) {
 
@@ -29,7 +33,7 @@ class ApoAPI(val globalAPI: GlobalAPI) {
 
     val config by lazy { loadConfig() }
 
-    fun createClient(inst: String): ApoClient {
+    fun createClient(inst: ApoInstance): ApoClient {
         val envcfg = config.environments[inst] ?: throw DirectoryException("Unknown ApoVZD instance: $inst")
         val apiKey = config.apiKeys[inst] ?: throw DirectoryException("API Key is not available for ApoVZD instance: $inst")
         return ApoClient {

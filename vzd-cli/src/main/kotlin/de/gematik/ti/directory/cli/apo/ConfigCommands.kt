@@ -29,10 +29,10 @@ class ConfigResetCommand : CliktCommand(name = "reset", help = "Reset configurat
 
 val SET_PROPERTIES = mapOf(
     "apiKeys.test" to { config: ApoConfig, value: String ->
-        config.apiKeys = config.apiKeys + Pair("test", value)
+        config.apiKeys = config.apiKeys + Pair(ApoInstance.test, value)
     },
     "apiKeys.prod" to { config: ApoConfig, value: String ->
-        config.apiKeys = config.apiKeys + Pair("prod", value)
+        config.apiKeys = config.apiKeys + Pair(ApoInstance.prod, value)
     }
 )
 
@@ -57,11 +57,11 @@ class ConfigSetCommand : CliktCommand(
 
 val GET_PROPERTIES = mapOf(
     "emvironments" to { config: ApoConfig -> config.environments },
-    "emvironments.test" to { config: ApoConfig -> config.environments["test"] },
-    "emvironments.prod" to { config: ApoConfig -> config.environments["prod"] },
+    "emvironments.test" to { config: ApoConfig -> config.environments[ApoInstance.test] },
+    "emvironments.prod" to { config: ApoConfig -> config.environments[ApoInstance.prod] },
     "apiKeys" to { config: ApoConfig -> config.apiKeys },
-    "apiKeys.test" to { config: ApoConfig -> config.apiKeys["test"] },
-    "apiKeys.prod" to { config: ApoConfig -> config.apiKeys["prod"] }
+    "apiKeys.test" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] },
+    "apiKeys.prod" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] }
 )
 
 class ConfigGetCommand : CliktCommand(

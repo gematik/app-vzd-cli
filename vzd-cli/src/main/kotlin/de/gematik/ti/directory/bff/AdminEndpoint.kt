@@ -34,7 +34,7 @@ class Admin {
     @Serializable
     @Resource("{envTitle}")
     class Env(val parent: Admin = Admin(), private val envTitle: String) {
-        val env get() = AdminEnvironment.valueOf(envTitle.uppercase())
+        val env get() = AdminEnvironment.valueOf(envTitle)
 
         @Serializable
         @Resource("search")

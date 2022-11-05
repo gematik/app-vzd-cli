@@ -12,8 +12,8 @@ data class ApoEnvironmentConfig(
 
 @Serializable
 class ApoConfig(
-    val environments: Map<String, ApoEnvironmentConfig>,
-    var apiKeys: Map<String, String>
+    val environments: Map<ApoInstance, ApoEnvironmentConfig>,
+    var apiKeys: Map<ApoInstance, String>
 )
 
 internal class ApoConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<ApoConfig>(
@@ -21,12 +21,12 @@ internal class ApoConfigFileStore(customConfigPath: Path? = null) : FileObjectSt
     {
         ApoConfig(
             mapOf(
-                "test" to ApoEnvironmentConfig("https://apovzd-test.app.ti-dienste.de/api/"),
-                "prod" to ApoEnvironmentConfig("https://apovzd.app.ti-dienste.de/api/")
+                ApoInstance.test to ApoEnvironmentConfig("https://apovzd-test.app.ti-dienste.de/api/"),
+                ApoInstance.prod to ApoEnvironmentConfig("https://apovzd.app.ti-dienste.de/api/")
             ),
             mapOf(
-                "test" to "unknown",
-                "prod" to "unknown"
+                ApoInstance.test to "unknown",
+                ApoInstance.prod to "unknown"
             )
         )
     },

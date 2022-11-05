@@ -86,7 +86,7 @@ export class SettingsComponent implements OnInit {
             })
             .catch( err => {
               this.loadingState = InlineLoadingState.Error
-              //this.showError(err)
+              this.showError(err)
             })
 			  }      
       }

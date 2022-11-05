@@ -2,12 +2,11 @@ package de.gematik.ti.directory.apo
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
-import de.gematik.ti.directory.cli.apo.SearchCommand
-import de.gematik.ti.directory.cli.apo.ShowCommand
+import de.gematik.ti.directory.cli.apo.InstanceCommands
 import de.gematik.ti.directory.global.GlobalAPI
 
 class ApoCliContext(
-    val apoAPI: ApoAPI
+    val apoAPI: ApoAPI,
 )
 
 class ApoCli : CliktCommand(name = "apo", help = """CLI for ApoVZD API""".trimMargin()) {
@@ -15,8 +14,11 @@ class ApoCli : CliktCommand(name = "apo", help = """CLI for ApoVZD API""".trimMa
     init {
         subcommands(
             ConfigCommand(),
-            SearchCommand(),
-            ShowCommand()
+        )
+        subcommands(
+            ApoInstance.values().map {
+                InstanceCommands(it)
+            }
         )
     }
 

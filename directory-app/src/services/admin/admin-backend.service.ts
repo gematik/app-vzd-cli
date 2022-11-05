@@ -73,7 +73,7 @@ export class AdminBackendService {
       this.http.post<Outcome>(
         `/api/admin/login`,
         {
-          env: env.toUpperCase(),
+          env: env,
           vaultPassword: vaultPassword
         }
       )

@@ -8,13 +8,9 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 enum class AdminEnvironment {
-    RU,
-    TU,
-    PU;
-
-    fun lowercase(): String {
-        return toString().lowercase()
-    }
+    ru,
+    tu,
+    pu;
 }
 
 @Serializable
@@ -33,7 +29,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
 
     fun createClient(env: AdminEnvironment): Client {
         val tokenStore = TokenStore()
-        val envConfig = config.environment(env.lowercase())
+        val envConfig = config.environment(env.toString())
         val client = Client {
             apiURL = envConfig.apiURL
             accessToken = tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
@@ -71,7 +67,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
         val envInfoList = config.environments.map {
             val backendInfo = if (includeBackendInfo) {
                 try {
-                    createClient(enumValueOf(it.key.uppercase())).getInfo()
+                    createClient(enumValueOf(it.key.lowercase())).getInfo()
                 } catch (e: Exception) {
                     null
                 }
@@ -90,7 +86,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
     }
 
     fun environmentConfig(env: AdminEnvironment): EnvironmentConfig {
-        return config.environment(env.lowercase())
+        return config.environment(env.toString())
     }
 
     fun login(env: AdminEnvironment, clientID: String, clientSecret: String): Map<String, String> {

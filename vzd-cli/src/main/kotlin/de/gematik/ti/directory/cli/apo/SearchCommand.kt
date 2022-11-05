@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import de.gematik.ti.directory.apo.ApoCliContext
+import de.gematik.ti.directory.apo.ApoInstance
 import de.gematik.ti.directory.cli.catching
 import hu.vissy.texttable.dsl.tableFormatter
 import kotlinx.coroutines.runBlocking
@@ -14,14 +15,13 @@ import org.hl7.fhir.r4.model.Location
 private val JSON = Json { prettyPrint = true }
 
 class SearchCommand : CliktCommand(name = "search", help = "Search for pharmacies in ApoVZD") {
-    private val context by requireObject<ApoCliContext>()
+    private val context by requireObject<ApoInstanceCliContext>()
     private val arguments by argument().multiple()
 
     override fun run() = catching {
         val queryString = arguments.joinToString(" ")
-        val client = context.apoAPI.createClient("test")
         val bundle = runBlocking {
-            client.search(queryString).second
+            context.client.search(queryString).second
         }
 
         val formatter = tableFormatter<Location> {

@@ -31,7 +31,7 @@ fun Route.vaultRoute() {
 
             vault.list().forEach { secret ->
                 application.log.info("Logging in to: ${secret.variant}")
-                adminAPI.login(AdminEnvironment.valueOf(secret.variant.uppercase()), secret.name, secret.secret)
+                adminAPI.login(AdminEnvironment.valueOf(secret.variant), secret.name, secret.secret)
             }
 
             call.respond(Outcome("", "Used vault to login to: ${vault.list().map { it.variant }.joinToString()}"))

@@ -2,7 +2,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-version = "2.1.0-alpha3"
+version = "2.1.0-alpha4"
 
 val ktorVersion = "2.1.2"
 val kotestVersion = "5.5.2"
