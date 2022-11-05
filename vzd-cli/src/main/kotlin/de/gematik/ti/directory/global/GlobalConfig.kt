@@ -20,7 +20,6 @@ data class GlobalConfig(
 
 @Serializable
 data class UpdatesConfig(
-    val checkURL: String,
     var preReleasesEnabled: Boolean,
     var lastCheck: Long,
     var latestRelease: String
@@ -35,7 +34,6 @@ internal class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjec
                 enabled = false
             ),
             updates = UpdatesConfig(
-                checkURL = "https://raw.githubusercontent.com/gematik/app-vzd-cli/main/latest.json",
                 preReleasesEnabled = false,
                 lastCheck = -1,
                 latestRelease = BuildConfig.APP_VERSION

@@ -2,28 +2,46 @@ package de.gematik.ti.directory.global
 
 import de.gematik.ti.directory.cli.BuildConfig
 import de.gematik.ti.directory.cli.Cli
+import de.gematik.ti.directory.util.DirectoryException
 import de.gematik.ti.directory.util.PKIClient
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.content.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.jvm.javaio.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import mu.KotlinLogging
 import java.time.Instant
 import java.util.zip.ZipFile
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.name
-import kotlin.io.path.outputStream
+import kotlin.io.path.*
 
 private val logger = KotlinLogging.logger {}
 
 @Serializable
-data class Latest(val release: String, val preRelease: String)
+data class Release(
+    val name: String,
+    @SerialName("prerelease")
+    val preRelease: Boolean,
+    @SerialName("published_at")
+    val publishedAt: String,
+)
+
+const val GITHUB_RELEASES_URL="https://api.github.com/repos/gematik/app-vzd-cli/releases"
+
+private val JSON = Json {
+    ignoreUnknownKeys = true
+}
 
 class GlobalAPI {
     val config by lazy { loadConfig() }
@@ -43,23 +61,22 @@ class GlobalAPI {
     suspend fun checkForUpdates(): String {
         val httpClient = createHttpClient()
 
-        logger.info { "Checking for updates at: ${config.updates.checkURL}" }
+        logger.info { "Checking for updates at: $GITHUB_RELEASES_URL" }
 
-        val jsonString = httpClient.get(config.updates.checkURL).body<String>()
-        val latest = Json.decodeFromString<Latest>(jsonString)
-        val latestRelease = if (!config.updates.preReleasesEnabled && latest.release != BuildConfig.APP_VERSION) {
-            latest.release
-        } else if (config.updates.preReleasesEnabled && latest.preRelease != BuildConfig.APP_VERSION) {
-            latest.preRelease
-        } else {
-            BuildConfig.APP_VERSION
+        val jsonString = httpClient.get(GITHUB_RELEASES_URL).body<String>()
+        val releases = JSON.decodeFromString<List<Release>>(jsonString)
+
+        val latestRelease = if (config.updates.preReleasesEnabled) {
+            releases.first()
+        } else  {
+            releases.first { it.preRelease == false }
         }
 
         config.updates.lastCheck = Instant.now().epochSecond
-        config.updates.latestRelease = latestRelease
+        config.updates.latestRelease = latestRelease.name
         updateConfig()
 
-        return latestRelease
+        return latestRelease.name
     }
 
     private fun createHttpClient(): HttpClient {
@@ -73,23 +90,19 @@ class GlobalAPI {
         return httpClient
     }
 
-    fun selfUpdate(version: String, progressListener: ProgressListener?) {
-        /*
-        println(
-            System.getenv().map {
-                "${it.key} = ${it.value}"
-            }
-                .joinToString("\n")
-        )
-         */
+    suspend fun installVersion(version: String, progressListener: ProgressListener?) {
+        if (version < "2.1.0") {
+            throw DirectoryException("Updates only supported from version 2.1.0")
+        }
         val appHome = Path(Cli::class.java.protectionDomain.codeSource.location.file).parent.parent
         logger.info { "Updating app in $appHome" }
 
         val updateUrl = "https://github.com/gematik/app-vzd-cli/releases/download/$version/vzd-cli-$version.zip"
         val httpClient = createHttpClient()
 
-        logger.info { "Downloading update from $updateUrl" }
-/*
+        val zipFile = kotlin.io.path.createTempFile("vzd-cli", ".zip") // Path(appHome.absolutePathString(), "vzd-cli-$version.zip")
+        logger.debug { "Downloading update from $updateUrl to $zipFile" }
+
         val response = httpClient.get(updateUrl) {
             onDownload(progressListener)
         }
@@ -98,31 +111,33 @@ class GlobalAPI {
         }
         val channel = response.body<ByteReadChannel>()
 
-        val tempFile = kotlin.io.path.createTempFile("vzd-cli", ".zip")
-        val tempOutput = tempFile.outputStream()
-
-        channel.copyTo(tempOutput)
- */
         // TODO: add GPG signature check
+        val tempOutput = zipFile.outputStream()
+        channel.copyTo(tempOutput)
 
-        val tempFile = Path("/var/folders/fn/5tmqsv5n67q2lnt74spjwdqc0000gn/T/vzd-cli9670087977622399596.zip")
+        val regex = Regex(".*vzd-cli.*all.jar$")
+        val jarFile = Path(appHome.absolutePathString(), "lib", "vzd-cli-all.jar.update")
+        withContext(Dispatchers.IO) {
+            logger.debug { "Looking for updated jars" }
+            ZipFile(zipFile.toFile()).use { zip ->
+                zip.entries().asSequence().forEach { entry ->
+                    logger.debug { entry.name }
+                    if (entry.name.matches(regex)) {
+                        logger.debug { "Extracting $entry" }
 
-        logger.debug { tempFile }
-
-        ZipFile(tempFile.toFile()).use { zip ->
-            zip.entries().asSequence().forEach { entry ->
-                if (entry.name.endsWith(".jar")) {
-                    var jarFile = Path(appHome.absolutePathString(), "lib", Path(entry.name).fileName.name)
-
-                    logger.debug { "Extracting $jarFile" }
-                    zip.getInputStream(entry).use { input ->
-                        jarFile.outputStream().use { output ->
-                            input.copyTo(output)
+                        zip.getInputStream(entry).use { input ->
+                            jarFile.outputStream().use { output ->
+                                input.copyTo(output)
+                            }
                         }
                     }
                 }
             }
         }
+
+        jarFile.moveTo(Path(appHome.absolutePathString(), "lib", "vzd-cli-all.jar"), true)
+
+        zipFile.deleteExisting()
     }
 
     val pkiClient by lazy {

@@ -20,7 +20,7 @@ class UpdateCommand : CliktCommand(name = "update", help = "Updates this softwar
                 echo("No updates available")
                 return@catching
             }
-            echo("Newer Release is available: $version (current: ${BuildConfig.APP_VERSION})")
+            echo("Newer Release is available: $latestRelease (current: ${BuildConfig.APP_VERSION})")
             latestRelease
         } else {
             version
@@ -29,7 +29,7 @@ class UpdateCommand : CliktCommand(name = "update", help = "Updates this softwar
         var progressBar: ProgressBar? = null
         try {
             runBlocking {
-                globalAPI.selfUpdate(updateToVersion) { bytesSentTotal, contentLength ->
+                globalAPI.installVersion(updateToVersion) { bytesSentTotal, contentLength ->
                     if (progressBar == null) {
                         progressBar = ProgressBar("Downloading $updateToVersion", contentLength / 1000)
                     }
@@ -41,5 +41,6 @@ class UpdateCommand : CliktCommand(name = "update", help = "Updates this softwar
             progressBar?.maxHint(progressBar?.current ?: 0)
             progressBar?.close()
         }
+
     }
 }
