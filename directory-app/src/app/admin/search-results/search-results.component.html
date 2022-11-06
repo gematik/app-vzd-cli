@@ -81,8 +81,8 @@
 </ng-template>
 
 <div ibmRow *ngIf="rows.length > 0">
-  <div ibmCol [columnNumbers]="{'lg': 3, 'md': 0}"></div>
-  <ibm-table-container class="SearchResultsContainer" ibmCol [columnNumbers]="{'lg': 10}">
+  <div ibmCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
+  <ibm-table-container class="SearchResultsContainer" ibmCol [columnNumbers]="{'lg': 12}">
     <ibm-table
       [model]="model"
 			size="lg"
@@ -95,7 +95,7 @@
 		</ibm-table>
 
   </ibm-table-container>
-  <div ibmCol [columnNumbers]="{'lg': 3, 'md': 0}"></div>
+  <div ibmCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
 </div>
 
 <div ibmRow *ngIf="model.totalDataLength > 1">
