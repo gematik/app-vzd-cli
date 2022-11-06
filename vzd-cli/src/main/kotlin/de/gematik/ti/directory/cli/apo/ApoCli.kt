@@ -6,14 +6,14 @@ import de.gematik.ti.directory.cli.apo.InstanceCommands
 import de.gematik.ti.directory.global.GlobalAPI
 
 class ApoCliContext(
-    val apoAPI: ApoAPI,
+    val apoAPI: ApoAPI
 )
 
 class ApoCli : CliktCommand(name = "apo", help = """CLI for ApoVZD API""".trimMargin()) {
 
     init {
         subcommands(
-            ConfigCommand(),
+            ConfigCommand()
         )
         subcommands(
             ApoInstance.values().map {

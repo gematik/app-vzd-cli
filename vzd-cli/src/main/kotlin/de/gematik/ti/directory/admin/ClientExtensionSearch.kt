@@ -1,6 +1,5 @@
 package de.gematik.ti.directory.admin
 
-import com.github.ajalt.clikt.core.CliktError
 import kotlinx.coroutines.*
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -126,14 +125,13 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
     var first: SearchResults? = null
     var second: SearchResults? = null
 
-
     withContext(Dispatchers.IO) {
         val firstTokens = Tokenizer.tokenize(searchQuery)
         if (firstTokens.firstOrNull { it.type == TokenType.LocalityName } == null) {
             // all safe, not locality found - just do one query
             first = quickSearch(searchQuery, firstTokens)
         } else {
-            val secondTokens =  Tokenizer.tokenize(searchQuery, listOf(TokenType.LocalityName))
+            val secondTokens = Tokenizer.tokenize(searchQuery, listOf(TokenType.LocalityName))
             listOf(
                 launch { first = quickSearch(searchQuery, firstTokens) },
                 launch { second = quickSearch(searchQuery, secondTokens) }
@@ -145,7 +143,6 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
         searchQuery = searchQuery,
         directoryEntries = (second?.directoryEntries ?: emptyList()) + (first?.directoryEntries ?: emptyList())
     )
-
 }
 
 suspend fun Client.quickSearch(searchQuery: String, tokens: List<Token>): SearchResults {
