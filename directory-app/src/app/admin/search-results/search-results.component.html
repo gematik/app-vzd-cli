@@ -12,8 +12,8 @@
 </div>
 
 <div ibmRow>
-  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
-  <div ibmCol [columnNumbers]="{'lg': 8}">
+  <div ibmCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
+  <div ibmCol [columnNumbers]="{'lg': 8, 'md': 6}">
     <div ibmRow>
     </div>
     <div ibmRow>
@@ -22,7 +22,7 @@
           class="SearchField" 
           [size]="'xl'" 
           ibmCol 
-          [columnNumbers]="{'lg': 12}"
+          [columnNumbers]="{'lg': 12, 'md': 6, 'sm': 4}"
           placeholder="Name, Ort, PLZ oder TelematikID"
           (search)="onSearch()"
           (clear)="onClear()"
@@ -31,7 +31,7 @@
         <button
           (click)="onSearch()"
           ibmCol 
-          [columnNumbers]="{'lg': 4}" 
+          [columnNumbers]="{'lg': 4, 'md': 2, 'sm': 4}" 
           [ibmButton]="'primary'"
           class="SearchButton"
         >Suchen</button>
@@ -50,8 +50,22 @@
       </div>
     </div>  
   </div>
-  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+  <div ibmCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
 </div>
+
+<div ibmRow>
+  <div ibmCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
+  <div ibmCol [columnNumbers]="{'lg': 8, 'md': 6}">
+      <ibm-inline-loading
+      class="LoadingState"
+      [state]="loadingState"
+      loadingText="Durchsuchen des Verzeichnisses"
+      [successText]="searchReport"
+      errorText="Es wurden keine Einträge gefunden, die den Suchkriterien entsprechen">
+      </ibm-inline-loading>  
+  </div>
+</div>
+
 
 <ng-template #tagTemplate let-data="data">
   <ibm-tag [type]="data.color" size="md">{{data.text}}</ibm-tag>
@@ -66,10 +80,9 @@
   <div>{{data.telematikID}}</div>
 </ng-template>
 
-<div ibmRow>
-  <div ibmCol [columnNumbers]="{'lg': 2}"></div>
-
-  <ibm-table-container class="SearchResulttContainer" ibmCol [columnNumbers]="{'lg': 12}">
+<div ibmRow *ngIf="rows.length > 0">
+  <div ibmCol [columnNumbers]="{'lg': 3, 'md': 0}"></div>
+  <ibm-table-container class="SearchResultsContainer" ibmCol [columnNumbers]="{'lg': 10}">
     <ibm-table
       [model]="model"
 			size="lg"
@@ -80,13 +93,12 @@
       (rowClick)="onRowClick($event)"
 			[isDataGrid]="false">
 		</ibm-table>
-		<ibm-pagination [model]="model" (selectPage)="selectPage($event)"></ibm-pagination>
 
   </ibm-table-container>
-  
+  <div ibmCol [columnNumbers]="{'lg': 3, 'md': 0}"></div>
 </div>
 
-
-
-<ibm-loading *ngIf="loading" [isActive]="true" [size]="'normal'" [overlay]="true"></ibm-loading>
+<div ibmRow *ngIf="model.totalDataLength > 1">
+  <ibm-pagination-nav class="Pagination" [model]="model" (selectPage)="selectPage($event)"></ibm-pagination-nav>
+</div>
 

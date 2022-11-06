@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Table, TableHeaderItem, TableItem, TableModel } from 'carbon-components-angular';
-import { BaseDirectoryEntry } from 'src/services/admin/admin.model';
+import { InlineLoadingState, Table, TableHeaderItem, TableItem, TableModel, TagType } from 'carbon-components-angular';
+import { BaseDirectoryEntry, DirectoryEntry } from 'src/services/admin/admin.model';
 import { AdminBackendService } from '../../../services/admin/admin-backend.service';
 
 @Component({
@@ -15,9 +15,9 @@ export class SearchResultsComponent implements OnInit {
   queryString = ""
   model = new TableModel()
   rows: TableItem[][] = []
-  loading = false
   errorMessage: string | null = null
-  skeletonModel = Table.skeletonModel(3, 3);
+  loadingState = InlineLoadingState.Hidden
+  searchReport = ""
 
   @ViewChild("expandedTemplate", { static: false })
   // @ts-ignore
@@ -52,7 +52,7 @@ export class SearchResultsComponent implements OnInit {
   }
 
   search() {
-    this.loading = true
+    this.loadingState = InlineLoadingState.Active
     this.adminBackend.search(this.env, this.queryString).then(searchResult => {
       this.rows = searchResult.directoryEntries.map( (entry) => {
         entry.DirectoryEntryBase.displayName = entry.DirectoryEntryBase?.displayName?.replace("TEST-ONLY", "")
@@ -79,17 +79,26 @@ export class SearchResultsComponent implements OnInit {
           { relativeTo: this.route.parent }
         )
       }
-      this.model.pageLength = 10
-      this.model.totalDataLength = this.rows.length
+      this.model.pageLength = 25
+      this.model.totalDataLength = this.rows.length / 25 
       this.selectPage(1);
-      this.loading = false
+      if (this.rows.length == 0) {
+        this.loadingState = InlineLoadingState.Error
+      } else {
+        this.loadingState = InlineLoadingState.Finished
+        if (this.rows.length >= 100) {
+          this.searchReport = `Über 100 Einträge gefunden`
+        } else {
+          this.searchReport = `${this.rows.length} Einträge gefunden`
+        }
+      }
     })
     .catch(e => {
       const httpError = e as HttpErrorResponse
       if (httpError?.status == 401) {
         this.router.navigate(["/settings"])
       }
-      this.loading = false
+      this.loadingState = InlineLoadingState.Error
       this.errorMessage = e.message
     })
   }
@@ -106,6 +115,11 @@ export class SearchResultsComponent implements OnInit {
     const startIndex = (page-1)*this.model.pageLength
     this.model.data = this.rows.slice(startIndex, startIndex+this.model.pageLength)
     this.model.currentPage = page;
+    window.scroll({ 
+      top: 0, 
+      left: 0, 
+      behavior: 'smooth' 
+    });    
   }
 
   onRowClick(clickedRow: number) {
