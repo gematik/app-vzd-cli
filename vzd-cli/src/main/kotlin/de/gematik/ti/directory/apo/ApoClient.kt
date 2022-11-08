@@ -37,10 +37,15 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
         this.http = HttpClient(CIO) {
             engine {
                 config.httpProxyURL?.let {
-                    logger.debug { "ApoCLient is using proxy: $it" }
-                    proxy = ProxyBuilder.http(it)
+                    // TODO: for some bizzare reason the gematik http proxy does not work with ApoVZD
+                    if (it != "http://192.168.110.10:3128/") {
+                        logger.debug { "ApoClient is using proxy: $it" }
+                        proxy = ProxyBuilder.http(it)
+                    }
                 }
             }
+
+            expectSuccess = false
 
             val l = logger
 
@@ -71,7 +76,7 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
         logger.debug { "ApoClient created ${config.apiURL}" }
     }
 
-    suspend fun search(queryString: String): Pair<String, Bundle> {
+    suspend fun search(queryString: String): Pair<String, Bundle>? {
         val response = http.get {
             url("Location")
             parameter("name", queryString)
@@ -79,7 +84,14 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
         if (response.status == HttpStatusCode.Forbidden) {
             throw DirectoryAuthException("Invalid API-Key for ${response.request.url}. Use `vzd-cli apo config` to configure API-Keys.")
         }
+
         val body = response.body<String>()
+        if (response.status == HttpStatusCode.NotFound) {
+            return null
+        } else if (response.status != HttpStatusCode.OK) {
+            throw DirectoryAuthException("${response.status} $body")
+        }
+
         // do this so that ShadowJar knows what classes to include
         FhirR4()
         val ctx = FhirContext.forR4()
