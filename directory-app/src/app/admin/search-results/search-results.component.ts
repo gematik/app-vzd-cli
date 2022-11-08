@@ -74,13 +74,14 @@ export class SearchResultsComponent implements OnInit {
         ]
       })
       if (this.rows.length == 1) {
+        this.loadingState = InlineLoadingState.Finished
         this.router.navigate(
-          ["entry", this.rows[0][0].expandedData.telematikID, {"q": this.queryString}],
+          ["entry", this.rows[0][0].expandedData.DirectoryEntryBase.telematikID, {"q": this.queryString}],
           { relativeTo: this.route.parent }
         )
       }
       this.model.pageLength = 25
-      this.model.totalDataLength = this.rows.length / 25 
+      this.model.totalDataLength = Math.ceil(this.rows.length / 25)
       this.selectPage(1);
       if (this.rows.length == 0) {
         this.loadingState = InlineLoadingState.Error
