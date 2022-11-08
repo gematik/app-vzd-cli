@@ -16,7 +16,6 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import org.hl7.fhir.r4.hapi.ctx.FhirR4
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Location
 

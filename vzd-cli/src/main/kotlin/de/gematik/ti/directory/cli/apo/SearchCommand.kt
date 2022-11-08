@@ -18,22 +18,21 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for pharmacie
     private val context by requireObject<ApoInstanceCliContext>()
     private val arguments by argument().multiple()
 
-     fun run2() = catching {
+    fun run2() = catching {
         val http = HttpClient(CIO) {
             engine {
-                //proxy = ProxyBuilder.http("http://192.168.110.10:3128/")
+                // proxy = ProxyBuilder.http("http://192.168.110.10:3128/")
             }
         }
 
         runBlocking {
-            val response = http.get ("https://apovzd.app.ti-dienste.de/api/") {
+            val response = http.get("https://apovzd.app.ti-dienste.de/api/") {
                 url {
                     appendPathSegments("Location")
                 }
             }
             echo(response)
         }
-
     }
     override fun run() = catching {
         val queryString = arguments.joinToString(" ")
