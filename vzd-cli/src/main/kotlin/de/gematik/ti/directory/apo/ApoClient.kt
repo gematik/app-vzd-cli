@@ -92,15 +92,13 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
             throw DirectoryAuthException("${response.status} $body")
         }
 
-        // do this so that ShadowJar knows what classes to include
-        FhirR4()
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = parser.parseResource(Bundle::class.java, body)
         return Pair(body, bundle)
     }
 
-    suspend fun getLocationByTelamatikID(telematikID: String): Pair<String, Location> {
+    suspend fun getLocationByTelematikID(telematikID: String): Pair<String, Location> {
         val response = http.get {
             url("Location")
             parameter("identifier", telematikID)
@@ -113,7 +111,6 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
             bundle.entry.firstOrNull()?.resource
                 ?: throw DirectoryException("Pharmacy with TelematikID '$telematikID' not found")
             ) as Location
-// parse JSON
         return Pair(body, location)
     }
 }

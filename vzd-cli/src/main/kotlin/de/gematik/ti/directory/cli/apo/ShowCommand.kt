@@ -21,7 +21,7 @@ class ShowCommand : CliktCommand(name = "show", help = "Show all information abo
     private val id by argument()
 
     override fun run() = catching {
-        val jsonString = runBlocking { context.client.getLocationByTelamatikID(id) }
+        val jsonString = runBlocking { context.client.getLocationByTelematikID(id) }
         val jsonObject = JSON.decodeFromString<JsonObject>(jsonString.first)
         echo(JSON.encodeToString(jsonObject["entry"]?.jsonArray?.first()?.jsonObject?.get("resource")))
     }
