@@ -16,6 +16,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import org.hl7.fhir.r4.hapi.ctx.FhirR4
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Location
 
@@ -91,6 +92,8 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
             throw DirectoryAuthException("${response.status} $body")
         }
 
+        // do this so that ShadowJar knows what classes to include
+        FhirR4()
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = parser.parseResource(Bundle::class.java, body)
