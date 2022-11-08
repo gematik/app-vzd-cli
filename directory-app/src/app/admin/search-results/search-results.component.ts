@@ -60,7 +60,7 @@ export class SearchResultsComponent implements OnInit {
         return [
           new TableItem({
             data: entry.DirectoryEntryBase.displayName,
-            expandedData: entry.DirectoryEntryBase,
+            expandedData: entry,
             expandedTemplate: this.expandedTemplate,
           }),
           new TableItem({
@@ -124,9 +124,9 @@ export class SearchResultsComponent implements OnInit {
 
   onRowClick(clickedRow: number) {
     const rowNum = (this.model.currentPage-1)*this.model.pageLength+clickedRow
-    const entry = this.rows[clickedRow][0].expandedData as BaseDirectoryEntry
+    const entry = this.rows[clickedRow][0].expandedData as DirectoryEntry
     this.router.navigate(
-      ["entry", entry.telematikID, {"q": this.queryString}],
+      ["entry", entry.DirectoryEntryBase.telematikID, {"q": this.queryString}],
       { relativeTo: this.route.parent }
     )
   }

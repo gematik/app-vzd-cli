@@ -77,7 +77,7 @@
 </ng-template>
 
 <ng-template #expandedTemplate let-data="data">
-  <div>{{data.telematikID}}</div>
+  <app-admin-directory-entry-summary [model]="data"></app-admin-directory-entry-summary>
 </ng-template>
 
 <div ibmRow *ngIf="rows.length > 0">

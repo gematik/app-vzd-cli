@@ -96,7 +96,7 @@ class AdminCli :
             TemplateCommand(),
             AddBaseCommand(),
             LoadBaseCommand(),
-            EditBaseCommand(),
+            EditCommand(),
             ModifyBaseCommand(),
             ModifyBaseAttrCommand(),
             DeleteCommand(),

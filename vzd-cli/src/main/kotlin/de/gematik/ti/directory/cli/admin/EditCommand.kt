@@ -21,8 +21,7 @@ import net.mamoe.yamlkt.Yaml
 
 private val JsonPretty = Json { prettyPrint = true }
 
-class EditBaseCommand : CliktCommand(name = "edit-base", help = "Edit base entry using text editor") {
-    private val logger = KotlinLogging.logger {}
+class EditCommand : CliktCommand(name = "edit", help = "Edit base entry using text editor") {
     private val telematikID by argument()
     private val context by requireObject<CommandContext>()
     private val format by option().switch(
