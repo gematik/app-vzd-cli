@@ -1,11 +1,10 @@
 package de.gematik.ti.directory.cli.admin
 
 import com.github.ajalt.clikt.parameters.groups.OptionGroup
+import com.github.ajalt.clikt.parameters.options.OptionWithValues
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.int
-import kotlin.reflect.KVisibility
-import kotlin.reflect.full.memberProperties
 
 class ParameterOptions : OptionGroup(name = "Query parameters") {
     val name by option()
@@ -38,11 +37,13 @@ class ParameterOptions : OptionGroup(name = "Query parameters") {
     fun toMap(): Map<String, String> {
         val self = this
         return buildMap<String, String>() {
-            for (prop in ParameterOptions::class.memberProperties) {
-                if (prop.visibility == KVisibility.PUBLIC && !prop.name.startsWith("group")) {
-                    prop.get(self)?.run {
-                        put(prop.name, this.toString())
-                    }
+            for (field in ParameterOptions::class.java.declaredFields) {
+                if (!field.name.endsWith("\$delegate")) {
+                    continue
+                }
+                val name = field.name.replace("\$delegate", "")
+                (field.get(self) as OptionWithValues<*, *, *>).value?.run {
+                    put(name, this.toString())
                 }
             }
         }
