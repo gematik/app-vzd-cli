@@ -10,65 +10,73 @@ image::images/vzd-cli.gif[]
 
 == Installation
 
-1. Download link:https://github.com/spilikin/app-vzd-cli/releases[Latest Release] von `vzd-cli` von github.
-2. ``vzd-cli-<VERSION>.zip`` extrahieren 
-3. Die Skripte in bin/ benutzen um `vzd-cli` zu starten
-3a. Zur Kompatibilität zur Version 1.6 s. Skripte unter `commands/``
+Die link:https://github.com/spilikin/app-vzd-cli/releases[neueste Version] von `vzd-cli` herunterladen.
 
+Für die Ausführung der CLI soll die `PATH` Variable um den Pfad `vzd-cli-<VERSION>/bin` erweitert werden.
+
+Sobald der Befehl `vzd-cli` ausgeführt werden kann sind wir start klar:
 [source]
 ----
-Usage: vzd-cli admin [OPTIONS] COMMAND [ARGS]...
-
-  CLI for DirectoryAdministration API
+Usage: vzd-cli [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --human, --json, --yaml, --csv, --short
-  -e, --env [tu|ru|pu]             Environment. Either tu, ru or pu. xIf not
-                                   specified default env is used.
-  -o, --ocsp                       Validate certificates using OCSP
-  -x, --proxy-on / -X, --proxy-off
-                                   Forces the use of the proxy, overrides the
-                                   configuration
-  -h, --help                       Show this message and exit
+  -v          Display log, use -vv for even more details
+  --version   Show the version and exit
+  -h, --help  Show this message and exit
 
 Commands:
-  vault             Manage OAuth credentials in the Vault
-  config            Manage configuration
-  login             Login to OAuth2 Server and store token(s)
-  login-cred        Login using the client credentials  
-  auth              Show current access token
-  info              Show information about the API
-  list              List directory entries
-  template          Create template for a resource
-  add-base          Add new directory entry
-  load-base         Load the base entry for editing.
-  modify-base       Modify single base directory entry
-  modify-base-attr  Modify specific attributes of a base entry
-  delete            Delete specified directory entries
-  list-cert         List certificates
-  
-  Add certificate to existing DirectoryEntry
-  save-cert         Saves certificate to DER files
-  delete-cert       Delete certificate
-  clear-cert        Clear all certificates of a given entry
-  cert-info         Show details of a certificate
-  dump              Dump data from server
+  config               Manage configuration
+  update               Updates this software
+  admin                CLI for DirectoryAdministration API
+  apo                  CLI for ApoVZD API
+  gui                  Starts HTTP Server with GUI
+  pers                 Process gematik SMC-B/HBA Exports
+  generate-completion  Generate a tab-complete script for the given shell
 ----
+
 
 == Erste Schritte
 
 Aufbau der CLI folgt aktuellen Best-Practices analog z.B. zu Docker, Kubernetes, Helm. 
-Für alle Befehle (Command) und Unter-Befehle (Subcommand) kann man mittels `--help` Option eine abschließende Liste aller Optionen und Argumente anzeigen lassen.
+Für alle Befehle (Commands) und Unter-Befehle (Subcommands) kann man mittels `--help` Option eine abschließende Liste aller Optionen und Argumente anzeigen lassen.
+
 [source,bash]
 ----
 vzd-cli --help
+vzd-cli config --help
+vzd-cli config get --help
 vzd-cli admin --help
-vzd-cli admin vault --help
-vzd-cli admin vault import --help
+vzd-cli admin ru --help
 ----
 
-Bevor eine Verbindung zum Verzeichnisdienst aufgebaut werden kann, benötigt man die OAuth2 Client Credentials. 
-Den Zugang bekommt man von der gematik. 
+== Konfiguration
+
+Die Verzeichnisdienst APIs werden über HTTPS erreicht. Falls für die Verbindung ein HTTP-Proxy erforderlich ist, muss es wie folgt konfiguriert werden:
+
+[source,bash]
+----
+vzd-cli config set httpProxy.proxyURL http://PROXY_HOST:PROXY_PORT
+vzd-cli config set httpProxy.enabled true
+----
+
+`vzd-cli` ermöglicht die Nutzung folgender APIs:
+* Directory Admin API
+* Pharmacies API
+
+Für die Nutzung dieser APIs sind jeweils entsprechende Geheimnisse bzw. Credentials erforderlich.
+Diese werden von der gematik bereitgestellt.
+
+=== Admin API Credentials
+
+Directory Admin API benutzt Oauth2 Client Credentials Flow als Authentisierung.
+Um diese sehr kritische Credentials sicher aufbewahren zu können stellt `vzd-cli` eine Tresor-Funktion bereit (Vault)-
+Durch den Vault werden alle credentials verschlüsselt gespeichert.
+Um Vault aufmachen und darin enthaltenen zu können Credentials nutzen zu können, wird der Nutzer aufgefordern einen Vault-Password zu vergeben.
+Dieser Password funktioniert analog zu den privaten Passwörtern bei den Password-Managern (z.B. Bitwarden, LastPass, 1Password).
+Die Vault Implementierung befinden sich link:./vzd-cli/src/vzd-cli/src/main/kotlin/de/gematik/ti/directory/util/Vault.kt[hier]
+
+
+=== Apo API API-Keys
 
 .Einen neuen Vault für die Geheimnisse erstellen
 [source,bash]
