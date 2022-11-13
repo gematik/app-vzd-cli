@@ -32,7 +32,7 @@ class ClearCertCommand : CliktCommand(name = "clear-cert", help = "Clear all cer
     private val parameterOptions by ParameterOptions()
 
     // private val force by option("-f", "--force").flag(default = false)
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
 
     override fun run() = catching {
         val params = parameterOptions.toMap() + customParams

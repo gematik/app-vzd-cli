@@ -36,7 +36,7 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
     private val outputDir by option("-o", "--output-dir", metavar = "OUTPUT_DIR", help = "Output directory for certificate files. Default ist current directory.")
         .path(mustExist = true, canBeFile = false)
         .default(Paths.get(""))
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
 
     override fun run() = catching {
         val params = parameterOptions.toMap() + customParams

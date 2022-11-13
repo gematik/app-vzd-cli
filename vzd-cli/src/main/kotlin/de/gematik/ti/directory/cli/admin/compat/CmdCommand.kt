@@ -11,7 +11,7 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.deprecated
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
-import de.gematik.ti.directory.cli.admin.CommandContext
+import de.gematik.ti.directory.cli.admin.AdminCliEnvironmentContext
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.epa.vzd.client.invoker.auth.OAuth
 import de.gematik.ti.epa.vzd.gem.Main
@@ -33,7 +33,7 @@ class CliTokenProvider(private val oauth: OAuth) : TokenProvider {
 
 class CmdCommand : CliktCommand(name = "cmd", help = "Compatibility mode: support for VZDClient XML-commands") {
     private val logger = KotlinLogging.logger {}
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val paramFile by option(
         "-p",
         "--params",

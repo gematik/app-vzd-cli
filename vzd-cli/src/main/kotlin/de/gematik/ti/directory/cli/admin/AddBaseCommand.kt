@@ -6,10 +6,7 @@ import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
-import com.github.ajalt.clikt.parameters.options.associate
-import com.github.ajalt.clikt.parameters.options.deprecated
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
@@ -62,8 +59,12 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
     private val inputFile by argument(
         help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN"
     ).path(mustExist = true, canBeDir = false, mustBeReadable = true).optional()
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (entry exists).").flag()
+    private val format by option().switch(
+        "--yaml" to OutputFormat.YAML,
+        "--json" to OutputFormat.JSON
+    ).default(OutputFormat.YAML)
 
     override fun run() = catching {
         val input = inputFile ?: deprecatedFile
@@ -79,10 +80,10 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
         }
 
         val baseDirectoryEntry: BaseDirectoryEntry = data?.let {
-            when (context.outputFormat) {
-                OutputFormat.HUMAN, OutputFormat.YAML -> Yaml.decodeFromString(it)
+            when (format) {
+                OutputFormat.YAML -> Yaml.decodeFromString(it)
                 OutputFormat.JSON -> Json.decodeFromString(it)
-                else -> throw CliktError("Unsupported format: ${context.outputFormat}")
+                else -> throw CliktError("Unsupported format: $format")
             }
         } ?: run {
             val telematikID: String = attrs["telematikID"] ?: throw UsageError("Option --set telematikID=<VALUE> or --file is required")
@@ -109,10 +110,10 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
             runBlocking { context.client.readDirectoryEntry(mapOf("telematikID" to baseDirectoryEntry.telematikID)) }
         }
 
-        when (context.outputFormat) {
+        when (format) {
             OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)
-            OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
-            else -> throw UsageError("Cant load for editing in for format: ${context.outputFormat}")
+            OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
+            else -> throw UsageError("Cant load for editing in for format: $format")
         }
     }
 }

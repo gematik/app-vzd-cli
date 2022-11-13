@@ -2,7 +2,6 @@ package de.gematik.ti.directory.cli.gui
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
-import com.github.ajalt.clikt.output.TermUi
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
@@ -22,8 +21,9 @@ class GuiCommand : CliktCommand(name = "gui", help = """Starts HTTP Server with 
     val port by option("-p", "--port").int().default(57036)
 
     override fun run() = catching {
-        TermUi.echo("Starting server at: http://127.0.0.1:$port")
         val url = "http://127.0.0.1:$port/"
+        println("Starting server at: $url")
+
         val os = System.getProperty("os.name").lowercase()
 
         try {

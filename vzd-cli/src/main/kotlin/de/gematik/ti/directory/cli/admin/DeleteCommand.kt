@@ -20,7 +20,7 @@ class DeleteCommand : CliktCommand(name = "delete", help = "Delete specified dir
     private val parameterOptions by ParameterOptions()
 
     // val force by option(help="Force delete").flag()
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
 
     override fun run() = catching {
         val params = parameterOptions.toMap() + customParams

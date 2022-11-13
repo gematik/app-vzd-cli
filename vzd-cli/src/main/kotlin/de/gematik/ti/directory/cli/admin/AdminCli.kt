@@ -1,13 +1,11 @@
 package de.gematik.ti.directory.cli.admin
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.CliktError
+import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.choice
 import de.gematik.ti.directory.admin.AdminAPI
 import de.gematik.ti.directory.admin.AdminEnvironment
-import de.gematik.ti.directory.admin.Client
 import de.gematik.ti.directory.cli.admin.compat.CmdCommand
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.global.GlobalAPI
@@ -15,17 +13,18 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-class CommandContext(
+class AdminCliContext(
+    val adminAPI: AdminAPI
+)
+
+class AdminCliEnvironmentContext(
     val adminAPI: AdminAPI,
-    private val clientDelegate: CommandContext.() -> Client,
-    var outputFormat: OutputFormat,
-    val env: AdminEnvironment,
-    val enableOcsp: Boolean,
+    var env: AdminEnvironment,
     var firstCommand: Boolean = true
 ) {
 
     val client by lazy {
-        clientDelegate.invoke(this)
+        adminAPI.createClient(env)
     }
 
     val pkiClient get() = adminAPI.globalAPI.pkiClient
@@ -33,63 +32,32 @@ class CommandContext(
 
 class AdminCli :
     CliktCommand(name = "admin", help = """CLI for DirectoryAdministration API""".trimMargin()) {
-    private val outputFormat by option().switch(
-        "--human" to OutputFormat.HUMAN,
-        "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML,
-        "--csv" to OutputFormat.CSV,
-        "--short" to OutputFormat.TABLE,
-        "--table" to OutputFormat.TABLE
-    )
-        .default(OutputFormat.HUMAN)
-        .deprecated("DEPRECATED: Specify the format on specific sub-command.")
-
-    private val env by option(
-        "-e",
-        "--env",
-        help = "Environment. Either tu, ru or pu. If not specified default env is used."
-    )
-        .choice("tu", "ru", "pu")
-        .deprecated("DEPRECATED: Switch environment globally using vzd-cli admin login <ENV>")
-
-    private val enableOcsp: Boolean by option(
-        "-o",
-        "--ocsp",
-        help = "Validate certificates using OCSP"
-    )
-        .flag()
-        .deprecated("Use --ocsp in particular sub-commands")
-
-    private val useProxy: Boolean? by option(
-        "--proxy-on",
-        "-x",
-        help = "Forces the use of the proxy, overrides the configuration"
-    )
-        .flag("--proxy-off", "-X")
 
     override fun run() = catching {
         val adminAPI = AdminAPI(GlobalAPI())
-        val clientEnvStr =
-            env ?: adminAPI.config.currentEnvironment ?: throw CliktError("Default environment is not configured")
-
-        val clientEnv = AdminEnvironment.valueOf(clientEnvStr.lowercase())
-
-        val clientDelegate: CommandContext.() -> Client = {
-            logger.info { "Using environment: $clientEnv" }
-            adminAPI.createClient(clientEnv)
-        }
-
-        currentContext.obj = CommandContext(adminAPI, clientDelegate, outputFormat, clientEnv, enableOcsp)
+        currentContext.obj = AdminCliContext(adminAPI)
     }
 
     init {
         subcommands(
             VaultCommand(),
             ConfigCommand(),
+            StatusCommand(),
+            EnvironmentCommands(AdminEnvironment.pu),
+            EnvironmentCommands(AdminEnvironment.ru),
+            EnvironmentCommands(AdminEnvironment.tu)
+        )
+    }
+}
+
+class EnvironmentCommands(env: AdminEnvironment) : CliktCommand(name = env.name, help = """Commands for $env instance""".trimMargin()) {
+    private val context by requireObject<AdminCliContext>()
+
+    init {
+        subcommands(
             LoginCommand(),
             LoginCredCommand(),
             TokenCommand(),
-            StatusCommand(),
             SearchCommand(),
             ShowCommand(),
             ListCommand(),
@@ -109,5 +77,9 @@ class AdminCli :
             DumpCommand(),
             CmdCommand()
         )
+    }
+
+    override fun run() = catching {
+        currentContext.obj = AdminCliEnvironmentContext(context.adminAPI, AdminEnvironment.valueOf(commandName))
     }
 }

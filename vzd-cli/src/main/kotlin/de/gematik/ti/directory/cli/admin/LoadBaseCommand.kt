@@ -21,7 +21,7 @@ class LoadBaseCommand : CliktCommand(name = "load-base", help = "Load the base e
         help = "Specify query parameters to find matching entries"
     ).associate()
     private val parameterOptions by ParameterOptions()
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val format by option().switch(
         "--json" to OutputFormat.JSON,
         "--yaml" to OutputFormat.YAML

@@ -26,7 +26,7 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
     private val files by argument().path(mustBeReadable = true).multiple()
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (certificate exists).").flag()
 
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     override fun run() = catching {
         files.forEach {
             val certB64 = Base64.toBase64String(it.inputStream().readBytes())

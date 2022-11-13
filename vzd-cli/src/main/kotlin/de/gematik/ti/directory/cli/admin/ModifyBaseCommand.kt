@@ -21,7 +21,7 @@ import java.io.File
 
 class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify single base directory entry") {
     private val logger = KotlinLogging.logger {}
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val file: String? by argument(
         "FILENAME",
         help = "Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN"

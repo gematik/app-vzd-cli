@@ -2,7 +2,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-version = "2.1.0-beta3"
+version = "2.1.0-beta4"
 
 val ktorVersion = "2.1.2"
 val kotestVersion = "5.5.2"
@@ -82,7 +82,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
 
     // Clikt library for creating nice CLI
-    implementation("com.github.ajalt.clikt:clikt:3.4.0")
+    implementation("com.github.ajalt.clikt:clikt:3.5.0")
 
     // Bouncy castle fpr crypto and certificates processing
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")

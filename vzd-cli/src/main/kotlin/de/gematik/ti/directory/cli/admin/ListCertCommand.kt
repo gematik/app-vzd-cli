@@ -5,10 +5,7 @@ import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
-import com.github.ajalt.clikt.parameters.options.associate
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.pair
-import com.github.ajalt.clikt.parameters.options.switch
+import com.github.ajalt.clikt.parameters.options.*
 import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
@@ -20,14 +17,14 @@ import kotlin.io.path.useLines
 private val logger = KotlinLogging.logger {}
 
 class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificates") {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val outputFormat by option().switch(
         "--human" to OutputFormat.HUMAN,
         "--json" to OutputFormat.JSON,
         "--yaml" to OutputFormat.YAML,
         "--csv" to OutputFormat.CSV,
         "--table" to OutputFormat.TABLE
-    )
+    ).default(OutputFormat.TABLE)
     private val paramFile: Pair<String, String>? by option(
         "-f",
         "--param-file",
@@ -58,14 +55,13 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
     }
 
     private fun runQuery(params: Map<String, String>) {
-        context.outputFormat = outputFormat ?: context.outputFormat
         if (params.isEmpty()) {
             throw UsageError("Specify at least one query parameter")
         }
 
         val result = runBlocking { context.client.readDirectoryCertificates(params) }
 
-        if (context.outputFormat == OutputFormat.CSV) {
+        if (outputFormat == OutputFormat.CSV) {
             if (context.firstCommand) {
                 context.firstCommand = false
                 Output.printCsv(UserCertificateCsvHeaders)
@@ -81,6 +77,6 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
             }
         }
 
-        CertificateOutputMapping[context.outputFormat]?.invoke(params, result)
+        CertificateOutputMapping[outputFormat]?.invoke(params, result)
     }
 }

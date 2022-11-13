@@ -2,6 +2,7 @@ package de.gematik.ti.directory.cli
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import com.github.ajalt.clikt.completion.CompletionCommand
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.context
@@ -84,7 +85,8 @@ class Cli : CliktCommand(name = "vzd-cli") {
             AdminCli(),
             ApoCli(),
             GuiCommand(),
-            PersCommand()
+            PersCommand(),
+            CompletionCommand(),
         )
         val configDir = Path(System.getProperty("user.home"), ".telematik")
         if (!configDir.toFile().exists()) {

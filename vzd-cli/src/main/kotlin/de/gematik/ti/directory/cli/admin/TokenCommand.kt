@@ -10,14 +10,14 @@ import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.util.TokenStore
 
 class TokenCommand : CliktCommand(name = "token", help = "Show access token") {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val env by argument().choice("ru", "tu", "pu").optional()
 
     override fun run() = catching {
         val config = context.adminAPI.config
 
-        val envConfig = config.environment(env)
+        val envConfig = config.environment(context.env)
 
-        echo(TokenStore().accessTokenFor(envConfig.apiURL)?.accessToken ?: throw CliktError("No token available for environment: ${env ?: config.currentEnvironment}"))
+        echo(TokenStore().accessTokenFor(envConfig.apiURL)?.accessToken ?: throw CliktError("No token available for environment: $env"))
     }
 }

@@ -14,14 +14,14 @@ import kotlin.io.path.exists
 import kotlin.io.path.useLines
 
 class ListCommand : CliktCommand(name = "list", help = "List directory entries") {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val outputFormat by option().switch(
         "--human" to OutputFormat.HUMAN,
         "--json" to OutputFormat.JSON,
         "--yaml" to OutputFormat.YAML,
         "--csv" to OutputFormat.CSV,
         "--table" to OutputFormat.TABLE
-    )
+    ).default(OutputFormat.HUMAN)
 
     private val paramFile: Pair<String, String>? by option(
         "-f",
@@ -40,7 +40,6 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
     private val ocspOptions by OcspOptions()
 
     override fun run() = catching {
-        context.outputFormat = outputFormat ?: context.outputFormat
         val params = parameterOptions.toMap() + customParams
         paramFile?.let { paramFile ->
             val file = Path(paramFile.second)
@@ -62,7 +61,7 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
             runBlocking { context.client.readDirectoryEntry(params) }
         }
 
-        if (context.outputFormat == OutputFormat.CSV) {
+        if (outputFormat == OutputFormat.CSV) {
             if (context.firstCommand) {
                 context.firstCommand = false
                 print('\uFEFF')
@@ -74,6 +73,6 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
             runBlocking { context.adminAPI.expandOCSPStatus(result) }
         }
 
-        DirectoryEntryOutputMapping[context.outputFormat]?.invoke(params, result)
+        DirectoryEntryOutputMapping[outputFormat]?.invoke(params, result)
     }
 }

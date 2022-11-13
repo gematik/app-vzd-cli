@@ -40,7 +40,7 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
     private val dryRun by option("--dry", help = "Perform a dry run and not delete any certificate.").flag()
 
     // private val force by option("-f", "--force").flag(default = false)
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
 
     override fun run() = catching {
         val params = parameterOptions.toMap() + customParams

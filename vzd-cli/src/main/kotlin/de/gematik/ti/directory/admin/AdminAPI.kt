@@ -29,7 +29,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
 
     fun createClient(env: AdminEnvironment): Client {
         val tokenStore = TokenStore()
-        val envConfig = config.environment(env.toString())
+        val envConfig = config.environment(env)
         val client = Client {
             apiURL = envConfig.apiURL
             accessToken = tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
@@ -86,7 +86,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
     }
 
     fun environmentConfig(env: AdminEnvironment): EnvironmentConfig {
-        return config.environment(env.toString())
+        return config.environment(env)
     }
 
     fun login(env: AdminEnvironment, clientID: String, clientSecret: String): Map<String, String> {

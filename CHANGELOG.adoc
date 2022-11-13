@@ -1,12 +1,15 @@
 = Changelog `vzd-cli`
 
 == Version 2.1.0
+- CLI Interface wurde weitgehend überarbeiten un vereinfacht, s. Dokumentation
+- Self-Update Funktion wurde implementiert, s. `vzd-cli update`
+- Erste simple Web-GUI wurde hinzugefügt, s. `vzd-cli gui`
 - Neu: ApoVZD Unterstützung über `vzd-cli apo`
-- `vzd-cli admin login` wurde komplett überarbeitet
-- `vzd-cli admin token` ersetzt `vzd-cli admin auth`
-- Neuer Befehl: `vzd-cli admin search`: schnelle, intuitive Suche nach Einträgen
-- Neuer Befehl: `vzd-cli admin show <TELEMATIK_ID>`: zeigt den gesamten Eintrag in verschiedenen Formaten
-- Neuer Befehl: `vzd-cli admin edit-base`: editieren eines Basiseintrags in einem Text-Editor
+- `vzd-cli admin <ENV> login` wurde komplett überarbeitet
+- `vzd-cli admin <ENV> token` ersetzt `vzd-cli admin auth`
+- Neuer Befehl: `vzd-cli admin <ENV> search`: schnelle, intuitive Suche nach Einträgen
+- Neuer Befehl: `vzd-cli admin <ENV> show <TELEMATIK_ID>`: zeigt den gesamten Eintrag in verschiedenen Formaten
+- Neuer Befehl: `vzd-cli admin <ENV> edit <TELEMATIK_ID>`: editieren eines Basiseintrags in einem Text-Editor
 - Neuer Ausgabeformat: `--table`, eine ASCII Tabelle
 
 == Version 2.0.0

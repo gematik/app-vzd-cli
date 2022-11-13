@@ -6,7 +6,9 @@ import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.switch
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.UpdateBaseDirectoryEntry
 import de.gematik.ti.directory.cli.catching
@@ -18,9 +20,14 @@ import mu.KotlinLogging
 
 private val JSON = Json { ignoreUnknownKeys = true }
 
-class ModifyBaseAttrCommand :
-    CliktCommand(name = "modify-base-attr", help = "Modify specific attributes of a base entry") {
+class ModifyBaseAttrCommand : CliktCommand(name = "modify-base-attr", help = "Modify specific attributes of a base entry") {
     private val logger = KotlinLogging.logger {}
+    private val context by requireObject<AdminCliEnvironmentContext>()
+
+    private val format by option().switch(
+        "--yaml" to OutputFormat.YAML,
+        "--json" to OutputFormat.JSON
+    ).default(OutputFormat.YAML)
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
@@ -33,7 +40,6 @@ class ModifyBaseAttrCommand :
         metavar = "ATTR=VALUE",
         help = "Set the attribute value in BaseDirectoryEntry."
     ).associate()
-    private val context by requireObject<CommandContext>()
 
     override fun run() = catching {
         val params = parameterOptions.toMap() + customParams
@@ -65,10 +71,10 @@ class ModifyBaseAttrCommand :
             runBlocking { context.client.modifyDirectoryEntry(dn.uid, updateBaseDirectoryEntry) }
             val result = runBlocking { context.client.readDirectoryEntry(mapOf("uid" to dn.uid)) }
 
-            when (context.outputFormat) {
+            when (format) {
                 OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)
-                OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
-                else -> throw UsageError("Unsupported format: ${context.outputFormat}")
+                OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
+                else -> throw UsageError("Unsupported format: $format")
             }
         }
     }

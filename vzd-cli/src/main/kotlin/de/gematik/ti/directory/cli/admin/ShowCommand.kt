@@ -20,7 +20,7 @@ class ShowCommand : CliktCommand(name = "show", help = "Show all information abo
         "--yaml" to OutputFormat.YAML
     ).default(OutputFormat.HUMAN)
     private val ocspOptions by OcspOptions()
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val id by argument()
 
     override fun run() = catching {

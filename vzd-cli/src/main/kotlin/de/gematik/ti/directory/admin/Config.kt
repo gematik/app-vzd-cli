@@ -1,5 +1,6 @@
 package de.gematik.ti.directory.admin
 
+import de.gematik.ti.directory.util.DirectoryException
 import de.gematik.ti.directory.util.FileObjectStore
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -25,8 +26,7 @@ internal class AdminConfigFileStore(customConfigPath: Path? = null) : FileObject
                     authURL = "https://auth.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token",
                     apiURL = "https://vzdpflege.vzd.ti-dienste.de:9543"
                 )
-            ),
-            currentEnvironment = "ru"
+            )
         )
     },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
@@ -38,10 +38,9 @@ internal class AdminConfigFileStore(customConfigPath: Path? = null) : FileObject
 
 @Serializable
 data class Config(
-    val environments: Map<String, EnvironmentConfig>,
-    var currentEnvironment: String?
+    val environments: Map<String, EnvironmentConfig>
 ) {
-    fun environment(name: String? = null) = environments.get(name ?: currentEnvironment) ?: throw ConfigException("Unknown environment: $name")
+    fun environment(env: AdminEnvironment) = environments[env.name] ?: throw ConfigException("Unknown environment: ${env.name}")
 }
 
 @Serializable
@@ -50,4 +49,4 @@ data class EnvironmentConfig(
     val apiURL: String
 )
 
-class ConfigException(message: String, cause: Throwable? = null) : Exception(message, cause)
+class ConfigException(message: String, cause: Throwable? = null) : DirectoryException(message, cause)

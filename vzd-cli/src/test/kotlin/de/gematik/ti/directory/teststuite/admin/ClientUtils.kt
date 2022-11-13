@@ -3,6 +3,7 @@ package de.gematik.ti.directory.teststuite.admin
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import de.gematik.ti.directory.admin.AdminAPI
+import de.gematik.ti.directory.admin.AdminEnvironment
 import de.gematik.ti.directory.admin.Client
 import de.gematik.ti.directory.global.GlobalAPI
 import org.slf4j.LoggerFactory
@@ -12,7 +13,7 @@ fun createClient(): Client {
     root.level = Level.DEBUG
 
     val adminAPI = AdminAPI(GlobalAPI())
-    val tucfg = adminAPI.config.environment("tu")
+    val tucfg = adminAPI.config.environment(AdminEnvironment.tu)
 
     return Client {
         apiURL = tucfg.apiURL

@@ -6,7 +6,7 @@ import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 
 class StatusCommand : CliktCommand(name = "status", help = "Show information about the API") {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliContext>()
 
     override fun run() = catching {
         runBlocking {

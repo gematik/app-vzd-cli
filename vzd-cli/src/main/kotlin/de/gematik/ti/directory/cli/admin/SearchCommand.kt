@@ -11,7 +11,7 @@ import kotlinx.coroutines.runBlocking
 
 class SearchCommand : CliktCommand(name = "search", help = "Search for directory entries") {
     private val arguments by argument().multiple()
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
 
     override fun run() = catching {
         val queryString = arguments.joinToString(" ")

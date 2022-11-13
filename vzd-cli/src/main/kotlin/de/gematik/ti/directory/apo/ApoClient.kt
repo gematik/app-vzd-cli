@@ -3,27 +3,23 @@ package de.gematik.ti.directory.apo
 import ca.uhn.fhir.context.FhirContext
 import de.gematik.ti.directory.util.DirectoryAuthException
 import de.gematik.ti.directory.util.DirectoryException
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import org.hl7.fhir.r4.hapi.ctx.FhirR4
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Location
+import java.net.ConnectException
+import java.net.InetSocketAddress
+import java.net.ProxySelector
+import java.net.URL
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.net.http.HttpResponse.BodyHandlers
 
 private val logger = KotlinLogging.logger {}
 
 class ApoClient(block: Configuration.() -> Unit = {}) {
-    private val http: HttpClient
+    private val httpClient: HttpClient
     private val config: Configuration = Configuration()
 
     class Configuration {
@@ -34,78 +30,76 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
 
     init {
         block(this.config)
-        this.http = HttpClient(CIO) {
-            engine {
-                config.httpProxyURL?.let {
-                    // TODO: for some bizzare reason the gematik http proxy does not work with ApoVZD
-                    if (it != "http://192.168.110.10:3128/") {
-                        logger.debug { "ApoClient is using proxy: $it" }
-                        proxy = ProxyBuilder.http(it)
-                    }
-                }
-            }
 
-            expectSuccess = false
+        val httpClientBuilder = HttpClient.newBuilder()
 
-            val l = logger
-
-            install(Logging) {
-                logger = Logger.DEFAULT
-                if (l.isDebugEnabled) {
-                    level = LogLevel.ALL
-                } else if (l.isInfoEnabled) {
-                    level = LogLevel.INFO
-                }
-            }
-
-            install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        prettyPrint = true
-                    }
-                )
-            }
-
-            defaultRequest {
-                url(config.apiURL)
-                header("X-API-KEY", config.apiKey)
-            }
+        config.httpProxyURL?.let {
+            logger.debug { "ApoClient is using proxy: $it" }
+            val proxyURL = URL(config.httpProxyURL)
+            httpClientBuilder.proxy(ProxySelector.of(InetSocketAddress(proxyURL.host, proxyURL.port)))
         }
+
+        this.httpClient = httpClientBuilder.build()
 
         logger.debug { "ApoClient created ${config.apiURL}" }
     }
 
-    suspend fun search(queryString: String): Pair<String, Bundle>? {
-        val response = http.get {
-            url("Location")
-            parameter("name", queryString)
-        }
-        if (response.status == HttpStatusCode.Forbidden) {
-            throw DirectoryAuthException("Invalid API-Key for ${response.request.url}. Use `vzd-cli apo config` to configure API-Keys.")
+    fun search(queryString: String): Pair<String, Bundle>? {
+        val request = HttpRequest.newBuilder()
+            .uri(
+                URL(URL(config.apiURL), "Location?name=${queryString.encodeURLParameter()}").toURI()
+            )
+            .header("X-API-KEY", config.apiKey)
+            .GET()
+            .build()
+
+        val response: HttpResponse<String>
+        try {
+            response = httpClient.send(request, BodyHandlers.ofString())
+        } catch (e: ConnectException) {
+            if (config.httpProxyURL != null) {
+                throw DirectoryAuthException("Unable to connect to proxy server: ${config.httpProxyURL}")
+            } else {
+                throw DirectoryAuthException("Unable to connect to API: ${config.apiURL}")
+            }
         }
 
-        val body = response.body<String>()
-        if (response.status == HttpStatusCode.NotFound) {
-            return null
-        } else if (response.status != HttpStatusCode.OK) {
-            throw DirectoryAuthException("${response.status} $body")
+        if (response.statusCode() == 403) {
+            throw DirectoryAuthException("Invalid API-Key for ${request.uri()}. Use `vzd-cli apo config` to configure API-Keys.")
         }
 
-        // do this so that ShadowJar knows what classes to include
-        FhirR4()
+        val body = response.body()
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = parser.parseResource(Bundle::class.java, body)
         return Pair(body, bundle)
     }
 
-    suspend fun getLocationByTelematikID(telematikID: String): Pair<String, Location> {
-        val response = http.get {
-            url("Location")
-            parameter("identifier", telematikID)
+    fun getLocationByTelematikID(telematikID: String): Pair<String, Location> {
+        val request = HttpRequest.newBuilder()
+            .uri(
+                URL(URL(config.apiURL), "Location?identifier=${telematikID.encodeURLParameter()}").toURI()
+            )
+            .header("X-API-KEY", config.apiKey)
+            .GET()
+            .build()
+
+        val response: HttpResponse<String>
+        try {
+            response = httpClient.send(request, BodyHandlers.ofString())
+        } catch (e: ConnectException) {
+            if (config.httpProxyURL != null) {
+                throw DirectoryAuthException("Unable to connect to proxy server: ${config.httpProxyURL}")
+            } else {
+                throw DirectoryAuthException("Unable to connect to API: ${config.apiURL}")
+            }
         }
-        val body = response.body<String>()
+
+        if (response.statusCode() == 403) {
+            throw DirectoryAuthException("Invalid API-Key for ${request.uri()}. Use `vzd-cli apo config` to configure API-Keys.")
+        }
+
+        val body = response.body()
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = parser.parseResource(Bundle::class.java, body)

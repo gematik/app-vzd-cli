@@ -13,6 +13,7 @@ import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.cli.escape
 import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
@@ -52,6 +53,7 @@ class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the da
     override fun run() = Unit
 }
 class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetching the data from server") {
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val paramFile: Pair<String, String>? by option(
         "-f",
         "--param-file",
@@ -68,7 +70,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         .int().default(500)
     private val expectedTotal by option("-e", "--expected-count", help = "Expected total count of entries. Used only for cosmetics to display the progressbar.").int().default(-1)
     private val parameterOptions by ParameterOptions()
-    private val context by requireObject<CommandContext>()
+    private val ocspOptions by OcspOptions()
 
     override fun run() = catching() {
         val params = parameterOptions.toMap() + customParams
@@ -91,7 +93,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
     }
 
     private fun expandOcspStatus(entry: DirectoryEntry) {
-        if (context.enableOcsp) {
+        if (ocspOptions.enableOcsp) {
             entry.userCertificates?.mapNotNull { it.userCertificate }?.forEach {
                 it.certificateInfo.ocspResponse = runBlocking { context.pkiClient.ocsp(it) }
             }
@@ -127,7 +129,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
 }
 
 class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests for each entry in the dump") {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
 
     override fun run() = catching {
         val semaphore = Semaphore(20)
@@ -161,7 +163,7 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
 }
 
 class DumpSaveCert : CliktCommand(name = "save-cert", help = "Reads dump from STDIN and saves all X509 certificate to specified directory") {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val destination by argument().path(mustExist = true, mustBeWritable = true, canBeFile = false)
 
     override fun run() = catching {

@@ -4,6 +4,9 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.choice
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntry
@@ -18,7 +21,11 @@ class TemplateCommand : CliktCommand(
      Supported types: base, entry, cert
 """
 ) {
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
+    private val outputFormat by option().switch(
+        "--json" to OutputFormat.JSON,
+        "--yaml" to OutputFormat.YAML
+    ).default(OutputFormat.YAML)
     private val resourceType by argument(help = "Specify type of a resource").choice("base", "entry", "cert")
 
     override fun run() = catching {
@@ -38,7 +45,7 @@ class TemplateCommand : CliktCommand(
         )
         when (resourceType) {
             "base" -> {
-                printTemplate(base, context.outputFormat)
+                printTemplate(base, outputFormat)
             }
             "entry" -> {
                 printTemplate(
@@ -52,17 +59,17 @@ class TemplateCommand : CliktCommand(
                             )
                         )
                     ),
-                    context.outputFormat
+                    outputFormat
                 )
             }
             "cert" -> {
                 printTemplate(
                     UserCertificate(
                         userCertificate = CertificateDataDER("BASE64"),
-                        description = "Benutzt Zertifikat in DES (CRT) Binärformat konfertiert nach String mittels BASE64"
+                        description = "Benutzt Zertifikat in DES (CRT) Binärformat konvertiert nach String mittels BASE64"
 
                     ),
-                    context.outputFormat
+                    outputFormat
                 )
             }
             else -> throw UsageError("Undefinded resource type: $resourceType")
@@ -72,8 +79,8 @@ class TemplateCommand : CliktCommand(
     private inline fun <reified T> printTemplate(template: T, outputFormat: OutputFormat) {
         when (outputFormat) {
             OutputFormat.JSON -> Output.printJson(template)
-            OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(template)
-            else -> throw UsageError("Templates are not available for format: ${context.outputFormat}")
+            OutputFormat.YAML -> Output.printYaml(template)
+            else -> throw UsageError("Templates are not available for format: $outputFormat")
         }
     }
 }

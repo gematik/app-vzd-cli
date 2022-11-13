@@ -31,12 +31,6 @@ object Output {
         delimiter = ';'
     }
 
-    private fun printHuman(value: Any?) {
-        value?.let {
-            println(yaml.encodeToString(value))
-        }
-    }
-
     fun printYaml(value: Any?) {
         println(yaml.encodeToString(value))
     }

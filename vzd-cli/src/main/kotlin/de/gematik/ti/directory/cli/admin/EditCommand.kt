@@ -22,7 +22,7 @@ private val JsonPretty = Json { prettyPrint = true }
 
 class EditCommand : CliktCommand(name = "edit", help = "Edit base entry using text editor") {
     private val telematikID by argument()
-    private val context by requireObject<CommandContext>()
+    private val context by requireObject<AdminCliEnvironmentContext>()
     private val format by option().switch(
         "--json" to OutputFormat.JSON,
         "--yaml" to OutputFormat.YAML
