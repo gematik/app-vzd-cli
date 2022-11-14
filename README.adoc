@@ -53,7 +53,7 @@ vzd-cli admin ru --help
 
 == Konfiguration
 
-Die Verzeichnisdienst APIs werden über HTTPS erreicht. Falls für die Verbindung ein HTTP-Proxy erforderlich ist, muss es wie folgt konfiguriert werden:
+Die Directory APIs werden über HTTPS erreicht. Falls für die Verbindung ein HTTP-Proxy erforderlich ist, muss es wie folgt konfiguriert werden:
 
 [source,bash]
 ----
@@ -65,7 +65,7 @@ vzd-cli config set httpProxy.enabled true
 `vzd-cli` ermöglicht u.a. die Nutzung folgender APIs:
 
 * Directory Admin API
-* Pharmacies API
+* Apo API (ApoVZD)
 
 Für die Nutzung dieser APIs sind jeweils entsprechende Geheimnisse bzw. Credentials erforderlich.
 Diese werden von der gematik *den bereichtigten Organistionen* bereitgestellt.
@@ -73,8 +73,8 @@ Diese werden von der gematik *den bereichtigten Organistionen* bereitgestellt.
 === Admin API Credentials
 
 Directory Admin API benutzt für die Authentisierung das Oauth2 Client Credentials Flow.
-Um hierfür erforderlichen Credentials angemessen sicher aufbewahren zu können, stellt `vzd-cli` eine Tresor-Funktion bereit (=Vault).
-Mithilfe der Vault werden alle credentials verschlüsselt gespeichert.
+Um hierfür erforderlichen Credentials angemessen sicher aufbewahren zu können, stellt `vzd-cli` eine Vault (Tresor) Funktion bereit.
+Mithilfe der Vault werden alle Client IDs und Client Secrets verschlüsselt gespeichert.
 Um Vault aufmachen und darin enthaltenen Credentials nutzen zu können, wird der Nutzer aufgefordert einen Vault-Password zu vergeben.
 Dieser Password funktioniert analog zu den privaten Passwörtern bei den Password-Managern (z.B. Bitwarden, LastPass, 1Password).
 Die Vault Implementierung befinden sich in der Datei `Vault.kt` und verwendet von NIST emfohlene Verschlüsselung.
@@ -93,11 +93,11 @@ vzd-cli admin vault store -e ru -c <CLIEND_ID> -s <CLIENT_SECRET>
 vzd-cli admin vault store -e pu -c <CLIEND_ID> -s <CLIENT_SECRET>
 ----
 
-Vault Password kann alternativ über die Umgebungsvariable `VAULT_PASSWORD` gesetzt werden (empfohlen) oder über `--password` Parameter angegeben werden (nicht empfohlen).
+Vault Password kann alternativ über die Umgebungsvariable `VAULT_PASSWORD` (empfohlen) oder über `--password` Parameter angegeben werden (nicht empfohlen).
 
 === Apo API API-Keys
 
-Zugriff auf Pharmacies API (ApoVZD) wird mittels API-KEYs geschützt.
+Zugriff auf Apo API (ApoVZD) wird mittels API-KEYs geschützt.
 Die API-KEYs werden durch die gematik an *die berechtigte Anwendungen* vergeben.
 
 [source,bash]
@@ -108,7 +108,7 @@ vzd-cli apo config set apiKeys.test <API_KEY_TEST>
 vzd-cli apo config set apiKeys.prod <API_KEY_PROD>
 ----
 
-=== Erste Schritte
+== Erste Schritte
 
 Befor die Directory Admin API genutzt werden kann, muss eine Anmeldung erfolgen.
 Die Anmeldung muss alle 6 Stunden wiederholt werden.
