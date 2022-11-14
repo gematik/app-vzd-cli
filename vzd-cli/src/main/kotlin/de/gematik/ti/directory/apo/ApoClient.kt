@@ -5,6 +5,7 @@ import de.gematik.ti.directory.util.DirectoryAuthException
 import de.gematik.ti.directory.util.DirectoryException
 import io.ktor.http.*
 import mu.KotlinLogging
+import org.hl7.fhir.r4.hapi.ctx.FhirR4
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Location
 import java.net.ConnectException
@@ -22,6 +23,12 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
     private val httpClient: HttpClient
     private val config: Configuration = Configuration()
 
+    // initialize FHIR R4 class just to signify, that ShadowJar minimizer must include it into big-jar
+    companion object {
+        init {
+            FhirR4()
+        }
+    }
     class Configuration {
         var apiURL = ""
         var apiKey = ""
@@ -44,7 +51,7 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
         logger.debug { "ApoClient created ${config.apiURL}" }
     }
 
-    fun search(queryString: String): Pair<String, Bundle>? {
+    fun search(queryString: String): Pair<String, Bundle> {
         val request = HttpRequest.newBuilder()
             .uri(
                 URL(URL(config.apiURL), "Location?name=${queryString.encodeURLParameter()}").toURI()
