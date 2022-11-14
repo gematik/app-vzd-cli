@@ -98,7 +98,7 @@ Vault Password kann alternativ über die Umgebungsvariable `VAULT_PASSWORD` gese
 === Apo API API-Keys
 
 Zugriff auf Pharmacies API (ApoVZD) wird mittels API-KEYs geschützt.
-Die API-KEYs werden durch die gamatik an *die berechtigte Anwendungen* vergeben.
+Die API-KEYs werden durch die gematik an *die berechtigte Anwendungen* vergeben.
 
 [source,bash]
 ----
@@ -126,21 +126,21 @@ vzd.cli admin pu login
 Für vollautomatisierte Nutzung des `vzd-cli`, auch bei der Anmeldung, wird das setzten der Umgebungsvariable `VAULT_PASSWORD` empfohlen.
 Dabei soll die Umgebungsvarianle den während der Konfiguration angegeben Vault Password enthalten.
 
-*Beispiel: Suche nach einem Eintrag mit angegebenen telematikID in der Referenzumgebung (`ru`):*
+*Beispiel:* Suche nach einem Eintrag mit angegebenen telematikID in der Referenzumgebung (`ru`)
 
 [source,bash]
 ----
 vzd-cli admin ru search 5-SMC-B-Testkarte-883110000092568
 ----
 
-*Beispiel: Suche nach den Einträgen in Berlin in der Referenzumgebung (`ru`):*
+*Beispiel:* Suche nach den Einträgen in Berlin in der Referenzumgebung (`ru`)
 
 [source,bash]
 ----
 vzd-cli admin ru search Berlin
 ----
 
-*Beispiel: Anzeige der Detailinformationen für die angegebene telematikID in der Referenzumgebung (`ru`):*
+*Beispiel:* Anzeige der Detailinformationen für die angegebene telematikID in der Referenzumgebung (`ru`)
 
 [source,bash]
 ----
@@ -156,18 +156,16 @@ vzd-cli admin ru show 5-SMC-B-Testkarte-883110000092568
 Aktualisiert das `vzd-cli` auf die neusete (oder angegebene Version).
 Anmerkung: Self-Updates werden erst ab der Version 2.1 unterstützt.
 
-*Beispiel:* Falls eine neuere Version verfügbar ist, wird diese von github.com heruntergeladen und installiert:
+*Beispiel:* Falls eine neuere Version verfügbar ist, wird diese von github.com heruntergeladen und installiert
 
 ----
 vzd-cli update
 ----
 
-Beispiel: Installiert eine bestimmte Version (auch Downgrade ist möglich):
+*Beispiel:* Installiert eine bestimmte Version (auch Downgrade ist möglich):
 
 ----
 vzd-cli update 2.1.0-beta4
-----
-
 ----
 
 == `admin`: CLI für Directory Administration 
