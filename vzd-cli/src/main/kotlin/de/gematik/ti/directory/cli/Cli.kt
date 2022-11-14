@@ -86,7 +86,7 @@ class Cli : CliktCommand(name = "vzd-cli") {
             ApoCli(),
             GuiCommand(),
             PersCommand(),
-            CompletionCommand(),
+            CompletionCommand()
         )
         val configDir = Path(System.getProperty("user.home"), ".telematik")
         if (!configDir.toFile().exists()) {

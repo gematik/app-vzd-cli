@@ -4,11 +4,9 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.output.TermUi
-import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
-import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.AdminEnvironment
@@ -53,7 +51,7 @@ fun openOrCreateVault(password: String?): KeyStoreVault {
 class VaultResetCommand : CliktCommand(name = "purge", help = "Remove Vault") {
     override fun run() = catching {
         if (confirm("Are you sure you want to delete ALL secrets stored in the vault?") == true) {
-            //vaultProvider.purge()
+            // vaultProvider.purge()
             echo("Vault purged.")
         } else {
             echo("Abort. Vault left intact.")
@@ -93,7 +91,7 @@ class VaultExportCommand : CliktCommand(name = "export", help = "Export Vault to
     private val password by option("--password", "-p", help = "Password for protection of the Vault")
     private val output by option("-o", "--output").path(canBeDir = false).required()
     private val transferPassword by option("-t", "--transfer-password")
-        .prompt("Enter Vault transfer password", hideInput = true)
+            .prompt("Enter Vault transfer password", hideInput = true)
 
     override fun run() = catching {
         logger.info { "Exporting Vault to $output" }
