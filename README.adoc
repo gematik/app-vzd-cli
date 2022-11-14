@@ -12,11 +12,13 @@ image::images/vzd-cli.gif[]
 
 Die link:https://github.com/spilikin/app-vzd-cli/releases[neueste Version] von `vzd-cli` herunterladen.
 
-Für die Ausführung der CLI soll die `PATH` Variable um den Pfad `vzd-cli-<VERSION>/bin` erweitert werden.
+Für die Ausführung des `vzd-cli` soll die `PATH` Variable um den Pfad `vzd-cli-<VERSION>/bin` erweitert werden.
 
 Sobald der Befehl `vzd-cli` ausgeführt werden kann sind wir start klar:
 [source]
 ----
+$ vzd-cli
+
 Usage: vzd-cli [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -37,7 +39,7 @@ Commands:
 
 == Erste Schritte
 
-Aufbau der CLI folgt aktuellen Best-Practices analog z.B. zu Docker, Kubernetes, Helm. 
+Aufbau des `vzd-cli` folgt aktuellen Best-Practices analog z.B. zu Docker.
 Für alle Befehle (Commands) und Unter-Befehle (Subcommands) kann man mittels `--help` Option eine abschließende Liste aller Optionen und Argumente anzeigen lassen.
 
 [source,bash]
@@ -60,21 +62,22 @@ vzd-cli config set httpProxy.proxyURL http://192.168.110.10:3128
 vzd-cli config set httpProxy.enabled true
 ----
 
-`vzd-cli` ermöglicht die Nutzung folgender APIs:
+`vzd-cli` ermöglicht u.a. die Nutzung folgender APIs:
+
 * Directory Admin API
 * Pharmacies API
 
 Für die Nutzung dieser APIs sind jeweils entsprechende Geheimnisse bzw. Credentials erforderlich.
-Diese werden von der gematik bereitgestellt.
+Diese werden von der gematik *den bereichtigten Organistionen* bereitgestellt.
 
 === Admin API Credentials
 
-Directory Admin API benutzt Oauth2 Client Credentials Flow als Authentisierung.
-Um diese sehr kritische Credentials sicher aufbewahren zu können stellt `vzd-cli` eine Tresor-Funktion bereit (Vault)-
-Durch den Vault werden alle credentials verschlüsselt gespeichert.
-Um Vault aufmachen und darin enthaltenen zu können Credentials nutzen zu können, wird der Nutzer aufgefordern einen Vault-Password zu vergeben.
+Directory Admin API benutzt für die Authentisierung das Oauth2 Client Credentials Flow.
+Um hierfür erforderlichen Credentials angemessen sicher aufbewahren zu können, stellt `vzd-cli` eine Tresor-Funktion bereit (=Vault).
+Mithilfe der Vault werden alle credentials verschlüsselt gespeichert.
+Um Vault aufmachen und darin enthaltenen Credentials nutzen zu können, wird der Nutzer aufgefordert einen Vault-Password zu vergeben.
 Dieser Password funktioniert analog zu den privaten Passwörtern bei den Password-Managern (z.B. Bitwarden, LastPass, 1Password).
-Die Vault Implementierung befinden sich in der Datei `Vault.kt`
+Die Vault Implementierung befinden sich in der Datei `Vault.kt` und verwendet von NIST emfohlene Verschlüsselung.
 
 [source,bash]
 ----
@@ -82,17 +85,20 @@ Die Vault Implementierung befinden sich in der Datei `Vault.kt`
 vzd-cli admin vault purge
 
 # Secret für die Referenzumgebung speichern
-# es folgt eine Abfrage nach dem Vault Password
+# es folgt eine Vault Passwortabfrage
 vzd-cli admin vault store -e ru -c <CLIEND_ID> -s <CLIENT_SECRET>
 
 # Secret für die Produktivumgebung speichern
-# es folgt eine Abfrage nach dem Vault Password
+# es folgt eine Vault Passwortabfrage
 vzd-cli admin vault store -e pu -c <CLIEND_ID> -s <CLIENT_SECRET>
 ----
 
-Vault Password kann alternativ über die Umgebungsvariable `VAULT_PASSWORD` gesetzt werden oder über `--password` Parameter angegeben werden (nicht empfohlen).
+Vault Password kann alternativ über die Umgebungsvariable `VAULT_PASSWORD` gesetzt werden (empfohlen) oder über `--password` Parameter angegeben werden (nicht empfohlen).
 
 === Apo API API-Keys
+
+Zugriff auf Pharmacies API (ApoVZD) wird mittels API-KEYs geschützt.
+Die API-KEYs werden durch die gamatik an *die berechtigte Anwendungen* vergeben.
 
 [source,bash]
 ----
@@ -110,16 +116,17 @@ Die Anmeldung muss alle 6 Stunden wiederholt werden.
 [source,bash]
 ----
 # Anmelden in die Referenzumgebung (ru)
-# es folgt eine Abfrage nach dem Vault Password
+# es folgt eine Vault Passwortabfrage
 vzd.cli admin ru login
 # Anmelden in die Referenzumgebung (pu)
+# es folgt eine Vault Passwortabfrage
 vzd.cli admin pu login
 ----
 
 Für vollautomatisierte Nutzung des `vzd-cli`, auch bei der Anmeldung, wird das setzten der Umgebungsvariable `VAULT_PASSWORD` empfohlen.
 Dabei soll die Umgebungsvarianle den während der Konfiguration angegeben Vault Password enthalten.
 
-Beispiel: Suche nach einem Eintrag mit angegebenen telematikID in der Referenzumgebung (`ru`):
+*Beispiel: Suche nach einem Eintrag mit angegebenen telematikID in der Referenzumgebung (`ru`):*
 
 [source,bash]
 ----
