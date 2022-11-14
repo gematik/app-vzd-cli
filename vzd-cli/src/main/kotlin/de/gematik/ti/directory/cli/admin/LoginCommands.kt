@@ -29,8 +29,11 @@ private fun doLogin(
 class LoginCommand : CliktCommand(name = "login", help = "Login to OAuth2 Server and store token(s)") {
     private val context by requireObject<AdminCliEnvironmentContext>()
 
-    private val password by option("--password", "-p", help = "Password for protection of the Vault")
-        .prompt("Enter Vault Password", hideInput = true)
+    private val password by option(
+        "--password", "-p",
+        help = "Password for protection of the Vault",
+        envvar = "VAULT_PASSWORD"
+    ).prompt("Enter Vault Password", hideInput = true)
 
     override fun run() = catching {
         val env = context.env

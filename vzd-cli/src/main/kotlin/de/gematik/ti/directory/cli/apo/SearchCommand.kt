@@ -7,7 +7,6 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import de.gematik.ti.directory.cli.catching
 import hu.vissy.texttable.dsl.tableFormatter
 import io.ktor.client.*
-import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -18,26 +17,10 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for pharmacie
     private val context by requireObject<ApoInstanceCliContext>()
     private val arguments by argument().multiple()
 
-    fun run2() = catching {
-        val http = HttpClient(CIO) {
-            engine {
-                // proxy = ProxyBuilder.http("http://192.168.110.10:3128/")
-            }
-        }
-
-        runBlocking {
-            val response = http.get("https://apovzd.app.ti-dienste.de/api/") {
-                url {
-                    appendPathSegments("Location")
-                }
-            }
-            echo(response)
-        }
-    }
     override fun run() = catching {
         val queryString = arguments.joinToString(" ")
         val bundle = runBlocking {
-            context.client.search(queryString)?.second
+            context.client.search(queryString).second
         }
 
         val formatter = tableFormatter<Location> {
@@ -85,6 +68,6 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for pharmacie
 
             showAggregation = true
         }
-        println(formatter.apply(bundle?.entry?.mapNotNull { it.resource }?.filterIsInstance<Location>() ?: emptyList()))
+        println(formatter.apply(bundle.entry?.mapNotNull { it.resource }?.filterIsInstance<Location>() ?: emptyList()))
     }
 }
