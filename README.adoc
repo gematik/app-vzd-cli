@@ -116,15 +116,15 @@ Die Anmeldung muss alle 6 Stunden wiederholt werden.
 [source,bash]
 ----
 # Anmelden in die Referenzumgebung (ru)
-# es folgt eine Vault Passwortabfrage
+# es folgt eine Vault-Passwortabfrage
 vzd.cli admin ru login
 # Anmelden in die Referenzumgebung (pu)
-# es folgt eine Vault Passwortabfrage
+# es folgt eine Vault-Passwortabfrage
 vzd.cli admin pu login
 ----
 
 Für vollautomatisierte Nutzung des `vzd-cli`, auch bei der Anmeldung, wird das setzten der Umgebungsvariable `VAULT_PASSWORD` empfohlen.
-Dabei soll die Umgebungsvarianle den während der Konfiguration angegeben Vault Password enthalten.
+Dabei soll die Umgebungsvarianle den während der Konfiguration angegeben Vault Passwort enthalten.
 
 .*Beispiel:* Suche nach allen Eintragen mit _Müller_ im Namen in der Referenzumgebung (`ru`)
 [source,bash]
@@ -138,10 +138,17 @@ vzd-cli admin ru search Müller
 vzd-cli admin pu search Berlin
 ----
 
+.*Beispiel:* Suche nach allen Eintragen in _Berlin_ mit dem Namen _Müller_ in der Referenzumgebung (`ru`)
+[source,bash]
+----
+vzd-cli admin ru search Müller Berlin
+----
+
+
 .*Beispiel:* Anzeige der Detailinformationen für die angegebene telematikID in der Referenzumgebung (`ru`)
 [source,bash]
 ----
-vzd-cli admin ru show 5-SMC-B-Testkarte-883110000092568
+vzd-cli admin ru show 1-SMC-B-Testkarte-883110000117729
 ----
 
 == Übergreifende Befehle
