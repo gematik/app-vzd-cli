@@ -73,8 +73,15 @@ Um diese sehr kritische Credentials sicher aufbewahren zu können stellt `vzd-cl
 Durch den Vault werden alle credentials verschlüsselt gespeichert.
 Um Vault aufmachen und darin enthaltenen zu können Credentials nutzen zu können, wird der Nutzer aufgefordern einen Vault-Password zu vergeben.
 Dieser Password funktioniert analog zu den privaten Passwörtern bei den Password-Managern (z.B. Bitwarden, LastPass, 1Password).
-Die Vault Implementierung befinden sich link:./vzd-cli/src/vzd-cli/src/main/kotlin/de/gematik/ti/directory/util/Vault.kt[hier]
+Die Vault Implementierung befinden sich in der Datei `Vault.kt`
 
+[source,bash]
+----
+# Vault zurücksetzen
+vzd-cli admin vault purge
+vzd-cli admin vault store -e ru -c <CLIEND_ID> -s <CLIENT_SECRET>
+vzd-cli admin vault store -e pu -c <CLIEND_ID> -s <CLIENT_SECRET>
+----
 
 === Apo API API-Keys
 

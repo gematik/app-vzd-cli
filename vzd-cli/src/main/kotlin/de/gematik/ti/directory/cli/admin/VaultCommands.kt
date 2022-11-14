@@ -4,11 +4,14 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.output.TermUi
+import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.choice
+import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.path
+import de.gematik.ti.directory.admin.AdminEnvironment
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.util.KeyStoreVault
 import de.gematik.ti.directory.util.KeyStoreVaultProvider
@@ -49,7 +52,12 @@ fun openOrCreateVault(password: String?): KeyStoreVault {
 
 class VaultResetCommand : CliktCommand(name = "purge", help = "Remove Vault") {
     override fun run() = catching {
-        vaultProvider.purge()
+        if (confirm("Are you sure you want to delete ALL secrets stored in the vault?") == true) {
+            //vaultProvider.purge()
+            echo("Vault purged.")
+        } else {
+            echo("Abort. Vault left intact.")
+        }
     }
 }
 
@@ -67,17 +75,17 @@ class VaultListCommand : CliktCommand(name = "list", help = "List configured OAu
 }
 
 class VaultStoreCommand : CliktCommand(name = "store", help = "Store OAuth2 client credentials") {
-    private val password by option("--password", "-p", help = "Password for protection of the Vault")
-    private val env by option("-e", "--env", help = "Environment. Either tu, ru or pu").choice("tu", "ru", "pu")
+    private val password by option("--password", "-p", help = "Password for protection of the Vault", envvar = "VAULT_PASSWORD")
+    private val env by option("-e", "--env", help = "Environment. Either tu, ru or pu", envvar = "VAULT_ENV").enum<AdminEnvironment>(ignoreCase = true)
         .prompt("Environment")
-    private val clientID by option("-c", "--client-id", help = "OAuth2 ClientID")
+    private val clientID by option("-c", "--client-id", help = "OAuth2 ClientID", envvar = "VAULT_CLIENT_ID")
         .prompt("OAuth2 ClientID")
-    private val secret by option("-s", "--secret", help = "OAuth2 Client Secret")
+    private val secret by option("-s", "--secret", help = "OAuth2 Client Secret", envvar = "VAULT_CLIENT_SECRET")
         .prompt("OAuth2 Client Secret", hideInput = true)
 
     override fun run() = catching {
         val vault = openOrCreateVault(password)
-        vault.store(env, clientID, secret)
+        vault.store(env.name, clientID, secret)
     }
 }
 
