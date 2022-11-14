@@ -126,22 +126,19 @@ vzd.cli admin pu login
 Für vollautomatisierte Nutzung des `vzd-cli`, auch bei der Anmeldung, wird das setzten der Umgebungsvariable `VAULT_PASSWORD` empfohlen.
 Dabei soll die Umgebungsvarianle den während der Konfiguration angegeben Vault Password enthalten.
 
-*Beispiel:* Suche nach einem Eintrag mit angegebenen telematikID in der Referenzumgebung (`ru`)
-
+.*Beispiel:* Suche nach einem Eintrag mit angegebenen telematikID in der Referenzumgebung (`ru`)
 [source,bash]
 ----
 vzd-cli admin ru search 5-SMC-B-Testkarte-883110000092568
 ----
 
-*Beispiel:* Suche nach den Einträgen in Berlin in der Referenzumgebung (`ru`)
-
+.*Beispiel:* Suche nach den Einträgen in Berlin in der Produktivumgebung (`pu`)
 [source,bash]
 ----
-vzd-cli admin ru search Berlin
+vzd-cli admin pu search Berlin
 ----
 
-*Beispiel:* Anzeige der Detailinformationen für die angegebene telematikID in der Referenzumgebung (`ru`)
-
+.*Beispiel:* Anzeige der Detailinformationen für die angegebene telematikID in der Referenzumgebung (`ru`)
 [source,bash]
 ----
 vzd-cli admin ru show 5-SMC-B-Testkarte-883110000092568
