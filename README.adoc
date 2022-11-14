@@ -133,14 +133,14 @@ Dabei soll die Umgebungsvarianle den während der Konfiguration angegeben Vault 
 vzd-cli admin ru search 5-SMC-B-Testkarte-883110000092568
 ----
 
-Beispiel: Suche nach den Einträgen in Berlin in der Referenzumgebung (`ru`):
+*Beispiel: Suche nach den Einträgen in Berlin in der Referenzumgebung (`ru`):*
 
 [source,bash]
 ----
 vzd-cli admin ru search Berlin
 ----
 
-Beispiel: Anzeige der Detailinformationen für die angegebene telematikID in der Referenzumgebung (`ru`): :
+*Beispiel: Anzeige der Detailinformationen für die angegebene telematikID in der Referenzumgebung (`ru`):*
 
 [source,bash]
 ----
@@ -154,9 +154,9 @@ vzd-cli admin ru show 5-SMC-B-Testkarte-883110000092568
 === `vzd-cli update`
 
 Aktualisiert das `vzd-cli` auf die neusete (oder angegebene Version).
-Self-Updates werden erst ab der Version 2.1 unterstützt.
+Anmerkung: Self-Updates werden erst ab der Version 2.1 unterstützt.
 
-Beispiel: Falls eine neuere Version verfügbar ist wird diese von github.com heruntergeladen und installiert:
+*Beispiel:* Falls eine neuere Version verfügbar ist, wird diese von github.com heruntergeladen und installiert:
 
 ----
 vzd-cli update
