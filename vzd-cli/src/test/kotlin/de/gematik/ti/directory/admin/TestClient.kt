@@ -1,9 +1,5 @@
-package de.gematik.ti.directory.teststuite.admin
+package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.admin.BaseDirectoryEntry
-import de.gematik.ti.directory.admin.Client
-import de.gematik.ti.directory.admin.CreateDirectoryEntry
-import de.gematik.ti.directory.admin.UpdateBaseDirectoryEntry
 import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging

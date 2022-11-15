@@ -1,10 +1,7 @@
-package de.gematik.ti.directory.teststuite.admin
+package de.gematik.ti.directory.admin
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import de.gematik.ti.directory.admin.AdminAPI
-import de.gematik.ti.directory.admin.AdminEnvironment
-import de.gematik.ti.directory.admin.Client
 import de.gematik.ti.directory.global.GlobalAPI
 import org.slf4j.LoggerFactory
 

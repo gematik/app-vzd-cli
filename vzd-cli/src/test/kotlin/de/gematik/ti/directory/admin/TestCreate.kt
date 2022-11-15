@@ -1,6 +1,5 @@
-package de.gematik.ti.directory.teststuite.admin
+package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.util.CertificateDataDER
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow

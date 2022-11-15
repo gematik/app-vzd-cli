@@ -1,13 +1,12 @@
-package de.gematik.ti.directory.teststuite.admin
+package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.admin.DirectoryEntry
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class TestAdminList : FeatureSpec({
+class TestList : FeatureSpec({
     feature("admin list") {
         scenario("Befehl 'admin list' ohne parameter liefert beliebige Liste von 100 Einträgen") {
             val output = runCLI(listOf("admin", "tu", "list", "--table"))

@@ -58,7 +58,7 @@ Die Directory APIs werden über HTTPS erreicht. Falls für die Verbindung ein HT
 [source,bash]
 ----
 # Beispiel Proxy (http://PROXY_HOST:PROXY_PORT)
-vzd-cli config set httpProxy.proxyURL http://192.168.110.10:3128
+vzd-cli config set httpProxy.proxyURL http://192.168.0.1:8080
 vzd-cli config set httpProxy.enabled true
 ----
 
@@ -78,6 +78,8 @@ Mithilfe der Vault werden alle Client IDs und Client Secrets verschlüsselt gesp
 Um Vault aufmachen und darin enthaltenen Credentials nutzen zu können, wird der Nutzer aufgefordert einen Vault-Password zu vergeben.
 Dieser Password funktioniert analog zu den privaten Passwörtern bei den Password-Managern (z.B. Bitwarden, LastPass, 1Password).
 Die Vault Implementierung befinden sich in der Datei `Vault.kt` und verwendet von NIST emfohlene Verschlüsselung.
+
+Falls das Speichern der Credentials nicht erwünscht ist, kann die Anmeldung direkt mit Client ID und Client Secret erfolgen, s. `vzd-cli admin login-cred`.
 
 [source,bash]
 ----
@@ -155,26 +157,51 @@ vzd-cli admin ru show 1-SMC-B-Testkarte-883110000117729
 
 === `vzd-cli config`
 
+Befehle für Konfiguration des `vzd-cli`. Folgende Konfigurationsparameter können geändert werden (s. `vzd-cli config set --help`)
+
+* `httpProxy.enabled` - wenn `true`, wird Proxy-Server bei allen Anfragen genutzt. Wenn `false` werden HTTP-Requests direkt ohne Proxy durchgeführt
+* `httpProxy.proxyURL`: URL des HTTP-Proxy Servers ggf. mit Port, z.B.: `http://192.168.0.1:8080`
+* `updates.preReleasesEnabled`: wenn `true`, werden beim `vzd-cli update` die Pre-Releses installiert
+
+.*Beispiel:* Aktuelle Konfiguration anzeigen
+[source,bash]
+----
+vzd-cli config get
+----
+
+
+.*Beispiel:* Konfigurationsparameter ändern
+[source,bash]
+----
+vzd-cli config set httpProxy.proxyURL "http://example.com:8080"
+vzd-cli config set httpProxy.enabled true
+vzd-cli config set updates.preReleasesEnabled true
+----
+
+.*Beispiel:* Konfiguration zurücksetzen
+[source,bash]
+----
+vzd-cli admin config reset
+----
+
+
 === `vzd-cli update`
 
 Aktualisiert das `vzd-cli` auf die neusete (oder angegebene Version).
 Anmerkung: Self-Updates werden erst ab der Version 2.1 unterstützt.
 
-*Beispiel:* Falls eine neuere Version verfügbar ist, wird diese von github.com heruntergeladen und installiert
-
+.*Beispiel:* Falls eine neuere Version verfügbar ist, wird diese von github.com heruntergeladen und installiert
 ----
 vzd-cli update
 ----
 
-*Beispiel:* Installiert eine bestimmte Version (auch Downgrade ist möglich):
-
+.*Beispiel:* Installiert eine bestimmte Version (auch Downgrade ist möglich):
 ----
 vzd-cli update 2.1.0-beta4
 ----
 
-== `admin`: CLI für Directory Administration 
+== `vzd-cli admin`: Directory Administration
 
-[#cmd-admin-info]
 === `admin vault`
 
 Befehle zur Verwaltung von OAuth2 Geheimnissen
@@ -195,90 +222,87 @@ Commands:
   import  Import credentials from another Vault
 ----
 
-=== `admin config`
+=== `admin status`
 
-Befehle für Konfiguration des CLI
+Zeigt die Information über den aktuellen Zustand des Clients.
+Insb. wird angezeigt in welche Umgebungen man angemeldet ist, OAuth2 Token Informationen und die Informationen über Backend APIs.
 
-.*Aktuelle Konfiguration anzeigen*
 [source,bash]
 ----
-vzd-cli admin config get
+vzd-cli admin status
 ----
 
-Folgende Konfigurationsparameter können geändert werden (s. `vzd-cli admin config set --help`)
-
-* `currentEnvironment` - Name der Standardumgebung, wenn `-e / --environment` nicht spezifiziert wird. Mögliche Werte: `ru`, `tu`, `pu`.
-* `httpProxy.enabled` - wenn `true`, wird Proxy-Server bei allen Anfragen genutzt. Wenn `false` werden HTTP-Requests direkt ohne Proxy durchgeführt, es sei dem `-x / --proxy-on` Option gesetzt ist.
-* `httpProxy.proxyURL`: URL des HTTP-Proxy Servers ggf. mit Port, z.B.: `http://192.168.0.1:8080`
-
-.*Konfigurationsparameter ändern*
-[source,bash]
-----
-vzd-cli admin config set httpProxy.proxyURL "http://example.com:8080"
-vzd-cli admin config set httpProxy.enabled true
-----
-
-.*Konfiguration zurücksetzen*
-[source,bash]
-----
-vzd-cli admin config reset
-----
-
-=== `admin login`
+=== `admin <tu|ru|pu> login`
 
 Anmelden beim OAuth2 Server mit Client-Credentials aus dem Vault.
 
-.In alle drei Umgebungen einloggen (vorausgesetzt alle drei ClientIDs sind über `admin vault` hinterlegt)
+.*Beispiel:* In alle drei Umgebungen einloggen (vorausgesetzt alle drei ClientIDs sind über `vzd-cli admin vault` hinterlegt)
 [source,bash]
 ----
-vzd-cli admin -e tu login
-vzd-cli admin -e ru login
-vzd-cli admin -e pu login
+vzd-cli admin tu login
+vzd-cli admin ru login
+vzd-cli admin pu login
 ----
 
-NOTE: Im Gegensatz zu Vault und darin enthaltenen Client-Credentials, werden die zeitlich befristete `ACCESS_TOKEN` unverschlüsselt im Ordner `$HOME/.telematik/` gespeichert
+NOTE: Im Gegensatz zu Vault und darin enthaltenen Client-Credentials, werden die zeitlich befristete `ACCESS_TOKEN` unverschlüsselt im Ordner `$HOME/.telematik/` gespeichert.
+Die Tokens sind 6 Stunden gültig.
 
-=== `admin login-cred`
+=== `admin <tu|ru|pu> login-cred`
 
-Anmelden beim OAuth2 Server mit explizit angegeben Client-Credemtials ()
+Anmelden beim OAuth2 Server mit explizit angegeben Client-Credentials
 
-.Anmelden in der Referenzumgebung, Client-Credentials werden über Parameter übergeben
+.*Beispiel:* Client-Id und Client-Secret werden über Parameter übergeben, Referenzumgebung (`ru`)
 [source,bash]
 ----
-vzd-cli admin -e ru login-cred --client-id=myclient --secret=mysecret
+vzd-cli admin ru login-cred -c myclient -s mysecret
 ----
 
-.Anmelden in der Produktivumgebung, Client-Id wird über Parameter übergeben, Client-Secret wird aus der Umgebungsvariable `CLIENT_SECRET` ausgelesen.
+.*Beispiel:* Client-Id wird über Parameter übergeben, Client-Secret wird aus der Umgebungsvariable `CLIENT_SECRET` ausgelesen, Referenzumgebung (`ru`)
 [source,bash]
 ----
 export CLIENT_SECRET=mysecret
-vzd-cli admin -e ru login-cred --client-id=myclient
+vzd-cli admin ru login-cred -c myclient
 ----
 
 
-[#cmd-admin-info]
-=== `admin info`
+=== `admin <tu|ru|pu> token`
 
-Zeigt die Information über den VZD-Server und die API.
+Zeigt den aktuellen `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client-Aufrufe keine erneute explizite Authentisierung durchführen müssen.
 
+.*Beispiel:* Speichert den ACCESS_TOKEN in die Umgebungsvariable und führt anschließend eine Query mit curl.
 [source,bash]
 ----
-vzd-cli admin info
+vzd-cli admin ru login
+export ADMIN_ACCESS_TOKEN=$(vzd-cli admin ru token)
+curl -H "Accept: application/json" \
+  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
+  https://vzdpflege-ref.vzd.ti-dienste.de:9543/DirectoryEntries?baseEntryOnly=true
 ----
 
+=== `admin <tu|ru|pu> search`
 
-[#cmd-admin-auth]
-=== `admin auth`
+Führt eine benutzerfreundliche Suche nach Einträgen. Dabei werden Natural Language Processing Algorithmen verwenden um angegebene Suchkriterien zu ermitteln.
+Derzeit werden folgende Kriterien unterstützt:
 
-Authentisiert den Client und gibt `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client-Aufrufe keine erneute explizite Authentisierung durchführen müssen.
+* Orte in Deutschland, z.B. _Berlin_, _Bad Homburg_, _Frankfurt am Main_
+* Deutsche Postleitzahlen
+* TelematikIDs
+* Betriebsstätten / IK-Nummer
 
-.Beispiel: Authentisiert und speichert den ACCESS_TOKEN in die Umgebungsvariable 
+.*Beispiele:*
 [source,bash]
 ----
-export ADMIN_ACCESS_TOKEN=$(vzd-cli admin auth)
-----
+# Name und Ort
+vzd-cli admin ru search Müller Berlin
+# Ort und längerer Name
+vzd-cli admin ru search Berlin Praxis Müller
+# nur Name
+vzd-cli admin ru search Praxis Müller
+# Name und PLZ
+vzd-cli admin ru search Praxis Müller 45144
+# Erste Nummern der TelematikID (Nidergelassene Arztpraxen)
+vzd-cli admin ru search 1-20
 
-[#cmd-admin-list]
 === `admin list`
 
 ==== Optionen

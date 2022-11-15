@@ -1,9 +1,5 @@
-package de.gematik.ti.directory.teststuite.admin
+package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.admin.Client
-import de.gematik.ti.directory.admin.TokenType
-import de.gematik.ti.directory.admin.Tokenizer
-import de.gematik.ti.directory.admin.quickSearch
 import io.kotest.common.runBlocking
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.ints.shouldBeGreaterThan

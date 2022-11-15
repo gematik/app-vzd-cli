@@ -1,4 +1,4 @@
-package de.gematik.ti.directory.teststuite.admin
+package de.gematik.ti.directory.admin
 
 import de.gematik.ti.directory.cli.escape
 import de.gematik.ti.directory.util.*

@@ -1,6 +1,7 @@
-package de.gematik.ti.directory.teststuite.admin
+package de.gematik.ti.directory.admin
 
 import de.gematik.ti.directory.cli.Cli
+import io.kotest.core.test.TestScope
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -18,4 +19,8 @@ fun runCLI(args: List<String>, data: String? = null): String {
         System.setOut(stdout)
         System.setIn(stdin)
     }
+}
+
+fun TestScope.cli(vararg args: String, test: (output: String) -> Unit) {
+    test(runCLI(args.asList()))
 }

@@ -30,7 +30,8 @@ class LoginCommand : CliktCommand(name = "login", help = "Login to OAuth2 Server
     private val context by requireObject<AdminCliEnvironmentContext>()
 
     private val password by option(
-        "--password", "-p",
+        "--password",
+        "-p",
         help = "Password for protection of the Vault",
         envvar = "VAULT_PASSWORD"
     ).prompt("Enter Vault Password", hideInput = true)

@@ -21,7 +21,7 @@ class ConfigCommand : CliktCommand(name = "config", help = "Manage configuration
 }
 
 class ConfigResetCommand : CliktCommand(name = "reset", help = "Reset configuration to defaults") {
-    private val context by requireObject<AdminCliEnvironmentContext>()
+    private val context by requireObject<AdminCliContext>()
     override fun run() = catching {
         val config = context.adminAPI.resetConfig()
         echo(YAML.encodeToString(config))
@@ -66,7 +66,7 @@ class ConfigGetCommand : CliktCommand(
             ```
             """
 ) {
-    private val context by requireObject<AdminCliEnvironmentContext>()
+    private val context by requireObject<AdminCliContext>()
     private val property by argument().choice(GET_PROPERTIES).optional()
     override fun run() {
         val config = context.adminAPI.config

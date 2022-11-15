@@ -1,9 +1,10 @@
-package de.gematik.ti.directory.teststuite.admin
+package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.admin.AdminConfigFileStore
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import kotlin.io.path.Path
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteIfExists
@@ -28,6 +29,21 @@ class TestConfig : FeatureSpec({
             AdminConfigFileStore(configPath).reset()
             configPath.toFile().exists() shouldBe true
             configPath.deleteIfExists()
+        }
+    }
+
+    feature("vzd-cli admin config") {
+        scenario("vzd-cli admin config get") {
+            cli("admin", "config", "get") {
+                it shouldContain "https://vzdpflege-ref.vzd.ti-dienste.de:9543"
+                it shouldContain "https://vzdpflege-test.vzd.ti-dienste.de:9543"
+            }
+        }
+        scenario("vzd-cli admin config get environments.tu") {
+            cli("admin", "config", "get", "environments.tu") {
+                it shouldNotContain "https://vzdpflege-ref.vzd.ti-dienste.de:9543"
+                it shouldContain "https://vzdpflege-test.vzd.ti-dienste.de:9543"
+            }
         }
     }
 

@@ -32,7 +32,8 @@ class VaultCommand : CliktCommand(name = "vault", help = "Manage OAuth credentia
 
 abstract class AbstractVaultCommand(name: String, help: String) : CliktCommand(name = name, help = help) {
     protected val password by option(
-        "--password", "-p",
+        "--password",
+        "-p",
         help = "Password for protection of the Vault",
         envvar = "VAULT_PASSWORD"
     )
