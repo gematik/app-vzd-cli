@@ -545,4 +545,4 @@ vzd-cli apo prod show 3-1234567890
 
 == `vzd-cli gui`: Directory GUI
 
-Durch dan Befehl `vzd-cli gui` wird ein HTTP Server gestartet und ein neuer Browser-Tab mit GUI geöffnet. 
+Durch den Befehl `vzd-cli gui` wird ein HTTP Server gestartet und ein neuer Browser-Tab mit GUI geöffnet.
