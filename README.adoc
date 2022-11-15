@@ -202,7 +202,7 @@ vzd-cli update 2.1.0-beta4
 
 == `vzd-cli admin`: Directory Administration
 
-=== `admin vault`
+=== `vzd-cli admin vault`
 
 Befehle zur Verwaltung von OAuth2 Geheimnissen
 
@@ -222,7 +222,7 @@ Commands:
   import  Import credentials from another Vault
 ----
 
-=== `admin status`
+=== `vzd-cli admin status`
 
 Zeigt die Information über den aktuellen Zustand des Clients.
 Insb. wird angezeigt in welche Umgebungen man angemeldet ist, OAuth2 Token Informationen und die Informationen über Backend APIs.
@@ -232,7 +232,7 @@ Insb. wird angezeigt in welche Umgebungen man angemeldet ist, OAuth2 Token Infor
 vzd-cli admin status
 ----
 
-=== `admin <tu|ru|pu> login`
+=== `vzd-cli admin <tu|ru|pu> login`
 
 Anmelden beim OAuth2 Server mit Client-Credentials aus dem Vault.
 
@@ -247,7 +247,7 @@ vzd-cli admin pu login
 NOTE: Im Gegensatz zu Vault und darin enthaltenen Client-Credentials, werden die zeitlich befristete `ACCESS_TOKEN` unverschlüsselt im Ordner `$HOME/.telematik/` gespeichert.
 Die Tokens sind 6 Stunden gültig.
 
-=== `admin <tu|ru|pu> login-cred`
+=== `vzd-cli admin <tu|ru|pu> login-cred`
 
 Anmelden beim OAuth2 Server mit explizit angegeben Client-Credentials
 
@@ -265,7 +265,7 @@ vzd-cli admin ru login-cred -c myclient
 ----
 
 
-=== `admin <tu|ru|pu> token`
+=== `vzd-cli admin <tu|ru|pu> token`
 
 Zeigt den aktuellen `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client-Aufrufe keine erneute explizite Authentisierung durchführen müssen.
 
@@ -279,7 +279,7 @@ curl -H "Accept: application/json" \
   https://vzdpflege-ref.vzd.ti-dienste.de:9543/DirectoryEntries?baseEntryOnly=true
 ----
 
-=== `admin <tu|ru|pu> search`
+=== `vzd-cli admin <tu|ru|pu> search`
 
 Führt eine benutzerfreundliche Suche nach Einträgen. Dabei werden Natural Language Processing Algorithmen verwenden um angegebene Suchkriterien zu ermitteln.
 Derzeit werden folgende Kriterien unterstützt:
@@ -304,7 +304,7 @@ vzd-cli admin ru search Praxis Müller 45144
 vzd-cli admin ru search 1-20
 ----
 
-=== `admin <tu|ru|pu> show <telematikID>`
+=== `vzd-cli admin <tu|ru|pu> show <telematikID>`
 
 Zeigt ausführliche Details zu dem Eintrag.
 Durch `--ocsp` Option kann die Online-Zertifikatsprüfung mittels OCSP-Responder eingefordert werden.
@@ -315,7 +315,7 @@ vzd-cli admin ru show 1-SMC-B-Testkarte-883110000102893
 vzd-cli admin ru show 1-SMC-B-Testkarte-883110000102893 --ocsp
 ----
 
-=== `admin <tu|ru|pu> list`
+=== `vzd-cli admin <tu|ru|pu> list`
 
 Suche und Anzeige von Verzeichnisdiensteinträgen durch eingabe einzelner Query-Parameter
 
@@ -398,7 +398,7 @@ vzd-cli admin ru list -f telematikID telematik.txt --table
 3-SMCB-Testkarte-883110000092193
 ----
 
-=== `admin <tu|ru|pu> template`
+=== `vzd-cli admin <tu|ru|pu> template`
 
 Generiert die Dateivorlagen für `add` oder `modify` Befehle.
 
@@ -414,7 +414,7 @@ vzd-cli admin ru template base > Eintrag.yaml
 vzd-cli admin template base --json > Eintrag.json
 ----
 
-=== `admin <tu|ru|pu> add-base`
+=== `vzd-cli admin <tu|ru|pu> add-base`
 
 Neuen Verzeichnisdiensteintrag erstellen.
 
@@ -423,27 +423,27 @@ Neuen Verzeichnisdiensteintrag erstellen.
 vzd-cli admin ru add-base -s telematikID=9-TEST
 ----
 
-=== `admin <tu|ru|pu> load-base`
+=== `vzd-cli admin <tu|ru|pu> load-base`
 
-Lädt einen Basiseintrag. Die geladene Struktur kann als Datei gespeichert werden, in einem Text-Editor bearbeitet und anschließend mit `admin modify-base` modifiziert werden.
+Lädt einen Basiseintrag. Die geladene Struktur kann als Datei gespeichert werden, in einem Text-Editor bearbeitet und anschließend mit `vzd-cli admin modify-base` modifiziert werden.
 
-=== `admin <tu|ru|pu> modify-base`
+=== `vzd-cli admin <tu|ru|pu> modify-base`
 
 Modifiziert den gesamten Basiseintrag im Verzeichnisdienst.
 
-=== `admin <tu|ru|pu> modify-base-attr`
+=== `vzd-cli admin <tu|ru|pu> modify-base-attr`
 
 Modifiziert einzelne Attribute des Basiseintrags
 
-=== `admin <tu|ru|pu> delete`
+=== `vzd-cli admin <tu|ru|pu> delete`
 
 Löscht Einträge aus dem Verzeichnisdienst.
 
-=== `admin <tu|ru|pu> list-cert`
+=== `vzd-cli admin <tu|ru|pu> list-cert`
 
 Suche und Anzeige von X509-Zertifikaten.
 
-=== `admin <tu|ru|pu> add-cert`
+=== `vzd-cli admin <tu|ru|pu> add-cert`
 
 Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinzu.
 
@@ -464,7 +464,7 @@ vzd-cli admin ru add-cert 1-123123.der
 vzd-cli admin ru add-cert *.der
 ----
 
-=== `admin <tu|ru|pu> clear-cert`
+=== `vzd-cli admin <tu|ru|pu> clear-cert`
 
 Löscht alle Zertifikate aus dem angegeben Eintrag.
 
@@ -473,17 +473,17 @@ Löscht alle Zertifikate aus dem angegeben Eintrag.
 vzd-cli admin ru clear-cert -t 1-123123
 ----
 
-=== `admin <tu|ru|pu> save-cert`
+=== `vzd-cli admin <tu|ru|pu> save-cert`
 
 Speichert alle gefundene Zertifikate in ein Verzeichnis
 
-=== `admin <tu|ru|pu> delete-cert`
+=== `vzd-cli admin <tu|ru|pu> delete-cert`
 
-WARNING: Nicht implementiert. Bitte `admin clear-cert` verwenden.
+WARNING: Nicht implementiert. Bitte `vzd-cli admin clear-cert` verwenden.
 
 Löscht einen X509-Zertifikat.
 
-=== `admin <tu|ru|pu> cmd`
+=== `vzd-cli admin <tu|ru|pu> cmd`
 
 Aktiviert link:COMPATIBILITY_MODE.adoc[Kompatibilitätsmodus zur VZDClient 1.6]
 
@@ -501,11 +501,11 @@ Options:
   -h, --help                   Show this message and exit
 ----
 
-=== `admin <tu|ru|pu> dump create`
+=== `vzd-cli admin <tu|ru|pu> dump create`
 
 Lädt große Mengen von Einträgen und schreibt sie in `STDOUT`, eine Zeile per Eintrag als JSON. So erzeugte Dumps können durch weitere Tools verarbeitet werden, z.B. https://gnupg.org[GnuPG] oder https://github.com/antonmedv/fx[FX].
 
-=== `admin <tu|ru|pu> dump ocsp`
+=== `vzd-cli admin <tu|ru|pu> dump ocsp`
 
 Liest die Einträga aus STDIN, stellt für jeden gefundenen Zertifikat eine OCSP-Abfrage.
 
