@@ -47,6 +47,7 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
                             it.directoryEntryBase.dn?.uid!!,
                             userCertificate
                         )
+                        echo("Added certificate: telematikID=${userCertificate.userCertificate?.certificateInfo?.admissionStatement?.registrationNumber} serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber}")
                     } catch (e: AdminResponseException) {
                         if (!ignore || e.response.status != HttpStatusCode.Conflict) {
                             throw e

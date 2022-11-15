@@ -52,7 +52,7 @@ fun catching(throwingBlock: () -> Unit = {}) {
     } catch (e: io.ktor.http.parsing.ParseException) {
         // another InterOp Issue with REST API
         if (e.message.contains("Expected `=` after parameter key ''")) {
-            throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin login`.")
+            throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin <ru|tu|pu> login`.")
         } else {
             throw e
         }

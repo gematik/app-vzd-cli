@@ -5,12 +5,15 @@ import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
+import java.io.PrintStream
 import kotlin.io.path.Path
 import kotlin.io.path.exists
+import kotlin.io.path.outputStream
 import kotlin.io.path.useLines
 
 class ListCommand : CliktCommand(name = "list", help = "List directory entries") {
@@ -35,6 +38,7 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
         help = "Specify query parameters to find matching entries",
         metavar = "NAME=VALUE"
     ).associate()
+    private val outfile by option("-o", "--outfile", help = "Write output to file").path(mustExist = false, canBeDir = false, canBeFile = true)
     private val parameterOptions by ParameterOptions()
     private val sync by option(help = "use Sync mode").flag()
     private val ocspOptions by OcspOptions()
@@ -52,27 +56,46 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
         } ?: run {
             runQuery(params)
         }
+
+        val entries = buildList {
+            paramFile?.let { paramFile ->
+                val file = Path(paramFile.second)
+                if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
+                file.useLines { line ->
+                    line.forEach {
+                        runQuery(params + Pair(paramFile.first, it))?.let { addAll(it) }
+                    }
+                }
+            } ?: run {
+                runQuery(params)?.let { addAll(it) }
+            }
+        }
+
+        val stdout = System.`out`
+        try {
+            outfile?.let { System.setOut(PrintStream(it.outputStream())) }
+
+            if (outputFormat == OutputFormat.CSV) {
+                print('\uFEFF')
+                Output.printCsv(DirectoryEntryCsvHeaders)
+            }
+            DirectoryEntryOutputMapping[outputFormat]?.invoke(params, entries)
+        } finally {
+            System.setOut(stdout)
+        }
     }
 
-    private fun runQuery(params: Map<String, String>) {
+    private fun runQuery(params: Map<String, String>): List<DirectoryEntry>? {
         val result: List<DirectoryEntry>? = if (sync) {
             runBlocking { context.client.readDirectoryEntryForSync(params) }
         } else {
             runBlocking { context.client.readDirectoryEntry(params) }
         }
 
-        if (outputFormat == OutputFormat.CSV) {
-            if (context.firstCommand) {
-                context.firstCommand = false
-                print('\uFEFF')
-                Output.printCsv(DirectoryEntryCsvHeaders)
-            }
-        }
-
         if (ocspOptions.enableOcsp) {
             runBlocking { context.adminAPI.expandOCSPStatus(result) }
         }
 
-        DirectoryEntryOutputMapping[outputFormat]?.invoke(params, result)
+        return result
     }
 }

@@ -300,26 +300,97 @@ vzd-cli admin ru search Berlin Praxis Müller
 vzd-cli admin ru search Praxis Müller
 # Name und PLZ
 vzd-cli admin ru search Praxis Müller 45144
-# Erste Nummern der TelematikID (Nidergelassene Arztpraxen)
+# Erste Nummern der TelematikID (niedergelassene Arztpraxen)
 vzd-cli admin ru search 1-20
+----
 
-=== `admin list`
+=== `admin <tu|ru|pu> show <telematikID>`
+
+Zeigt ausführliche Details zu dem Eintrag.
+Durch `--ocsp` Option kann die Online-Zertifikatsprüfung mittels OCSP-Responder eingefordert werden.
+
+.*Beispiele*
+----
+vzd-cli admin ru show 1-SMC-B-Testkarte-883110000102893
+vzd-cli admin ru show 1-SMC-B-Testkarte-883110000102893 --ocsp
+----
+
+=== `admin <tu|ru|pu> list`
+
+Suche und Anzeige von Verzeichnisdiensteinträgen durch eingabe einzelner Query-Parameter
+
+----
+Usage: vzd-cli admin ru list [OPTIONS]
+
+  List directory entries
+
+Query parameters:
+  --name TEXT
+  --uid TEXT
+  --givenName TEXT
+  --sn TEXT
+  --cn TEXT
+  --displayName TEXT
+  --streetAddress TEXT
+  --postalCode TEXT
+  --countryCode TEXT
+  --localityName TEXT
+  --stateOrProvinceName TEXT
+  --title TEXT
+  --organization TEXT
+  --otherName TEXT
+  -t, --telematikID TEXT
+  --specialization TEXT
+  --domainID TEXT
+  --holder TEXT
+  --personalEntry [true|false]
+  --dataFromAuthority [true|false]
+  --professionOID TEXT
+  --entryType INT
+  --maxKOMLEadr INT
+  --changeDateTimeFrom ISODATE
+  --changeDateTimeTo ISODATE
+  --baseEntryOnly [true|false]
+
+OCSP options:
+  --ocsp  Validate certificates using OCSP
+
+Options:
+  --human, --json, --yaml, --csv, --table
+                                   (default: HUMAN)
+  -f, --param-file PARAM FILENAME...
+                                   Read parameter values from file
+  -p, --param NAME=VALUE           Specify query parameters to find matching
+                                   entries
+  -o, --outfile PATH               Write output to file
+  --sync                           use Sync mode
+  -h, --help                       Show this message and exit
+----
 
 ==== Optionen
-* `--param` oder `-p` +
-Setzt einen Query-Parameter bei der Suche der Einträge über die API. Kann mehrfach angegeben werden um die Parameter zu kombinieren. +
-Die Liste von gültigen Parametern kann aus https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml[DirectoryAdministration API] entnommen werden (s. `read_Directory_Entry`)
 
 * `--param-file` oder `-f` +
 Liest Werte eines Parameters aus der Datei und fragt für jeden Wert nach Eintrag im VZD ab. Die Datei soll den gewünschten Wert einmal pro Zeile enthalten:
 
-.Beispiel: Findet alle Einträge mit TelematikID aus `telematik.txt`
+.*Beispiel:* Findet alle Einträge mit angegeben TelematikID
 [source,bash]
 ----
-vzd-cli admin --short list -f telematikID telematik.txt
+vzd-cli admin ru list -t 1-SMC-B-Testkarte-883110000102893
 ----
 
-.Inhalt von `telematik.txt`
+.*Beispiel:* Findet alle Einträge aus Berlin, bei welchen die TelematikID mit `5-` beginnt (Krankenhäuser).
+[source,bash]
+----
+vzd-cli admin ru list -t "5-*" --localityName Berlin
+----
+
+.*Beispiel:* Findet alle Einträge mit TelematikID aus `telematik.txt`
+[source,bash]
+----
+vzd-cli admin ru list -f telematikID telematik.txt --table
+----
+
+.Inhalt der `telematik.txt`
 ----
 4-SMC-B-Testkarte-883110000093329
 3-SMC-B-Testkarte-883110000093294
@@ -327,68 +398,62 @@ vzd-cli admin --short list -f telematikID telematik.txt
 3-SMCB-Testkarte-883110000092193
 ----
 
+=== `admin <tu|ru|pu> template`
 
-Suche und Anzeige von Verzeichnisdiensteinträgen.
-
-[#cmd-admin-template]
-=== `admin template`
-
-Generiert die Dateivorlagen für `admin add` oder `admin modify` Befehle.
+Generiert die Dateivorlagen für `add` oder `modify` Befehle.
 
 .Beispiel: Erzeugt eine Vorlage und schreibt es in eine YAML-Datei 
 [source,bash]
 ----
-vzd-cli admin template base > Eintrag.yaml
+vzd-cli admin ru template base > Eintrag.yaml
 ----
 
 .Beispiel: Erzeugt eine Vorlage und schreibt es in eine JSON-Datei 
 [source,bash]
 ----
-vzd-cli admin --json template base > Eintrag.json
+vzd-cli admin template base --json > Eintrag.json
 ----
 
-[#cmd-admin-add-base]
-=== `admin add-base`
+=== `admin <tu|ru|pu> add-base`
 
 Neuen Verzeichnisdiensteintrag erstellen.
 
-[#cmd-admin-load-base]
-=== `admin load-base`
+*Beispiel:* einen leeren Eintrag mit angegebenen telematikID erstellen:
+----
+vzd-cli admin ru add-base -s telematikID=9-TEST
+----
+
+=== `admin <tu|ru|pu> load-base`
 
 Lädt einen Basiseintrag. Die geladene Struktur kann als Datei gespeichert werden, in einem Text-Editor bearbeitet und anschließend mit `admin modify-base` modifiziert werden.
 
-[#cmd-admin-modify-base]
-=== `admin modify-base`
+=== `admin <tu|ru|pu> modify-base`
 
 Modifiziert den gesamten Basiseintrag im Verzeichnisdienst.
 
-[#cmd-admin-modify-base-attr]
-=== `admin modify-base-attr`
+=== `admin <tu|ru|pu> modify-base-attr`
 
 Modifiziert einzelne Attribute des Basiseintrags
 
-[#cmd-admin-delete]
-=== `admin delete`
+=== `admin <tu|ru|pu> delete`
 
 Löscht Einträge aus dem Verzeichnisdienst.
 
-[#cmd-admin-list-cert]
-=== `admin list-cert`
+=== `admin <tu|ru|pu> list-cert`
 
 Suche und Anzeige von X509-Zertifikaten.
 
-[#cmd-admin-add-cert]
-=== `admin add-cert`
+=== `admin <tu|ru|pu> add-cert`
 
 Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinzu.
 
 [source,bash]
 ----
 # zuerst einen leeren Basiseintrag erzeugen
-vzd-cli admin add-base -s telematikID=1-123123
+vzd-cli admin ru add-base -s telematikID=1-123123
 # danach Zertifikat hinzufügen
 # Achtung: TelematikID beim Befehl admin add-base und im Zertifikat müssen identisch sein
-vzd-cli admin add-cert 1-123123.der
+vzd-cli admin ru add-cert 1-123123.der
 ----
 
 [source,bash]
@@ -396,35 +461,29 @@ vzd-cli admin add-cert 1-123123.der
 # Fügt alle Zertifikate aus dem aktuellen Ordner das VZD
 # TelematikID und BasisEintrag werden automatisch aus dem Zertifikat 
 # ermittelt (Admission Statement -> Registration Number)
-vzd-cli admin add-cert *.der
+vzd-cli admin ru add-cert *.der
 ----
 
-
-
-[#cmd-admin-clear-cert]
-=== `admin clear-cert`
+=== `admin <tu|ru|pu> clear-cert`
 
 Löscht alle Zertifikate aus dem angegeben Eintrag.
 
 [source,bash]
 ----
-vzd-cli admin clear-cert -p telematikID=1-123123
+vzd-cli admin ru clear-cert -t 1-123123
 ----
 
-[#cmd-admin-save-cert]
-=== `admin save-cert`
+=== `admin <tu|ru|pu> save-cert`
 
 Speichert alle gefundene Zertifikate in ein Verzeichnis
 
-[#cmd-admin-delete-cert]
-=== `admin delete-cert`
+=== `admin <tu|ru|pu> delete-cert`
 
 WARNING: Nicht implementiert. Bitte `admin clear-cert` verwenden.
 
 Löscht einen X509-Zertifikat.
 
-[#cmd-admin-cmd]
-=== `admin cmd`
+=== `admin <tu|ru|pu> cmd`
 
 Aktiviert link:COMPATIBILITY_MODE.adoc[Kompatibilitätsmodus zur VZDClient 1.6]
 
@@ -442,12 +501,10 @@ Options:
   -h, --help                   Show this message and exit
 ----
 
-[#cmd-dump-create]
-=== `admin dump create`
+=== `admin <tu|ru|pu> dump create`
 
 Lädt große Mengen von Einträgen und schreibt sie in `STDOUT`, eine Zeile per Eintrag als JSON. So erzeugte Dumps können durch weitere Tools verarbeitet werden, z.B. https://gnupg.org[GnuPG] oder https://github.com/antonmedv/fx[FX].
 
-[#cmd-dump-ocsp]
-=== `admin dump ocsp`
+=== `admin <tu|ru|pu> dump ocsp`
 
 Ließt die Einträga aus STDIN, stellt für jeden gefundenen Zertifikat eine OCSP-Abfrage.

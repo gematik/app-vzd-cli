@@ -19,8 +19,7 @@ class AdminCliContext(
 
 class AdminCliEnvironmentContext(
     val adminAPI: AdminAPI,
-    var env: AdminEnvironment,
-    var firstCommand: Boolean = true
+    var env: AdminEnvironment
 ) {
 
     val client by lazy {

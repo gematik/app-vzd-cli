@@ -18,26 +18,24 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
+import java.beans.Introspector
 import java.io.File
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.typeOf
 
 fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<String, String>) {
     attrs.forEach { (name, value) ->
 
-        val property = BaseDirectoryEntry::class.memberProperties
-            .filterIsInstance<KMutableProperty<*>>()
-            .first { it.name == name }
+        val beanInfo = Introspector.getBeanInfo(BaseDirectoryEntry::class.java)
 
-        if (property.returnType == typeOf<String>() || property.returnType == typeOf<String?>()) {
-            property.setter.call(baseDirectoryEntry, value)
-        } else if (property.returnType == typeOf<Int>() || property.returnType == typeOf<Int?>()) {
-            property.setter.call(baseDirectoryEntry, value.toInt())
-        } else if (property.returnType == typeOf<List<String>>() || property.returnType == typeOf<List<String>?>()) {
-            property.setter.call(baseDirectoryEntry, value.split(',').map { it.trim() })
+        val property = beanInfo.propertyDescriptors.filter { it.writeMethod != null }.first { it.name == name }
+
+        if (property.propertyType == String::class.java) {
+            property.writeMethod.invoke(baseDirectoryEntry, value)
+        } else if (property.propertyType == Int::class.java) {
+            property.writeMethod.invoke(baseDirectoryEntry, value.toInt())
+        } else if (property.readMethod.genericReturnType.typeName == "java.util.List<java.lang.String>") {
+            property.writeMethod.invoke(baseDirectoryEntry, value.split(',').map { it.trim() })
         } else {
-            throw UsageError("Unsupported property type '$name': ${property.returnType}")
+            throw UsageError("Unsupported property type '$name': ${property.readMethod.genericReturnType.typeName}")
         }
     }
 }

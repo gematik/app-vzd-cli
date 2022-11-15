@@ -35,7 +35,7 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
         .path(mustExist = true, canBeFile = false, mustBeWritable = true)
         .default(Paths.get(""))
 
-    private val match by option("-m", "--match", help = "Pattern to match the to be deleted certificates.").multiple()
+    private val match by option("-m", "--match", help = "Pattern to match the to be deleted certificates.").multiple(required = true)
 
     private val dryRun by option("--dry", help = "Perform a dry run and not delete any certificate.").flag()
 
@@ -63,7 +63,6 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
 
         val entry = result.first()
 
-        echo("Processing entry ${entry.directoryEntryBase.telematikID} ${entry.directoryEntryBase.displayName}")
         var deletedCount = 0
         entry.userCertificates?.filter { it.userCertificate?.certificateInfo != null }?.forEach certLoop@{ userCertificate ->
             val cert = userCertificate.userCertificate!!.certificateInfo
@@ -87,7 +86,7 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
                 return@certLoop
             }
             logger.debug { "Deleting certificate: $certText" }
-            echo("Deleting certificate ${cert.serialNumber} ${cert.subjectInfo.serialNumber ?: ""}")
+            echo("Deleting certificate telematikID=${entry.directoryEntryBase.telematikID} serialNumber=${cert.serialNumber}")
             backupDir.let {
                 val filename = "${cert.admissionStatement.registrationNumber.escape()}-${cert.serialNumber}.der"
                 val path = backupDir.resolve(filename)
@@ -103,9 +102,9 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
         }
 
         if (dryRun) {
-            echo("Would have deleted $deletedCount of ${entry.userCertificates?.count()} certificates (dry run)")
+            echo("Would have deleted $deletedCount of ${entry.userCertificates?.count { it.userCertificate != null }} certificates (dry run)")
         } else {
-            echo("Deleted $deletedCount of ${entry.userCertificates?.count()} certificates")
+            echo("Deleted $deletedCount of ${entry.userCertificates?.count { it.userCertificate != null }} certificates")
         }
     }
 }
