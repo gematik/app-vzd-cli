@@ -1,14 +1,18 @@
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.0.3"
-version = "2.0.0"
+version = "2.1.0-beta5"
+
+val ktorVersion = "2.1.2"
+val kotestVersion = "5.5.2"
+val hapiVersion = "6.1.3"
 
 plugins {
-    // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    kotlin("jvm").version("1.6.10")
-    kotlin("plugin.serialization").version("1.6.10")
+    id("org.jetbrains.kotlin.jvm") version "1.7.20"
+    kotlin("plugin.serialization").version("1.7.20")
     id("com.github.johnrengelman.shadow").version("7.1.2")
-    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
     // Apply the application plugin to add support for building a CLI application in Java.
     application
     `maven-publish`
@@ -32,51 +36,97 @@ dependencies {
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    // implementation("org.jetbrains.kotlin:kotlin-reflect")
+    // Kotlin logging wrapper
     implementation("io.github.microutils:kotlin-logging:2.1.21")
+    // logback logging backend
     implementation("ch.qos.logback:logback-classic:1.2.9")
-    implementation("io.github.cdimascio:dotenv-kotlin:6.2.2")
+    // Ktor client libraties
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("net.mamoe.yamlkt:yamlkt:0.10.2")
-    implementation("com.google.code.gson:gson:2.9.0")
+    // YAML support for kotlinx serialisation
+    implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
 
-    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0")
+    // CSV support
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.6.0")
 
-    implementation("com.github.ajalt.clikt:clikt:3.4.0")
+    // HAPI-FHIR Model classes
+    implementation("ca.uhn.hapi.fhir:hapi-fhir-base:$hapiVersion")
+    implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiVersion")
+
+    // LDAP/LDIF processing
+    // implementation("org.ldaptive:ldaptive:2.1.1")
+
+    // Text-GUI: Progressbar
+    implementation("me.tongfei:progressbar:0.9.3")
+    // Text-GUI: Text Tables
+    implementation("hu.vissy.plain-text-table:ptt-kotlin:1.1.7")
+    implementation("hu.vissy.plain-text-table:ptt-core:3.0.0")
+
+    // OpenNLP - natural text prcessor
+    // implementation("org.apache.opennlp:opennlp-tools:2.0.0")
+    // implementation("org.apache.opennlp:opennlp-uima:2.0.0")
+
+    // Ktor server (for GUI BFF)
+    implementation("io.ktor:ktor-server-core:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-server-resources:$ktorVersion")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-server-sessions:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth:$ktorVersion")
+
+    // Clikt library for creating nice CLI
+    implementation("com.github.ajalt.clikt:clikt:3.5.0")
+
+    // Bouncy castle fpr crypto and certificates processing
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
 
-    implementation("org.ldaptive:ldaptive:2.1.1")
-    implementation("me.tongfei:progressbar:0.9.3")
-
-    // implementation("com.nimbusds:nimbus-jose-jwt:9.23")
-
+    // test libraries
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    // testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("io.kotest:kotest-runner-junit5:5.1.0")
-    testImplementation("io.kotest:kotest-assertions-core:5.1.0")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
 }
 
 application {
     // Define the main class for the application.
-    mainClass.set("de.gematik.ti.directory.CliKt")
+    mainClass.set("de.gematik.ti.directory.cli.CliKt")
 }
 
 tasks.register<Zip>("customDist") {
     dependsOn("installShadowDist")
-    archiveBaseName.set("${project.name}")
+    archiveBaseName.set(project.name)
     destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+
     into("${project.name}-${project.version}/commands") {
-        from(layout.projectDirectory.dir("commands"))
+        from(layout.projectDirectory.dir("../legacy-client-java/commands"))
     }
+
+    into("${project.name}-${project.version}/bin") {
+        from(layout.projectDirectory.dir("additionalScripts"))
+    }
+
     into("${project.name}-${project.version}/") {
         from(layout.buildDirectory.dir("install/vzd-cli-shadow"))
     }
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    minimize {
+        exclude(dependency("org.bouncycastle:.*:.*"))
+    }
+    archiveVersion.set("")
+}
+
+tasks.named<CreateStartScripts>("startShadowScripts") {
+    val generator = windowsStartScriptGenerator as TemplateBasedScriptGenerator
+    generator.template = project.resources.text.fromFile("startScriptTemplates/windowsStartScript.txt")
 }
 
 tasks.named("build") {
@@ -118,4 +168,12 @@ publishing {
             from(components["java"])
         }
     }
+}
+
+tasks.register<JavaExec>("serve") {
+    mainClass.set("de.gematik.ti.directory.bff.TestServerKt")
+    // mainClass.set("de.gematik.ti.directory.cli.CliKt")
+    // args = listOf("gui")
+    classpath = sourceSets["test"].runtimeClasspath
+    jvmArgs = listOf("-Dio.ktor.development=true")
 }

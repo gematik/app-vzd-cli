@@ -1,0 +1,23 @@
+<div ibmRow>
+  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+  <div ibmCol [columnNumbers]="{'lg': 8}">
+    <div ibmRow>
+      <div ibmCol>
+        <h1 class="Headline">Einstellungen</h1>
+      </div>
+    </div>
+    <div ibmRow>
+      <div ibmCol>
+        <ibm-tabs [followFocus]="true" [isNavigation]="true" [cacheActive]="false">
+          <ibm-tab heading="Administration">
+            <app-admin-settings></app-admin-settings>
+          </ibm-tab>
+          <ibm-tab heading="Proxy"></ibm-tab>
+        </ibm-tabs>
+      </div>
+    </div>
+  </div>
+  <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+</div>
+
+<ibm-placeholder></ibm-placeholder>

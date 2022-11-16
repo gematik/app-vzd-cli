@@ -4,214 +4,397 @@
 
 image::images/vzd-cli.gif[]
 
-`vzd-cli` 2.0 wurde in Vorbereitung der Migration des gematik Verzeichnisdienstes (VZD) von LDAP nach FHIR entwickelt. Über ein modernes CLI (Command Line Interface) können neue und alte Schnittstellen des VZD genutzt werden.
+== Einführung
+
+`vzd-cli` wurde in Vorbereitung der Migration des gematik Verzeichnisdienstes (VZD) von LDAP nach FHIR entwickelt. Über ein modernes CLI (Command Line Interface) können neue und alte Schnittstellen des VZD genutzt werden.
 
 `vzd-cli` enthält ein link:COMPATIBILITY_MODE.adoc[Kompatibilitätsmodus zur VZDClient 1.6] um bereits vorhandene Konfigurationen und Skripte nachnutzen zu können. 
 
+Seit version 2.1 bittet `vzd-cli` eine simple GUI.
+
 == Installation
 
-1. Download link:https://github.com/spilikin/app-vzd-cli/releases[Latest Release] von `vzd-cli` von github.
-2. ``vzd-cli-<VERSION>.zip`` extrahieren 
-3. Die Skripte in bin/ benutzen um `vzd-cli` zu starten
-3a. Zur Kompatibilität zur Version 1.6 s. Skripte unter `commands/``
+Die link:https://github.com/spilikin/app-vzd-cli/releases[neueste Version] von `vzd-cli` herunterladen.
 
+Für die Ausführung des `vzd-cli` soll die `PATH` Variable um den Pfad `vzd-cli-<VERSION>/bin` erweitert werden.
+
+Sobald der Befehl `vzd-cli` ausgeführt werden kann sind wir start klar:
 [source]
 ----
-Usage: vzd-cli admin [OPTIONS] COMMAND [ARGS]...
+$ vzd-cli
 
-  CLI for DirectoryAdministration API
+Usage: vzd-cli [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --human, --json, --yaml, --csv, --short
-  -e, --env [tu|ru|pu]             Environment. Either tu, ru or pu. If not
-                                   specified default env is used.
-  -o, --ocsp                       Validate certificates using OCSP
-  -x, --proxy-on / -X, --proxy-off
-                                   Forces the use of the proxy, overrides the
-                                   configuration
-  -h, --help                       Show this message and exit
+  -v          Display log, use -vv for even more details
+  --version   Show the version and exit
+  -h, --help  Show this message and exit
 
 Commands:
-  vault             Manage OAuth credentials in the Vault
-  config            Manage configuration
-  login             Login to OAuth2 Server and store token(s)
-  login-cred        Login using the client credentials  
-  auth              Show current access token
-  info              Show information about the API
-  list              List directory entries
-  template          Create template for a resource
-  add-base          Add new directory entry
-  load-base         Load the base entry for editing.
-  modify-base       Modify single base directory entry
-  modify-base-attr  Modify specific attributes of a base entry
-  delete            Delete specified directory entries
-  list-cert         List certificates
-  
-  Add certificate to existing DirectoryEntry
-  save-cert         Saves certificate to DER files
-  delete-cert       Delete certificate
-  clear-cert        Clear all certificates of a given entry
-  cert-info         Show details of a certificate
-  dump              Dump data from server
+  config               Manage configuration
+  update               Updates this software
+  admin                CLI for DirectoryAdministration API
+  apo                  CLI for ApoVZD API
+  gui                  Starts HTTP Server with GUI
+  pers                 Process gematik SMC-B/HBA Exports
+  generate-completion  Generate a tab-complete script for the given shell
+----
+
+
+== Erste Schritte
+
+Aufbau des `vzd-cli` folgt aktuellen Best-Practices analog z.B. zu Docker.
+Für alle Befehle (Commands) und Unter-Befehle (Subcommands) kann man mittels `--help` Option eine abschließende Liste aller Optionen und Argumente anzeigen lassen.
+
+[source,bash]
+----
+vzd-cli --help
+vzd-cli config --help
+vzd-cli config get --help
+vzd-cli admin --help
+vzd-cli admin ru --help
+----
+
+== Konfiguration
+
+Die Directory APIs werden über HTTPS erreicht. Falls für die Verbindung ein HTTP-Proxy erforderlich ist, muss es wie folgt konfiguriert werden:
+
+[source,bash]
+----
+# Beispiel Proxy (http://PROXY_HOST:PROXY_PORT)
+vzd-cli config set httpProxy.proxyURL http://192.168.0.1:8080
+vzd-cli config set httpProxy.enabled true
+----
+
+`vzd-cli` ermöglicht u.a. die Nutzung folgender APIs:
+
+* Directory Admin API
+* Apo API (ApoVZD)
+
+Für die Nutzung dieser APIs sind jeweils entsprechende Geheimnisse bzw. Credentials erforderlich.
+Diese werden von der gematik *den bereichtigten Organistionen* bereitgestellt.
+
+=== Admin API Credentials
+
+Directory Admin API benutzt für die Authentisierung das Oauth2 Client Credentials Flow.
+Um hierfür erforderlichen Credentials angemessen sicher aufbewahren zu können, stellt `vzd-cli` eine Vault (Tresor) Funktion bereit.
+Mithilfe der Vault werden alle Client IDs und Client Secrets verschlüsselt gespeichert.
+Um Vault aufmachen und darin enthaltenen Credentials nutzen zu können, wird der Nutzer aufgefordert einen Vault-Password zu vergeben.
+Dieser Password funktioniert analog zu den privaten Passwörtern bei den Password-Managern (z.B. Bitwarden, LastPass, 1Password).
+Die Vault Implementierung befinden sich in der Datei `Vault.kt` und verwendet von NIST emfohlene Verschlüsselung.
+
+Falls das Speichern der Credentials nicht erwünscht ist, kann die Anmeldung direkt mit Client ID und Client Secret erfolgen, s. `vzd-cli admin login-cred`.
+
+[source,bash]
+----
+# Vault zurücksetzen
+vzd-cli admin vault purge
+
+# Secret für die Referenzumgebung speichern
+# es folgt eine Vault Passwortabfrage
+vzd-cli admin vault store -e ru -c <CLIEND_ID> -s <CLIENT_SECRET>
+
+# Secret für die Produktivumgebung speichern
+# es folgt eine Vault Passwortabfrage
+vzd-cli admin vault store -e pu -c <CLIEND_ID> -s <CLIENT_SECRET>
+----
+
+Vault Password kann alternativ über die Umgebungsvariable `VAULT_PASSWORD` (empfohlen) oder über `--password` Parameter angegeben werden (nicht empfohlen).
+
+=== Apo API API-Keys
+
+Zugriff auf Apo API (ApoVZD) wird mittels API-KEYs geschützt.
+Die API-KEYs werden durch die gematik an *die berechtigte Anwendungen* vergeben.
+
+[source,bash]
+----
+# API Key für die Testinstanz
+vzd-cli apo config set apiKeys.test <API_KEY_TEST>
+# API Key für die Produktivinstanz
+vzd-cli apo config set apiKeys.prod <API_KEY_PROD>
 ----
 
 == Erste Schritte
 
-Aufbau der CLI folgt aktuellen Best-Practices analog z.B. zu Docker, Kubernetes, Helm. 
-Für alle Befehle (Command) und Unter-Befehle (Subcommand) kann man mittels `--help` Option eine abschließende Liste aller Optionen und Argumente anzeigen lassen.
+Befor die Directory Admin API genutzt werden kann, muss eine Anmeldung erfolgen.
+Die Anmeldung muss alle 6 Stunden wiederholt werden.
+
 [source,bash]
 ----
-vzd-cli --help
-vzd-cli admin --help
-vzd-cli admin vault --help
-vzd-cli admin vault import --help
+# Anmelden in die Referenzumgebung (ru)
+# es folgt eine Vault-Passwortabfrage
+vzd.cli admin ru login
+# Anmelden in die Referenzumgebung (pu)
+# es folgt eine Vault-Passwortabfrage
+vzd.cli admin pu login
 ----
 
-Bevor eine Verbindung zum Verzeichnisdienst aufgebaut werden kann, benötigt man die OAuth2 Client Credentials. 
-Den Zugang bekommt man von der gematik. 
+Für vollautomatisierte Nutzung des `vzd-cli`, auch bei der Anmeldung, wird das setzten der Umgebungsvariable `VAULT_PASSWORD` empfohlen.
+Dabei soll die Umgebungsvarianle den während der Konfiguration angegeben Vault Passwort enthalten.
 
-.Einen neuen Vault für die Geheimnisse erstellen
+.*Beispiel:* Suche nach allen Eintragen mit _Müller_ im Namen in der Referenzumgebung (`ru`)
 [source,bash]
 ----
-vzd-cli admin vault purge
+vzd-cli admin ru search Müller
 ----
 
-.Client Credentials für die jeweiligen Umgebungen hinterlegen
+.*Beispiel:* Suche nach den Einträgen in Berlin in der Produktivumgebung (`pu`)
 [source,bash]
 ----
-vzd-cli admin vault store --help
-vzd-cli admin vault store -e ru -c <CLIEND_ID> -s <CLIENT_SECRET>
-vzd-cli admin vault store -e pu -c <CLIEND_ID> -s <CLIENT_SECRET>
+vzd-cli admin pu search Berlin
 ----
 
-.Geheimnisse aus einem Transport- oder Backup-Vault importieren
+.*Beispiel:* Suche nach allen Eintragen in _Berlin_ mit dem Namen _Müller_ in der Referenzumgebung (`ru`)
 [source,bash]
 ----
-vzd-cli admin vault import --help
-vzd-cli admin vault import -i vault.keystore
+vzd-cli admin ru search Müller Berlin
 ----
 
 
-.Beispiel: Suche nach einem Eintrag mit angegebenen telematikID
+.*Beispiel:* Anzeige der Detailinformationen für die angegebene telematikID in der Referenzumgebung (`ru`)
 [source,bash]
 ----
-vzd-cli admin list -p telematikID=5-SMC-B-Testkarte-883110000092568
+vzd-cli admin ru show 1-SMC-B-Testkarte-883110000117729
 ----
 
-== `admin`: CLI für Directory Administration 
+== Übergreifende Befehle
 
-[#cmd-admin-info]
-=== `admin vault`
+=== `vzd-cli config`
 
-Befehle zur Verwaltung von OAuth2 Geheimnissen  
+Befehle für Konfiguration des `vzd-cli`. Folgende Konfigurationsparameter können geändert werden (s. `vzd-cli config set --help`)
 
-.Aktuelle OAuth ClientIDs anzeigen
-[source,bash]
-----
-vzd-cli admin vault list
-----
-
-=== `admin config`
-
-Befehle für Konfiguration des CLI
-
-.*Aktuelle Konfiguration anzeigen*
-[source,bash]
-----
-vzd-cli admin config get
-----
-
-Folgende Konfigurationsparameter können geändert werden (s. `vzd-cli admin config set --help`)
-
-* `currentEnvironment` - Name der Standardumgebung, wenn `-e / --environment` nicht spezifiziert wird. Mögliche Werte: `ru`, `tu`, `pu`.
-* `httpProxy.enabled` - wenn `true`, wird Proxy-Server bei allen Anfragen genutzt. Wenn `false` werden HTTP-Requests direkt ohne Proxy durchgeführt, es sei dem `-x / --proxy-on` Option gesetzt ist.
+* `httpProxy.enabled` - wenn `true`, wird Proxy-Server bei allen Anfragen genutzt. Wenn `false` werden HTTP-Requests direkt ohne Proxy durchgeführt
 * `httpProxy.proxyURL`: URL des HTTP-Proxy Servers ggf. mit Port, z.B.: `http://192.168.0.1:8080`
+* `updates.preReleasesEnabled`: wenn `true`, werden beim `vzd-cli update` die Pre-Releses installiert
 
-.*Konfigurationsparameter ändern*
+.*Beispiel:* Aktuelle Konfiguration anzeigen
 [source,bash]
 ----
-vzd-cli admin config set httpProxy.proxyURL "http://example.com:8080"
-vzd-cli admin config set httpProxy.enabled true
+vzd-cli config get
 ----
 
-.*Konfiguration zurücksetzen*
+
+.*Beispiel:* Konfigurationsparameter ändern
+[source,bash]
+----
+vzd-cli config set httpProxy.proxyURL "http://example.com:8080"
+vzd-cli config set httpProxy.enabled true
+vzd-cli config set updates.preReleasesEnabled true
+----
+
+.*Beispiel:* Konfiguration zurücksetzen
 [source,bash]
 ----
 vzd-cli admin config reset
 ----
 
-=== `admin login`
+
+=== `vzd-cli update`
+
+Aktualisiert das `vzd-cli` auf die neusete (oder angegebene Version).
+Anmerkung: Self-Updates werden erst ab der Version 2.1 unterstützt.
+
+.*Beispiel:* Falls eine neuere Version verfügbar ist, wird diese von github.com heruntergeladen und installiert
+----
+vzd-cli update
+----
+
+.*Beispiel:* Installiert eine bestimmte Version (auch Downgrade ist möglich):
+----
+vzd-cli update 2.1.0-beta4
+----
+
+== `vzd-cli admin`: Directory Administration
+
+=== `vzd-cli admin vault`
+
+Befehle zur Verwaltung von OAuth2 Geheimnissen
+
+----
+Usage: vzd-cli admin vault [OPTIONS] COMMAND [ARGS]...
+
+  Manage OAuth credentials in the Vault
+
+Options:
+  -h, --help  Show this message and exit
+
+Commands:
+  purge   Remove Vault
+  list    List configured OAuth2 credentials
+  store   Store OAuth2 client credentials
+  export  Export Vault to a file for backup or transfer.
+  import  Import credentials from another Vault
+----
+
+=== `vzd-cli admin status`
+
+Zeigt die Information über den aktuellen Zustand des Clients.
+Insb. wird angezeigt in welche Umgebungen man angemeldet ist, OAuth2 Token Informationen und die Informationen über Backend APIs.
+
+[source,bash]
+----
+vzd-cli admin status
+----
+
+=== `vzd-cli admin <tu|ru|pu> login`
 
 Anmelden beim OAuth2 Server mit Client-Credentials aus dem Vault.
 
-.In alle drei Umgebungen einloggen (vorausgesetzt alle drei ClientIDs sind über `admin vault` hinterlegt)
+.*Beispiel:* In alle drei Umgebungen einloggen (vorausgesetzt alle drei ClientIDs sind über `vzd-cli admin vault` hinterlegt)
 [source,bash]
 ----
-vzd-cli admin -e tu login
-vzd-cli admin -e ru login
-vzd-cli admin -e pu login
+vzd-cli admin tu login
+vzd-cli admin ru login
+vzd-cli admin pu login
 ----
 
-NOTE: Im Gegensatz zu Vault und darin enthaltenen Client-Credentials, werden die zeitlich befristete `ACCESS_TOKEN` unverschlüsselt im Ordner `$HOME/.telematik/` gespeichert
+NOTE: Im Gegensatz zu Vault und darin enthaltenen Client-Credentials, werden die zeitlich befristete `ACCESS_TOKEN` unverschlüsselt im Ordner `$HOME/.telematik/` gespeichert.
+Die Tokens sind 6 Stunden gültig.
 
-=== `admin login-cred`
+=== `vzd-cli admin <tu|ru|pu> login-cred`
 
-Anmelden beim OAuth2 Server mit explizit angegeben Client-Credemtials ()
+Anmelden beim OAuth2 Server mit explizit angegeben Client-Credentials
 
-.Anmelden in der Referenzumgebung, Client-Credentials werden über Parameter übergeben
+.*Beispiel:* Client-Id und Client-Secret werden über Parameter übergeben, Referenzumgebung (`ru`)
 [source,bash]
 ----
-vzd-cli admin -e ru login-cred --client-id=myclient --secret=mysecret
+vzd-cli admin ru login-cred -c myclient -s mysecret
 ----
 
-.Anmelden in der Produktivumgebung, Client-Id wird über Parameter übergeben, Client-Secret wird aus der Umgebungsvariable `CLIENT_SECRET` ausgelesen.
+.*Beispiel:* Client-Id wird über Parameter übergeben, Client-Secret wird aus der Umgebungsvariable `CLIENT_SECRET` ausgelesen, Referenzumgebung (`ru`)
 [source,bash]
 ----
 export CLIENT_SECRET=mysecret
-vzd-cli admin -e ru login-cred --client-id=myclient
+vzd-cli admin ru login-cred -c myclient
 ----
 
 
-[#cmd-admin-info]
-=== `admin info`
+=== `vzd-cli admin <tu|ru|pu> token`
 
-Zeigt die Information über den VZD-Server und die API.
+Zeigt den aktuellen `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client-Aufrufe keine erneute explizite Authentisierung durchführen müssen.
 
+.*Beispiel:* Speichert den ACCESS_TOKEN in die Umgebungsvariable und führt anschließend eine Query mit curl.
 [source,bash]
 ----
-vzd-cli admin info
+vzd-cli admin ru login
+export ADMIN_ACCESS_TOKEN=$(vzd-cli admin ru token)
+curl -H "Accept: application/json" \
+  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
+  https://vzdpflege-ref.vzd.ti-dienste.de:9543/DirectoryEntries?baseEntryOnly=true
 ----
 
+=== `vzd-cli admin <tu|ru|pu> search`
 
-[#cmd-admin-auth]
-=== `admin auth`
+Führt eine benutzerfreundliche Suche nach Einträgen. Dabei werden Natural Language Processing Algorithmen verwenden um angegebene Suchkriterien zu ermitteln.
+Derzeit werden folgende Kriterien unterstützt:
 
-Authentisiert den Client und gibt `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client-Aufrufe keine erneute explizite Authentisierung durchführen müssen.
+* Orte in Deutschland, z.B. _Berlin_, _Bad Homburg_, _Frankfurt am Main_
+* Deutsche Postleitzahlen
+* TelematikIDs
+* Betriebsstätten / IK-Nummer
 
-.Beispiel: Authentisiert und speichert den ACCESS_TOKEN in die Umgebungsvariable 
+.*Beispiele:*
 [source,bash]
 ----
-export ADMIN_ACCESS_TOKEN=$(vzd-cli admin auth)
+# Name und Ort
+vzd-cli admin ru search Müller Berlin
+# Ort und längerer Name
+vzd-cli admin ru search Berlin Praxis Müller
+# nur Name
+vzd-cli admin ru search Praxis Müller
+# Name und PLZ
+vzd-cli admin ru search Praxis Müller 45144
+# Erste Nummern der TelematikID (niedergelassene Arztpraxen)
+vzd-cli admin ru search 1-20
 ----
 
-[#cmd-admin-list]
-=== `admin list`
+=== `vzd-cli admin <tu|ru|pu> show <telematikID>`
+
+Zeigt ausführliche Details zu dem Eintrag.
+Durch `--ocsp` Option kann die Online-Zertifikatsprüfung mittels OCSP-Responder eingefordert werden.
+
+.*Beispiele*
+----
+vzd-cli admin ru show 1-SMC-B-Testkarte-883110000102893
+vzd-cli admin ru show 1-SMC-B-Testkarte-883110000102893 --ocsp
+----
+
+=== `vzd-cli admin <tu|ru|pu> list`
+
+Suche und Anzeige von Verzeichnisdiensteinträgen durch eingabe einzelner Query-Parameter
+
+----
+Usage: vzd-cli admin ru list [OPTIONS]
+
+  List directory entries
+
+Query parameters:
+  --name TEXT
+  --uid TEXT
+  --givenName TEXT
+  --sn TEXT
+  --cn TEXT
+  --displayName TEXT
+  --streetAddress TEXT
+  --postalCode TEXT
+  --countryCode TEXT
+  --localityName TEXT
+  --stateOrProvinceName TEXT
+  --title TEXT
+  --organization TEXT
+  --otherName TEXT
+  -t, --telematikID TEXT
+  --specialization TEXT
+  --domainID TEXT
+  --holder TEXT
+  --personalEntry [true|false]
+  --dataFromAuthority [true|false]
+  --professionOID TEXT
+  --entryType INT
+  --maxKOMLEadr INT
+  --changeDateTimeFrom ISODATE
+  --changeDateTimeTo ISODATE
+  --baseEntryOnly [true|false]
+
+OCSP options:
+  --ocsp  Validate certificates using OCSP
+
+Options:
+  --human, --json, --yaml, --csv, --table
+                                   (default: HUMAN)
+  -f, --param-file PARAM FILENAME...
+                                   Read parameter values from file
+  -p, --param NAME=VALUE           Specify query parameters to find matching
+                                   entries
+  -o, --outfile PATH               Write output to file
+  --sync                           use Sync mode
+  -h, --help                       Show this message and exit
+----
 
 ==== Optionen
-* `--param` oder `-p` +
-Setzt einen Query-Parameter bei der Suche der Einträge über die API. Kann mehrfach angegeben werden um die Parameter zu kombinieren. +
-Die Liste von gültigen Parametern kann aus https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml[DirectoryAdministration API] entnommen werden (s. `read_Directory_Entry`)
 
 * `--param-file` oder `-f` +
 Liest Werte eines Parameters aus der Datei und fragt für jeden Wert nach Eintrag im VZD ab. Die Datei soll den gewünschten Wert einmal pro Zeile enthalten:
 
-.Beispiel: Findet alle Einträge mit TelematikID aus `telematik.txt`
+.*Beispiel:* Findet alle Einträge mit angegeben TelematikID
 [source,bash]
 ----
-vzd-cli admin --short list -f telematikID telematik.txt
+vzd-cli admin ru list -t 1-SMC-B-Testkarte-883110000102893
 ----
 
-.Inhalt von `telematik.txt`
+.*Beispiel:* Findet alle Einträge aus Berlin, bei welchen die TelematikID mit `5-` beginnt (Krankenhäuser).
+[source,bash]
+----
+vzd-cli admin ru list -t "5-*" --localityName Berlin
+----
+
+.*Beispiel:* Findet alle Einträge mit TelematikID aus `telematik.txt`
+[source,bash]
+----
+vzd-cli admin ru list -f telematikID telematik.txt --table
+----
+
+.Inhalt der `telematik.txt`
 ----
 4-SMC-B-Testkarte-883110000093329
 3-SMC-B-Testkarte-883110000093294
@@ -219,68 +402,62 @@ vzd-cli admin --short list -f telematikID telematik.txt
 3-SMCB-Testkarte-883110000092193
 ----
 
+=== `vzd-cli admin <tu|ru|pu> template`
 
-Suche und Anzeige von Verzeichnisdiensteinträgen.
-
-[#cmd-admin-template]
-=== `admin template`
-
-Generiert die Dateivorlagen für `admin add` oder `admin modify` Befehle.
+Generiert die Dateivorlagen für `add` oder `modify` Befehle.
 
 .Beispiel: Erzeugt eine Vorlage und schreibt es in eine YAML-Datei 
 [source,bash]
 ----
-vzd-cli admin template base > Eintrag.yaml
+vzd-cli admin ru template base > Eintrag.yaml
 ----
 
 .Beispiel: Erzeugt eine Vorlage und schreibt es in eine JSON-Datei 
 [source,bash]
 ----
-vzd-cli admin --json template base > Eintrag.json
+vzd-cli admin template base --json > Eintrag.json
 ----
 
-[#cmd-admin-add-base]
-=== `admin add-base`
+=== `vzd-cli admin <tu|ru|pu> add-base`
 
 Neuen Verzeichnisdiensteintrag erstellen.
 
-[#cmd-admin-load-base]
-=== `admin load-base`
+*Beispiel:* einen leeren Eintrag mit angegebenen telematikID erstellen:
+----
+vzd-cli admin ru add-base -s telematikID=9-TEST
+----
 
-Lädt einen Basiseintrag. Die geladene Struktur kann als Datei gespeichert werden, in einem Text-Editor bearbeitet und anschließend mit `admin modify-base` modifiziert werden.
+=== `vzd-cli admin <tu|ru|pu> load-base`
 
-[#cmd-admin-modify-base]
-=== `admin modify-base`
+Lädt einen Basiseintrag. Die geladene Struktur kann als Datei gespeichert werden, in einem Text-Editor bearbeitet und anschließend mit `vzd-cli admin modify-base` modifiziert werden.
+
+=== `vzd-cli admin <tu|ru|pu> modify-base`
 
 Modifiziert den gesamten Basiseintrag im Verzeichnisdienst.
 
-[#cmd-admin-modify-base-attr]
-=== `admin modify-base-attr`
+=== `vzd-cli admin <tu|ru|pu> modify-base-attr`
 
 Modifiziert einzelne Attribute des Basiseintrags
 
-[#cmd-admin-delete]
-=== `admin delete`
+=== `vzd-cli admin <tu|ru|pu> delete`
 
 Löscht Einträge aus dem Verzeichnisdienst.
 
-[#cmd-admin-list-cert]
-=== `admin list-cert`
+=== `vzd-cli admin <tu|ru|pu> list-cert`
 
 Suche und Anzeige von X509-Zertifikaten.
 
-[#cmd-admin-add-cert]
-=== `admin add-cert`
+=== `vzd-cli admin <tu|ru|pu> add-cert`
 
 Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinzu.
 
 [source,bash]
 ----
 # zuerst einen leeren Basiseintrag erzeugen
-vzd-cli admin add-base -s telematikID=1-123123
+vzd-cli admin ru add-base -s telematikID=1-123123
 # danach Zertifikat hinzufügen
 # Achtung: TelematikID beim Befehl admin add-base und im Zertifikat müssen identisch sein
-vzd-cli admin add-cert 1-123123.der
+vzd-cli admin ru add-cert 1-123123.der
 ----
 
 [source,bash]
@@ -288,35 +465,29 @@ vzd-cli admin add-cert 1-123123.der
 # Fügt alle Zertifikate aus dem aktuellen Ordner das VZD
 # TelematikID und BasisEintrag werden automatisch aus dem Zertifikat 
 # ermittelt (Admission Statement -> Registration Number)
-vzd-cli admin add-cert *.der
+vzd-cli admin ru add-cert *.der
 ----
 
-
-
-[#cmd-admin-clear-cert]
-=== `admin clear-cert`
+=== `vzd-cli admin <tu|ru|pu> clear-cert`
 
 Löscht alle Zertifikate aus dem angegeben Eintrag.
 
 [source,bash]
 ----
-vzd-cli admin clear-cert -p telematikID=1-123123
+vzd-cli admin ru clear-cert -t 1-123123
 ----
 
-[#cmd-admin-save-cert]
-=== `admin save-cert`
+=== `vzd-cli admin <tu|ru|pu> save-cert`
 
 Speichert alle gefundene Zertifikate in ein Verzeichnis
 
-[#cmd-admin-delete-cert]
-=== `admin delete-cert`
+=== `vzd-cli admin <tu|ru|pu> delete-cert`
 
-WARNING: Nicht implementiert. Bitte `admin clear-cert` verwenden.
+WARNING: Nicht implementiert. Bitte `vzd-cli admin clear-cert` verwenden.
 
 Löscht einen X509-Zertifikat.
 
-[#cmd-admin-cmd]
-=== `admin cmd`
+=== `vzd-cli admin <tu|ru|pu> cmd`
 
 Aktiviert link:COMPATIBILITY_MODE.adoc[Kompatibilitätsmodus zur VZDClient 1.6]
 
@@ -334,12 +505,44 @@ Options:
   -h, --help                   Show this message and exit
 ----
 
-[#cmd-dump-create]
-=== `admin dump create`
+=== `vzd-cli admin <tu|ru|pu> dump create`
 
 Lädt große Mengen von Einträgen und schreibt sie in `STDOUT`, eine Zeile per Eintrag als JSON. So erzeugte Dumps können durch weitere Tools verarbeitet werden, z.B. https://gnupg.org[GnuPG] oder https://github.com/antonmedv/fx[FX].
 
-[#cmd-dump-ocsp]
-=== `admin dump ocsp`
+=== `vzd-cli admin <tu|ru|pu> dump ocsp`
 
-Ließt die Einträga aus STDIN, stellt für jeden gefundenen Zertifikat eine OCSP-Abfrage.
+Liest die Einträga aus STDIN, stellt für jeden gefundenen Zertifikat eine OCSP-Abfrage.
+
+== `vzd-cli apo`: ApoVZD API
+
+=== `vzd-cli apo config`
+
+Konfiguration der ApoVZD Clients.
+
+.*Beispiele*
+----
+# aktuelle konfiguration anzeigen:
+vzd-cli apo config get
+# Api-Key für Testinstanz setzen:
+vzd-cli apo config set apiKeys.test <Api-Key>
+# Api-Key für Produktivinstanz setzen:
+vzd-cli apo config set apiKeys.prod <Api-Key>
+----
+
+=== `vzd-cli apo <test|prod> search`
+
+.*Beispeil*: Suche nach allen Apotheken mit Namen _Linden_
+----
+vzd-cli apo prod search Linden
+----
+
+=== `vzd-cli apo <test|prod> show`
+
+.*Beispeil*: Zeige die Informationen über Apotheke mit angegebenen TelematikID
+----
+vzd-cli apo prod show 3-1234567890
+----
+
+== `vzd-cli gui`: Directory GUI
+
+Durch den Befehl `vzd-cli gui` wird ein HTTP Server gestartet und ein neuer Browser-Tab mit GUI geöffnet.

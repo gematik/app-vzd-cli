@@ -1,10 +1,22 @@
 = Changelog `vzd-cli`
 
+== Version 2.1.0
+- CLI Interface wurde weitgehend überarbeiten un vereinfacht, s. Dokumentation
+- Self-Update Funktion wurde implementiert, s. `vzd-cli update`
+- Erste simple Web-GUI wurde hinzugefügt, s. `vzd-cli gui`
+- Neu: ApoVZD Unterstützung über `vzd-cli apo`
+- `vzd-cli admin <ENV> login` wurde komplett überarbeitet
+- `vzd-cli admin <ENV> token` ersetzt `vzd-cli admin auth`
+- Neuer Befehl: `vzd-cli admin <ENV> search`: schnelle, intuitive Suche nach Einträgen
+- Neuer Befehl: `vzd-cli admin <ENV> show <TELEMATIK_ID>`: zeigt den gesamten Eintrag in verschiedenen Formaten
+- Neuer Befehl: `vzd-cli admin <ENV> edit <TELEMATIK_ID>`: editieren eines Basiseintrags in einem Text-Editor
+- Neuer Ausgabeformat: `--table`, eine ASCII Tabelle
+
 == Version 2.0.0
 - Kompatibilitätsmodus zur VZDClient 1.6. Befehl `vzd-cli admin cmd`
 - Neue Befehle unter `vzd-cli pers`: verarbeitet die Basisdaten und Zertifikate aus den Peronalisierung-XML(TSP-Schnittstelle exports)
 und schreibt diese in `vzd-cli` kompatiblen Format
-- Neues Befehl `vzd-cli admin delete-cert`: Löschen der Zertifikate
+- Neuer Befehl `vzd-cli admin delete-cert`: Löschen der Zertifikate
 - Unterstützung für Admin API 1.8.1 https://github.com/gematik/api-vzd/blob/I_Directory_Administration/1.8.1/src/openapi/DirectoryAdministration.yaml
 - Unterstützung von Paging in `vzd-cli admin dump create` über `-c / --cursor-size` und `-e / --expected-count`
 - Anpassung der Konfiguration über `vzd-cli admin config set`
@@ -26,7 +38,7 @@ und schreibt diese in `vzd-cli` kompatiblen Format
   - `vzd-cli admin dump create` erzeugt einen neuen dump
   - `vzd-cli admin dump ocsp` ergänzt für jeden Zertifikat aus dem Dump die OCSP Informationen
   - Falls ein Dump bereits die OCSP-Daten enthält, werden nur die fehlerhafte Zertifikate erneut geprpüft (status != GOOD)
-- neues Befehl: `admin login-cred`: erlaubt Anmelden mit Client-Credentials, angegeben über Kommandozeile oder Umgebungsvariablen
+- neuer Befehl: `admin login-cred`: erlaubt Anmelden mit Client-Credentials, angegeben über Kommandozeile oder Umgebungsvariablen
 - Befehle unterstützen zusätzlich zu `-p` die explizite Optionen:
 ```
       --name TEXT
@@ -63,7 +75,7 @@ und schreibt diese in `vzd-cli` kompatiblen Format
 
 - Unterstützung der OCSP-Abfragen für X509-Zertifikate (s. `vzd-cli admin -o` oder `vzd-cli admin --ocsp`
 - Unterstützung von CertHash Extension
-- Neues Befehl: `vzd-cli admin dump`: lädt große Mengen von Einträgen vom Server für nachfolgende loikale Verarbeitung
+- Neuer Befehl: `vzd-cli admin dump`: lädt große Mengen von Einträgen vom Server für nachfolgende loikale Verarbeitung
 (z.B. Datenanalysen)
 - Es werden mehr Zertifikatdetails angezeigt (z.B. einzelne Subject-Felder, OCSP-Responder-URL)
 - CSV-Output Verbesserungen:
@@ -74,7 +86,7 @@ und schreibt diese in `vzd-cli` kompatiblen Format
 == Version 0.13.x
 
 - Die Abfragen nach Vault-Password sind jetzt klarer
-- Neues Befehl: `vzd-cli admin vault purge` - löscht alle Credentials aus dem Vault
+- Neuer Befehl: `vzd-cli admin vault purge` - löscht alle Credentials aus dem Vault
 - Fix Bug beim Einloggen hinter dem Proxy-Server
 
 == Version 0.12.x
@@ -91,5 +103,3 @@ und schreibt diese in `vzd-cli` kompatiblen Format
 - Skelett-Zertifikatsblöcke werden beim CSV-Output nicht mehr gezählt 
 - Authentisierung wird jetzt nur beim Bedarf verlangt, z.B. `vzd-cli admin cert-info` funktioniert ohne Authentisierung. 
 - Viele Bugfixes
-
-== Backlog

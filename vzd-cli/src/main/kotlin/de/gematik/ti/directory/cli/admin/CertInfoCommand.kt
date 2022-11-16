@@ -1,0 +1,45 @@
+package de.gematik.ti.directory.cli.admin
+
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.UsageError
+import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.switch
+import com.github.ajalt.clikt.parameters.types.path
+import de.gematik.ti.directory.cli.OcspOptions
+import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.util.CertificateDataDER
+import kotlinx.coroutines.runBlocking
+import org.bouncycastle.util.encoders.Base64
+import kotlin.io.path.inputStream
+
+class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of a certificate") {
+    private val files by argument().path(mustBeReadable = true, canBeDir = false).multiple()
+    private val outputFormat by option().switch(
+        "--yaml" to OutputFormat.YAML,
+        "--json" to OutputFormat.JSON
+    ).default(OutputFormat.YAML)
+    private val ocspOptions by OcspOptions()
+    private val context by requireObject<AdminCliEnvironmentContext>()
+    override fun run() = catching {
+        files.forEach {
+            val certB64 = Base64.toBase64String(it.inputStream().readBytes())
+            val userCertificate = CertificateDataDER(certB64)
+            val certificateInfo = userCertificate.certificateInfo
+
+            if (ocspOptions.enableOcsp) {
+                certificateInfo.ocspResponse = runBlocking { context.adminAPI.globalAPI.pkiClient.ocsp(userCertificate) }
+            }
+
+            when (outputFormat) {
+                OutputFormat.JSON -> Output.printJson(certificateInfo)
+                OutputFormat.YAML -> Output.printYaml(certificateInfo)
+                else -> throw UsageError("Cant use output format: $outputFormat")
+            }
+        }
+    }
+}
