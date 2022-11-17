@@ -73,6 +73,7 @@ export class SearchResultsComponent implements OnInit {
           }),
         ]
       })
+      /*
       if (this.rows.length == 1) {
         this.loadingState = InlineLoadingState.Finished
         this.router.navigate(
@@ -80,6 +81,7 @@ export class SearchResultsComponent implements OnInit {
           { relativeTo: this.route.parent }
         )
       }
+      */
       this.model.pageLength = 25
       this.model.totalDataLength = Math.ceil(this.rows.length / 25)
       this.selectPage(1);

@@ -13,16 +13,16 @@ data class HttpProxyConfig(
 )
 
 @Serializable
-data class GlobalConfig(
-    var httpProxy: HttpProxyConfig,
-    var updates: UpdatesConfig
-)
-
-@Serializable
 data class UpdatesConfig(
     var preReleasesEnabled: Boolean,
     var lastCheck: Long,
     var latestRelease: String
+)
+
+@Serializable
+data class GlobalConfig(
+    var httpProxy: HttpProxyConfig,
+    var updates: UpdatesConfig
 )
 
 internal class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<GlobalConfig>(

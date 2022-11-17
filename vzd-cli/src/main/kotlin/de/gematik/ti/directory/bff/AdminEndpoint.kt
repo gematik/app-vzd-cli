@@ -13,6 +13,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import java.io.IOException
 
 @Serializable
 data class LoginWithVaultRepresentation(
@@ -62,9 +63,12 @@ fun Route.adminRoutes() {
             return@post
         }
 
-        call.adminAPI.login(body.env, credential.name, credential.secret)
-
-        call.respond(HttpStatusCode.OK, Outcome("VAULT_LOGIN_OK", "Logged in to '${body.env}'"))
+        try {
+            call.adminAPI.login(body.env, credential.name, credential.secret)
+            call.respond(HttpStatusCode.OK, Outcome("VAULT_LOGIN_OK", "Logged in to '${body.env}'"))
+        } catch (e: IOException) {
+            call.respond(HttpStatusCode.BadGateway, Outcome("DOWNSTREAM_CONNECTION_ERROR", "Unable to connect to backend. Check proxy settings."))
+        }
     }
 
     get<Admin.Env.Search> { search ->

@@ -2,7 +2,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-version = "2.1.0-beta5"
+version = "2.1.0-beta6"
 
 val ktorVersion = "2.1.2"
 val kotestVersion = "5.5.2"
@@ -32,7 +32,7 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
-    implementation(project(":legacy-client-java"))
+    // implementation(project(":legacy-client-java"))
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
@@ -118,9 +118,11 @@ tasks.register<Zip>("customDist") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    /*
     minimize {
         exclude(dependency("org.bouncycastle:.*:.*"))
     }
+    */
     archiveVersion.set("")
 }
 

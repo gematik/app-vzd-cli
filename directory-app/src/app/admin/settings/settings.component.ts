@@ -64,7 +64,7 @@ export class SettingsComponent implements OnInit {
     this.notificationService.showNotification({
       type: "error",
       title: "Error",
-      message: err.message,
+      message: err.error?.message || err.message,
       target: ".notification-container",
     })  
   }
