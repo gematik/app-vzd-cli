@@ -8,8 +8,6 @@ image::images/vzd-cli.gif[]
 
 `vzd-cli` wurde in Vorbereitung der Migration des gematik Verzeichnisdienstes (VZD) von LDAP nach FHIR entwickelt. Über ein modernes CLI (Command Line Interface) können neue und alte Schnittstellen des VZD genutzt werden.
 
-`vzd-cli` enthält ein link:COMPATIBILITY_MODE.adoc[Kompatibilitätsmodus zur VZDClient 1.6] um bereits vorhandene Konfigurationen und Skripte nachnutzen zu können. 
-
 Seit version 2.1 bittet `vzd-cli` eine simple GUI.
 
 == Installation

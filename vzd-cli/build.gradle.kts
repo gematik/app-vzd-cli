@@ -85,13 +85,16 @@ dependencies {
     implementation("com.github.ajalt.clikt:clikt:3.5.0")
 
     // Bouncy castle fpr crypto and certificates processing
-    implementation("org.bouncycastle:bcprov-jdk15on:1.70")
-    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+    shadow("org.bouncycastle:bcprov-jdk15on:1.70")
+    shadow("org.bouncycastle:bcpkix-jdk15on:1.70")
 
     // test libraries
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    // Bouncy Castle again, now only for tests
+    testImplementation("org.bouncycastle:bcprov-jdk15on:1.70")
+    testImplementation("org.bouncycastle:bcpkix-jdk15on:1.70")
 }
 
 application {
@@ -104,10 +107,6 @@ tasks.register<Zip>("customDist") {
     archiveBaseName.set(project.name)
     destinationDirectory.set(layout.buildDirectory.dir("distributions"))
 
-    into("${project.name}-${project.version}/commands") {
-        from(layout.projectDirectory.dir("../legacy-client-java/commands"))
-    }
-
     into("${project.name}-${project.version}/bin") {
         from(layout.projectDirectory.dir("additionalScripts"))
     }
@@ -117,22 +116,27 @@ tasks.register<Zip>("customDist") {
     }
 }
 
+tasks.named("build") {
+    finalizedBy("customDist")
+}
+
+tasks.named("startScripts") {
+    dependsOn("copyShadowLibs")
+}
+
 tasks.named<ShadowJar>("shadowJar") {
-    /*
-    minimize {
-        exclude(dependency("org.bouncycastle:.*:.*"))
-    }
-    */
+    dependsOn("copyShadowLibs")
     archiveVersion.set("")
+}
+
+tasks.register<Copy>("copyShadowLibs") {
+    from(configurations.shadow)
+    into(layout.buildDirectory.dir("libs"))
 }
 
 tasks.named<CreateStartScripts>("startShadowScripts") {
     val generator = windowsStartScriptGenerator as TemplateBasedScriptGenerator
     generator.template = project.resources.text.fromFile("startScriptTemplates/windowsStartScript.txt")
-}
-
-tasks.named("build") {
-    finalizedBy("customDist")
 }
 
 tasks.distZip.configure { enabled = false }
@@ -178,4 +182,8 @@ tasks.register<JavaExec>("serve") {
     // args = listOf("gui")
     classpath = sourceSets["test"].runtimeClasspath
     jvmArgs = listOf("-Dio.ktor.development=true")
+}
+
+tasks.named<JavaExec>("run") {
+    configurations.add(configurations.shadow.get())
 }
