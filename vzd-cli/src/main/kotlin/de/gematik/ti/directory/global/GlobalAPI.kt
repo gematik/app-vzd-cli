@@ -106,8 +106,7 @@ class GlobalAPI {
         val updateUrl = "https://github.com/gematik/app-vzd-cli/releases/download/$version/vzd-cli-$version.zip"
         val httpClient = createHttpClient()
 
-        val zipFile = kotlin.io.path.createTempFile("vzd-cli", ".zip") // Path(appHome.absolutePathString(), "vzd-cli-$version.zip")
-        logger.debug { "Downloading update from $updateUrl to $zipFile" }
+        logger.debug { "Downloading update from $updateUrl" }
 
         val response = httpClient.get(updateUrl) {
             onDownload(progressListener)
@@ -118,33 +117,39 @@ class GlobalAPI {
         val channel = response.body<ByteReadChannel>()
 
         // TODO: add GPG signature check
+        val zipFile = kotlin.io.path.createTempFile("vzd-cli", ".zip")
         val tempOutput = zipFile.outputStream()
         channel.copyTo(tempOutput)
 
-        val regex = Regex(".*vzd-cli.*all.jar$")
-        val jarFile = Path(appHome.absolutePathString(), "lib", "vzd-cli-all.jar.update")
+        val regex = Regex("^vzd-cli-.*?/")
         withContext(Dispatchers.IO) {
-            logger.debug { "Looking for updated jars" }
+            logger.debug { "Processing $zipFile" }
             ZipFile(zipFile.toFile()).use { zip ->
                 zip.entries().asSequence().forEach { entry ->
-                    logger.debug { entry.name }
-                    if (entry.name.matches(regex)) {
-                        logger.debug { "Extracting $entry" }
+                    if (entry.isDirectory) {
+                        return@forEach
+                    }
+                    val fileName = entry.name.replace(regex, "")
+                    logger.debug { "Extracting $fileName" }
 
-                        zip.getInputStream(entry).use { input ->
-                            jarFile.outputStream().use { output ->
-                                input.copyTo(output)
-                            }
+                    val outputFileName = fileName + ".update"
+                    val outputFile = Path(appHome.absolutePathString(), *outputFileName.split("/").toTypedArray())
+
+                    zip.getInputStream(entry).use { input ->
+                        logger.debug { "Extracting to $outputFileName" }
+                        outputFile.outputStream().use { output ->
+                            input.copyTo(output)
                         }
+                    }
+
+                    try {
+                        logger.debug { "Overwriting $fileName" }
+                        outputFile.moveTo(Path(appHome.absolutePathString(), *fileName.split("/").toTypedArray()), true)
+                    } catch (e: Throwable) {
+                        logger.debug { "Unable to overwrite $fileName. Start start script will rename it on next run." }
                     }
                 }
             }
-        }
-
-        try {
-            jarFile.moveTo(Path(appHome.absolutePathString(), "lib", "vzd-cli-all.jar"), true)
-        } catch (e: Throwable) {
-            // if this fails, the start script will rename this file on next run
         }
 
         zipFile.deleteExisting()
