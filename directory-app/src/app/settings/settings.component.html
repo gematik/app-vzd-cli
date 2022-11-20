@@ -12,7 +12,54 @@
           <ibm-tab heading="Administration">
             <app-admin-settings></app-admin-settings>
           </ibm-tab>
-          <ibm-tab heading="Proxy"></ibm-tab>
+          <ibm-tab i18n-heading heading="Einstellungen" *ngIf="config" (selected)="tabSelected()">
+            <div class="notification-container"></div>
+            <div ibmRow class="row">
+                <div ibmCol>
+                    <ibm-inline-loading
+                        [state]="configState"
+                        i18n-loadingText
+                        loadingText="Updating configuration"
+                        i18n-successText
+                        successText="Configuration updated"
+                        i18n-errorText
+                        errorText="Configuration update error">
+                    </ibm-inline-loading>
+                </div>
+            </div>
+            <div ibmRow class="row">
+              <div ibmCol>
+                <ibm-checkbox
+                  [(ngModel)]="config.updates.preReleasesEnabled"
+                i18>Enable Pre-Releases</ibm-checkbox>
+              </div>
+            </div>
+            <div ibmRow class="row">
+              <div ibmCol>
+                <ibm-checkbox
+                  [(ngModel)]="config.httpProxy.enabled"
+                i18>Enable Proxy</ibm-checkbox>
+              </div>
+            </div>
+            <div ibmRow *ngIf="config.httpProxy.enabled" class="row">
+              <div ibmCol>
+                <ibm-label>
+                  Proxy URL
+                  <input
+                      ibmText
+                      [(ngModel)]="config.httpProxy.proxyURL"
+                      readonly="true"
+                  >
+                </ibm-label>
+              </div>
+              <div ibmCol>
+                </div>
+            </div>
+            <div class="row">
+              &nbsp;
+            </div>
+            <button ibmButton="primary" i18n (click)="updateConfig()">Update Config</button>
+          </ibm-tab>
         </ibm-tabs>
       </div>
     </div>

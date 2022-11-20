@@ -20,6 +20,7 @@ import {
   StructuredListModule,
   AccordionModule,
   TagModule,
+  CheckboxModule,
 } from 'carbon-components-angular';
 
 @NgModule({
@@ -44,6 +45,7 @@ import {
     StructuredListModule,
     AccordionModule,
     TagModule,
+    CheckboxModule,
   ]
 })
 export class CarbonModule {}

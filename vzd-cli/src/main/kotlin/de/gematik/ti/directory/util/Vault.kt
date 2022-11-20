@@ -117,7 +117,7 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
     private val keyStore: KeyStore by lazy {
         val keyStore = KeyStore.getInstance("BCFKS", BouncyCastleProvider())
 
-        if (keystorePath.toFile().exists()) {
+        if (keystorePath.toFile().exists() && keystorePath.toFile().length() > 0) {
             try {
                 keyStore.load(keystorePath.inputStream(), keystorePassword)
             } catch (e: IOException) {

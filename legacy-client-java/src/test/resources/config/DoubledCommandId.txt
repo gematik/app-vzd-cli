@@ -1,3 +1,0 @@
-base=http://[::1]:8080/OAuth2Token
-retryingOAuth=https://to.be.defined/oauth/token
-commands=src\test\resources\config\DoubleIdCommands.xml

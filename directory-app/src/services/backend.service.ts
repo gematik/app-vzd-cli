@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { StatusRepresentation } from './global.model';
+import { GlobalConfig } from './global.model';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,11 @@ export class BackendService {
     private http: HttpClient    
   ) { }
 
-  getStatus() {
-    return this.http.get<StatusRepresentation>('/api/status')    
+  getConfig() {
+    return this.http.get<GlobalConfig>('/api/config')
+  }
+
+  updateConfig(config: GlobalConfig) {
+    return firstValueFrom(this.http.post<GlobalConfig>('/api/config', config))
   }
 }
