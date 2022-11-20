@@ -64,12 +64,9 @@ set CMD_LINE_ARGS=%*
 :execute
 @rem Setup the command line
 
-@rem check if xxx.update files are available and move them in proper place
-SETLOCAL ENABLEDELAYEDEXPANSION
-for %%f in ("%APP_HOME%\\lib\\*.update") do (
-  set update_file=%%f
-  set proper_file=!update_file:.jar.update=.jar!
-  move "!update_file!" "!proper_file!" >nul
+@rem check if updated jar is available and move it in place of the old jar
+if exist ${classpath}.update (
+    move ${classpath}.update $classpath >nul
 )
 
 set CLASSPATH=$classpath

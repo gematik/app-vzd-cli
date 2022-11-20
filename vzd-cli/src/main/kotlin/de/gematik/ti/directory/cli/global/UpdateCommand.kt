@@ -3,6 +3,8 @@ package de.gematik.ti.directory.cli.global
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
 import de.gematik.ti.directory.cli.BuildConfig
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.global.GlobalAPI
@@ -10,11 +12,14 @@ import kotlinx.coroutines.runBlocking
 import me.tongfei.progressbar.ProgressBar
 
 class UpdateCommand : CliktCommand(name = "update", help = "Updates this software") {
+    private val reinstall by option("-r", "--reinstall", help = "Force re-install").flag()
     private val version by argument(help = "Version to install, latest version is installed by default").default("latest")
     override fun run() = catching {
         val globalAPI = GlobalAPI()
 
-        val updateToVersion = if (version == "latest") {
+        val updateToVersion = if (reinstall) {
+            BuildConfig.APP_VERSION
+        } else if (version == "latest") {
             val latestRelease = runBlocking { globalAPI.checkForUpdates() }
             if (latestRelease == BuildConfig.APP_VERSION) {
                 echo("No updates available")

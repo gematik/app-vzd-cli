@@ -129,6 +129,10 @@ class GlobalAPI {
                     if (entry.isDirectory) {
                         return@forEach
                     }
+                    if (!entry.name.endsWith(".jar")) {
+                        // extract only jars
+                        return@forEach
+                    }
                     val fileName = entry.name.replace(regex, "")
                     logger.debug { "Extracting $fileName" }
 
