@@ -20,7 +20,7 @@ class UpdateCommand : CliktCommand(name = "update", help = "Updates this softwar
         val updateToVersion = if (reinstall) {
             BuildConfig.APP_VERSION
         } else if (version == "latest") {
-            val latestRelease = runBlocking { globalAPI.checkForUpdates() }
+            val latestRelease = runBlocking { globalAPI.getLatestVersion() }
             if (latestRelease == BuildConfig.APP_VERSION) {
                 echo("No updates available")
                 return@catching

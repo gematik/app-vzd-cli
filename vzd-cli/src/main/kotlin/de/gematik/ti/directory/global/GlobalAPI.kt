@@ -56,7 +56,7 @@ class GlobalAPI {
         return store.reset()
     }
 
-    suspend fun checkForUpdates(): String {
+    suspend fun getLatestVersion(): String {
         val httpClient = createHttpClient()
 
         logger.info { "Checking for updates at: $GITHUB_RELEASES_URL" }
@@ -155,7 +155,6 @@ class GlobalAPI {
                 }
             }
         }
-
         zipFile.deleteExisting()
     }
 
