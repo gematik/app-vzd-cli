@@ -18,13 +18,16 @@ import de.gematik.ti.directory.cli.global.ConfigCommand
 import de.gematik.ti.directory.cli.global.UpdateCommand
 import de.gematik.ti.directory.cli.gui.GuiCommand
 import de.gematik.ti.directory.cli.pers.PersCommand
+import de.gematik.ti.directory.global.GlobalAPI
 import de.gematik.ti.directory.util.DirectoryException
 import de.gematik.ti.directory.util.VaultException
 import io.ktor.client.network.sockets.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
 import org.slf4j.LoggerFactory
+import java.net.SocketException
 import java.nio.file.attribute.PosixFilePermission
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
@@ -48,7 +51,9 @@ fun catching(throwingBlock: () -> Unit = {}) {
     } catch (e: VaultException) {
         throw CliktError(e.message)
     } catch (e: ConnectTimeoutException) {
-        throw CliktError("${e.message}. Try configuring proxy: vzd-cli config set httpProxy.enabled true")
+        throw CliktError("${e.message}. Try configuring proxy: vzd-cli config set httpProxy.enabled true or false")
+    } catch (e: SocketException) {
+        throw CliktError("${e.message}. Try configuring proxy: vzd-cli config set httpProxy.enabled true or false")
     } catch (e: io.ktor.http.parsing.ParseException) {
         // another InterOp Issue with REST API
         if (e.message.contains("Expected `=` after parameter key ''")) {
@@ -65,6 +70,11 @@ fun catching(throwingBlock: () -> Unit = {}) {
         }
     }
 }
+
+class CliContext(
+    val globalAPI: GlobalAPI
+)
+
 class Cli : CliktCommand(name = "vzd-cli") {
     init {
         context {
@@ -111,6 +121,21 @@ class Cli : CliktCommand(name = "vzd-cli") {
             root.level = Level.DEBUG
         } else {
             root.level = Level.ERROR
+        }
+        // reduce log level for some FHIR classes, which log obvious things
+        val fhir = LoggerFactory.getLogger("ca.uhn.fhir.context.ModelScanner") as Logger
+        fhir.level = Level.ERROR
+        try {
+            this.javaClass.classLoader.loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider")
+        } catch (e: ClassNotFoundException) {
+            echo("Required jars (BouncyCastle) are not installed. Please force update using `vzd-cli update -r`", err = true)
+        }
+        val globalAPI = GlobalAPI()
+        currentContext.obj = CliContext(globalAPI)
+
+        val version = runBlocking { globalAPI.dailyUpdateCheck() }
+        if (version != BuildConfig.APP_VERSION) {
+            echo("Update is available: $version. Please update using `vzd-cli update`", err = true)
         }
     }
 }
