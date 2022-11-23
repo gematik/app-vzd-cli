@@ -84,6 +84,9 @@ dependencies {
     // Clikt library for creating nice CLI
     implementation("com.github.ajalt.clikt:clikt:3.5.0")
 
+    // Validation framework
+    implementation("org.valiktor:valiktor-core:0.12.0")
+
     // Bouncy castle fpr crypto and certificates processing
     shadow("org.bouncycastle:bcprov-jdk15on:1.70")
     shadow("org.bouncycastle:bcpkix-jdk15on:1.70")
