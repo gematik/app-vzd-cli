@@ -55,6 +55,16 @@ class GlobalAPI {
         val store = GlobalConfigFileStore()
         return store.reset()
     }
+    private fun createHttpClient(): HttpClient {
+        val httpClient = HttpClient(CIO) {
+            engine {
+                if (config.httpProxy.enabled) {
+                    proxy = ProxyBuilder.http(config.httpProxy.proxyURL)
+                }
+            }
+        }
+        return httpClient
+    }
 
     suspend fun getLatestVersion(): String {
         val httpClient = createHttpClient()
@@ -77,15 +87,11 @@ class GlobalAPI {
         return latestRelease.name
     }
 
-    private fun createHttpClient(): HttpClient {
-        val httpClient = HttpClient(CIO) {
-            engine {
-                if (config.httpProxy.enabled) {
-                    proxy = ProxyBuilder.http(config.httpProxy.proxyURL)
-                }
-            }
+    suspend fun dailyUpdateCheck(): String {
+        if ((Instant.now().epochSecond - config.updates.lastCheck) > 24 * 60 * 60) {
+            return getLatestVersion()
         }
-        return httpClient
+        return config.updates.latestRelease
     }
 
     suspend fun installVersion(version: String, progressListener: ProgressListener?) {

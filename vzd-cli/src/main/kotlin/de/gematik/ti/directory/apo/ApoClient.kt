@@ -4,6 +4,10 @@ import ca.uhn.fhir.context.FhirContext
 import de.gematik.ti.directory.util.DirectoryAuthException
 import de.gematik.ti.directory.util.DirectoryException
 import io.ktor.http.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import mu.KotlinLogging
 import org.hl7.fhir.r4.hapi.ctx.FhirR4
 import org.hl7.fhir.r4.model.Bundle
@@ -18,6 +22,7 @@ import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
 
 private val logger = KotlinLogging.logger {}
+private val prettyJson = Json { prettyPrint = true }
 
 class ApoClient(block: Configuration.() -> Unit = {}) {
     private val httpClient: HttpClient
@@ -60,9 +65,12 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
             .GET()
             .build()
 
+        logger.info { request }
+
         val response: HttpResponse<String>
         try {
             response = httpClient.send(request, BodyHandlers.ofString())
+            logger.info { response }
         } catch (e: ConnectException) {
             if (config.httpProxyURL != null) {
                 throw DirectoryAuthException("Unable to connect to proxy server: ${config.httpProxyURL}")
@@ -76,6 +84,9 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
         }
 
         val body = response.body()
+
+        logger.debug { prettyJson.encodeToString(Json.decodeFromString<JsonObject>(body)) }
+
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = parser.parseResource(Bundle::class.java, body)
@@ -91,9 +102,12 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
             .GET()
             .build()
 
+        logger.info { request }
+
         val response: HttpResponse<String>
         try {
             response = httpClient.send(request, BodyHandlers.ofString())
+            logger.info { response }
         } catch (e: ConnectException) {
             if (config.httpProxyURL != null) {
                 throw DirectoryAuthException("Unable to connect to proxy server: ${config.httpProxyURL}")
@@ -107,6 +121,9 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
         }
 
         val body = response.body()
+
+        logger.debug { prettyJson.encodeToString(Json.decodeFromString<JsonObject>(body)) }
+
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = parser.parseResource(Bundle::class.java, body)

@@ -38,22 +38,22 @@ enum class DirectoryEntryKind(val matcher: (DirectoryEntry) -> Boolean) {
 
     HBAGematik({ directoryEntry ->
         directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("9-") && directoryEntry.directoryEntryBase.personalEntry == true
+            it.startsWith("9-1")
         }
     }),
     SMCBGematik({ directoryEntry ->
         directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("9-") && directoryEntry.directoryEntryBase.personalEntry == false
+            it.startsWith("9-2")
         }
     }),
     HBAeGBR({ directoryEntry ->
         directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("10-") && directoryEntry.directoryEntryBase.personalEntry == true
+            it.startsWith("10-67.22")
         }
     }),
     SMCBeGBR({ directoryEntry ->
         directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("10-") && directoryEntry.directoryEntryBase.personalEntry == false
+            it.startsWith("10-67.22")
         }
     }),
 

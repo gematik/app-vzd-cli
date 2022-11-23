@@ -13,7 +13,6 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.apo.ApoCli
-import de.gematik.ti.directory.apo.ApoCliContext
 import de.gematik.ti.directory.cli.admin.AdminCli
 import de.gematik.ti.directory.cli.global.ConfigCommand
 import de.gematik.ti.directory.cli.global.UpdateCommand
@@ -23,6 +22,7 @@ import de.gematik.ti.directory.global.GlobalAPI
 import de.gematik.ti.directory.util.DirectoryException
 import de.gematik.ti.directory.util.VaultException
 import io.ktor.client.network.sockets.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
@@ -122,13 +122,21 @@ class Cli : CliktCommand(name = "vzd-cli") {
         } else {
             root.level = Level.ERROR
         }
+        // reduce log level for some FHIR classes, which log obvious things
+        val fhir = LoggerFactory.getLogger("ca.uhn.fhir.context.ModelScanner") as Logger
+        fhir.level = Level.ERROR
         try {
             this.javaClass.classLoader.loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider")
-        } catch(e: ClassNotFoundException) {
-            throw CliktError("Required jars (BouncyCastle) are not installed. Please force update using `vzd-cli update -r`")
+        } catch (e: ClassNotFoundException) {
+            echo("Required jars (BouncyCastle) are not installed. Please force update using `vzd-cli update -r`", err = true)
         }
         val globalAPI = GlobalAPI()
         currentContext.obj = CliContext(globalAPI)
+
+        val version = runBlocking { globalAPI.dailyUpdateCheck() }
+        if (version != BuildConfig.APP_VERSION) {
+            echo("Update is available: $version. Please update using `vzd-cli update`", err = true)
+        }
     }
 }
 

@@ -4,9 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
 import de.gematik.ti.directory.cli.CliContext
-import de.gematik.ti.directory.cli.admin.AdminCliEnvironmentContext
 import de.gematik.ti.directory.cli.apo.InstanceCommands
-import de.gematik.ti.directory.global.GlobalAPI
 
 class ApoCliContext(
     val apoAPI: ApoAPI
