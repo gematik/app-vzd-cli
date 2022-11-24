@@ -23,7 +23,7 @@ data class DirectoryEntryExtension(
     var kind: DirectoryEntryKind
 )
 
-object DirectoryEntryExtensionSerializer : KSerializer<DirectoryEntry> {
+object DirectoryEntryExtSerializer : KSerializer<DirectoryEntry> {
 
     override val descriptor: SerialDescriptor = DirectoryEntryExtension.serializer().descriptor
 

@@ -1,7 +1,7 @@
 package de.gematik.ti.directory.bff
 
 import de.gematik.ti.directory.admin.AdminAPI
-import de.gematik.ti.directory.admin.DirectoryEntryExtensionSerializer
+import de.gematik.ti.directory.admin.DirectoryEntryExtSerializer
 import de.gematik.ti.directory.global.GlobalAPI
 import de.gematik.ti.directory.util.DirectoryAuthException
 import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
@@ -37,8 +37,8 @@ fun Application.directoryModule() {
                 isLenient = true
                 serializersModule = SerializersModule {
                     contextual(ExtendedCertificateDataDERSerializer)
-                    contextual(DirectoryEntryExtensionSerializer)
-                    contextual(ListSerializer(DirectoryEntryExtensionSerializer))
+                    contextual(DirectoryEntryExtSerializer)
+                    contextual(ListSerializer(DirectoryEntryExtSerializer))
                 }
             }
         )

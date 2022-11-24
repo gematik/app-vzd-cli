@@ -19,6 +19,6 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for directory
             context.client.quickSearch(queryString).directoryEntries
         }
 
-        DirectoryEntryOutputMapping[OutputFormat.TABLE]?.invoke(mapOf("query" to queryString), result)
+        DirectoryEntryListOutputFormatters[OutputFormat.TABLE]?.invoke(mapOf("query" to queryString), result)
     }
 }

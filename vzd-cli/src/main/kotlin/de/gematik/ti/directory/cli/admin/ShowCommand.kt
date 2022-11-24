@@ -17,7 +17,9 @@ class ShowCommand : CliktCommand(name = "show", help = "Show all information abo
     private val outputFormat by option().switch(
         "--human" to OutputFormat.HUMAN,
         "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML
+        "--yaml" to OutputFormat.YAML,
+        "--yaml-ext" to OutputFormat.YAML_EXT,
+        "--json-ext" to OutputFormat.JSON_EXT,
     ).default(OutputFormat.HUMAN)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()
@@ -28,12 +30,10 @@ class ShowCommand : CliktCommand(name = "show", help = "Show all information abo
         val entry = runBlocking { client.readDirectoryEntryByTelematikID(id) }
             ?: throw CliktError("Entry with TelematikID '$id' not found")
 
-        val entryList = listOf(entry)
-
         if (ocspOptions.enableOcsp) {
-            runBlocking { context.adminAPI.expandOCSPStatus(entryList) }
+            runBlocking { context.adminAPI.expandOCSPStatus(listOf(entry)) }
         }
 
-        DirectoryEntryOutputMapping[outputFormat]?.invoke(emptyMap(), entryList)
+        DirectoryEntryOutputFormatters[outputFormat]?.invoke(entry)
     }
 }

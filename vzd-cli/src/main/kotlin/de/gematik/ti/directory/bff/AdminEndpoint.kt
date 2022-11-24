@@ -1,4 +1,4 @@
-@file:UseSerializers(DirectoryEntryExtensionSerializer::class)
+@file:UseSerializers(DirectoryEntryExtSerializer::class)
 
 package de.gematik.ti.directory.bff
 

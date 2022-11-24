@@ -14,7 +14,7 @@ private val optimizedSerializersModule = SerializersModule {
     contextual(ExtendedCertificateDataDERSerializer)
 }
 enum class OutputFormat {
-    HUMAN, JSON, YAML, CSV, SHORT, TABLE
+    HUMAN, JSON, YAML, CSV, SHORT, TABLE, JSON_EXT, YAML_EXT
 }
 
 /**

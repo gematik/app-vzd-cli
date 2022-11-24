@@ -1,7 +1,7 @@
 package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.DirectoryEntry
-import de.gematik.ti.directory.admin.DirectoryEntryExtensionSerializer
+import de.gematik.ti.directory.admin.DirectoryEntryExtSerializer
 import de.gematik.ti.directory.cli.escape
 import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
 import hu.vissy.texttable.dsl.tableFormatter
@@ -33,23 +33,59 @@ val DirectoryEntryCsvHeaders = listOf(
     "specialization"
 )
 
-val HumanDirectoryEntrySerializersModule = SerializersModule {
-    contextual(ExtendedCertificateDataDERSerializer)
-}
-
-private var HumanDirectoryEntry = Yaml {
+var YamlDirectoryEntryExt = Yaml {
     encodeDefaultValues = false
-    serializersModule = HumanDirectoryEntrySerializersModule
+    serializersModule = SerializersModule {
+        contextual(ExtendedCertificateDataDERSerializer)
+    }
 }
 
-val DirectoryEntryOutputMapping = mapOf(
+var JsonDirectoryEntryExt = Json {
+    encodeDefaults = true
+    prettyPrint = true
+    serializersModule = SerializersModule {
+        contextual(ExtendedCertificateDataDERSerializer)
+    }
+}
+
+val DirectoryEntryOutputFormatters = mapOf(
+    OutputFormat.HUMAN to { entry: DirectoryEntry? ->
+        entry?.let {
+            println(HumanDirectoryYaml.encodeToString(DirectoryEntryHumanSerializer, it))
+        }
+    },
+    OutputFormat.YAML to { entry: DirectoryEntry? -> Output.printYaml(entry) },
+    OutputFormat.YAML_EXT to { entry: DirectoryEntry? ->
+        entry?.let {
+            println(YamlDirectoryEntryExt.encodeToString(DirectoryEntryExtSerializer, it))
+        }
+    },
+    OutputFormat.JSON to { entry: DirectoryEntry? -> Output.printJson(entry) },
+    OutputFormat.JSON_EXT to { entry: DirectoryEntry? ->
+        entry?.let {
+            println(JsonDirectoryEntryExt.encodeToString(DirectoryEntryExtSerializer, it))
+        }
+    },
+)
+
+val DirectoryEntryListOutputFormatters = mapOf(
     OutputFormat.HUMAN to { _: Map<String, String>, value: List<DirectoryEntry>? ->
         value?.let {
-            println(HumanDirectoryEntry.encodeToString(ListSerializer(DirectoryEntryExtensionSerializer), it))
+            println(HumanDirectoryYaml.encodeToString(ListSerializer(DirectoryEntryHumanSerializer), it))
         }
     },
     OutputFormat.YAML to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printYaml(value) },
+    OutputFormat.YAML_EXT to { _: Map<String, String>, value: List<DirectoryEntry>? ->
+        value?.let {
+            println(YamlDirectoryEntryExt.encodeToString(ListSerializer(DirectoryEntryExtSerializer), it))
+        }
+    },
     OutputFormat.JSON to { _: Map<String, String>, value: List<DirectoryEntry>? -> Output.printJson(value) },
+    OutputFormat.JSON_EXT to { _: Map<String, String>, value: List<DirectoryEntry>? ->
+        value?.let {
+            println(JsonDirectoryEntryExt.encodeToString(ListSerializer(DirectoryEntryExtSerializer), it))
+        }
+    },
     OutputFormat.SHORT to { _: Map<String, String>, value: List<DirectoryEntry>? ->
         value?.forEach {
             val kims = it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }

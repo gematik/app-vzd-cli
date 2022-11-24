@@ -2,7 +2,10 @@ package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
 import hu.vissy.texttable.dsl.tableFormatter
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
 import java.time.LocalDateTime
 
@@ -20,7 +23,9 @@ val UserCertificateCsvHeaders = listOf(
 
 private var HumanCertificateOutput = Yaml {
     encodeDefaultValues = false
-    serializersModule = HumanDirectoryEntrySerializersModule
+    serializersModule = SerializersModule {
+        contextual(ExtendedCertificateDataDERSerializer)
+    }
 }
 
 val CertificateOutputMapping = mapOf(

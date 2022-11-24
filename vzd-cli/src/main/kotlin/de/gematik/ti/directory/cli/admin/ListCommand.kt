@@ -23,7 +23,9 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
         "--json" to OutputFormat.JSON,
         "--yaml" to OutputFormat.YAML,
         "--csv" to OutputFormat.CSV,
-        "--table" to OutputFormat.TABLE
+        "--table" to OutputFormat.TABLE,
+        "--yaml-ext" to OutputFormat.YAML_EXT,
+        "--json-ext" to OutputFormat.JSON_EXT,
     ).default(OutputFormat.HUMAN)
 
     private val paramFile: Pair<String, String>? by option(
@@ -79,7 +81,7 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
                 print('\uFEFF')
                 Output.printCsv(DirectoryEntryCsvHeaders)
             }
-            DirectoryEntryOutputMapping[outputFormat]?.invoke(params, entries)
+            DirectoryEntryListOutputFormatters[outputFormat]?.invoke(params, entries)
         } finally {
             System.setOut(stdout)
         }
