@@ -7,11 +7,10 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
-import de.gematik.ti.directory.cli.JsonPretty
-import de.gematik.ti.directory.cli.YamlPretty
 import de.gematik.ti.directory.cli.escape
+import de.gematik.ti.directory.cli.toJsonPrettyNoDefaults
+import de.gematik.ti.directory.cli.toYamlNoDefaults
 import de.gematik.ti.directory.util.CertificateDataDER
-import kotlinx.serialization.encodeToString
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
 import org.w3c.dom.Node
@@ -90,9 +89,9 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
 
     private fun writeBaseEntry(base: BaseDirectoryEntry) {
         val jsonPath = outputDir.resolve("${base.telematikID.escape()}.json")
-        jsonPath.writeText(JsonPretty.encodeToString(base))
+        jsonPath.writeText(base.toJsonPrettyNoDefaults())
         val yamlPath = outputDir.resolve("${base.telematikID.escape()}.yaml")
-        yamlPath.writeText(YamlPretty.encodeToString(base))
+        yamlPath.writeText(base.toYamlNoDefaults())
     }
 
     private fun baseEntryFromCert(cert: CertificateDataDER): BaseDirectoryEntry {
@@ -114,7 +113,7 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
         val filenameBase =
             "${cert.certificateInfo.admissionStatement.registrationNumber.escape()}-${cert.certificateInfo.serialNumber}"
         outputDir.resolve("$filenameBase.der").writeBytes(Base64.decode(cert.base64String))
-        outputDir.resolve("$filenameBase.certinfo.yaml").writeText(YamlPretty.encodeToString(cert.certificateInfo))
+        outputDir.resolve("$filenameBase.certinfo.yaml").writeText(cert.certificateInfo.toYamlNoDefaults())
     }
 
     private fun certificates(antrag: Node): Sequence<CertificateDataDER> {

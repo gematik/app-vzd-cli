@@ -24,6 +24,7 @@ import de.gematik.ti.directory.util.VaultException
 import io.ktor.client.network.sockets.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
 import org.slf4j.LoggerFactory
@@ -33,8 +34,20 @@ import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.setPosixFilePermissions
 
-val JsonPretty = Json { prettyPrint = true }
-val YamlPretty = Yaml { encodeDefaultValues = false }
+private val JsonPretty = Json { prettyPrint = true }
+internal inline fun <reified T> T.toJsonPretty(): String = JsonPretty.encodeToString(this)
+
+private val JsonPrettyNoDefaults = Json {
+    prettyPrint = true
+    encodeDefaults = false
+}
+internal inline fun <reified T> T.toJsonPrettyNoDefaults(): String = JsonPrettyNoDefaults.encodeToString(this)
+
+private val YamlNoDefaults = Yaml { encodeDefaultValues = false }
+internal fun Any.toYamlNoDefaults(): String = YamlNoDefaults.encodeToString(this)
+
+private val yaml = Yaml {}
+internal fun Any.toYaml(): String = yaml.encodeToString(this)
 
 /**
  * Must love Kotlin - create a simple try / catch function and use in all classes that throws these exceptions
@@ -134,7 +147,7 @@ class Cli : CliktCommand(name = "vzd-cli") {
         currentContext.obj = CliContext(globalAPI)
 
         val version = runBlocking { globalAPI.dailyUpdateCheck() }
-        if (version != BuildConfig.APP_VERSION) {
+        if (version > BuildConfig.APP_VERSION) {
             echo("Update is available: $version. Please update using `vzd-cli update`", err = true)
         }
     }

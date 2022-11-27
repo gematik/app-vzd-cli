@@ -12,6 +12,8 @@ import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.cli.toJsonPretty
+import de.gematik.ti.directory.cli.toYaml
 import de.gematik.ti.directory.util.CertificateDataDER
 
 class TemplateCommand : CliktCommand(
@@ -23,9 +25,9 @@ class TemplateCommand : CliktCommand(
 ) {
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val outputFormat by option().switch(
-        "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML
-    ).default(OutputFormat.YAML)
+        "--json" to RepresentationFormat.JSON,
+        "--yaml" to RepresentationFormat.YAML
+    ).default(RepresentationFormat.YAML)
     private val resourceType by argument(help = "Specify type of a resource").choice("base", "entry", "cert")
 
     override fun run() = catching {
@@ -76,10 +78,10 @@ class TemplateCommand : CliktCommand(
         }
     }
 
-    private inline fun <reified T> printTemplate(template: T, outputFormat: OutputFormat) {
+    private fun printTemplate(template: Any?, outputFormat: RepresentationFormat) {
         when (outputFormat) {
-            OutputFormat.JSON -> Output.printJson(template)
-            OutputFormat.YAML -> Output.printYaml(template)
+            RepresentationFormat.JSON -> echo(template?.toJsonPretty())
+            RepresentationFormat.YAML -> echo(template?.toYaml())
             else -> throw UsageError("Templates are not available for format: $outputFormat")
         }
     }

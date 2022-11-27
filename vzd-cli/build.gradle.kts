@@ -85,7 +85,7 @@ dependencies {
     implementation("com.github.ajalt.clikt:clikt:3.5.0")
 
     // Validation framework
-    implementation("org.valiktor:valiktor-core:0.12.0")
+    implementation("io.konform:konform-jvm:0.4.0")
 
     // Bouncy castle fpr crypto and certificates processing
     shadow("org.bouncycastle:bcprov-jdk15on:1.70")
@@ -188,5 +188,5 @@ tasks.register<JavaExec>("serve") {
 }
 
 tasks.named<JavaExec>("run") {
-    configurations.add(configurations.shadow.get())
+    classpath = sourceSets["test"].runtimeClasspath
 }

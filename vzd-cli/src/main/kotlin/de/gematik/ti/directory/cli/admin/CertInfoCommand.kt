@@ -10,8 +10,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
-import de.gematik.ti.directory.cli.OcspOptions
-import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.cli.*
 import de.gematik.ti.directory.util.CertificateDataDER
 import kotlinx.coroutines.runBlocking
 import org.bouncycastle.util.encoders.Base64
@@ -20,9 +19,9 @@ import kotlin.io.path.inputStream
 class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of a certificate") {
     private val files by argument().path(mustBeReadable = true, canBeDir = false).multiple()
     private val outputFormat by option().switch(
-        "--yaml" to OutputFormat.YAML,
-        "--json" to OutputFormat.JSON
-    ).default(OutputFormat.YAML)
+        "--yaml" to RepresentationFormat.YAML,
+        "--json" to RepresentationFormat.JSON
+    ).default(RepresentationFormat.YAML)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()
     override fun run() = catching {
@@ -36,8 +35,8 @@ class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of
             }
 
             when (outputFormat) {
-                OutputFormat.JSON -> Output.printJson(certificateInfo)
-                OutputFormat.YAML -> Output.printYaml(certificateInfo)
+                RepresentationFormat.JSON -> echo(certificateInfo.toJsonPrettyNoDefaults())
+                RepresentationFormat.YAML -> echo(certificateInfo.toYamlNoDefaults())
                 else -> throw UsageError("Cant use output format: $outputFormat")
             }
         }

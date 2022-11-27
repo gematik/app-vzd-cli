@@ -10,7 +10,8 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.UpdateBaseDirectoryEntry
-import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.cli.*
+import de.gematik.ti.directory.cli.toYamlNoDefaults
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -18,6 +19,8 @@ import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import java.io.File
+
+private val JsonIgnoreUnknownKeys = Json { ignoreUnknownKeys = true }
 
 class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify single base directory entry") {
     private val logger = KotlinLogging.logger {}
@@ -27,9 +30,9 @@ class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify sing
         help = "Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN"
     )
     private val format by option().switch(
-        "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML
-    ).default(OutputFormat.YAML)
+        "--json" to RepresentationFormat.JSON,
+        "--yaml" to RepresentationFormat.YAML
+    ).default(RepresentationFormat.YAML)
 
     override fun run() = catching {
         val baseFromFile: BaseDirectoryEntry = file?.let {
@@ -39,8 +42,8 @@ class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify sing
             }
         }?.let {
             when (format) {
-                OutputFormat.HUMAN, OutputFormat.YAML -> Yaml.decodeFromString(it)
-                OutputFormat.JSON -> Json.decodeFromString(it)
+                RepresentationFormat.HUMAN, RepresentationFormat.YAML -> Yaml.decodeFromString(it)
+                RepresentationFormat.JSON -> Json.decodeFromString(it)
                 else -> throw CliktError("Unsupported format: $format")
             }
         } ?: run { throw CliktError("Unable to load base entry") }
@@ -55,13 +58,13 @@ class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify sing
 
         val jsonData = Json.encodeToString(baseFromFile)
         val updateBaseDirectoryEntry =
-            Json { ignoreUnknownKeys = true }.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
+            JsonIgnoreUnknownKeys.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
         runBlocking { context.client.modifyDirectoryEntry(dn.uid, updateBaseDirectoryEntry) }
         val result = runBlocking { context.client.readDirectoryEntry(mapOf("uid" to dn.uid)) }
-
+        val firstEntry = result?.first()?.directoryEntryBase
         when (format) {
-            OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)
-            OutputFormat.HUMAN, OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
+            RepresentationFormat.JSON -> echo(firstEntry?.toJsonPrettyNoDefaults())
+            RepresentationFormat.HUMAN, RepresentationFormat.YAML -> echo(firstEntry?.toYamlNoDefaults())
             else -> throw UsageError("Cant load for editing in for format: $format")
         }
     }

@@ -15,12 +15,12 @@ import kotlinx.coroutines.runBlocking
 
 class ShowCommand : CliktCommand(name = "show", help = "Show all information about an entry") {
     private val outputFormat by option().switch(
-        "--human" to OutputFormat.HUMAN,
-        "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML,
-        "--yaml-ext" to OutputFormat.YAML_EXT,
-        "--json-ext" to OutputFormat.JSON_EXT,
-    ).default(OutputFormat.HUMAN)
+        "--human" to RepresentationFormat.HUMAN,
+        "--json" to RepresentationFormat.JSON,
+        "--yaml" to RepresentationFormat.YAML,
+        "--yaml-ext" to RepresentationFormat.YAML_EXT,
+        "--json-ext" to RepresentationFormat.JSON_EXT
+    ).default(RepresentationFormat.HUMAN)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val id by argument()
@@ -34,6 +34,6 @@ class ShowCommand : CliktCommand(name = "show", help = "Show all information abo
             runBlocking { context.adminAPI.expandOCSPStatus(listOf(entry)) }
         }
 
-        DirectoryEntryOutputFormatters[outputFormat]?.invoke(entry)
+        echo(entry.toStringRepresentation(outputFormat))
     }
 }

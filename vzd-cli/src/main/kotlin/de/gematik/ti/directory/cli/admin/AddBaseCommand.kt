@@ -12,6 +12,8 @@ import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.CreateDirectoryEntry
 import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.cli.toJsonPretty
+import de.gematik.ti.directory.cli.toYaml
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
@@ -60,9 +62,9 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (entry exists).").flag()
     private val format by option().switch(
-        "--yaml" to OutputFormat.YAML,
-        "--json" to OutputFormat.JSON
-    ).default(OutputFormat.YAML)
+        "--yaml" to RepresentationFormat.YAML,
+        "--json" to RepresentationFormat.JSON
+    ).default(RepresentationFormat.YAML)
 
     override fun run() = catching {
         val input = inputFile ?: deprecatedFile
@@ -79,8 +81,8 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
 
         val baseDirectoryEntry: BaseDirectoryEntry = data?.let {
             when (format) {
-                OutputFormat.YAML -> Yaml.decodeFromString(it)
-                OutputFormat.JSON -> Json.decodeFromString(it)
+                RepresentationFormat.YAML -> Yaml.decodeFromString(it)
+                RepresentationFormat.JSON -> Json.decodeFromString(it)
                 else -> throw CliktError("Unsupported format: $format")
             }
         } ?: run {
@@ -109,8 +111,8 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
         }
 
         when (format) {
-            OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)
-            OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
+            RepresentationFormat.JSON -> echo(result?.first()?.directoryEntryBase?.toJsonPretty())
+            RepresentationFormat.YAML -> echo(result?.first()?.directoryEntryBase?.toYaml())
             else -> throw UsageError("Cant load for editing in for format: $format")
         }
     }

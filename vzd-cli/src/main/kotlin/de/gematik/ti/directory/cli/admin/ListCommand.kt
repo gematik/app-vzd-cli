@@ -19,14 +19,14 @@ import kotlin.io.path.useLines
 class ListCommand : CliktCommand(name = "list", help = "List directory entries") {
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val outputFormat by option().switch(
-        "--human" to OutputFormat.HUMAN,
-        "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML,
-        "--csv" to OutputFormat.CSV,
-        "--table" to OutputFormat.TABLE,
-        "--yaml-ext" to OutputFormat.YAML_EXT,
-        "--json-ext" to OutputFormat.JSON_EXT,
-    ).default(OutputFormat.HUMAN)
+        "--human" to RepresentationFormat.HUMAN,
+        "--json" to RepresentationFormat.JSON,
+        "--yaml" to RepresentationFormat.YAML,
+        "--csv" to RepresentationFormat.CSV,
+        "--table" to RepresentationFormat.TABLE,
+        "--yaml-ext" to RepresentationFormat.YAML_EXT,
+        "--json-ext" to RepresentationFormat.JSON_EXT
+    ).default(RepresentationFormat.HUMAN)
 
     private val paramFile: Pair<String, String>? by option(
         "-f",
@@ -76,12 +76,7 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
         val stdout = System.`out`
         try {
             outfile?.let { System.setOut(PrintStream(it.outputStream())) }
-
-            if (outputFormat == OutputFormat.CSV) {
-                print('\uFEFF')
-                Output.printCsv(DirectoryEntryCsvHeaders)
-            }
-            DirectoryEntryListOutputFormatters[outputFormat]?.invoke(params, entries)
+            echo(entries.toStringRepresentation(outputFormat))
         } finally {
             System.setOut(stdout)
         }

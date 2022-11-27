@@ -7,6 +7,7 @@ import de.gematik.ti.directory.util.NameInfo
 import de.gematik.ti.directory.util.OCSPResponse
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -16,7 +17,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
 
-var HumanDirectoryYaml = Yaml {
+private var HumanDirectoryEntryYaml = Yaml {
     encodeDefaultValues = false
     serializersModule = SerializersModule {
         contextual(ExtendedCertificateDataDERSerializer)
@@ -26,6 +27,7 @@ var HumanDirectoryYaml = Yaml {
 @Serializable
 private class CertificateShortInfo(
     val subjectInfo: NameInfo,
+    val admissionStatement: AdmissionStatementInfo,
     val issuer: String,
     val publicKeyAlgorithm: String,
     val serialNumber: String,
@@ -34,12 +36,11 @@ private class CertificateShortInfo(
     var ocspResponse: OCSPResponse? = null
 )
 
-
 @Serializable
 private class KIMInfo(
     val fad: String,
     val mail: String,
-    val version: String,
+    val version: String
 )
 
 @Serializable
@@ -83,7 +84,7 @@ private class HumanDirectoryEntry(
     var kim: List<KIMInfo>? = null,
 
     //
-    var kind: DirectoryEntryKind,
+    var kind: DirectoryEntryKind
 )
 
 object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
@@ -129,13 +130,14 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
                 it.userCertificate?.certificateInfo?.let {
                     CertificateShortInfo(
                         subjectInfo = it.subjectInfo,
+                        admissionStatement = it.admissionStatement,
                         issuer = it.issuer,
                         publicKeyAlgorithm = it.publicKeyAlgorithm,
                         serialNumber = it.serialNumber,
                         notBefore = it.notBefore,
                         notAfter = it.notAfter,
                         ocspResponse = it.ocspResponse
-                        )
+                    )
                 }
             },
 
@@ -144,7 +146,6 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
             kind = value.kind
         )
 
-
         encoder.encodeSerializableValue(HumanDirectoryEntry.serializer(), surrogate)
     }
 
@@ -152,3 +153,6 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
         throw NotImplementedError()
     }
 }
+
+fun DirectoryEntry.toHuman() = HumanDirectoryEntryYaml.encodeToString(DirectoryEntryHumanSerializer, this)
+fun List<DirectoryEntry>.toHuman() = HumanDirectoryEntryYaml.encodeToString(ListSerializer(DirectoryEntryHumanSerializer), this)
