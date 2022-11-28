@@ -33,6 +33,7 @@ private class CertificateShortInfo(
     val serialNumber: String,
     val notBefore: String,
     val notAfter: String,
+    val active: Boolean,
     var ocspResponse: OCSPResponse? = null
 )
 
@@ -81,6 +82,8 @@ private class HumanDirectoryEntry(
     var maxKOMLEadr: Int? = null,
 
     var userCertificate: List<CertificateShortInfo>? = null,
+    var smartcards: List<Smartcard>? = null,
+
     var kim: List<KIMInfo>? = null,
 
     //
@@ -127,19 +130,22 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
             maxKOMLEadr = value.directoryEntryBase.maxKOMLEadr,
 
             userCertificate = value.userCertificates?.mapNotNull {
-                it.userCertificate?.certificateInfo?.let {
+                it.userCertificate?.certificateInfo?.let { certInfo ->
                     CertificateShortInfo(
-                        subjectInfo = it.subjectInfo,
-                        admissionStatement = it.admissionStatement,
-                        issuer = it.issuer,
-                        publicKeyAlgorithm = it.publicKeyAlgorithm,
-                        serialNumber = it.serialNumber,
-                        notBefore = it.notBefore,
-                        notAfter = it.notAfter,
-                        ocspResponse = it.ocspResponse
+                        subjectInfo = certInfo.subjectInfo,
+                        admissionStatement = certInfo.admissionStatement,
+                        issuer = certInfo.issuer,
+                        publicKeyAlgorithm = certInfo.publicKeyAlgorithm,
+                        serialNumber = certInfo.serialNumber,
+                        notBefore = certInfo.notBefore,
+                        notAfter = certInfo.notAfter,
+                        active = it.active ?: true,
+                        ocspResponse = certInfo.ocspResponse
                     )
                 }
             },
+
+            smartcards = value.smartcards,
 
             kim = value.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.map { fad1 -> fad1.komLeData?.map { KIMInfo(fad1.dn.ou?.first() ?: "", it.mail, it.version) } ?: emptyList() } } }?.flatten()?.flatten(),
 

@@ -1,5 +1,11 @@
 package de.gematik.ti.directory.admin
 
+val DirectoryEntry.kind: DirectoryEntryKind get() {
+    return DirectoryEntryKind.values().first {
+        it.matcher.invoke(this)
+    }
+}
+
 enum class DirectoryEntryKind(val matcher: (DirectoryEntry) -> Boolean) {
     Arzt({ directoryEntry ->
         directoryEntry.directoryEntryBase.telematikID.let {
