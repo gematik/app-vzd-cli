@@ -199,7 +199,7 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
                             }
                         )
                         // finish with query without localityName
-                        if (tokenizerResult.positions.size > 1) {
+                        if (tokenizerResult.positions.size > 0) {
                             add(
                                 launch {
                                     self.readDirectoryEntry(
