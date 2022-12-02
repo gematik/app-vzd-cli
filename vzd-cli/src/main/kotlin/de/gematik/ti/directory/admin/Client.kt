@@ -162,6 +162,7 @@ class Client(block: Configuration.() -> Unit = {}) {
         parameters: Map<String, String>,
         path: String = "/DirectoryEntries"
     ): List<DirectoryEntry>? {
+        logger.info { "readDirectoryEntry $parameters" }
         val response = http.get(path) {
             for (param in parameters.entries) {
                 parameter(param.key, param.value)

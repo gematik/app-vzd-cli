@@ -1,8 +1,12 @@
 package de.gematik.ti.directory.admin
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import okhttp3.internal.toImmutableList
 
 private val RE_POSTAL_CODE = Regex("^[0-9]{5}\$")
 private val RE_TELEMATIK_ID = Regex("^[0-9]{1,2}-.*$")
@@ -24,14 +28,14 @@ enum class TokenType {
 }
 
 fun String.trailingAsterisk(): String {
-    if (!this.contains("*")) {
-        return "$this*"
+    return if (!this.contains("*")) {
+        "$this*"
     } else {
-        return this
+        this
     }
 }
 
-fun String.asterisks(): String {
+fun String.leadindAndTrailingAsterisks(): String {
     if (!this.contains("*")) {
         return "*$this*"
     } else {
@@ -39,10 +43,33 @@ fun String.asterisks(): String {
     }
 }
 
-class Token(val value: String, val type: TokenType)
+data class TokenPosition(val type: TokenType, val range: IntRange)
 
-object Tokenizer {
-    val LOCALITY_NAMES = lazy {
+data class TokenizerResult(val tokens: List<String>, val positions: List<TokenPosition>) {
+    fun joinAll(): String {
+        return tokens.joinToString(" ")
+    }
+
+    fun join(tokenPosition: TokenPosition): String {
+        return tokens.slice(tokenPosition.range).joinToString(" ")
+    }
+
+    fun joinAllExcept(tokenPosition: TokenPosition): String {
+        return tokens.filterIndexed { index, token ->
+            !(index in tokenPosition.range)
+        }.joinToString(" ")
+    }
+
+    fun subset(subsetPositions: List<TokenPosition>): TokenizerResult {
+        val subsetTokens = tokens.filterIndexed { index, token ->
+            subsetPositions.any { index in it.range }
+        }
+        return TokenizerResult(subsetTokens, subsetPositions)
+    }
+}
+
+object POSTokenizer {
+    private val LOCALITY_NAMES = lazy {
         object {}.javaClass.getResourceAsStream("/PLZ_2021.csv")
             ?.bufferedReader()
             ?.readLines()
@@ -50,138 +77,152 @@ object Tokenizer {
             ?.toSet()
     }
 
-    fun tokenize(query: String, tokensToSkip: List<TokenType> = emptyList()): List<Token> {
-        val strings = query.split(Regex(" ")).filter { it != "" }.toMutableList()
-        val result = mutableListOf<Token>()
+    fun tokenize(query: String): TokenizerResult {
+        val tokens = query.split(Regex(" ")).filter { it != "" }
 
-        if (!tokensToSkip.contains(TokenType.LocalityName)) {
-            consumeLocalityName(strings)?.let {
-                result.add(it)
-            }
-        }
+        val positions = mutableListOf<TokenPosition>()
 
-        strings.forEach { str ->
-            if (RE_POSTAL_CODE.matches(str)) {
-                result.add(Token(str, TokenType.PostalCode))
-            } else if (RE_TELEMATIK_ID.matches(str)) {
-                result.add(Token(str, TokenType.TelematikID))
-            } else if (RE_DOMAIN_ID.matches(str)) {
-                result.add(Token(str, TokenType.DomainID))
-            } else {
-                result.add(Token(str, TokenType.Plain))
-            }
-        }
-
-        return result
-    }
-
-    fun consumeLocalityName(strings: MutableList<String>, start: Int, length: Int): Token? {
-        if (strings.size >= start + length) {
-            var position = start
-            strings.slice(position..strings.size - 1).chunked(length).forEach() {
-                val candidate = it.joinToString(" ")
-                if (LOCALITY_NAMES.value?.contains(candidate.lowercase()) == true) {
-                    var endPos = position + length
-                    if (endPos > strings.size) {
-                        endPos = strings.size
+        // look for 3 ,2 and 1 word localities
+        listOf(3, 2, 1).forEach { localityLength ->
+            if(localityLength > tokens.size) return@forEach
+            // try also with one word offset
+            listOf(0, 1).forEach { offset ->
+                @Suppress("LABEL_NAME_CLASH")
+                if (tokens.size < localityLength+offset) return@forEach
+                tokens.drop(offset).chunked(localityLength).forEachIndexed { index, strings ->
+                    if (strings.size < localityLength) return@forEachIndexed
+                    val candidate = strings.joinToString(" ")
+                    if (LOCALITY_NAMES.value?.contains(candidate.lowercase()) == true) {
+                        val startPos = (index) + offset
+                        val endPos = startPos + localityLength
+                        // only add if we dont have already position in the same range
+                        if (!positions.any { startPos >= it.range.first && endPos-1 <= it.range.last }) {
+                            positions.add(
+                                TokenPosition(
+                                    TokenType.LocalityName,
+                                    startPos until endPos
+                                )
+                            )
+                        }
                     }
-                    strings.subList(position, endPos).clear()
-                    return Token(candidate, TokenType.LocalityName)
                 }
-                position += length
             }
         }
-        return null
-    }
 
-    fun consumeLocalityName(strings: MutableList<String>): Token? {
-        consumeLocalityName(strings, 0, 2)?.let {
-            return it
-        }
-        consumeLocalityName(strings, 0, 3)?.let {
-            return it
-        }
-        // shift to position 1 and try all odd strings
-        consumeLocalityName(strings, 1, 2)?.let {
-            return it
-        }
-        consumeLocalityName(strings, 1, 3)?.let {
-            return it
-        }
-        // final try with one word localities
-        consumeLocalityName(strings, 0, 1)?.let {
-            return it
+        tokens.forEachIndexed { index, token ->
+            if (positions.any { index in it.range }) return@forEachIndexed
+            if (RE_POSTAL_CODE.matches(token)) {
+                positions.add(TokenPosition(TokenType.PostalCode, index until index+1))
+            } else if (RE_TELEMATIK_ID.matches(token)) {
+                positions.add(TokenPosition(TokenType.TelematikID, index until index+1))
+            } else if (RE_DOMAIN_ID.matches(token)) {
+                positions.add(TokenPosition(TokenType.DomainID, index until index+1))
+            } else {
+                positions.add(TokenPosition(TokenType.Plain, index until index+1))
+            }
         }
 
-        return null
+        return TokenizerResult(tokens, positions.toImmutableList())
     }
 }
 
+private fun extractFixedParams(tokenizerResult: TokenizerResult): Pair<Map<String,String>, TokenizerResult> {
+    val namesAndLocalities = mutableListOf<TokenPosition>()
+    val fixedParams = buildMap<String, String> {
+        tokenizerResult.positions.forEach { position ->
+            when (position.type) {
+                TokenType.TelematikID -> {
+                    put("telematikID", tokenizerResult.tokens[position.range.first].trailingAsterisk())
+                }
+                TokenType.PostalCode -> {
+                    put("postalCode", tokenizerResult.tokens[position.range.first])
+                }
+                TokenType.DomainID -> {
+                    put("domainID", tokenizerResult.tokens[position.range.first].trailingAsterisk())
+                }
+                else -> {
+                    namesAndLocalities.add(position)
+                }
+            }
+        }
+        put("baseDirectoryOnly", "true")
+    }
+    return Pair(fixedParams, tokenizerResult.subset(namesAndLocalities))
+}
+
 /**
- * Experimental search. It is a bit messy, because people might have the same names as cities,
- * thats why we fire 2 queries to the server: one with localityName Token and one without.
+ * Experimental search. It is a bit messy, because people might have the same names as localities,
+ * that is why we fire more than one query to the server: with localityName and without.
  */
 suspend fun Client.quickSearch(searchQuery: String): SearchResults {
-    var first: SearchResults? = null
-    var second: SearchResults? = null
+    logger.debug { "QuickSearch query: $searchQuery" }
 
-    withContext(Dispatchers.IO) {
-        val firstTokens = Tokenizer.tokenize(searchQuery)
-        if (firstTokens.firstOrNull { it.type == TokenType.LocalityName } == null) {
-            // all safe, not locality found - just do one query
-            first = quickSearch(searchQuery, firstTokens)
-        } else {
-            val secondTokens = Tokenizer.tokenize(searchQuery, listOf(TokenType.LocalityName))
-            listOf(
-                launch { first = quickSearch(searchQuery, firstTokens) },
-                launch { second = quickSearch(searchQuery, secondTokens) }
-            ).joinAll()
+    val tokenizerResult = POSTokenizer.tokenize(searchQuery)
+
+    val (fixedParams, namesAndLocalities) = extractFixedParams(tokenizerResult)
+
+    logger.info { namesAndLocalities }
+
+    val self = this
+    val entries = buildList {
+        val entriesList = this
+        withContext(Dispatchers.IO) {
+            if (!namesAndLocalities.positions.any { it.type == TokenType.LocalityName}) {
+                // no localities in search query
+                self.readDirectoryEntry(
+                    buildMap {
+                        putAll(fixedParams)
+                        if (namesAndLocalities.positions.isNotEmpty()) {
+                            put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
+                        }
+                    }
+                )?.apply { addAll(this) }
+            } else {
+                // for each locality token query the API
+                // queries are fired in parallel using co-routines
+                buildList {
+                    namesAndLocalities.positions.filter { it.type == TokenType.LocalityName }.forEach { localityPos ->
+                        add(
+                            launch {
+                                self.readDirectoryEntry(
+                                    buildMap {
+                                        putAll(fixedParams)
+                                        put("localityName", namesAndLocalities.join(localityPos).trailingAsterisk())
+                                        if (namesAndLocalities.positions.size > 1) {
+                                            put("displayName", namesAndLocalities.joinAllExcept(localityPos).leadindAndTrailingAsterisks())
+                                        }
+
+                                    }
+                                )?.apply {
+                                    entriesList.addAll(this)
+                                }
+                            }
+                        )
+                        // finish with query without localityName
+                        if (tokenizerResult.positions.size > 1) {
+                            add(
+                                launch {
+                                    self.readDirectoryEntry(
+                                        buildMap {
+                                            putAll(fixedParams)
+                                            put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
+                                        }
+                                    )?.apply {
+                                        entriesList.addAll(this)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }.apply {
+                    logger.info { "Executing $size Admin API calls" }
+                }.joinAll()
+            }
         }
     }
 
     return SearchResults(
         searchQuery = searchQuery,
-        directoryEntries = (second?.directoryEntries ?: emptyList()) + (first?.directoryEntries ?: emptyList())
+        directoryEntries = entries
     )
-}
-
-suspend fun Client.quickSearch(searchQuery: String, tokens: List<Token>): SearchResults {
-    logger.debug { "QuickSearch query: $searchQuery" }
-
-    var reducedQuery = mutableListOf<String>()
-
-    val searchParams = mutableMapOf<String, String>()
-
-    tokens.forEach { token ->
-        when (token.type) {
-            TokenType.TelematikID -> {
-                searchParams["telematikID"] = token.value.trailingAsterisk()
-            }
-            TokenType.PostalCode -> {
-                searchParams["postalCode"] = token.value
-            }
-            TokenType.DomainID -> {
-                searchParams["domainID"] = token.value.trailingAsterisk()
-            }
-            TokenType.LocalityName -> {
-                searchParams["localityName"] = token.value.trailingAsterisk()
-            }
-            TokenType.Plain -> {
-                reducedQuery.add(token.value)
-            }
-        }
-    }
-
-    if (reducedQuery.isNotEmpty()) {
-        searchParams["displayName"] = reducedQuery.joinToString(" ").asterisks()
-    }
-
-    logger.debug { searchParams }
-
-    val entries = mutableListOf<DirectoryEntry>()
-
-    val result = readDirectoryEntry(searchParams + Pair("baseEntryOnly", "true"))
-    entries.addAll(result ?: emptyList())
-
-    return SearchResults(searchQuery, entries)
 }
