@@ -55,13 +55,13 @@ data class TokenizerResult(val tokens: List<String>, val positions: List<TokenPo
     }
 
     fun joinAllExcept(tokenPosition: TokenPosition): String {
-        return tokens.filterIndexed { index, token ->
-            !(index in tokenPosition.range)
+        return tokens.filterIndexed { index, _ ->
+            index !in tokenPosition.range
         }.joinToString(" ")
     }
 
     fun subset(subsetPositions: List<TokenPosition>): TokenizerResult {
-        val subsetTokens = tokens.filterIndexed { index, token ->
+        val subsetTokens = tokens.filterIndexed { index, _ ->
             subsetPositions.any { index in it.range }
         }
         return TokenizerResult(subsetTokens, subsetPositions)
@@ -84,11 +84,11 @@ object POSTokenizer {
 
         // look for 3 ,2 and 1 word localities
         listOf(3, 2, 1).forEach { localityLength ->
-            if(localityLength > tokens.size) return@forEach
+            if (localityLength > tokens.size) return@forEach
             // try also with one word offset
             listOf(0, 1).forEach { offset ->
                 @Suppress("LABEL_NAME_CLASH")
-                if (tokens.size < localityLength+offset) return@forEach
+                if (tokens.size < localityLength + offset) return@forEach
                 tokens.drop(offset).chunked(localityLength).forEachIndexed { index, strings ->
                     if (strings.size < localityLength) return@forEachIndexed
                     val candidate = strings.joinToString(" ")
@@ -112,13 +112,13 @@ object POSTokenizer {
         tokens.forEachIndexed { index, token ->
             if (positions.any { index in it.range }) return@forEachIndexed
             if (RE_POSTAL_CODE.matches(token)) {
-                positions.add(TokenPosition(TokenType.PostalCode, index until index+1))
+                positions.add(TokenPosition(TokenType.PostalCode, index until index + 1))
             } else if (RE_TELEMATIK_ID.matches(token)) {
-                positions.add(TokenPosition(TokenType.TelematikID, index until index+1))
+                positions.add(TokenPosition(TokenType.TelematikID, index until index + 1))
             } else if (RE_DOMAIN_ID.matches(token)) {
-                positions.add(TokenPosition(TokenType.DomainID, index until index+1))
+                positions.add(TokenPosition(TokenType.DomainID, index until index + 1))
             } else {
-                positions.add(TokenPosition(TokenType.Plain, index until index+1))
+                positions.add(TokenPosition(TokenType.Plain, index until index + 1))
             }
         }
 
@@ -126,7 +126,7 @@ object POSTokenizer {
     }
 }
 
-private fun extractFixedParams(tokenizerResult: TokenizerResult): Pair<Map<String,String>, TokenizerResult> {
+private fun extractFixedParams(tokenizerResult: TokenizerResult): Pair<Map<String, String>, TokenizerResult> {
     val namesAndLocalities = mutableListOf<TokenPosition>()
     val fixedParams = buildMap<String, String> {
         tokenizerResult.positions.forEach { position ->
@@ -167,7 +167,7 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
     val entries = buildList {
         val entriesList = this
         withContext(Dispatchers.IO) {
-            if (!namesAndLocalities.positions.any { it.type == TokenType.LocalityName}) {
+            if (!namesAndLocalities.positions.any { it.type == TokenType.LocalityName }) {
                 // no localities in search query
                 self.readDirectoryEntry(
                     buildMap {
@@ -191,7 +191,6 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
                                         if (namesAndLocalities.positions.size > 1) {
                                             put("displayName", namesAndLocalities.joinAllExcept(localityPos).leadindAndTrailingAsterisks())
                                         }
-
                                     }
                                 )?.apply {
                                     entriesList.addAll(this)

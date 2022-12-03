@@ -23,11 +23,11 @@ enum class SmartcardType {
     HBA,
     HBA2_1,
     SMCB,
-    SMCB2_1,
+    SMCB2_1
 }
 
 @Serializable
-data class Smartcard (
+data class Smartcard(
     val type: SmartcardType,
     val notBefore: String,
     val notAfter: String,
@@ -51,7 +51,7 @@ private fun infereSmartcardFrom(entry: DirectoryEntry, index: Int, cert1: Certif
         notBefore = cert1.notBefore,
         notAfter = cert1.notAfter,
         active = entry.userCertificates?.first { it.userCertificate?.certificateInfo?.serialNumber == cert1.serialNumber }?.active ?: false,
-        certificateRefs = if (cert2 != null) listOf(index, index+1) else listOf(index)
+        certificateRefs = if (cert2 != null) listOf(index, index + 1) else listOf(index)
     )
 }
 
@@ -67,15 +67,15 @@ val DirectoryEntry.smartcards: List<Smartcard>? get() {
                     if (cert1 == null) {
                         cert1 = certInfo
                     } else if (certInfo.publicKeyAlgorithm != cert1?.publicKeyAlgorithm) {
-                        add(infereSmartcardFrom(entry, index-1, cert1!!, certInfo))
+                        add(infereSmartcardFrom(entry, index - 1, cert1!!, certInfo))
                         cert1 = null
                     } else {
-                        add(infereSmartcardFrom(entry, index-1, cert1!!))
+                        add(infereSmartcardFrom(entry, index - 1, cert1!!))
                         cert1 = certInfo
                     }
                 }
                 if (cert1 != null) {
-                    add(infereSmartcardFrom(entry, it.size-1, cert1!!))
+                    add(infereSmartcardFrom(entry, it.size - 1, cert1!!))
                 }
             }
         }
@@ -117,4 +117,3 @@ object DirectoryEntryExtSerializer : KSerializer<DirectoryEntry> {
         )
     }
 }
-
