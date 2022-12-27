@@ -91,16 +91,20 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
     }
 
     val ocspResponderURL by lazy {
-        val certHolder = X509CertificateHolder(Base64.decode(base64String))
+        try {
+            val certHolder = X509CertificateHolder(Base64.decode(base64String))
 
-        val aiaExtension = AuthorityInformationAccess.fromExtensions(certHolder.extensions)
+            val aiaExtension = AuthorityInformationAccess.fromExtensions(certHolder.extensions)
 
-        if (aiaExtension != null && aiaExtension.accessDescriptions != null) {
-            aiaExtension.accessDescriptions.asSequence()
-                .filter { ad -> ad.accessMethod == X509ObjectIdentifiers.id_ad_ocsp }
-                .map { ad -> ad.accessLocation.name }
-                .first().toASN1Primitive().toString()
-        } else {
+            if (aiaExtension != null && aiaExtension.accessDescriptions != null) {
+                    aiaExtension.accessDescriptions.asSequence()
+                        .filter { ad -> ad.accessMethod == X509ObjectIdentifiers.id_ad_ocsp }
+                        .map { ad -> ad.accessLocation.name }
+                        .first().toASN1Primitive().toString()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
             null
         }
     }

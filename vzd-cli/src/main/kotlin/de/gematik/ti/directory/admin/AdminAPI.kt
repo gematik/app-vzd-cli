@@ -7,12 +7,7 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-// ktlint-disable enum-entry-name-case
-enum class AdminEnvironment {
-    ru,
-    tu,
-    pu;
-}
+typealias AdminEnvironment = EnvironmentEnum
 
 @Serializable
 data class AdminEnvironmentStatus(

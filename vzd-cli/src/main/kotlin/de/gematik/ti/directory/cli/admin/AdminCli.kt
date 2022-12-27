@@ -41,6 +41,7 @@ class AdminCli :
             VaultCommand(),
             ConfigCommand(),
             StatusCommand(),
+            CertInfoCommand(),
             EnvironmentCommands(AdminEnvironment.pu),
             EnvironmentCommands(AdminEnvironment.ru),
             EnvironmentCommands(AdminEnvironment.tu)
