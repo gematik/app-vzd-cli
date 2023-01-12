@@ -87,6 +87,9 @@ dependencies {
     // Validation framework
     implementation("io.konform:konform-jvm:0.4.0")
 
+    // Proper Dates support
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
     // Bouncy castle fpr crypto and certificates processing
     shadow("org.bouncycastle:bcprov-jdk15on:1.70")
     shadow("org.bouncycastle:bcpkix-jdk15on:1.70")

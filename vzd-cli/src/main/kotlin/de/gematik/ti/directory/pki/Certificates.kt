@@ -1,5 +1,11 @@
 package de.gematik.ti.directory.util
 
+import io.ktor.client.plugins.*
+import io.ktor.server.util.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -21,20 +27,9 @@ import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.util.encoders.Base64
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.*
 
-/**
- * Converts Date object to ISO String
- */
-fun dateToString(date: Date): String {
-    return DateTimeFormatter.ISO_DATE_TIME.format(
-        date.toInstant()
-            .atZone(ZoneId.systemDefault())
-            .toLocalDateTime(),
-    )
-}
+private val timeZone = TimeZone.of("Europe/Berlin")
 
 /**
  * Simple datatype for base64 encoded certificates to differentiate them from plain strings
@@ -67,6 +62,8 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 registrationNumber = admission.registrationNumber,
             )
 
+            println(certificate.notAfter)
+
             CertificateInfo(
                 certificate.subjectX500Principal.name,
                 NameInfo(X500Name(certificate.subjectX500Principal.name)),
@@ -75,8 +72,8 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 certificate.publicKey.algorithm,
                 certificate.serialNumber.toString(),
                 keyUsage,
-                dateToString(certificate.notBefore),
-                dateToString(certificate.notAfter),
+                Instant.fromEpochMilliseconds(certificate.notBefore.time).toLocalDateTime(timeZone),
+                Instant.fromEpochMilliseconds(certificate.notAfter.time).toLocalDateTime(timeZone),
                 admissionInfo,
                 base64String,
                 ocspResponderURL,
@@ -205,8 +202,8 @@ data class CertificateInfo(
     val publicKeyAlgorithm: String,
     val serialNumber: String,
     val keyUsage: List<String>,
-    val notBefore: String,
-    val notAfter: String,
+    val notBefore: LocalDateTime,
+    val notAfter: LocalDateTime,
     val admissionStatement: AdmissionStatementInfo,
     val certData: String,
     val ocspReponderURL: String? = null,

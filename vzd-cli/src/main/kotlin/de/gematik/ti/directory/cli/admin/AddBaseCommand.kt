@@ -32,7 +32,7 @@ fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<String, St
 
         if (property.propertyType == String::class.java) {
             property.writeMethod.invoke(baseDirectoryEntry, value)
-        } else if (property.propertyType == Int::class.java) {
+        } else if (property.propertyType == Int::class.java || property.propertyType == Integer::class.java) {
             property.writeMethod.invoke(baseDirectoryEntry, value.toInt())
         } else if (property.readMethod.genericReturnType.typeName == "java.util.List<java.lang.String>") {
             property.writeMethod.invoke(baseDirectoryEntry, value.split(',').map { it.trim() })

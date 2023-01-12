@@ -1,6 +1,7 @@
 package de.gematik.ti.directory.admin
 
 import de.gematik.ti.directory.util.CertificateInfo
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -29,8 +30,8 @@ enum class SmartcardType {
 @Serializable
 data class Smartcard(
     val type: SmartcardType,
-    val notBefore: String,
-    val notAfter: String,
+    val notBefore: LocalDateTime,
+    val notAfter: LocalDateTime,
     val active: Boolean,
     val certificateRefs: List<Int>,
 )

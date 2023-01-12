@@ -5,6 +5,7 @@ import de.gematik.ti.directory.util.AdmissionStatementInfo
 import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
 import de.gematik.ti.directory.util.NameInfo
 import de.gematik.ti.directory.util.OCSPResponse
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -32,8 +33,8 @@ private class CertificateShortInfo(
     val issuer: String,
     val publicKeyAlgorithm: String,
     val serialNumber: String,
-    val notBefore: String,
-    val notAfter: String,
+    val notBefore: LocalDateTime,
+    val notAfter: LocalDateTime,
     val active: Boolean,
     var ocspResponse: OCSPResponse? = null,
 )
@@ -78,7 +79,8 @@ private class HumanDirectoryEntry(
     var holder: List<String>? = null,
     var dataFromAuthority: Boolean? = null,
     var personalEntry: Boolean? = null,
-    var changeDateTime: String? = null,
+    @Serializable(with = ForgivingLocalDateTimeSerializer::class)
+    var changeDateTime: LocalDateTime? = null,
 
     // Internal
     var maxKOMLEadr: Int? = null,

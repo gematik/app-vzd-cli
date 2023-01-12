@@ -95,7 +95,7 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
     }
 
     private fun baseEntryFromCert(cert: CertificateDataDER): BaseDirectoryEntry {
-        val base = BaseDirectoryEntry(cert.certificateInfo.admissionStatement.registrationNumber)
+        val base = BaseDirectoryEntry(cert.certificateInfo.admissionStatement.registrationNumber, entryType = 1)
         base.displayName = cert.certificateInfo.subjectInfo.cn
         base.givenName = cert.certificateInfo.subjectInfo.givenName
         base.sn = cert.certificateInfo.subjectInfo.sn
@@ -126,7 +126,7 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
     }
 
     private fun institutionToBaseEntry(antrag: Node): BaseDirectoryEntry {
-        val base = BaseDirectoryEntry(xpath.evaluate("Institution/TelematikID", antrag))
+        val base = BaseDirectoryEntry(xpath.evaluate("Institution/TelematikID", antrag), entryType = 1)
         base.displayName = evalString("Institution/InstName", antrag)
         base.streetAddress = evalString("Institution/Anschrift/StrassenAdresse/Strasse", antrag) + " " + evalString("Institution/Anschrift/StrassenAdresse/Hausnummer", antrag)
         base.postalCode = evalString("Institution/Anschrift/StrassenAdresse/Postleitzahl", antrag)

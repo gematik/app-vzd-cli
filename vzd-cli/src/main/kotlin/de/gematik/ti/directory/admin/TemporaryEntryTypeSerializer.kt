@@ -17,9 +17,7 @@ object TemporaryEntryTypeSerializer : KSerializer<Int?> {
     private val intListSerializer: KSerializer<List<Int>> = ListSerializer(Int.serializer())
 
     override fun serialize(encoder: Encoder, value: Int?) {
-        if (value != null) {
-            encoder.encodeInt(value)
-        }
+        value?.apply { encoder.encodeInt(value) }
     }
 
     override fun deserialize(decoder: Decoder): Int? {
@@ -27,9 +25,9 @@ object TemporaryEntryTypeSerializer : KSerializer<Int?> {
             decoder.decodeInt()
         } catch (e: Throwable) {
             try {
-                decoder.decodeSerializableValue(intListSerializer).first()
+                decoder.decodeSerializableValue(intListSerializer).firstOrNull()
             } catch (ee: Throwable) {
-                decoder.decodeNull()
+                null
             }
         }
     }

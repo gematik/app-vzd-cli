@@ -11,7 +11,6 @@ import hu.vissy.texttable.dsl.tableFormatter
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
-import java.time.LocalDateTime
 
 val UserCertificateCsvHeaders = listOf(
     "uid",
@@ -111,7 +110,7 @@ fun List<UserCertificate>.toTable(): String {
         labeled("Not After") {
             extractor { cert ->
                 runCatching {
-                    LocalDateTime.parse(cert.certificateInfo.notAfter).toLocalDate()
+                    cert.certificateInfo.notAfter
                 }.getOrNull()
             }
         }
