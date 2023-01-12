@@ -79,9 +79,13 @@ class TemplateCommand : CliktCommand(
         }
     }
 
-    private fun printTemplate(template: Any?, outputFormat: RepresentationFormat) {
+    private fun printTemplate(template: Any, outputFormat: RepresentationFormat) {
         when (outputFormat) {
-            RepresentationFormat.JSON -> echo(template?.toJsonPretty())
+            RepresentationFormat.JSON -> when (template) {
+                is BaseDirectoryEntry -> echo(template.toJsonPretty())
+                is DirectoryEntry -> echo(template.toJsonPretty())
+                is UserCertificate -> echo(template.toJsonPretty())
+            }
             RepresentationFormat.YAML -> echo(template?.toYaml())
             else -> throw UsageError("Templates are not available for format: $outputFormat")
         }

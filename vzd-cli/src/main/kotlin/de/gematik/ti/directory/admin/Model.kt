@@ -114,6 +114,7 @@ data class UpdateBaseDirectoryEntry(
     var domainID: List<String>? = null,
     var holder: List<String>? = null,
     var maxKOMLEadr: Int? = null,
+    var meta: List<String>? = null,
 )
 
 /**

@@ -1,12 +1,10 @@
 = Changelog `vzd-cli`
 
 == Version 2.2.0
+- Kompatibilität mit VZD 3.2.0 (Admin API 1.9.4)
 - `--human` Output Format ist jetzt deutlich kompakter und lesbar
 - Neue Output Formate: `--yaml-ext` und `--json-ext`
-- Validierung impliementiert
 - Zertifikate werden zu Smartcards gebündelt
-- GUI: Anzeige der Mehrwertdaten aus dem ApoVZD
-- GUI: Anzeige der Texte zur Codes (ProfessionOID, specialisation)
 
 == Version 2.1.0
 - CLI Interface wurde weitgehend überarbeiten un vereinfacht, s. Dokumentation
