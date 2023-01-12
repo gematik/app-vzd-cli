@@ -27,19 +27,19 @@ class ModifyBaseAttrCommand : CliktCommand(name = "modify-base-attr", help = "Mo
 
     private val format by option().switch(
         "--yaml" to RepresentationFormat.YAML,
-        "--json" to RepresentationFormat.JSON
+        "--json" to RepresentationFormat.JSON,
     ).default(RepresentationFormat.YAML)
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
-        help = "Specify query parameters to find matching entries"
+        help = "Specify query parameters to find matching entries",
     ).associate()
     private val parameterOptions by ParameterOptions()
     private val attrs: Map<String, String> by option(
         "-s",
         "--set",
         metavar = "ATTR=VALUE",
-        help = "Set the attribute value in BaseDirectoryEntry."
+        help = "Set the attribute value in BaseDirectoryEntry.",
     ).associate()
 
     override fun run() = catching {

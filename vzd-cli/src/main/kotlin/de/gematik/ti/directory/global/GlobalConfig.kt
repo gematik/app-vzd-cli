@@ -9,20 +9,20 @@ import java.nio.file.Path
 @Serializable
 data class HttpProxyConfig(
     var proxyURL: String,
-    var enabled: Boolean
+    var enabled: Boolean,
 )
 
 @Serializable
 data class UpdatesConfig(
     var preReleasesEnabled: Boolean,
     var lastCheck: Long,
-    var latestRelease: String
+    var latestRelease: String,
 )
 
 @Serializable
 data class GlobalConfig(
     var httpProxy: HttpProxyConfig,
-    var updates: UpdatesConfig
+    var updates: UpdatesConfig,
 )
 
 internal class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<GlobalConfig>(
@@ -31,15 +31,15 @@ internal class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjec
         GlobalConfig(
             httpProxy = HttpProxyConfig(
                 proxyURL = "http://192.168.110.10:3128/",
-                enabled = false
+                enabled = false,
             ),
             updates = UpdatesConfig(
                 preReleasesEnabled = false,
                 lastCheck = -1,
-                latestRelease = BuildConfig.APP_VERSION
-            )
+                latestRelease = BuildConfig.APP_VERSION,
+            ),
         )
     },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
-    customConfigPath
+    customConfigPath,
 )

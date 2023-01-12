@@ -20,7 +20,7 @@ class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of
     private val files by argument().path(mustBeReadable = true, canBeDir = false).multiple()
     private val outputFormat by option().switch(
         "--yaml" to RepresentationFormat.YAML,
-        "--json" to RepresentationFormat.JSON
+        "--json" to RepresentationFormat.JSON,
     ).default(RepresentationFormat.YAML)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()

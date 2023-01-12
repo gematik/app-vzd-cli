@@ -2,15 +2,15 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-version = "2.2.0"
+version = "2.2.0-beta1"
 
-val ktorVersion = "2.1.2"
-val kotestVersion = "5.5.2"
+val ktorVersion = "2.2.2"
+val kotestVersion = "5.5.4"
 val hapiVersion = "6.1.3"
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
-    kotlin("plugin.serialization").version("1.7.20")
+    id("org.jetbrains.kotlin.jvm") version "1.8.0"
+    kotlin("plugin.serialization").version("1.8.0")
     id("com.github.johnrengelman.shadow").version("7.1.2")
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
     // Apply the application plugin to add support for building a CLI application in Java.
@@ -63,7 +63,7 @@ dependencies {
     // implementation("org.ldaptive:ldaptive:2.1.1")
 
     // Text-GUI: Progressbar
-    implementation("me.tongfei:progressbar:0.9.3")
+    implementation("me.tongfei:progressbar:0.9.5")
     // Text-GUI: Text Tables
     implementation("hu.vissy.plain-text-table:ptt-kotlin:1.1.7")
     implementation("hu.vissy.plain-text-table:ptt-core:3.0.0")

@@ -85,7 +85,7 @@ fun catching(throwingBlock: () -> Unit = {}) {
 }
 
 class CliContext(
-    val globalAPI: GlobalAPI
+    val globalAPI: GlobalAPI,
 )
 
 class Cli : CliktCommand(name = "vzd-cli") {
@@ -93,7 +93,7 @@ class Cli : CliktCommand(name = "vzd-cli") {
         context {
             helpFormatter = CliktHelpFormatter(
                 requiredOptionMarker = "*",
-                showDefaultValues = true
+                showDefaultValues = true,
             )
         }
     }
@@ -109,7 +109,7 @@ class Cli : CliktCommand(name = "vzd-cli") {
             ApoCli(),
             GuiCommand(),
             PersCommand(),
-            CompletionCommand()
+            CompletionCommand(),
         )
         val configDir = Path(System.getProperty("user.home"), ".telematik")
         if (!configDir.toFile().exists()) {
@@ -120,8 +120,8 @@ class Cli : CliktCommand(name = "vzd-cli") {
                 setOf(
                     PosixFilePermission.OWNER_READ,
                     PosixFilePermission.OWNER_WRITE,
-                    PosixFilePermission.OWNER_EXECUTE
-                )
+                    PosixFilePermission.OWNER_EXECUTE,
+                ),
             )
         } catch (e: UnsupportedOperationException) {} // ignore this exception on windows
     }

@@ -18,13 +18,13 @@ class LoadBaseCommand : CliktCommand(name = "load-base", help = "Load the base e
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
-        help = "Specify query parameters to find matching entries"
+        help = "Specify query parameters to find matching entries",
     ).associate()
     private val parameterOptions by ParameterOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val format by option().switch(
         "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML
+        "--yaml" to RepresentationFormat.YAML,
     ).default(RepresentationFormat.YAML)
 
     private val json = Json {

@@ -69,7 +69,7 @@ class TestClient {
             displayName = "Uniklinik Entenhausen (modified)",
             domainID = directoryEntry.directoryEntryBase!!.domainID,
             postalCode = "54321",
-            holder = listOf("gematik_test")
+            holder = listOf("gematik_test"),
         )
 
         runBlocking { client?.modifyDirectoryEntry(dn.uid, updateDirectoryEntry) }

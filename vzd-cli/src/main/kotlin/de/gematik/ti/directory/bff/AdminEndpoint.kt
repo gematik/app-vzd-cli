@@ -18,7 +18,7 @@ import java.io.IOException
 @Serializable
 data class LoginWithVaultRepresentation(
     val env: AdminEnvironment,
-    val vaultPassword: String
+    val vaultPassword: String,
 )
 
 @Serializable

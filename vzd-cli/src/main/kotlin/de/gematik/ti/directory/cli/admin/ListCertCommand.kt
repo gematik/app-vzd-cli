@@ -27,18 +27,18 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
         "--json" to RepresentationFormat.JSON,
         "--yaml" to RepresentationFormat.YAML,
         "--csv" to RepresentationFormat.CSV,
-        "--table" to RepresentationFormat.TABLE
+        "--table" to RepresentationFormat.TABLE,
     ).default(RepresentationFormat.TABLE)
     private val paramFile: Pair<String, String>? by option(
         "-f",
         "--param-file",
         help = "Read parameter values from file",
-        metavar = "PARAM FILENAME"
+        metavar = "PARAM FILENAME",
     ).pair()
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
-        help = "Specify query parameters to find matching entries"
+        help = "Specify query parameters to find matching entries",
     ).associate()
     private val outfile by option("-o", "--outfile", help = "Write output to file").path(mustExist = false, canBeDir = false, canBeFile = true)
     private val parameterOptions by ParameterOptions()

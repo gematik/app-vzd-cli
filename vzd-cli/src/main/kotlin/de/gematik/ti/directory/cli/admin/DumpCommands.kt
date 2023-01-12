@@ -50,7 +50,7 @@ class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the da
         subcommands(
             DumpCreateCommand(),
             DumpOcspCommand(),
-            DumpSaveCert()
+            DumpSaveCert(),
         )
     }
 
@@ -62,13 +62,13 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         "-f",
         "--param-file",
         help = "Read parameter values from file",
-        metavar = "PARAM FILENAME"
+        metavar = "PARAM FILENAME",
     ).pair()
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
         metavar = "PARAM=VALUE",
-        help = "Specify query parameters to find matching entries"
+        help = "Specify query parameters to find matching entries",
     ).associate()
     private val cursorSize by option("-c", "--cursor-size", help = "Size of the cursor per HTTP Request")
         .int().default(500)

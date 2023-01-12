@@ -40,7 +40,7 @@ fun Application.directoryModule() {
                     contextual(DirectoryEntryExtSerializer)
                     contextual(ListSerializer(DirectoryEntryExtSerializer))
                 }
-            }
+            },
         )
     }
     install(Resources)

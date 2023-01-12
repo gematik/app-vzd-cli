@@ -13,12 +13,12 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 class AdminCliContext(
-    val adminAPI: AdminAPI
+    val adminAPI: AdminAPI,
 )
 
 class AdminCliEnvironmentContext(
     val adminAPI: AdminAPI,
-    var env: AdminEnvironment
+    var env: AdminEnvironment,
 ) {
 
     val client by lazy {
@@ -44,7 +44,7 @@ class AdminCli :
             CertInfoCommand(),
             EnvironmentCommands(AdminEnvironment.pu),
             EnvironmentCommands(AdminEnvironment.ru),
-            EnvironmentCommands(AdminEnvironment.tu)
+            EnvironmentCommands(AdminEnvironment.tu),
         )
     }
 }
@@ -73,7 +73,7 @@ class EnvironmentCommands(env: AdminEnvironment) : CliktCommand(name = env.name,
             DeleteCertCommand(),
             ClearCertCommand(),
             CertInfoCommand(),
-            DumpCommand()
+            DumpCommand(),
         )
     }
 

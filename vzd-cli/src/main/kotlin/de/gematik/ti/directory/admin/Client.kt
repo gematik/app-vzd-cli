@@ -143,7 +143,7 @@ class Client(block: Configuration.() -> Unit = {}) {
     suspend fun readDirectoryEntryV2(
         parameters: Map<String, String>,
         cursorSize: Int = 100,
-        cookie: String? = null
+        cookie: String? = null,
     ): ReadDirectoryEntryForSyncResponse? {
         return fetchNextEntries(parameters, cursorSize, cookie)
     }
@@ -160,7 +160,7 @@ class Client(block: Configuration.() -> Unit = {}) {
      */
     suspend fun readDirectoryEntry(
         parameters: Map<String, String>,
-        path: String = "/DirectoryEntries"
+        path: String = "/DirectoryEntries",
     ): List<DirectoryEntry>? {
         logger.info { "readDirectoryEntry $parameters" }
         val response = http.get(path) {
@@ -187,7 +187,7 @@ class Client(block: Configuration.() -> Unit = {}) {
     suspend fun streamDirectoryEntriesPaging(
         parameters: Map<String, String>,
         cursorSize: Int = 100,
-        sink: (entry: DirectoryEntry) -> Unit
+        sink: (entry: DirectoryEntry) -> Unit,
     ) {
         var cookie: String? = null
         coroutineScope {

@@ -61,7 +61,7 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
                 Secret(
                     it.groups[1]!!.value,
                     it.groups[2]!!.value,
-                    getSecret(alias)!!
+                    getSecret(alias)!!,
                 )
             }
         }
@@ -100,7 +100,7 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
             Secret(
                 it.groups[1]!!.value,
                 it.groups[2]!!.value,
-                getSecret(alias)!!
+                getSecret(alias)!!,
             )
         }
     }

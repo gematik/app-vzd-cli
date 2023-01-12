@@ -16,7 +16,7 @@ private val RE_DOMAIN_ID = Regex("^[0-9]{6,}")
 data class SearchResults(
     val searchQuery: String,
     @Contextual
-    val directoryEntries: List<DirectoryEntry>
+    val directoryEntries: List<DirectoryEntry>,
 )
 
 enum class TokenType {
@@ -24,7 +24,7 @@ enum class TokenType {
     PostalCode,
     TelematikID,
     LocalityName,
-    DomainID;
+    DomainID,
 }
 
 fun String.trailingAsterisk(): String {
@@ -100,8 +100,8 @@ object POSTokenizer {
                             positions.add(
                                 TokenPosition(
                                     TokenType.LocalityName,
-                                    startPos until endPos
-                                )
+                                    startPos until endPos,
+                                ),
                             )
                         }
                     }
@@ -175,7 +175,7 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
                         if (namesAndLocalities.positions.isNotEmpty()) {
                             put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
                         }
-                    }
+                    },
                 )?.apply { addAll(this) }
             } else {
                 // for each locality token query the API
@@ -191,11 +191,11 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
                                         if (namesAndLocalities.positions.size > 1) {
                                             put("displayName", namesAndLocalities.joinAllExcept(localityPos).leadindAndTrailingAsterisks())
                                         }
-                                    }
+                                    },
                                 )?.apply {
                                     entriesList.addAll(this)
                                 }
-                            }
+                            },
                         )
                         // finish with query without localityName
                         if (tokenizerResult.positions.size > 0) {
@@ -205,11 +205,11 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
                                         buildMap {
                                             putAll(fixedParams)
                                             put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
-                                        }
+                                        },
                                     )?.apply {
                                         entriesList.addAll(this)
                                     }
-                                }
+                                },
                             )
                         }
                     }
@@ -222,6 +222,6 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
 
     return SearchResults(
         searchQuery = searchQuery,
-        directoryEntries = entries
+        directoryEntries = entries,
     )
 }

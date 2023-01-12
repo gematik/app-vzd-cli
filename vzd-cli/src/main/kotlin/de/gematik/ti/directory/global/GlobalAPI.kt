@@ -32,7 +32,7 @@ data class Release(
     @SerialName("prerelease")
     val preRelease: Boolean,
     @SerialName("published_at")
-    val publishedAt: String
+    val publishedAt: String,
 )
 
 const val GITHUB_RELEASES_URL = "https://api.github.com/repos/gematik/app-vzd-cli/releases"

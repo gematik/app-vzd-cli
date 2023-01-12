@@ -17,15 +17,15 @@ class TestPaging : FeatureSpec({
             runBlocking {
                 val withOutPaging = client?.readDirectoryEntryForSync(
                     mapOf(
-                        "telematikID" to "9-*"
-                    )
+                        "telematikID" to "9-*",
+                    ),
                 )?.size
                 var withPaging = 0
                 client?.streamDirectoryEntriesPaging(
                     mapOf(
-                        "telematikID" to "9-*"
+                        "telematikID" to "9-*",
                     ),
-                    3
+                    3,
                 ) {
                     withPaging++
                 }

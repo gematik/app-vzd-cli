@@ -21,13 +21,13 @@ class ClearCertCommand : CliktCommand(name = "clear-cert", help = "Clear all cer
         "-f",
         "--param-file",
         help = "Read parameter values from file",
-        metavar = "PARAM FILENAME"
+        metavar = "PARAM FILENAME",
     ).pair()
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
         help = "Specify query parameters to find matching entries",
-        metavar = "PARAM=VALUE"
+        metavar = "PARAM=VALUE",
     ).associate()
     private val parameterOptions by ParameterOptions()
 

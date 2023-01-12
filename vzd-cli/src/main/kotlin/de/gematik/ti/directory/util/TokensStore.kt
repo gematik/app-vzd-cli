@@ -21,7 +21,7 @@ class TokenStore(customConfigPath: Path? = null) : FileObjectStore<List<TokenSto
     "directory-tokens.yaml",
     { emptyList() },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
-    customConfigPath
+    customConfigPath,
 ) {
 
     fun accessTokenFor(url: String): TokenStoreItem? {

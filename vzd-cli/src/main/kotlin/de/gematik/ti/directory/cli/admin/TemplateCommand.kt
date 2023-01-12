@@ -21,12 +21,12 @@ class TemplateCommand : CliktCommand(
     help = """Create template for a resource
      
      Supported types: base, entry, cert
-"""
+""",
 ) {
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val outputFormat by option().switch(
         "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML
+        "--yaml" to RepresentationFormat.YAML,
     ).default(RepresentationFormat.YAML)
     private val resourceType by argument(help = "Specify type of a resource").choice("base", "entry", "cert")
 
@@ -43,7 +43,7 @@ class TemplateCommand : CliktCommand(
             localityName = "Berlin",
             stateOrProvinceName = "Berlin",
             title = "Dr.",
-            domainID = listOf("vzd-cli")
+            domainID = listOf("vzd-cli"),
         )
         when (resourceType) {
             "base" -> {
@@ -56,22 +56,22 @@ class TemplateCommand : CliktCommand(
                         userCertificates = listOf(
                             UserCertificate(
                                 userCertificate = CertificateDataDER("BASE64"),
-                                description = "Benutzt Zertifikat in DES (CRT) Binärformat konfertiert nach String mittels BASE64"
+                                description = "Benutzt Zertifikat in DES (CRT) Binärformat konfertiert nach String mittels BASE64",
 
-                            )
-                        )
+                            ),
+                        ),
                     ),
-                    outputFormat
+                    outputFormat,
                 )
             }
             "cert" -> {
                 printTemplate(
                     UserCertificate(
                         userCertificate = CertificateDataDER("BASE64"),
-                        description = "Benutzt Zertifikat in DES (CRT) Binärformat konvertiert nach String mittels BASE64"
+                        description = "Benutzt Zertifikat in DES (CRT) Binärformat konvertiert nach String mittels BASE64",
 
                     ),
-                    outputFormat
+                    outputFormat,
                 )
             }
             else -> throw UsageError("Undefinded resource type: $resourceType")

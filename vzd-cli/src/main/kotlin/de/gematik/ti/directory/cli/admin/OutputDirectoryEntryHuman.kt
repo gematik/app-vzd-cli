@@ -7,7 +7,9 @@ import de.gematik.ti.directory.util.NameInfo
 import de.gematik.ti.directory.util.OCSPResponse
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.IntArraySerializer
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -34,14 +36,14 @@ private class CertificateShortInfo(
     val notBefore: String,
     val notAfter: String,
     val active: Boolean,
-    var ocspResponse: OCSPResponse? = null
+    var ocspResponse: OCSPResponse? = null,
 )
 
 @Serializable
 private class KIMInfo(
     val fad: String,
     val mail: String,
-    val version: String
+    val version: String,
 )
 
 @Serializable
@@ -70,7 +72,8 @@ private class HumanDirectoryEntry(
     // Professional
     var professionOID: List<String>? = null,
     var specialization: List<String>? = null,
-    var entryType: List<String>? = null,
+    @Serializable(with = TemporaryEntryTypeSerializer::class)
+    var entryType: Any? = null,
 
     // System
     var holder: List<String>? = null,
@@ -87,7 +90,7 @@ private class HumanDirectoryEntry(
     var kim: List<KIMInfo>? = null,
 
     //
-    var kind: DirectoryEntryKind
+    var kind: DirectoryEntryKind,
 )
 
 object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
@@ -140,7 +143,7 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
                         notBefore = certInfo.notBefore,
                         notAfter = certInfo.notAfter,
                         active = it.active ?: true,
-                        ocspResponse = certInfo.ocspResponse
+                        ocspResponse = certInfo.ocspResponse,
                     )
                 }
             },
@@ -149,7 +152,7 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
 
             kim = value.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.map { fad1 -> fad1.komLeData?.map { KIMInfo(fad1.dn.ou?.first() ?: "", it.mail, it.version) } ?: emptyList() } } }?.flatten()?.flatten(),
 
-            kind = value.kind
+            kind = value.kind,
         )
 
         encoder.encodeSerializableValue(HumanDirectoryEntry.serializer(), surrogate)

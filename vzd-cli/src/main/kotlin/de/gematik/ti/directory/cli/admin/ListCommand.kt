@@ -25,20 +25,20 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
         "--csv" to RepresentationFormat.CSV,
         "--table" to RepresentationFormat.TABLE,
         "--yaml-ext" to RepresentationFormat.YAML_EXT,
-        "--json-ext" to RepresentationFormat.JSON_EXT
+        "--json-ext" to RepresentationFormat.JSON_EXT,
     ).default(RepresentationFormat.HUMAN)
 
     private val paramFile: Pair<String, String>? by option(
         "-f",
         "--param-file",
         help = "Read parameter values from file",
-        metavar = "PARAM FILENAME"
+        metavar = "PARAM FILENAME",
     ).pair()
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
         help = "Specify query parameters to find matching entries",
-        metavar = "NAME=VALUE"
+        metavar = "NAME=VALUE",
     ).associate()
     private val outfile by option("-o", "--outfile", help = "Write output to file").path(mustExist = false, canBeDir = false, canBeFile = true)
     private val parameterOptions by ParameterOptions()

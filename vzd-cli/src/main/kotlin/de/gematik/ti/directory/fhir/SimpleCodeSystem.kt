@@ -7,13 +7,13 @@ import kotlinx.serialization.json.Json
 @Serializable
 class SimpleConcept(
     val code: String,
-    val display: String
+    val display: String,
 )
 
 @Serializable
 class SimpleCodeSystem(
     val name: String,
-    val concept: List<SimpleConcept>
+    val concept: List<SimpleConcept>,
 ) {
     fun displayFor(code: String): String {
         return concept.firstOrNull { it.code == code }?.display ?: code

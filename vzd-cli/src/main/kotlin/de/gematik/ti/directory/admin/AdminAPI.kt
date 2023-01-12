@@ -13,12 +13,12 @@ typealias AdminEnvironment = EnvironmentEnum
 data class AdminEnvironmentStatus(
     val env: String,
     val accessTokenClaims: Map<String, String>?,
-    val backendInfo: InfoObject?
+    val backendInfo: InfoObject?,
 )
 
 @Serializable
 data class AdminStatus(
-    val environmentStatus: List<AdminEnvironmentStatus>
+    val environmentStatus: List<AdminEnvironmentStatus>,
 )
 
 class AdminAPI(val globalAPI: GlobalAPI) {
@@ -73,11 +73,11 @@ class AdminAPI(val globalAPI: GlobalAPI) {
             AdminEnvironmentStatus(
                 it.key,
                 tokenStore.claimsFor(it.value.apiURL),
-                backendInfo
+                backendInfo,
             )
         }
         return AdminStatus(
-            envInfoList
+            envInfoList,
         )
     }
 
@@ -91,7 +91,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
 
         val auth = ClientCredentialsAuthenticator(
             envcfg.authURL,
-            if (globalAPI.config.httpProxy.enabled) globalAPI.config.httpProxy.proxyURL else null
+            if (globalAPI.config.httpProxy.enabled) globalAPI.config.httpProxy.proxyURL else null,
         )
         val authResponse = auth.authenticate(clientID, clientSecret)
 

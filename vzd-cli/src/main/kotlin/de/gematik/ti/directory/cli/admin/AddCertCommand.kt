@@ -45,7 +45,7 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
                     try {
                         context.client.addDirectoryEntryCertificate(
                             it.directoryEntryBase.dn?.uid!!,
-                            userCertificate
+                            userCertificate,
                         )
                         echo("Added certificate: telematikID=${userCertificate.userCertificate?.certificateInfo?.admissionStatement?.registrationNumber} serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber}")
                     } catch (e: AdminResponseException) {

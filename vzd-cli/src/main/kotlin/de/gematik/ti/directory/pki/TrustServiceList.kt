@@ -36,19 +36,19 @@ object TrustServiceListAddresses {
 }
 
 enum class TrustServiceType(val uri: String) {
-    CA_NON_QES("http://uri.etsi.org/TrstSvc/Svctype/CA/PKC")
+    CA_NON_QES("http://uri.etsi.org/TrstSvc/Svctype/CA/PKC"),
 }
 
 @Serializable
 data class CAService(
     val env: TrustEnvironment,
     val name: String,
-    val caCertificate: CertificateDataDER
+    val caCertificate: CertificateDataDER,
 )
 
 @Serializable
 data class TrustedServiceList(
-    val caServices: List<CAService>
+    val caServices: List<CAService>,
 )
 
 @Serializable
@@ -56,7 +56,7 @@ data class TrustedServiceListCache(
     val tu: TrustedServiceList? = null,
     val ru: TrustedServiceList? = null,
     val pu: TrustedServiceList? = null,
-    val lastModified: Long = Instant.now().epochSecond
+    val lastModified: Long = Instant.now().epochSecond,
 ) {
     val caServices by lazy {
         val result = mutableListOf<CAService>()

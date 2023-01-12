@@ -68,7 +68,7 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
             val cache = TrustedServiceListCache(
                 TSLLoader(httpClient).load(TrustEnvironment.TU),
                 TSLLoader(httpClient).load(TrustEnvironment.RU),
-                TSLLoader(httpClient).load(TrustEnvironment.PU)
+                TSLLoader(httpClient).load(TrustEnvironment.PU),
             )
             TrustedServiceListCache.save(cache)
             cache
@@ -91,7 +91,7 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
             val certificateID = CertificateID(
                 digestCalculator,
                 JcaX509CertificateHolder(issuerCert),
-                eeCert.serialNumber
+                eeCert.serialNumber,
             )
 
             val builder = OCSPReqBuilder()
@@ -132,7 +132,7 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
                     logger.info { "Certificate is unknown by the OCSP server subject='${eeCert.subjectX500Principal}', serialNumber='${ocspReq.requestList[0].certID.serialNumber}', issuer='${issuerCert.subjectX500Principal}'" }
                     OCSPResponse(
                         OCSPResponseCertificateStatus.UNKNOWN,
-                        "Certificate is unknown by the OCSP server"
+                        "Certificate is unknown by the OCSP server",
                     )
                 }
                 is RevokedStatus -> {
@@ -140,12 +140,12 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
                     OCSPResponse(
                         OCSPResponseCertificateStatus.REVOKED,
 
-                        "Revocation reason: '$reason' at ${certStatus.revocationTime}"
+                        "Revocation reason: '$reason' at ${certStatus.revocationTime}",
                     )
                 }
                 else -> OCSPResponse(
                     OCSPResponseCertificateStatus.ERROR,
-                    "Unknown status: $certStatus"
+                    "Unknown status: $certStatus",
                 )
             }
 

@@ -21,7 +21,7 @@ val UserCertificateCsvHeaders = listOf(
     "subject",
     "notBefore",
     "notAfter",
-    "ocspResponse"
+    "ocspResponse",
 )
 
 private var HumanUserCertificateYaml = Yaml {
@@ -55,9 +55,9 @@ fun List<UserCertificate>.toCsv(): String {
                         cert?.subject,
                         cert?.notBefore,
                         cert?.notAfter,
-                        cert?.ocspResponse?.status
-                    )
-                )
+                        cert?.ocspResponse?.status,
+                    ),
+                ),
             )
         }
     }

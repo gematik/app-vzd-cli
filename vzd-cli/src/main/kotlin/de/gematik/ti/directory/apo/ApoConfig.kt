@@ -7,13 +7,13 @@ import java.nio.file.Path
 
 @Serializable
 data class ApoEnvironmentConfig(
-    var apiURL: String
+    var apiURL: String,
 )
 
 @Serializable
 class ApoConfig(
     val environments: Map<ApoInstance, ApoEnvironmentConfig>,
-    var apiKeys: Map<ApoInstance, String>
+    var apiKeys: Map<ApoInstance, String>,
 )
 
 internal class ApoConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<ApoConfig>(
@@ -22,14 +22,14 @@ internal class ApoConfigFileStore(customConfigPath: Path? = null) : FileObjectSt
         ApoConfig(
             mapOf(
                 ApoInstance.test to ApoEnvironmentConfig("https://apovzd-test.app.ti-dienste.de/api/"),
-                ApoInstance.prod to ApoEnvironmentConfig("https://apovzd.app.ti-dienste.de/api/")
+                ApoInstance.prod to ApoEnvironmentConfig("https://apovzd.app.ti-dienste.de/api/"),
             ),
             mapOf(
                 ApoInstance.test to "unknown",
-                ApoInstance.prod to "unknown"
-            )
+                ApoInstance.prod to "unknown",
+            ),
         )
     },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
-    customConfigPath
+    customConfigPath,
 )

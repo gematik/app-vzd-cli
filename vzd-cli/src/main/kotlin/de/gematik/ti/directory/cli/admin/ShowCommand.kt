@@ -19,7 +19,7 @@ class ShowCommand : CliktCommand(name = "show", help = "Show all information abo
         "--json" to RepresentationFormat.JSON,
         "--yaml" to RepresentationFormat.YAML,
         "--yaml-ext" to RepresentationFormat.YAML_EXT,
-        "--json-ext" to RepresentationFormat.JSON_EXT
+        "--json-ext" to RepresentationFormat.JSON_EXT,
     ).default(RepresentationFormat.HUMAN)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()

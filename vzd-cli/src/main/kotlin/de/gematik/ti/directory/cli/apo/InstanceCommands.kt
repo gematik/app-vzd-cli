@@ -11,7 +11,7 @@ import de.gematik.ti.directory.apo.ApoInstance
 class ApoInstanceCliContext(
     val apoAPI: ApoAPI,
     val instance: ApoInstance,
-    val client: ApoClient
+    val client: ApoClient,
 )
 
 class InstanceCommands(inst: ApoInstance) : CliktCommand(name = inst.lowercase(), help = """Commands for ${inst.lowercase()} instance""".trimMargin()) {
@@ -20,7 +20,7 @@ class InstanceCommands(inst: ApoInstance) : CliktCommand(name = inst.lowercase()
     init {
         subcommands(
             SearchCommand(),
-            ShowCommand()
+            ShowCommand(),
         )
     }
 
@@ -29,7 +29,7 @@ class InstanceCommands(inst: ApoInstance) : CliktCommand(name = inst.lowercase()
         currentContext.obj = ApoInstanceCliContext(
             context.apoAPI,
             instance,
-            context.apoAPI.createClient(instance)
+            context.apoAPI.createClient(instance),
         )
     }
 }

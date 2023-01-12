@@ -11,19 +11,19 @@ import kotlinx.serialization.encoding.Encoder
 @Serializable
 data class SerializableValidationError(
     val dataPath: String,
-    val message: String
+    val message: String,
 )
 
 @Serializable
 data class SerializableValidationResult(
-    val errors: List<SerializableValidationError>
+    val errors: List<SerializableValidationError>,
 )
 
 enum class SmartcardType {
     HBA,
     HBA2_1,
     SMCB,
-    SMCB2_1
+    SMCB2_1,
 }
 
 @Serializable
@@ -32,7 +32,7 @@ data class Smartcard(
     val notBefore: String,
     val notAfter: String,
     val active: Boolean,
-    val certificateRefs: List<Int>
+    val certificateRefs: List<Int>,
 )
 
 private fun infereSmartcardFrom(entry: DirectoryEntry, index: Int, cert1: CertificateInfo, cert2: CertificateInfo? = null): Smartcard {
@@ -51,7 +51,7 @@ private fun infereSmartcardFrom(entry: DirectoryEntry, index: Int, cert1: Certif
         notBefore = cert1.notBefore,
         notAfter = cert1.notAfter,
         active = entry.userCertificates?.first { it.userCertificate?.certificateInfo?.serialNumber == cert1.serialNumber }?.active ?: false,
-        certificateRefs = if (cert2 != null) listOf(index, index + 1) else listOf(index)
+        certificateRefs = if (cert2 != null) listOf(index, index + 1) else listOf(index),
     )
 }
 
@@ -90,7 +90,7 @@ data class DirectoryEntryExt(
     val fachdaten: List<Fachdaten>? = null,
     val smartcards: List<Smartcard>? = null,
     val validationResult: SerializableValidationResult? = null,
-    val kind: DirectoryEntryKind
+    val kind: DirectoryEntryKind,
 )
 
 object DirectoryEntryExtSerializer : KSerializer<DirectoryEntry> {
@@ -103,7 +103,7 @@ object DirectoryEntryExtSerializer : KSerializer<DirectoryEntry> {
             userCertificates = value.userCertificates,
             fachdaten = value.fachdaten,
             smartcards = value.smartcards,
-            kind = value.kind
+            kind = value.kind,
         )
         encoder.encodeSerializableValue(DirectoryEntryExt.serializer(), surrogate)
     }
@@ -113,7 +113,7 @@ object DirectoryEntryExtSerializer : KSerializer<DirectoryEntry> {
         return DirectoryEntry(
             directoryEntryBase = surrogate.directoryEntryBase,
             userCertificates = surrogate.userCertificates,
-            fachdaten = surrogate.fachdaten
+            fachdaten = surrogate.fachdaten,
         )
     }
 }

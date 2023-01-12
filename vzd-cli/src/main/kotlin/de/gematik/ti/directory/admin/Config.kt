@@ -16,21 +16,21 @@ internal class AdminConfigFileStore(customConfigPath: Path? = null) : FileObject
             environments = mapOf(
                 "tu" to EnvironmentConfig(
                     authURL = "https://auth-test.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token",
-                    apiURL = "https://vzdpflege-test.vzd.ti-dienste.de:9543"
+                    apiURL = "https://vzdpflege-test.vzd.ti-dienste.de:9543",
                 ),
                 "ru" to EnvironmentConfig(
                     authURL = "https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token",
-                    apiURL = "https://vzdpflege-ref.vzd.ti-dienste.de:9543/"
+                    apiURL = "https://vzdpflege-ref.vzd.ti-dienste.de:9543/",
                 ),
                 "pu" to EnvironmentConfig(
                     authURL = "https://auth.vzd.ti-dienste.de:9443/auth/realms/RSDirectoryAdministration/protocol/openid-connect/token",
-                    apiURL = "https://vzdpflege.vzd.ti-dienste.de:9543"
-                )
-            )
+                    apiURL = "https://vzdpflege.vzd.ti-dienste.de:9543",
+                ),
+            ),
         )
     },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
-    customConfigPath
+    customConfigPath,
 ) {
     var config: Config get() = value
         set(newValue) { value = newValue }
@@ -38,7 +38,7 @@ internal class AdminConfigFileStore(customConfigPath: Path? = null) : FileObject
 
 @Serializable
 data class Config(
-    val environments: Map<String, EnvironmentConfig>
+    val environments: Map<String, EnvironmentConfig>,
 ) {
     fun environment(env: AdminEnvironment) = environments[env.name] ?: throw ConfigException("Unknown environment: ${env.name}")
 }
@@ -46,7 +46,7 @@ data class Config(
 @Serializable
 data class EnvironmentConfig(
     val authURL: String,
-    val apiURL: String
+    val apiURL: String,
 )
 
 class ConfigException(message: String, cause: Throwable? = null) : DirectoryException(message, cause)

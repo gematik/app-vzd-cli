@@ -27,11 +27,11 @@ class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify sing
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val file: String? by argument(
         "FILENAME",
-        help = "Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN"
+        help = "Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN",
     )
     private val format by option().switch(
         "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML
+        "--yaml" to RepresentationFormat.YAML,
     ).default(RepresentationFormat.YAML)
 
     override fun run() = catching {

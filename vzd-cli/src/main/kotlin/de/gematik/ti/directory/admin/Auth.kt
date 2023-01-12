@@ -29,7 +29,7 @@ data class TokenResponse(
     val scope: String,
     val expires_in: Int,
     val refresh_expires_in: Int,
-    val refresh_token: String
+    val refresh_token: String,
 )
 
 class ClientCredentialsAuthenticator(private val authURL: String, private val httpProxyUrl: String?) {
@@ -60,7 +60,7 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
                 json(
                     Json {
                         ignoreUnknownKeys = true
-                    }
+                    },
                 )
             }
         }
@@ -69,7 +69,7 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
                 url = authURL,
                 formParameters = Parameters.build {
                     append("grant_type", "client_credentials")
-                }
+                },
             )
 
             if (response.status != HttpStatusCode.OK) {

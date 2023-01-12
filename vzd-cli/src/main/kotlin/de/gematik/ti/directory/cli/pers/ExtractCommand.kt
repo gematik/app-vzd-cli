@@ -66,7 +66,7 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
             val objects = xpath.evaluate(
                 "//child[@id='EF.C.HCI.ENC.R2048' or @id='EF.C.HCI.ENC.E256']/attributes/attribute[@id='body']/text()",
                 doc,
-                XPathConstants.NODESET
+                XPathConstants.NODESET,
             ) as NodeList
 
             var firstCert = true

@@ -33,7 +33,7 @@ val SET_PROPERTIES = mapOf(
     },
     "apiKeys.prod" to { config: ApoConfig, value: String ->
         config.apiKeys = config.apiKeys + Pair(ApoInstance.prod, value)
-    }
+    },
 )
 
 class ConfigSetCommand : CliktCommand(
@@ -42,7 +42,7 @@ class ConfigSetCommand : CliktCommand(
         
             ```${SET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
-            """
+            """,
 ) {
     private val context by requireObject<ApoCliContext>()
     private val property by argument().choice(SET_PROPERTIES)
@@ -61,7 +61,7 @@ val GET_PROPERTIES = mapOf(
     "emvironments.prod" to { config: ApoConfig -> config.environments[ApoInstance.prod] },
     "apiKeys" to { config: ApoConfig -> config.apiKeys },
     "apiKeys.test" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] },
-    "apiKeys.prod" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] }
+    "apiKeys.prod" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] },
 )
 
 class ConfigGetCommand : CliktCommand(
@@ -70,7 +70,7 @@ class ConfigGetCommand : CliktCommand(
         
             ```${GET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
-            """
+            """,
 ) {
     private val context by requireObject<ApoCliContext>()
     private val property by argument().choice(GET_PROPERTIES).optional()

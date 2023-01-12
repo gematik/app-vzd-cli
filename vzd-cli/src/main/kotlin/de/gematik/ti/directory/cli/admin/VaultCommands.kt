@@ -23,7 +23,7 @@ class VaultCommand : CliktCommand(name = "vault", help = "Manage OAuth credentia
             VaultListCommand(),
             VaultStoreCommand(),
             VaultExportCommand(),
-            VaultImportCommand()
+            VaultImportCommand(),
         )
     }
 
@@ -35,7 +35,7 @@ abstract class AbstractVaultCommand(name: String, help: String) : CliktCommand(n
         "--password",
         "-p",
         help = "Password for protection of the Vault",
-        envvar = "VAULT_PASSWORD"
+        envvar = "VAULT_PASSWORD",
     )
 
     protected val vaultProvider = KeyStoreVaultProvider()
@@ -52,7 +52,7 @@ abstract class AbstractVaultCommand(name: String, help: String) : CliktCommand(n
                 val newPassword = prompt(
                     "*** Creating new Vault.\nEnter new Vault password",
                     hideInput = true,
-                    requireConfirmation = true
+                    requireConfirmation = true,
                 ) ?: throw CliktError()
                 vaultProvider.open(newPassword)
             }

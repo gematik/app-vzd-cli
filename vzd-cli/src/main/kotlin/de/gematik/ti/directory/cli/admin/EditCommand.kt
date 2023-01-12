@@ -25,7 +25,7 @@ class EditCommand : CliktCommand(name = "edit", help = "Edit base entry using te
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val format by option().switch(
         "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML
+        "--yaml" to RepresentationFormat.YAML,
     ).default(RepresentationFormat.YAML)
 
     private val json = Json { ignoreUnknownKeys = true }

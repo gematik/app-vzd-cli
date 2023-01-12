@@ -17,7 +17,7 @@ open class FileObjectStore<T>(
     val filename: String,
     private val defaultValue: (() -> T),
     val deserialize: ((yaml: Yaml, stringValue: String) -> T),
-    private val customPath: Path? = null
+    private val customPath: Path? = null,
 ) {
     private val defaultPath = Path(System.getProperty("user.home"), ".telematik", filename)
     val path get() = customPath ?: defaultPath

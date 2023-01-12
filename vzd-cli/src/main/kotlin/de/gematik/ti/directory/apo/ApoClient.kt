@@ -59,7 +59,7 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
     fun search(queryString: String): Pair<String, Bundle> {
         val request = HttpRequest.newBuilder()
             .uri(
-                URL(URL(config.apiURL), "Location?name=${queryString.encodeURLParameter()}").toURI()
+                URL(URL(config.apiURL), "Location?name=${queryString.encodeURLParameter()}").toURI(),
             )
             .header("X-API-KEY", config.apiKey)
             .GET()
@@ -96,7 +96,7 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
     fun getLocationByTelematikID(telematikID: String): Pair<String, Location> {
         val request = HttpRequest.newBuilder()
             .uri(
-                URL(URL(config.apiURL), "Location?identifier=${telematikID.encodeURLParameter()}").toURI()
+                URL(URL(config.apiURL), "Location?identifier=${telematikID.encodeURLParameter()}").toURI(),
             )
             .header("X-API-KEY", config.apiKey)
             .GET()

@@ -34,7 +34,7 @@ val SET_PROPERTIES = mapOf(
         config.httpProxy.proxyURL = URL(value).toString()
     },
     "httpProxy.enabled" to { config: GlobalConfig, value: String -> config.httpProxy.enabled = value.toBoolean() },
-    "updates.preReleasesEnabled" to { config: GlobalConfig, value: String -> config.updates.preReleasesEnabled = value.toBoolean() }
+    "updates.preReleasesEnabled" to { config: GlobalConfig, value: String -> config.updates.preReleasesEnabled = value.toBoolean() },
 )
 
 class ConfigSetCommand : CliktCommand(
@@ -43,7 +43,7 @@ class ConfigSetCommand : CliktCommand(
         
             ```${SET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
-            """
+            """,
 ) {
     private val property by argument().choice(SET_PROPERTIES)
     private val value by argument()
@@ -60,7 +60,7 @@ val GET_PROPERTIES = mapOf(
     "httpProxy" to { config: GlobalConfig -> config.httpProxy },
     "httpProxy.proxyURL" to { config: GlobalConfig -> config.httpProxy.proxyURL },
     "httpProxy.enabled" to { config: GlobalConfig -> config.httpProxy.enabled },
-    "updates" to { config: GlobalConfig -> config.updates }
+    "updates" to { config: GlobalConfig -> config.updates },
 )
 
 class ConfigGetCommand : CliktCommand(
@@ -69,7 +69,7 @@ class ConfigGetCommand : CliktCommand(
         
             ```${GET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
-            """
+            """,
 ) {
     private val property by argument().choice(GET_PROPERTIES).optional()
     override fun run() {

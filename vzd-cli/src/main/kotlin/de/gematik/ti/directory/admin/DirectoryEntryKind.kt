@@ -63,5 +63,5 @@ enum class DirectoryEntryKind(val matcher: (DirectoryEntry) -> Boolean) {
         }
     }),
 
-    Weitere({ _ -> true })
+    Weitere({ _ -> true }),
 }

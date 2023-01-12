@@ -4,5 +4,5 @@ package de.gematik.ti.directory.util
 enum class EnvironmentEnum {
     ru,
     tu,
-    pu;
+    pu,
 }

@@ -23,7 +23,7 @@ val DirectoryEntryCsvHeaders = listOf(
     "mailCount",
     "mail",
     "FAD",
-    "specialization"
+    "specialization",
 )
 
 fun listToCsvLine(csvWriter: CsvWriter, value: List<Any?>): String {
@@ -62,9 +62,9 @@ fun List<DirectoryEntry>.toCsv(): String {
                         it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
                             ?.flatten()?.joinToString(),
                         it.fachdaten?.let { it.mapNotNull { it.fad1 }.flatten().mapNotNull { it.dn.ou?.firstOrNull() }.joinToString() },
-                        it.directoryEntryBase.specialization?.map { it }?.joinToString() ?: ""
-                    )
-                )
+                        it.directoryEntryBase.specialization?.map { it }?.joinToString() ?: "",
+                    ),
+                ),
             )
         }
     }

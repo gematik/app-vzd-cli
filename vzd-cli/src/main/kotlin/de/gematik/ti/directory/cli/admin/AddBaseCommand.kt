@@ -48,22 +48,22 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
         "-s",
         "--set",
         metavar = "ATTR=VALUE",
-        help = "Set the attribute value in BaseDirectoryEntry."
+        help = "Set the attribute value in BaseDirectoryEntry.",
     ).associate()
     private val deprecatedFile: String? by option(
         "--file",
         "-f",
         metavar = "FILENAME",
-        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN"
+        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN",
     ).deprecated("WARINING: -f / --file ist deprecated. Use argument without option instead.")
     private val inputFile by argument(
-        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN"
+        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN",
     ).path(mustExist = true, canBeDir = false, mustBeReadable = true).optional()
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (entry exists).").flag()
     private val format by option().switch(
         "--yaml" to RepresentationFormat.YAML,
-        "--json" to RepresentationFormat.JSON
+        "--json" to RepresentationFormat.JSON,
     ).default(RepresentationFormat.YAML)
 
     override fun run() = catching {
@@ -88,7 +88,7 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
         } ?: run {
             val telematikID: String = attrs["telematikID"] ?: throw UsageError("Option --set telematikID=<VALUE> or --file is required")
             BaseDirectoryEntry(
-                telematikID = telematikID
+                telematikID = telematikID,
             )
         }
 

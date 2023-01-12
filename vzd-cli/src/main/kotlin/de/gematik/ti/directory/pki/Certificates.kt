@@ -32,7 +32,7 @@ fun dateToString(date: Date): String {
     return DateTimeFormatter.ISO_DATE_TIME.format(
         date.toInstant()
             .atZone(ZoneId.systemDefault())
-            .toLocalDateTime()
+            .toLocalDateTime(),
     )
 }
 
@@ -64,7 +64,7 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 admissionAuthority = admission.admissionAuthority,
                 professionItems = admission.professionItems,
                 professionOids = admission.professionOids,
-                registrationNumber = admission.registrationNumber
+                registrationNumber = admission.registrationNumber,
             )
 
             CertificateInfo(
@@ -79,7 +79,7 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 dateToString(certificate.notAfter),
                 admissionInfo,
                 base64String,
-                ocspResponderURL
+                ocspResponderURL,
             )
         }
     }
@@ -97,10 +97,10 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
             val aiaExtension = AuthorityInformationAccess.fromExtensions(certHolder.extensions)
 
             if (aiaExtension != null && aiaExtension.accessDescriptions != null) {
-                    aiaExtension.accessDescriptions.asSequence()
-                        .filter { ad -> ad.accessMethod == X509ObjectIdentifiers.id_ad_ocsp }
-                        .map { ad -> ad.accessLocation.name }
-                        .first().toASN1Primitive().toString()
+                aiaExtension.accessDescriptions.asSequence()
+                    .filter { ad -> ad.accessMethod == X509ObjectIdentifiers.id_ad_ocsp }
+                    .map { ad -> ad.accessLocation.name }
+                    .first().toASN1Primitive().toString()
             } else {
                 null
             }
@@ -156,7 +156,7 @@ data class NameInfo(
     var postalCode: String? = null,
     var localityName: String? = null,
     var stateOrProvinceName: String? = null,
-    var countryCode: String? = null
+    var countryCode: String? = null,
 ) {
     constructor(x500Name: X500Name) : this() {
         val rdns = x500Name.rdNs.map { it.typesAndValues.toList() }.flatten().toTypedArray()
@@ -190,7 +190,7 @@ data class AdmissionStatementInfo(
     val admissionAuthority: String,
     val professionItems: List<String>,
     val professionOids: List<String>,
-    val registrationNumber: String
+    val registrationNumber: String,
 )
 
 /**
@@ -210,7 +210,7 @@ data class CertificateInfo(
     val admissionStatement: AdmissionStatementInfo,
     val certData: String,
     val ocspReponderURL: String? = null,
-    var ocspResponse: OCSPResponse? = null
+    var ocspResponse: OCSPResponse? = null,
 )
 
 /**

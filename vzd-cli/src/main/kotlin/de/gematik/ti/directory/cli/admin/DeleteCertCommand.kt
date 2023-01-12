@@ -22,7 +22,7 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
         "-p",
         "--param",
         help = "Specify query parameters to find matching entries",
-        metavar = "PARAM=VALUE"
+        metavar = "PARAM=VALUE",
     ).associate()
     private val parameterOptions by ParameterOptions()
 
@@ -30,7 +30,7 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
         "-b",
         "--backup-dir",
         metavar = "OUTPUT_DIR",
-        help = "Backup directory to store deleted certificates."
+        help = "Backup directory to store deleted certificates.",
     )
         .path(mustExist = true, canBeFile = false, mustBeWritable = true)
         .default(Paths.get(""))
