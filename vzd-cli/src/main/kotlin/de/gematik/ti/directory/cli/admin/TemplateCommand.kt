@@ -86,7 +86,7 @@ class TemplateCommand : CliktCommand(
                 is DirectoryEntry -> echo(template.toJsonPretty())
                 is UserCertificate -> echo(template.toJsonPretty())
             }
-            RepresentationFormat.YAML -> echo(template?.toYaml())
+            RepresentationFormat.YAML -> echo(template.toYaml())
             else -> throw UsageError("Templates are not available for format: $outputFormat")
         }
     }

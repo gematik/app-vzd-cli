@@ -85,6 +85,8 @@ private class HumanDirectoryEntry(
     // Internal
     var maxKOMLEadr: Int? = null,
 
+    var meta: List<String>? = null,
+
     var userCertificate: List<CertificateShortInfo>? = null,
     var smartcards: List<Smartcard>? = null,
 
@@ -133,6 +135,8 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
             // Internal
             maxKOMLEadr = value.directoryEntryBase.maxKOMLEadr,
 
+            meta = value.directoryEntryBase.meta,
+
             userCertificate = value.userCertificates?.mapNotNull {
                 it.userCertificate?.certificateInfo?.let { certInfo ->
                     CertificateShortInfo(
@@ -154,6 +158,7 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
             kim = value.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.map { fad1 -> fad1.komLeData?.map { KIMInfo(fad1.dn.ou?.first() ?: "", it.mail, it.version) } ?: emptyList() } } }?.flatten()?.flatten(),
 
             kind = value.kind,
+
         )
 
         encoder.encodeSerializableValue(HumanDirectoryEntry.serializer(), surrogate)
