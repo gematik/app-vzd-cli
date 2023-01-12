@@ -32,6 +32,5 @@ object TemporaryEntryTypeSerializer : KSerializer<Int?> {
                 decoder.decodeNull()
             }
         }
-
     }
 }

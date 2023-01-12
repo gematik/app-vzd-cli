@@ -47,17 +47,6 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
 
     override fun run() = catching {
         val params = parameterOptions.toMap() + customParams
-        paramFile?.let { paramFile ->
-            val file = Path(paramFile.second)
-            if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
-            file.useLines { line ->
-                line.forEach {
-                    runQuery(params + Pair(paramFile.first, it))
-                }
-            }
-        } ?: run {
-            runQuery(params)
-        }
 
         val entries = buildList {
             paramFile?.let { paramFile ->

@@ -86,9 +86,11 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
                 else -> throw CliktError("Unsupported format: $format")
             }
         } ?: run {
-            val telematikID: String = attrs["telematikID"] ?: throw UsageError("Option --set telematikID=<VALUE> or --file is required")
+            val telematikID = attrs["telematikID"] ?: throw UsageError("Option --set telematikID=<VALUE> or --file is required")
+            val entryType = attrs["entryType"]?.toInt() ?: throw UsageError("Option --set entryType=<VALUE> or --file is required")
             BaseDirectoryEntry(
                 telematikID = telematikID,
+                entryType = entryType,
             )
         }
 

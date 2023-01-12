@@ -6,7 +6,6 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-
 class TestEntryTypeSerializer : FeatureSpec({
 
     feature("Abwährtskompatibilität beim EntryType") {
@@ -54,6 +53,5 @@ class TestEntryTypeSerializer : FeatureSpec({
             val baseEntry1 = BaseDirectoryEntry(telematikID = "9-test", entryType = 1)
             Json.encodeToString(baseEntry1) shouldBe """{"telematikID":"9-test","entryType":1}"""
         }
-
     }
 })

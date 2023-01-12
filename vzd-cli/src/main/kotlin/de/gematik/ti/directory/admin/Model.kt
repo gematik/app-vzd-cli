@@ -71,7 +71,7 @@ data class BaseDirectoryEntry(
     // Professional
     var professionOID: List<String>? = null,
     var specialization: List<String>? = null,
-    @Serializable(with=TemporaryEntryTypeSerializer::class)
+    @Serializable(with = TemporaryEntryTypeSerializer::class)
     var entryType: Int? = null,
 
     // System

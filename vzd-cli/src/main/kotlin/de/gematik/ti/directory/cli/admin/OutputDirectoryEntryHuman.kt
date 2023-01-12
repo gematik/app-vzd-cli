@@ -7,7 +7,6 @@ import de.gematik.ti.directory.util.NameInfo
 import de.gematik.ti.directory.util.OCSPResponse
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.IntArraySerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -73,7 +72,7 @@ private class HumanDirectoryEntry(
     var professionOID: List<String>? = null,
     var specialization: List<String>? = null,
     @Serializable(with = TemporaryEntryTypeSerializer::class)
-    var entryType: Any? = null,
+    var entryType: Int? = null,
 
     // System
     var holder: List<String>? = null,
