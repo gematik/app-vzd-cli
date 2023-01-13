@@ -94,6 +94,8 @@ private class HumanDirectoryEntry(
 
     //
     var kind: DirectoryEntryKind,
+
+    var active: Boolean? = null,
 )
 
 object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
@@ -158,6 +160,8 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
             kim = value.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.map { fad1 -> fad1.komLeData?.map { KIMInfo(fad1.dn.ou?.first() ?: "", it.mail, it.version) } ?: emptyList() } } }?.flatten()?.flatten(),
 
             kind = value.kind,
+
+            active = value.directoryEntryBase.active,
 
         )
 

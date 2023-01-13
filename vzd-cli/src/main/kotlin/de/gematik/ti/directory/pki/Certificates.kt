@@ -62,8 +62,6 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 registrationNumber = admission.registrationNumber,
             )
 
-            println(certificate.notAfter)
-
             CertificateInfo(
                 certificate.subjectX500Principal.name,
                 NameInfo(X500Name(certificate.subjectX500Principal.name)),
