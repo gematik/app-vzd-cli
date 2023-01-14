@@ -1,6 +1,6 @@
 package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.pki.CertificateDataDER
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FeatureSpec

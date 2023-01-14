@@ -11,7 +11,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.cli.*
-import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.pki.CertificateDataDER
 import kotlinx.coroutines.runBlocking
 import org.bouncycastle.util.encoders.Base64
 import kotlin.io.path.inputStream

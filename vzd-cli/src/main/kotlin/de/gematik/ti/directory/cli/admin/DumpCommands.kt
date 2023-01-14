@@ -15,9 +15,9 @@ import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.cli.escape
-import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
-import de.gematik.ti.directory.util.OCSPResponseCertificateStatus
+import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
+import de.gematik.ti.directory.pki.OCSPResponseCertificateStatus
+import de.gematik.ti.directory.util.escape
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore

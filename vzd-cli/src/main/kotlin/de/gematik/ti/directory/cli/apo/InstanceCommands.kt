@@ -3,10 +3,8 @@ package de.gematik.ti.directory.cli.apo
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
-import de.gematik.ti.directory.apo.ApoAPI
 import de.gematik.ti.directory.apo.ApoCliContext
 import de.gematik.ti.directory.apo.ApoClient
-import de.gematik.ti.directory.apo.ApoInstance
 
 class ApoInstanceCliContext(
     val apoAPI: ApoAPI,

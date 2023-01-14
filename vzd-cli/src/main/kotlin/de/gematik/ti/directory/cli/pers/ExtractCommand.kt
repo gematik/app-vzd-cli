@@ -7,10 +7,10 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
-import de.gematik.ti.directory.cli.escape
 import de.gematik.ti.directory.cli.toJsonPrettyNoDefaults
 import de.gematik.ti.directory.cli.toYamlNoDefaults
-import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.pki.CertificateDataDER
+import de.gematik.ti.directory.util.escape
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
 import org.w3c.dom.Node

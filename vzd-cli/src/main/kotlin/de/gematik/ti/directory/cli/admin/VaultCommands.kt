@@ -8,10 +8,9 @@ import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.path
-import de.gematik.ti.directory.admin.AdminEnvironment
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.util.KeyStoreVault
-import de.gematik.ti.directory.util.KeyStoreVaultProvider
+import de.gematik.ti.directory.cli.util.KeyStoreVault
+import de.gematik.ti.directory.cli.util.KeyStoreVaultProvider
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}

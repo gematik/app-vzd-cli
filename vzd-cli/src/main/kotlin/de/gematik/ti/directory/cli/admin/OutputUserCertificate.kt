@@ -5,8 +5,8 @@ import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.toJsonPretty
 import de.gematik.ti.directory.cli.toYamlNoDefaults
-import de.gematik.ti.directory.util.CertificateDataDER
-import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
+import de.gematik.ti.directory.pki.CertificateDataDER
+import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import hu.vissy.texttable.dsl.tableFormatter
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual

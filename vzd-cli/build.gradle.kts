@@ -1,63 +1,48 @@
-
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-version = "2.2.0-beta2"
-
-val ktorVersion = "2.2.2"
-val kotestVersion = "5.5.4"
-val hapiVersion = "6.1.3"
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.8.0"
-    kotlin("plugin.serialization").version("1.8.0")
-    id("com.github.johnrengelman.shadow").version("7.1.2")
+    id("de.gematik.directory.app-conventions")
+    kotlin("plugin.serialization") version "1.7.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
-    // Apply the application plugin to add support for building a CLI application in Java.
-    application
-    `maven-publish`
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     disabledRules.set(setOf("no-wildcard-imports"))
 }
 
-repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
-}
-
 dependencies {
-    // implementation(project(":legacy-client-java"))
+    implementation(project(":directory-lib"))
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
     // implementation("org.jetbrains.kotlin:kotlin-reflect")
     // Kotlin logging wrapper
-    implementation("io.github.microutils:kotlin-logging:2.1.21")
+    // implementation("io.github.microutils:kotlin-logging:3.0.4")
     // logback logging backend
-    implementation("ch.qos.logback:logback-classic:1.2.9")
+    // implementation("ch.qos.logback:logback-classic:1.4.5")
     // Ktor client libraties
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
-    implementation("io.ktor:ktor-client-logging:$ktorVersion")
-    implementation("io.ktor:ktor-client-auth:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    val ktorVersion: String by project
+    // implementation("io.ktor:ktor-client-core:$ktorVersion")
+    // implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    // implementation("io.ktor:ktor-client-logging:$ktorVersion")
+    // implementation("io.ktor:ktor-client-auth:$ktorVersion")
+    // implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    // implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    // Proper Dates support
+    // implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
     // YAML support for kotlinx serialisation
     implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
 
     // CSV support
-    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.6.0")
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.7.0")
 
     // HAPI-FHIR Model classes
-    implementation("ca.uhn.hapi.fhir:hapi-fhir-base:$hapiVersion")
-    implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiVersion")
+    // val hapiVersion: String by project
+    // implementation("ca.uhn.hapi.fhir:hapi-fhir-base:$hapiVersion")
+    // implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiVersion")
 
     // LDAP/LDIF processing
     // implementation("org.ldaptive:ldaptive:2.1.1")
@@ -82,25 +67,19 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
 
     // Clikt library for creating nice CLI
-    implementation("com.github.ajalt.clikt:clikt:3.5.0")
+    implementation("com.github.ajalt.clikt:clikt:3.5.1")
 
     // Validation framework
     implementation("io.konform:konform-jvm:0.4.0")
 
-    // Proper Dates support
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-
     // Bouncy castle fpr crypto and certificates processing
-    shadow("org.bouncycastle:bcprov-jdk15on:1.70")
-    shadow("org.bouncycastle:bcpkix-jdk15on:1.70")
+    val bcVersion: String by project
+    shadow("org.bouncycastle:bcprov-jdk15on:$bcVersion")
+    shadow("org.bouncycastle:bcpkix-jdk15on:$bcVersion")
 
-    // test libraries
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     // Bouncy Castle again, now only for tests
-    testImplementation("org.bouncycastle:bcprov-jdk15on:1.70")
-    testImplementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+    testImplementation("org.bouncycastle:bcprov-jdk15on:$bcVersion")
+    testImplementation("org.bouncycastle:bcpkix-jdk15on:$bcVersion")
 }
 
 application {
@@ -167,18 +146,6 @@ tasks {
 
     processResources {
         from(projectProps)
-    }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = "de.gematik"
-            artifactId = "vzd-cli"
-            version = version
-
-            from(components["java"])
-        }
     }
 }
 

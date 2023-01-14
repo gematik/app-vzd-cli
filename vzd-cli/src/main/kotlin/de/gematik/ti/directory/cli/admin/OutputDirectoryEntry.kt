@@ -4,7 +4,7 @@ import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntryExtSerializer
 import de.gematik.ti.directory.cli.toJsonPretty
 import de.gematik.ti.directory.cli.toYamlNoDefaults
-import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
+import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule

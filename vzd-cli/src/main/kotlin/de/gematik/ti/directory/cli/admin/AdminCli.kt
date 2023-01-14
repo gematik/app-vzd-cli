@@ -3,11 +3,8 @@ package de.gematik.ti.directory.cli.admin
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
-import com.github.ajalt.clikt.parameters.options.*
-import de.gematik.ti.directory.admin.AdminAPI
-import de.gematik.ti.directory.admin.AdminEnvironment
+import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.global.GlobalAPI
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}

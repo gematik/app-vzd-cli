@@ -3,7 +3,7 @@ package de.gematik.ti.directory.cli.admin
 import com.github.doyaaaaaken.kotlincsv.client.CsvWriter
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import de.gematik.ti.directory.admin.DirectoryEntry
-import de.gematik.ti.directory.cli.escape
+import de.gematik.ti.directory.util.escape
 import java.io.ByteArrayOutputStream
 
 val DirectoryEntryCsvHeaders = listOf(

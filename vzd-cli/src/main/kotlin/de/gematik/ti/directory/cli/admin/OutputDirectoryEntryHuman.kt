@@ -1,15 +1,14 @@
 package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.*
-import de.gematik.ti.directory.util.AdmissionStatementInfo
-import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
-import de.gematik.ti.directory.util.NameInfo
-import de.gematik.ti.directory.util.OCSPResponse
+import de.gematik.ti.directory.pki.AdmissionStatementInfo
+import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
+import de.gematik.ti.directory.pki.NameInfo
+import de.gematik.ti.directory.pki.OCSPResponse
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor

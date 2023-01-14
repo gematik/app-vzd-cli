@@ -2,7 +2,9 @@ package de.gematik.ti.directory.admin
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import de.gematik.ti.directory.global.GlobalAPI
+import de.gematik.ti.directory.cli.GlobalAPI
+import de.gematik.ti.directory.cli.admin.AdminAPI
+import de.gematik.ti.directory.cli.admin.AdminEnvironment
 import org.slf4j.LoggerFactory
 
 fun createClient(): Client {

@@ -5,7 +5,7 @@ import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.admin.DistinguishedName
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.fhir.OrganizationProfessionOID
-import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.pki.CertificateDataDER
 import io.konform.validation.*
 import io.konform.validation.jsonschema.maxItems
 import io.konform.validation.jsonschema.pattern

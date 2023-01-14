@@ -6,6 +6,8 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.types.choice
+import de.gematik.ti.directory.cli.apo.ApoConfig
+import de.gematik.ti.directory.cli.apo.ApoInstance
 import de.gematik.ti.directory.cli.catching
 import net.mamoe.yamlkt.Yaml
 

@@ -5,10 +5,13 @@ import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
-import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.cli.escape
+import de.gematik.ti.directory.util.escape
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64

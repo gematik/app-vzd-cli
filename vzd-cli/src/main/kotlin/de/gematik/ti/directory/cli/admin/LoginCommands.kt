@@ -6,7 +6,6 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
-import de.gematik.ti.directory.admin.AdminEnvironment
 import de.gematik.ti.directory.cli.catching
 import java.util.*
 

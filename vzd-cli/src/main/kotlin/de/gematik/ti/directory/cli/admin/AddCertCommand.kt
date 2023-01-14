@@ -11,7 +11,7 @@ import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.pki.CertificateDataDER
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging

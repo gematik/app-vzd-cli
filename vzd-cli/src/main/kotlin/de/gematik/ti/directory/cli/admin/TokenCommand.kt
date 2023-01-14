@@ -4,7 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.util.TokenStore
+import de.gematik.ti.directory.cli.util.TokenStore
 
 class TokenCommand : CliktCommand(name = "token", help = "Show access token") {
     private val context by requireObject<AdminCliEnvironmentContext>()

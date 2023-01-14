@@ -1,6 +1,6 @@
 package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.util.KeyStoreVaultProvider
+import de.gematik.ti.directory.cli.util.KeyStoreVaultProvider
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe

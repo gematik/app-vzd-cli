@@ -14,7 +14,7 @@ import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.cli.toJsonPretty
 import de.gematik.ti.directory.cli.toYaml
-import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.pki.CertificateDataDER
 
 class TemplateCommand : CliktCommand(
     name = "template",
