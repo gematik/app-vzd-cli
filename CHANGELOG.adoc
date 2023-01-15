@@ -1,6 +1,8 @@
 = Changelog `vzd-cli`
 
 == Version 2.2.0
+- Quellcode wurde in Vorbereitung der Web-Version des Clients modularisiert und umstrukturiert
+- Versionen der Abhängiogkeiten wurden aktualisiert
 - Kompatibilität mit VZD 3.2.0 und Admin API 1.9.4
 - `--human` Output Format ist jetzt deutlich kompakter und lesbar
 - Neue Output Formate: `--yaml-ext` und `--json-ext`
