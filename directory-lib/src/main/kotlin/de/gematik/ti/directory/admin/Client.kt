@@ -9,6 +9,7 @@ import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.observer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -52,15 +53,19 @@ class Client(block: Configuration.() -> Unit = {}) {
     val logger = KotlinLogging.logger {}
     class Configuration {
         var apiURL = ""
-        var accessToken = ""
         var httpProxyURL: String? = null
+
+        internal var authConfigurator: DirectoryAuthPluginConfig.() -> Unit = {}
+        fun auth(block: DirectoryAuthPluginConfig.() -> Unit) {
+            authConfigurator = block
+        }
     }
 
     private val config: Configuration = Configuration()
     private val http: HttpClient
 
     init {
-        block(this.config)
+        block(config)
         this.http = HttpClient(CIO) {
             engine {
                 config.httpProxyURL?.let {
@@ -85,16 +90,11 @@ class Client(block: Configuration.() -> Unit = {}) {
                     level = LogLevel.INFO
                 }
             }
-            install(Auth) {
-                bearer {
-                    sendWithoutRequest {
-                        true
-                    }
-                    loadTokens {
-                        BearerTokens(config.accessToken, "")
-                    }
-                }
+
+            install(DirectoryAuthPlugin) {
+                config.authConfigurator(this)
             }
+
             install(ContentNegotiation) {
                 json(JSON)
             }
@@ -105,8 +105,6 @@ class Client(block: Configuration.() -> Unit = {}) {
 
         logger.debug { "Client created ${config.apiURL}" }
     }
-
-    val accessToken get() = config.accessToken
 
     /**
      * Implements POST /DirectoryEntries (add_Directory_Entry)

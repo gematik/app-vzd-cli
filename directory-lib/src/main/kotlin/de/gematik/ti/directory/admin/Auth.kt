@@ -4,6 +4,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -33,7 +34,7 @@ data class TokenResponse(
 )
 
 class ClientCredentialsAuthenticator(private val authURL: String, private val httpProxyUrl: String?) {
-    fun authenticate(clientId: String, clientSecret: String): BearerTokens {
+    suspend fun authenticate(clientId: String, clientSecret: String): BearerTokens {
         logger.debug { "Authenticating at: $authURL, client_id: $clientId" }
         val authClient = HttpClient(CIO) {
             httpProxyUrl?.let {
@@ -64,21 +65,47 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
                 )
             }
         }
-        val tokenResponse: TokenResponse = runBlocking {
-            var response = authClient.submitForm(
-                url = authURL,
-                formParameters = Parameters.build {
-                    append("grant_type", "client_credentials")
-                },
-            )
 
-            if (response.status != HttpStatusCode.OK) {
-                throw AdminResponseException(response, "Authentication failed: ${response.body<String>()}")
-            }
+        var response = authClient.submitForm(
+            url = authURL,
+            formParameters = Parameters.build {
+                append("grant_type", "client_credentials")
+            },
+        )
 
-            response.body()
+        if (response.status != HttpStatusCode.OK) {
+            throw AdminResponseException(response, "Authentication failed: ${response.body<String>()}")
         }
 
+        val tokenResponse: TokenResponse = response.body()
+
         return BearerTokens(tokenResponse.access_token, tokenResponse.refresh_token)
+    }
+}
+
+val DirectoryAuthPlugin = createClientPlugin("DirectoryAuthPlugin", ::DirectoryAuthPluginConfig) {
+
+    var accessToken = runBlocking { pluginConfig.accessTokenCallback() }
+
+    on(Send) { request ->
+        request.headers.append("Authorization", "Bearer $accessToken")
+        val originalCall = proceed(request)
+        if (pluginConfig.retry && originalCall.response.status == HttpStatusCode.Unauthorized) {
+            logger.debug { "Token was refused by the server. Probably expired, obtain new token and retry." }
+            // try to obtain the accessToken again and retry
+            accessToken = runBlocking { pluginConfig.accessTokenCallback() }
+            request.headers["Authorization"] = "Bearer $accessToken"
+            proceed(request)
+        } else {
+            originalCall
+        }
+    }
+}
+
+class DirectoryAuthPluginConfig {
+    var retry = true
+    internal var accessTokenCallback: suspend () -> String? = { null }
+    fun accessToken(block: suspend () -> String?) {
+        accessTokenCallback = block
     }
 }

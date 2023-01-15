@@ -160,7 +160,8 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
 
     val (fixedParams, namesAndLocalities) = extractFixedParams(tokenizerResult)
 
-    logger.info { namesAndLocalities }
+    logger.debug { "Detected fixed query parameters: $fixedParams" }
+    logger.debug { "Detected names and localities: $namesAndLocalities" }
 
     val self = this
     val entries = buildList {

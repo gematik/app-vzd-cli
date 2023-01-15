@@ -16,7 +16,11 @@ fun createClient(): Client {
 
     return Client {
         apiURL = tucfg.apiURL
-        accessToken = System.getenv()["TEST_ACCESS_TOKEN"] ?: throw RuntimeException("Environment variable 'TEST_ACCESS_TOKEN' must be set.")
+        auth {
+            accessToken {
+                System.getenv()["TEST_ACCESS_TOKEN"] ?: throw RuntimeException("Environment variable 'TEST_ACCESS_TOKEN' must be set.")
+            }
+        }
         if (adminAPI.globalAPI.config.httpProxy.enabled) {
             httpProxyURL = adminAPI.globalAPI.config.httpProxy.proxyURL
         }

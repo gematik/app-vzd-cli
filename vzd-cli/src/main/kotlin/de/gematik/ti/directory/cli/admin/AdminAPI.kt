@@ -8,6 +8,7 @@ import de.gematik.ti.directory.cli.util.KeyStoreVault
 import de.gematik.ti.directory.cli.util.KeyStoreVaultProvider
 import de.gematik.ti.directory.cli.util.TokenStore
 import de.gematik.ti.directory.pki.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
@@ -46,7 +47,11 @@ class AdminAPI(val globalAPI: GlobalAPI) {
         val envConfig = config.environment(env)
         val client = Client {
             apiURL = envConfig.apiURL
-            accessToken = tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
+            auth {
+                accessToken {
+                    tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
+                }
+            }
             if (globalAPI.config.httpProxy.enabled) {
                 httpProxyURL = globalAPI.config.httpProxy.proxyURL
             }
@@ -111,7 +116,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
             envcfg.authURL,
             if (globalAPI.config.httpProxy.enabled) globalAPI.config.httpProxy.proxyURL else null,
         )
-        val authResponse = auth.authenticate(clientID, clientSecret)
+        val authResponse = runBlocking { auth.authenticate(clientID, clientSecret) }
 
         tokenStore.addAccessToken(envcfg.apiURL, authResponse.accessToken)
 

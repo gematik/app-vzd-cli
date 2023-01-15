@@ -23,7 +23,7 @@ dependencies {
     // logback logging backend
     // implementation("ch.qos.logback:logback-classic:1.4.5")
     // Ktor client libraties
-    val ktorVersion: String by project
+    // val ktorVersion: String by project
     // implementation("io.ktor:ktor-client-core:$ktorVersion")
     // implementation("io.ktor:ktor-client-cio:$ktorVersion")
     // implementation("io.ktor:ktor-client-logging:$ktorVersion")
@@ -58,6 +58,7 @@ dependencies {
     // implementation("org.apache.opennlp:opennlp-uima:2.0.0")
 
     // Ktor server (for GUI BFF)
+    val ktorVersion: String by project
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
