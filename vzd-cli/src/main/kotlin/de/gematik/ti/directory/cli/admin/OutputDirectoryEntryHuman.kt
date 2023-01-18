@@ -1,16 +1,15 @@
 package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.*
+import de.gematik.ti.directory.elaborate.*
 import de.gematik.ti.directory.pki.AdmissionStatementInfo
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import de.gematik.ti.directory.pki.NameInfo
 import de.gematik.ti.directory.pki.OCSPResponse
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -32,17 +31,10 @@ private class CertificateShortInfo(
     val issuer: String,
     val publicKeyAlgorithm: String,
     val serialNumber: String,
-    val notBefore: LocalDateTime,
-    val notAfter: LocalDateTime,
+    val notBefore: Instant,
+    val notAfter: Instant,
     val active: Boolean,
     var ocspResponse: OCSPResponse? = null,
-)
-
-@Serializable
-private class KIMInfo(
-    val fad: String,
-    val mail: String,
-    val version: String,
 )
 
 @Serializable
@@ -69,17 +61,16 @@ private class HumanDirectoryEntry(
     var countryCode: String? = null,
 
     // Professional
-    var professionOID: List<String>? = null,
-    var specialization: List<String>? = null,
+    var professionOID: List<ElaborateProfessionOID>? = null,
+    var specialization: List<ElaborateSpecialization>? = null,
     @Serializable(with = TemporaryEntryTypeSerializer::class)
     var entryType: Int? = null,
 
     // System
-    var holder: List<String>? = null,
+    var holder: List<ElaborateHolder>? = null,
     var dataFromAuthority: Boolean? = null,
     var personalEntry: Boolean? = null,
-    @Serializable(with = ForgivingLocalDateTimeSerializer::class)
-    var changeDateTime: LocalDateTime? = null,
+    var changeDateTime: Instant? = null,
 
     // Internal
     var maxKOMLEadr: Int? = null,
@@ -89,56 +80,56 @@ private class HumanDirectoryEntry(
     var userCertificate: List<CertificateShortInfo>? = null,
     var smartcards: List<Smartcard>? = null,
 
-    var kim: List<KIMInfo>? = null,
+    var kim: List<ElaborateKIMAddress>? = null,
 
-    //
-    var kind: DirectoryEntryKind,
+    var kind: DirectoryEntryKind? = null,
 
     var active: Boolean? = null,
 )
 
 object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = HumanDirectoryEntry.serializer().descriptor
 
-    override fun serialize(encoder: Encoder, value: DirectoryEntry) {
+    override fun serialize(encoder: Encoder, value2: DirectoryEntry) {
+        val entry = value2.elaborate()
         val surrogate = HumanDirectoryEntry(
-            uid = value.directoryEntryBase.dn?.uid,
-            telematikID = value.directoryEntryBase.telematikID,
-            domainID = value.directoryEntryBase.domainID,
+            uid = entry.base.dn?.uid,
+            telematikID = entry.base.telematikID,
+            domainID = entry.base.domainID,
 
             // Names
-            displayName = value.directoryEntryBase.displayName,
-            cn = value.directoryEntryBase.cn,
-            otherName = value.directoryEntryBase.otherName,
-            organization = value.directoryEntryBase.organization,
-            givenName = value.directoryEntryBase.givenName,
-            sn = value.directoryEntryBase.sn,
-            title = value.directoryEntryBase.title,
+            displayName = entry.base.displayName,
+            cn = entry.base.cn,
+            otherName = entry.base.otherName,
+            organization = entry.base.organization,
+            givenName = entry.base.givenName,
+            sn = entry.base.sn,
+            title = entry.base.title,
 
             // Addresses
-            streetAddress = value.directoryEntryBase.streetAddress,
-            postalCode = value.directoryEntryBase.postalCode,
-            localityName = value.directoryEntryBase.localityName,
-            stateOrProvinceName = value.directoryEntryBase.stateOrProvinceName,
-            countryCode = value.directoryEntryBase.countryCode,
+            streetAddress = entry.base.streetAddress,
+            postalCode = entry.base.postalCode,
+            localityName = entry.base.localityName,
+            stateOrProvinceName = entry.base.stateOrProvinceName,
+            countryCode = entry.base.countryCode,
 
             // Professional
-            professionOID = value.directoryEntryBase.professionOID,
-            specialization = value.directoryEntryBase.specialization,
-            entryType = value.directoryEntryBase.entryType,
+            professionOID = entry.base.professionOID,
+            specialization = entry.base.specialization,
+            entryType = entry.base.entryType,
 
             // System
-            holder = value.directoryEntryBase.holder,
-            dataFromAuthority = value.directoryEntryBase.dataFromAuthority,
-            personalEntry = value.directoryEntryBase.personalEntry,
-            changeDateTime = value.directoryEntryBase.changeDateTime,
+            holder = entry.base.holder,
+            dataFromAuthority = entry.base.dataFromAuthority,
+            personalEntry = entry.base.personalEntry,
+            changeDateTime = entry.base.changeDateTime,
 
             // Internal
-            maxKOMLEadr = value.directoryEntryBase.maxKOMLEadr,
+            maxKOMLEadr = entry.base.maxKOMLEadr,
 
-            meta = value.directoryEntryBase.meta,
+            meta = entry.base.meta,
 
-            userCertificate = value.userCertificates?.mapNotNull {
+            userCertificate = entry.userCertificates?.mapNotNull {
                 it.userCertificate?.certificateInfo?.let { certInfo ->
                     CertificateShortInfo(
                         subjectInfo = certInfo.subjectInfo,
@@ -154,13 +145,11 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
                 }
             },
 
-            smartcards = value.smartcards,
+            smartcards = entry.smartcards,
 
-            kim = value.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.map { fad1 -> fad1.komLeData?.map { KIMInfo(fad1.dn.ou?.first() ?: "", it.mail, it.version) } ?: emptyList() } } }?.flatten()?.flatten(),
-
-            kind = value.kind,
-
-            active = value.directoryEntryBase.active,
+            kim = entry.kimAddresses,
+            kind = entry.kind,
+            active = entry.base.active,
 
         )
 

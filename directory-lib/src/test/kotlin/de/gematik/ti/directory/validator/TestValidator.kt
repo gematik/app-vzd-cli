@@ -1,9 +1,10 @@
-package de.gematik.ti.directory.admin.validator
+package de.gematik.ti.directory.validator
 
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.admin.DistinguishedName
 import de.gematik.ti.directory.admin.UserCertificate
+import de.gematik.ti.directory.admin.validator.basicallyValid
 import de.gematik.ti.directory.fhir.OrganizationProfessionOID
 import de.gematik.ti.directory.pki.CertificateDataDER
 import io.konform.validation.*
@@ -70,7 +71,7 @@ class TestValidator : FeatureSpec({
 
             val validationResult = validateEntry(entry)
 
-            println(validationResult.errors.map { it.dataPath + it.message }.joinToString("\n"))
+            println(validationResult.errors.map { it.dataPath + " " + it.message }.joinToString("\n"))
         }
     }
 })

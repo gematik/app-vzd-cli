@@ -1,5 +1,3 @@
-@file:UseSerializers(DirectoryEntryExtSerializer::class)
-
 package de.gematik.ti.directory.cli.bff
 
 import de.gematik.ti.directory.admin.*
@@ -12,7 +10,6 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import java.io.IOException
 
 @Serializable

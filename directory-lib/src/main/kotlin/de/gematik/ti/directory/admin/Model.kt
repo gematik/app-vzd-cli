@@ -1,23 +1,11 @@
 package de.gematik.ti.directory.admin
 
+import de.gematik.ti.directory.elaborate.*
 import de.gematik.ti.directory.pki.CertificateDataDER
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-
-@Serializable
-@SerialName("Error")
-data class AttributeError(
-    val attributeName: String? = null,
-    val attributeError: String? = null,
-)
 
 @Serializable
 data class Contact(
@@ -85,8 +73,7 @@ data class BaseDirectoryEntry(
     var holder: List<String>? = null,
     var dataFromAuthority: Boolean? = null,
     var personalEntry: Boolean? = null,
-    @Serializable(with = ForgivingLocalDateTimeSerializer::class)
-    var changeDateTime: LocalDateTime? = null,
+    var changeDateTime: Instant? = null,
 
     // Internal
     var maxKOMLEadr: Int? = null,
@@ -117,22 +104,6 @@ data class UpdateBaseDirectoryEntry(
     var meta: List<String>? = null,
 )
 
-/**
- * This class fixes bad dates coming from VZD
- */
-object ForgivingLocalDateTimeSerializer : KSerializer<LocalDateTime> {
-
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("LocalDateTime", PrimitiveKind.STRING)
-
-    override fun deserialize(decoder: Decoder): LocalDateTime =
-        LocalDateTime.parse(decoder.decodeString().substring(0..18))
-
-    override fun serialize(encoder: Encoder, value: LocalDateTime) {
-        encoder.encodeString(value.toString())
-    }
-}
-
 @Serializable
 data class UserCertificate(
     @Contextual
@@ -148,10 +119,8 @@ data class UserCertificate(
     var serialNumber: String? = null,
     var issuer: String? = null,
     var publicKeyAlgorithm: String? = null,
-    @Serializable(with = ForgivingLocalDateTimeSerializer::class)
-    var notBefore: LocalDateTime? = null,
-    @Serializable(with = ForgivingLocalDateTimeSerializer::class)
-    var notAfter: LocalDateTime? = null,
+    var notBefore: Instant? = null,
+    var notAfter: Instant? = null,
 )
 
 @Serializable

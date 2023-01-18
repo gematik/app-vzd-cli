@@ -9,6 +9,12 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     disabledRules.set(setOf("no-wildcard-imports"))
 }
 
+repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    maven(url = "https://jitpack.io")
+}
+
 dependencies {
     implementation(project(":directory-lib"))
     // Ktor server (for GUI BFF)
@@ -16,12 +22,13 @@ dependencies {
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-server-resources:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-    implementation("io.ktor:ktor-server-sessions:$ktorVersion")
-    implementation("io.ktor:ktor-server-auth:$ktorVersion")
+    // ktor OpenAPI generator
+    implementation("io.github.smiley4:ktor-swagger-ui:1.0.1")
     // use dotenv only for testing
     testImplementation("io.github.cdimascio:dotenv-kotlin:6.4.0")
+    // test host for ktor
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
 }
 
 application {
@@ -43,4 +50,5 @@ tasks {
 tasks.register<JavaExec>("serve") {
     mainClass.set("de.gematik.ti.directory.bff.dev.DevServerKt")
     classpath = sourceSets["test"].runtimeClasspath
+    jvmArgs = listOf("-Dio.ktor.development=true")
 }

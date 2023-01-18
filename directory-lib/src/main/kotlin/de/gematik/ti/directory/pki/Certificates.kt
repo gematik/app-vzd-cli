@@ -1,9 +1,7 @@
 package de.gematik.ti.directory.pki
 
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -67,8 +65,8 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 certificate.publicKey.algorithm,
                 certificate.serialNumber.toString(),
                 keyUsage,
-                Instant.fromEpochMilliseconds(certificate.notBefore.time).toLocalDateTime(timeZone),
-                Instant.fromEpochMilliseconds(certificate.notAfter.time).toLocalDateTime(timeZone),
+                Instant.fromEpochMilliseconds(certificate.notBefore.time),
+                Instant.fromEpochMilliseconds(certificate.notAfter.time),
                 admissionInfo,
                 base64String,
                 ocspResponderURL,
@@ -197,8 +195,8 @@ data class CertificateInfo(
     val publicKeyAlgorithm: String,
     val serialNumber: String,
     val keyUsage: List<String>,
-    val notBefore: LocalDateTime,
-    val notAfter: LocalDateTime,
+    val notBefore: Instant,
+    val notAfter: Instant,
     val admissionStatement: AdmissionStatementInfo,
     val certData: String,
     val ocspReponderURL: String? = null,

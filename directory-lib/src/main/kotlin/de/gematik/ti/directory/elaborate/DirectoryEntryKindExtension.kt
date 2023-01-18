@@ -1,6 +1,8 @@
-package de.gematik.ti.directory.admin
+package de.gematik.ti.directory.elaborate
 
-val DirectoryEntry.kind: DirectoryEntryKind get() {
+import de.gematik.ti.directory.admin.DirectoryEntry
+
+fun DirectoryEntry.infereKind(): DirectoryEntryKind {
     return DirectoryEntryKind.values().first {
         it.matcher.invoke(this)
     }

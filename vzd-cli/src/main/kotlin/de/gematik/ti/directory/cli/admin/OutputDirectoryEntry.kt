@@ -1,11 +1,11 @@
 package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.DirectoryEntry
-import de.gematik.ti.directory.admin.DirectoryEntryExtSerializer
 import de.gematik.ti.directory.cli.toJsonPretty
 import de.gematik.ti.directory.cli.toYamlNoDefaults
+import de.gematik.ti.directory.elaborate.elaborate
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
-import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
@@ -17,8 +17,8 @@ var YamlDirectoryEntryExt = Yaml {
         contextual(ExtendedCertificateDataDERSerializer)
     }
 }
-fun DirectoryEntry.toYamlExt(): String = YamlDirectoryEntryExt.encodeToString(DirectoryEntryExtSerializer, this)
-fun List<DirectoryEntry>.toYamlExt(): String = YamlDirectoryEntryExt.encodeToString(ListSerializer(DirectoryEntryExtSerializer), this)
+fun DirectoryEntry.toYamlExt(): String = YamlDirectoryEntryExt.encodeToString(this)
+fun List<DirectoryEntry>.toYamlExt(): String = YamlDirectoryEntryExt.encodeToString(this)
 
 var JsonDirectoryEntryExt = Json {
     encodeDefaults = true
@@ -27,8 +27,8 @@ var JsonDirectoryEntryExt = Json {
         contextual(ExtendedCertificateDataDERSerializer)
     }
 }
-fun DirectoryEntry.toJsonExt(): String = JsonDirectoryEntryExt.encodeToString(DirectoryEntryExtSerializer, this)
-fun List<DirectoryEntry>.toJsonExt(): String = JsonDirectoryEntryExt.encodeToString(ListSerializer(DirectoryEntryExtSerializer), this)
+fun DirectoryEntry.toJsonExt(): String = JsonDirectoryEntryExt.encodeToString(this.elaborate())
+fun List<DirectoryEntry>.toJsonExt(): String = JsonDirectoryEntryExt.encodeToString(this.map { it.elaborate() })
 
 fun DirectoryEntry.toStringRepresentation(format: RepresentationFormat): String {
     return when (format) {

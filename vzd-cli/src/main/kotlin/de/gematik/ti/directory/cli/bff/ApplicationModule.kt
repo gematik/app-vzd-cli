@@ -1,7 +1,6 @@
 package de.gematik.ti.directory.cli.bff
 
 import de.gematik.ti.directory.DirectoryAuthException
-import de.gematik.ti.directory.admin.DirectoryEntryExtSerializer
 import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.admin.AdminAPI
 import de.gematik.ti.directory.cli.util.VaultException
@@ -18,7 +17,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
@@ -37,8 +35,6 @@ fun Application.directoryModule() {
                 isLenient = true
                 serializersModule = SerializersModule {
                     contextual(ExtendedCertificateDataDERSerializer)
-                    contextual(DirectoryEntryExtSerializer)
-                    contextual(ListSerializer(DirectoryEntryExtSerializer))
                 }
             },
         )

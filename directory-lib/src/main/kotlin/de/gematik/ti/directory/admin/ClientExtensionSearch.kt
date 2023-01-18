@@ -144,7 +144,7 @@ private fun extractFixedParams(tokenizerResult: TokenizerResult): Pair<Map<Strin
                 }
             }
         }
-        put("baseDirectoryOnly", "true")
+        put("baseEntryOnly", "true")
     }
     return Pair(fixedParams, tokenizerResult.subset(namesAndLocalities))
 }

@@ -1,4 +1,4 @@
-package de.gematik.spegg
+package de.gematik.ti.directory.bff
 
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString

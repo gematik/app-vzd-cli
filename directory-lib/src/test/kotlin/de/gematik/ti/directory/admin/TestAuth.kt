@@ -11,7 +11,6 @@ class TestAuth : FeatureSpec({
             val adminClient = Client {
                 apiURL = DefaultConfig.environment(AdminEnvironment.tu).apiURL
                 auth {
-                    val authURL = DefaultConfig.environment(AdminEnvironment.tu).authURL
                     accessToken {
                         System.getenv("TEST_ACCESS_TOKEN")
                     }
@@ -24,7 +23,6 @@ class TestAuth : FeatureSpec({
             val adminClient = Client {
                 apiURL = DefaultConfig.environment(AdminEnvironment.tu).apiURL
                 auth {
-                    val authURL = DefaultConfig.environment(AdminEnvironment.tu).authURL
                     accessToken {
                         if (firstRun) {
                             firstRun = false

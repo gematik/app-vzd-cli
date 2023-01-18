@@ -15,8 +15,8 @@ class SimpleCodeSystem(
     val name: String,
     val concept: List<SimpleConcept>,
 ) {
-    fun displayFor(code: String): String {
-        return concept.firstOrNull { it.code == code }?.display ?: code
+    fun displayFor(code: String): String? {
+        return concept.firstOrNull { it.code == code }?.display
     }
 }
 
@@ -27,3 +27,4 @@ private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem {
 }
 
 val OrganizationProfessionOID = loadSimpleCodeSystem("OrganizationProfessionOID")
+val PractitionerProfessionOID = loadSimpleCodeSystem("PractitionerProfessionOID")
