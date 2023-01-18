@@ -21,7 +21,7 @@ export TEST_ACCESS_TOKEN=$(java -jar ./vzd-cli/build/libs/vzd-cli-all.jar admin 
 
 [source,bash]
 ----
-VERSION=2.2.0
+VERSION=$(grep "^version=" gradle.properties | cut -d'=' -f2)
 gh release create ${VERSION}
 gh release upload ${VERSION} vzd-cli/build/distributions/vzd-cli-${VERSION}.zip
 ----
