@@ -109,6 +109,10 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
                 setBody(ocspReq.encoded)
             }
 
+            if (response.status != HttpStatusCode.OK) {
+                throw Exception("OCSP server returned bad response: \n${response.body<String>()}")
+            }
+
             val body: ByteArray = response.body()
 
             val basicOcspResp = OCSPResp(body).responseObject as BasicOCSPResp
@@ -156,7 +160,7 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
         } catch (e: UnresolvedAddressException) {
             return OCSPResponse(OCSPResponseCertificateStatus.ERROR, "Unresolvable OCSP URL: $ocspResponderURL")
         } catch (e: Throwable) {
-            logger.error { e }
+            logger.error(e) {}
             return OCSPResponse(OCSPResponseCertificateStatus.ERROR, e.message)
         }
     }
