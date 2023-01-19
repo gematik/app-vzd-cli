@@ -90,8 +90,8 @@ private class HumanDirectoryEntry(
 object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
     override val descriptor: SerialDescriptor = HumanDirectoryEntry.serializer().descriptor
 
-    override fun serialize(encoder: Encoder, value2: DirectoryEntry) {
-        val entry = value2.elaborate()
+    override fun serialize(encoder: Encoder, value: DirectoryEntry) {
+        val entry = value.elaborate()
         val surrogate = HumanDirectoryEntry(
             uid = entry.base.dn?.uid,
             telematikID = entry.base.telematikID,
