@@ -14,6 +14,6 @@ data class InfoResource(
 
 fun Route.infoRoute() {
     get("info") {
-        call.respond(InfoResource("Directory API", BuildConfig.APP_VERSION, listOf("++core")))
+        call.respond(InfoResource("Directory API", BuildConfig.APP_VERSION, listOf("core")))
     }
 }
