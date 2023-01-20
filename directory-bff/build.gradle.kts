@@ -11,7 +11,6 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
 repositories {
     gradlePluginPortal()
     mavenCentral()
-    maven(url = "https://jitpack.io")
 }
 
 dependencies {
@@ -23,7 +22,7 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     // ktor OpenAPI generator
-    implementation("io.github.smiley4:ktor-swagger-ui:1.0.1")
+    // implementation("io.github.smiley4:ktor-swagger-ui:1.0.1")
     // use dotenv only for testing
     testImplementation("io.github.cdimascio:dotenv-kotlin:6.4.0")
     // test host for ktor
@@ -46,8 +45,11 @@ tasks {
     }
 }
 
+tasks.named<JavaExec>("run") {
+    jvmArgs = listOf("-Dio.ktor.development=true")
+}
+
 tasks.register<JavaExec>("serve") {
     mainClass.set("de.gematik.ti.directory.bff.dev.DevServerKt")
     classpath = sourceSets["test"].runtimeClasspath
-    jvmArgs = listOf("-Dio.ktor.development=true")
 }

@@ -2,7 +2,6 @@ package de.gematik.ti.directory.bff
 
 import de.gematik.ti.directory.admin.Client
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
-import io.github.smiley4.ktorswaggerui.SwaggerUI
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -17,20 +16,6 @@ import kotlinx.serialization.modules.contextual
 
 fun Application.directoryApplicationModule(adminClient: Client) {
     attributes.put(AdminClientAttributeKey, adminClient)
-    install(SwaggerUI) {
-        swagger {
-            swaggerUrl = "/api/swagger-ui"
-            onlineSpecValidator()
-        }
-        info {
-            title = "Directory Backend-for-Frontend API"
-            version = BuildConfig.APP_VERSION
-        }
-        server {
-            url = "http://localhost:8080"
-            description = "Development server"
-        }
-    }
     install(ContentNegotiation) {
         json(
             Json {
@@ -49,8 +34,13 @@ fun Application.directoryApplicationModule(adminClient: Client) {
         status(HttpStatusCode.InternalServerError) { call, code ->
             call.respond(status = code, ErrorResponse("internal_server_error", "Internal Server Error"))
         }
+        exception<java.net.ConnectException> { call, cause ->
+            call.application.log.error("Connection error", cause)
+            call.respond(status = HttpStatusCode.ServiceUnavailable,
+                ErrorResponse("service_unavailable", "Service Unavailable"))
+        }
     }
-    routing() {
+    routing {
         route("api") {
             infoRoute()
             searchRoute()
