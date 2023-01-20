@@ -36,8 +36,10 @@ fun Application.directoryApplicationModule(adminClient: Client) {
         }
         exception<java.net.ConnectException> { call, cause ->
             call.application.log.error("Connection error", cause)
-            call.respond(status = HttpStatusCode.ServiceUnavailable,
-                ErrorResponse("service_unavailable", "Service Unavailable"))
+            call.respond(
+                status = HttpStatusCode.ServiceUnavailable,
+                ErrorResponse("service_unavailable", "Service Unavailable"),
+            )
         }
     }
     routing {

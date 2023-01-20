@@ -14,7 +14,6 @@ fun main() {
     embeddedServer(Netty, host = "0.0.0.0", port = directoryApiPort) {
         directoryApplication()
     }.start(wait = true)
-
 }
 
 fun Application.directoryApplication() {
@@ -40,6 +39,4 @@ fun Application.directoryApplication() {
     }
 
     directoryApplicationModule(adminClient)
-
 }
-
