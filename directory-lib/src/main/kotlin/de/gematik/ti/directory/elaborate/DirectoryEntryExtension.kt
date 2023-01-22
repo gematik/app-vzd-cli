@@ -75,11 +75,11 @@ val PractitionerSpecializationRegex = Regex("^urn:as:([0-9\\.]+):(.*)$")
 val OrganisationSpecializationRegex = Regex("^urn:psc:([0-9\\.]+):(.*)$")
 
 fun elaborateSpecialization(base: BaseDirectoryEntry, specialization: String): ElaborateSpecialization {
-    val display = if (base.personalEntry == true && PractitionerSpecializationRegex.matches(specialization)) {
+    val display = if (PractitionerSpecializationRegex.matches(specialization)) {
         PractitionerSpecializationRegex.matchEntire(specialization)?.let {
             PractitionerQualificationVS.displayFor("urn:oid:${it.groupValues[1]}", it.groupValues[2])
         } ?: specialization
-    } else if (base.personalEntry == false && OrganisationSpecializationRegex.matches(specialization)) {
+    } else if (OrganisationSpecializationRegex.matches(specialization)) {
         OrganisationSpecializationRegex.matchEntire(specialization)?.let {
             HealthcareServiceSpecialtyVS.displayFor("urn:oid:${it.groupValues[1]}", it.groupValues[2])
         } ?: specialization
