@@ -25,6 +25,25 @@ import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 
 private val timeZone = TimeZone.of("Europe/Berlin")
+/**
+ * Textual information about the X509 Certificate
+ */
+@Serializable
+data class CertificateInfo(
+    val subject: String,
+    val subjectInfo: NameInfo,
+    val issuer: String,
+    val signatureAlgorithm: String,
+    val publicKeyAlgorithm: String,
+    val serialNumber: String,
+    val keyUsage: List<String>,
+    val notBefore: Instant,
+    val notAfter: Instant,
+    val admissionStatement: AdmissionStatementInfo,
+    val certData: String,
+    val ocspReponderURL: String? = null,
+    var ocspResponse: OCSPResponse? = null,
+)
 
 /**
  * Simple datatype for base64 encoded certificates to differentiate them from plain strings
@@ -181,26 +200,6 @@ data class AdmissionStatementInfo(
     val professionItems: List<String>,
     val professionOids: List<String>,
     val registrationNumber: String,
-)
-
-/**
- * Textual information about the X509 Certificate
- */
-@Serializable
-data class CertificateInfo(
-    val subject: String,
-    val subjectInfo: NameInfo,
-    val issuer: String,
-    val signatureAlgorithm: String,
-    val publicKeyAlgorithm: String,
-    val serialNumber: String,
-    val keyUsage: List<String>,
-    val notBefore: Instant,
-    val notAfter: Instant,
-    val admissionStatement: AdmissionStatementInfo,
-    val certData: String,
-    val ocspReponderURL: String? = null,
-    var ocspResponse: OCSPResponse? = null,
 )
 
 /**

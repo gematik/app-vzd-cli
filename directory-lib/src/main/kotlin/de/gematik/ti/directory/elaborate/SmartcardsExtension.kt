@@ -19,22 +19,24 @@ private fun infereSmartcardFrom(entry: DirectoryEntry, index: Int, cert1: Certif
         notBefore = cert1.notBefore,
         notAfter = cert1.notAfter,
         active = entry.userCertificates?.first { it.userCertificate?.certificateInfo?.serialNumber == cert1.serialNumber }?.active ?: false,
-        certificateRefs = if (cert2 != null) listOf(index, index + 1) else listOf(index),
+        certificateSerialNumbers = if (cert2 != null) listOf(cert1.serialNumber, cert2.serialNumber) else listOf(cert1.serialNumber),
     )
 }
 
 fun DirectoryEntry.infereSmartcards(): List<Smartcard>? {
     val entry = this
-    return entry.userCertificates
-        ?.mapNotNull { it.userCertificate?.certificateInfo }
+    entry.userCertificates = entry.userCertificates
+        ?.filter { it.userCertificate != null }
         ?.sortedBy { it.notBefore }
+    return entry.userCertificates
+        ?.map { it.userCertificate?.certificateInfo }
         ?.let {
             buildList<Smartcard> {
                 var cert1: CertificateInfo? = null
                 it.forEachIndexed { index, certInfo ->
                     if (cert1 == null) {
                         cert1 = certInfo
-                    } else if (certInfo.publicKeyAlgorithm != cert1?.publicKeyAlgorithm) {
+                    } else if (certInfo != null && certInfo.publicKeyAlgorithm != cert1?.publicKeyAlgorithm) {
                         add(infereSmartcardFrom(entry, index - 1, cert1!!, certInfo))
                         cert1 = null
                     } else {

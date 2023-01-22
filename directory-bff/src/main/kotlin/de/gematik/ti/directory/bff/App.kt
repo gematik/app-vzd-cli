@@ -17,23 +17,24 @@ fun main() {
 }
 
 fun Application.directoryApplication() {
-    val directoryApiAdminEnv by Setting()
-    val directoryApiAdminClientId by Setting()
-    val directoryApiAdminClientSecret by Setting()
+    log.info("Starting Directory BFF v.${BuildConfig.APP_VERSION}")
+    val directoryBffAdminEnv by Setting()
+    val directoryBffAdminClientId by Setting()
+    val directoryBffAdminClientSecret by Setting()
 
     checkMandatorySettings(
         "DIRECTORY_BFF_ADMIN_ENV",
         "DIRECTORY_BFF_ADMIN_CLIENT_ID",
         "DIRECTORY_BFF_ADMIN_CLIENT_SECRET",
     )
-    val env = AdminEnvironment.valueOf(directoryApiAdminEnv)
+    val env = AdminEnvironment.valueOf(directoryBffAdminEnv)
     val authenticator = ClientCredentialsAuthenticator(DefaultConfig.environment(env).authURL, null)
 
     val adminClient = Client {
         apiURL = DefaultConfig.environment(env).apiURL
         auth {
             accessToken {
-                authenticator.authenticate(directoryApiAdminClientId, directoryApiAdminClientSecret).accessToken
+                authenticator.authenticate(directoryBffAdminClientId, directoryBffAdminClientSecret).accessToken
             }
         }
     }

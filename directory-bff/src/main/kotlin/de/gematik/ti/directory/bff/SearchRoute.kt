@@ -16,23 +16,6 @@ data class SearchResultsRepresentation(
     val directoryEntries: List<ElaborateDirectoryEntry>,
 )
 
-@Serializable
-data class DirectoryEntrySearchRepresentation(
-    val base: BaseDirectoryEntry,
-) {
-    companion object {
-        fun from(entry: DirectoryEntry): DirectoryEntrySearchRepresentation {
-            return DirectoryEntrySearchRepresentation(
-                base = entry.directoryEntryBase,
-            ).let {
-                // todo: hide meta from end users?
-                it.base.meta = null
-                it
-            }
-        }
-    }
-}
-
 fun Route.searchRoute() {
     get("search") {
         val searchQuery = call.request.queryParameters["q"] ?: throw BadRequestException()

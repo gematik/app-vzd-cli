@@ -1,7 +1,9 @@
 plugins {
     id("de.gematik.directory.app-conventions")
     kotlin("plugin.serialization") version "1.7.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+    id("io.ktor.plugin") version "2.2.2"
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {

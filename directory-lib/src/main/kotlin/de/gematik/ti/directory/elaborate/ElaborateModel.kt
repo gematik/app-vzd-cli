@@ -53,7 +53,7 @@ data class ElaborateBaseDirectoryEntry(
     var maxKOMLEadr: Int? = null,
 
     // Misc
-    var active: Boolean = true,
+    var active: Boolean,
     var meta: List<String>? = null,
 )
 
@@ -88,7 +88,7 @@ data class Smartcard(
     val notBefore: Instant,
     val notAfter: Instant,
     val active: Boolean,
-    val certificateRefs: List<Int>,
+    val certificateSerialNumbers: List<String>,
 )
 
 @Serializable

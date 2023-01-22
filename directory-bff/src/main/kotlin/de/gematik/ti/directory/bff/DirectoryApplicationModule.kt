@@ -46,6 +46,7 @@ fun Application.directoryApplicationModule(adminClient: Client) {
         route("api") {
             infoRoute()
             searchRoute()
+            entryRoute()
         }
     }
 }
