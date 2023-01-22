@@ -1,4 +1,4 @@
-package de.gematik.ti.directory.validation.rules
+package de.gematik.ti.directory.elaborate.validation
 
 import de.gematik.ti.directory.elaborate.ElaborateBaseDirectoryEntry
 import de.gematik.ti.directory.validation.FindingSeverity

@@ -13,11 +13,6 @@ enum class FindingSeverity {
 data class Finding(
     val code: String,
     val severity: FindingSeverity,
-    val templateValues: List<String>? = null,
-)
-
-@Serializable
-data class ValidationResult(
-    val findings: List<Finding>? = null,
-    val attributes: Map<String, ValidationResult>? = null,
+    val index: Int? = null,
+    val key: String? = null,
 )

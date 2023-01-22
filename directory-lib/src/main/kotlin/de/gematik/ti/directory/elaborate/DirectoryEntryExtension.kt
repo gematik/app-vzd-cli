@@ -2,17 +2,26 @@ package de.gematik.ti.directory.elaborate
 
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.elaborate.validation.validate
 import de.gematik.ti.directory.fhir.OrganizationProfessionOID
 import de.gematik.ti.directory.fhir.PractitionerProfessionOID
 
 fun DirectoryEntry.elaborate(): ElaborateDirectoryEntry {
     val entry = this
+    val base = entry.directoryEntryBase.elaborate()
+    val baseValidationResult = base.validate()
+    val validationResult = if (baseValidationResult?.isNotEmpty() == true) {
+        ValidationResult(base=baseValidationResult)
+    } else {
+        null
+    }
     return ElaborateDirectoryEntry(
         kind = infereKind(),
-        base = entry.directoryEntryBase.elaborate(),
+        base = base,
         userCertificates = entry.userCertificates?.mapNotNull { it },
         kimAddresses = infereKIMAddresses(),
         smartcards = infereSmartcards(),
+        validationResult = validationResult
     )
 }
 

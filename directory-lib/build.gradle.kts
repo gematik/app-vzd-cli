@@ -20,8 +20,6 @@ dependencies {
     api("io.ktor:ktor-client-auth:$ktorVersion")
     api("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     api("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    // Validation framework
-    api("io.konform:konform-jvm:0.4.0")
     // Bouncy castle fpr crypto and certificates processing
     val bcVersion: String by project
     api("org.bouncycastle:bcprov-jdk15on:$bcVersion")

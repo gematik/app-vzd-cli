@@ -2,6 +2,7 @@ package de.gematik.ti.directory.elaborate
 
 import de.gematik.ti.directory.admin.DistinguishedName
 import de.gematik.ti.directory.admin.UserCertificate
+import de.gematik.ti.directory.validation.Finding
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
@@ -12,7 +13,12 @@ data class ElaborateDirectoryEntry(
     val userCertificates: List<UserCertificate>? = null,
     val kimAddresses: List<ElaborateKIMAddress>? = null,
     val smartcards: List<Smartcard>? = null,
-    val validationResult: ValidationResult? = null,
+    var validationResult: ValidationResult? = null,
+)
+
+@Serializable
+data class ValidationResult(
+    val base: Map<String, List<Finding>>?
 )
 
 @Serializable
