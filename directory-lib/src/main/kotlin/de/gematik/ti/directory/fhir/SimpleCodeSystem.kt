@@ -20,7 +20,6 @@ class SimpleCodeSystem(
     }
 }
 
-private val json = Json { ignoreUnknownKeys = true }
 
 private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem {
     return json.decodeFromString(SimpleCodeSystem::class.java.getResource("/de.gematik.fhir.directory/CodeSystem-$name.json")!!.readText())

@@ -85,6 +85,8 @@ private class HumanDirectoryEntry(
     var kind: DirectoryEntryKind? = null,
 
     var active: Boolean? = null,
+
+    var validationResult: ValidationResult? = null,
 )
 
 object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
@@ -151,6 +153,7 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
             kind = entry.kind,
             active = entry.base.active,
 
+            validationResult = entry.validationResult
         )
 
         encoder.encodeSerializableValue(HumanDirectoryEntry.serializer(), surrogate)
