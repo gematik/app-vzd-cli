@@ -18,7 +18,7 @@ data class ElaborateDirectoryEntry(
 
 @Serializable
 data class ValidationResult(
-    val base: Map<String, List<Finding>>?
+    val base: Map<String, List<Finding>>?,
 )
 
 @Serializable

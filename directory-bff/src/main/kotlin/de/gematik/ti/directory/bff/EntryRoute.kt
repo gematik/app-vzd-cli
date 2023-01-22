@@ -4,7 +4,6 @@ import de.gematik.ti.directory.admin.DistinguishedName
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.admin.readDirectoryEntryByTelematikID
 import de.gematik.ti.directory.elaborate.*
-import de.gematik.ti.directory.elaborate.validation.validate
 import de.gematik.ti.directory.pki.AdmissionStatementInfo
 import de.gematik.ti.directory.pki.NameInfo
 import de.gematik.ti.directory.pki.OCSPResponse
@@ -58,20 +57,21 @@ class RestrictedCertificateInfo(
     }
 }
 
-
 fun Route.entryRoute() {
     get("entry/{telematikID}") {
         val telematikID = call.parameters["telematikID"] ?: throw BadRequestException()
         call.adminClient.readDirectoryEntryByTelematikID(telematikID)?.let { entry ->
-            call.respond(entry.elaborate().let {
-                RestrictedDirectoryEntry(
-                    kind = it.kind,
-                    base = it.base,
-                    userCertificateInfos = it.userCertificates?.map { cert -> RestrictedCertificateInfo.from(cert)  },
-                    smartcards = it.smartcards,
-                    validationResult = it.validationResult,
-                )
-            })
+            call.respond(
+                entry.elaborate().let {
+                    RestrictedDirectoryEntry(
+                        kind = it.kind,
+                        base = it.base,
+                        userCertificateInfos = it.userCertificates?.map { cert -> RestrictedCertificateInfo.from(cert) },
+                        smartcards = it.smartcards,
+                        validationResult = it.validationResult,
+                    )
+                },
+            )
         }
     }
 }

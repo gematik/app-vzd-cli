@@ -1,7 +1,5 @@
 package de.gematik.ti.directory.bff
 
-import de.gematik.ti.directory.admin.BaseDirectoryEntry
-import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.admin.quickSearch
 import de.gematik.ti.directory.elaborate.ElaborateDirectoryEntry
 import de.gematik.ti.directory.elaborate.elaborate

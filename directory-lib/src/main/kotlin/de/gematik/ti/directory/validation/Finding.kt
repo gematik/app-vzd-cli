@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 enum class FindingSeverity {
     INFO,
     WARNING,
-    ERROR
+    ERROR,
 }
 
 @Serializable

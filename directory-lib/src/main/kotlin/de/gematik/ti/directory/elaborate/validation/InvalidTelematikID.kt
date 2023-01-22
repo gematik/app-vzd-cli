@@ -5,7 +5,7 @@ import de.gematik.ti.directory.validation.FindingSeverity
 import de.gematik.ti.directory.validation.ValidationRule
 
 val pattern = Regex("^[0-9]+-[._\\-\\p{L}0-9]+$")
-object InvalidTelematikID: ValidationRule<ElaborateBaseDirectoryEntry>({
+object InvalidTelematikID : ValidationRule<ElaborateBaseDirectoryEntry>({
     if (!it.telematikID.matches(pattern)) {
         addFinding(ElaborateBaseDirectoryEntry::telematikID, FindingSeverity.ERROR)
     }

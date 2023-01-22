@@ -11,7 +11,7 @@ fun DirectoryEntry.elaborate(): ElaborateDirectoryEntry {
     val base = entry.directoryEntryBase.elaborate()
     val baseValidationResult = base.validate()
     val validationResult = if (baseValidationResult?.isNotEmpty() == true) {
-        ValidationResult(base=baseValidationResult)
+        ValidationResult(base = baseValidationResult)
     } else {
         null
     }
@@ -21,7 +21,7 @@ fun DirectoryEntry.elaborate(): ElaborateDirectoryEntry {
         userCertificates = entry.userCertificates?.mapNotNull { it },
         kimAddresses = infereKIMAddresses(),
         smartcards = infereSmartcards(),
-        validationResult = validationResult
+        validationResult = validationResult,
     )
 }
 

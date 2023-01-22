@@ -4,7 +4,6 @@ import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.elaborate.ElaborateBaseDirectoryEntry
 import de.gematik.ti.directory.elaborate.elaborate
-import de.gematik.ti.directory.elaborate.validation.InvalidDisplayName
 import de.gematik.ti.directory.elaborate.validation.validate
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldNotBe

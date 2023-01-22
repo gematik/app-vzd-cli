@@ -25,6 +25,7 @@ import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 
 private val timeZone = TimeZone.of("Europe/Berlin")
+
 /**
  * Textual information about the X509 Certificate
  */

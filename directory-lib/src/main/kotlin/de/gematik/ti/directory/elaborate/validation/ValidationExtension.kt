@@ -10,6 +10,7 @@ fun ElaborateBaseDirectoryEntry.validate(): Map<String, List<Finding>>? {
             InvalidDisplayName,
             InvalidSpecialization,
             InvalidTelematikID,
-            ),
-        this).validate()
+        ),
+        this,
+    ).validate()
 }

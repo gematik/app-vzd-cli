@@ -9,7 +9,8 @@ class ValidationRuleContext<T>(val validation: Validation<T>, val validationRule
         property: KProperty1<T, *>,
         severity: FindingSeverity,
         index: Int? = null,
-        key: String? = null) {
+        key: String? = null,
+    ) {
         validation.addFinding(property, Finding(validationRule.javaClass.simpleName, severity, index, key))
     }
 
@@ -32,4 +33,3 @@ class Validation<T>(val rules: List<ValidationRule<T>>, val value: T) {
         findings.getOrPut(property.name) { mutableListOf() }.add(finding)
     }
 }
-
