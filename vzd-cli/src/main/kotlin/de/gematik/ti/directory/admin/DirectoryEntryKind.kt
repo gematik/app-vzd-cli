@@ -48,12 +48,12 @@ enum class DirectoryEntryKind(val matcher: (DirectoryEntry) -> Boolean) {
     }),
     HBAeGBR({ directoryEntry ->
         directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("10-67.22")
+            it.startsWith("10-67.23")
         }
     }),
     SMCBeGBR({ directoryEntry ->
         directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("10-67.22")
+            it.startsWith("10-67.24")
         }
     }),
 
