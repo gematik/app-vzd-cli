@@ -152,6 +152,13 @@ export interface ElaborateDirectoryEntry {
   base: ElaborateBaseDirectoryEntry
   userCertificates?: UserCertificate[]
   kind: DirectoryEntryKind
+  kimAddresses?: [ElaborateKIMAddress] 
+}
+
+export interface ElaborateKIMAddress {
+    mail: string,
+    version: string,
+    provider?: CodeableConcept,
 }
 
 export interface ElaborateSearchResults {

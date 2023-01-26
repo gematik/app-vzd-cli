@@ -79,13 +79,15 @@
                     <ibm-structured-list [border]="false" [condensed]="true" [nowrap]="false">
                         <ibm-list-header>
                             <ibm-list-column [nowrap]="true">KIM-Adresse</ibm-list-column>
+                            <ibm-list-column>Version</ibm-list-column>
                             <ibm-list-column>Anbieter</ibm-list-column>
                         </ibm-list-header>
-                        <ibm-list-row *ngFor="let kimAddress of kimAddressList">
+                        <ibm-list-row *ngFor="let kimAddress of entry.kimAddresses">
                             <ibm-list-column>{{kimAddress?.mail}}</ibm-list-column>
-                            <ibm-list-column>{{kimAddress?.provider}}</ibm-list-column>
+                            <ibm-list-column>{{kimAddress?.version}}</ibm-list-column>
+                            <ibm-list-column>{{kimAddress?.provider?.display}}</ibm-list-column>
                         </ibm-list-row>
-                        <ibm-list-row *ngIf="kimAddressList === undefined || kimAddressList?.length === 0">
+                        <ibm-list-row *ngIf="entry.kimAddresses === undefined">
                             <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg> Keine KIM-Adressen</ibm-list-column>
                             <ibm-list-column></ibm-list-column>
                         </ibm-list-row>

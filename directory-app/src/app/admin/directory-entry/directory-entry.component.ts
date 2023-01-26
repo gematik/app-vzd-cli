@@ -46,31 +46,11 @@ export class DirectoryEntryComponent implements OnInit {
       this.adminBackend.loadEntry(this.env, telematikID).then(
         value => {
           this.entry = value
-          this.kimAddressList = this.createKIMAddressList(value)
           this.userCertificateList = this.createUserCertificateList(value)
           this.changeDetector.detectChanges()
         }
       )
     })
-  }
-
-  private createKIMAddressList(entry: ElaborateDirectoryEntry): KIMAddressInfo[] {
-    return []
-    /*
-    return this.entry?.Fachdaten 
-    ?.map ( it => it.FAD1 )
-    .flat()
-    .map( it => { 
-      return it.mail?.map( mail => { 
-        return {
-          mail: mail, 
-          provider: it.dn.ou?.find(x=>x!==undefined) 
-        } 
-      })
-    }) 
-    .flat() 
-    .filter( x => x !== undefined) as KIMAddressInfo[]
-    */
   }
 
   private createUserCertificateList(entry: ElaborateDirectoryEntry): UserCertificateInfo[] {
