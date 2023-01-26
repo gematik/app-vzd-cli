@@ -2,17 +2,12 @@
 
 == Release
 
-Die gewünschte Versionsnummer in `vzd-cli/build.gradle.kts` setzen, z.B. 0.13.0
+Die gewünschte Versionsnummer in `vzd-cli/build.gradle.kts` setzen, z.B. 2.2.0
 
 === Build und Test
 [source,bash]
 ----
-ktlint -F --disabled_rules=no-wildcard-imports
-./gradlew clean
-./gradlew build -x test 
-java -jar ./vzd-cli/build/libs/vzd-cli-all.jar admin tu login
-export TEST_ACCESS_TOKEN=$(gradle -q run --args="admin tu token")
-./gradlew build
+make dist
 ----
 
 === Release im github veröffentlichen 
@@ -21,8 +16,6 @@ export TEST_ACCESS_TOKEN=$(gradle -q run --args="admin tu token")
 
 [source,bash]
 ----
-VERSION=2.1.0
-gh release create ${VERSION}
-gh release upload ${VERSION} vzd-cli/build/distributions/vzd-cli-${VERSION}.zip
+make release
 ----
 

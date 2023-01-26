@@ -34,7 +34,7 @@ class TestClient {
             return
         }
 
-        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-cli-only-telematikID")
+        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-cli-only-telematikID", entryType = listOf("1"))
         val directoryEntry = CreateDirectoryEntry(baseDirectoryEntry)
         val dn = runBlocking { client?.addDirectoryEntry(directoryEntry) }
         assertNotNull(dn)
@@ -47,7 +47,7 @@ class TestClient {
 
     @Test
     fun testCreateDirectoryEntry() {
-        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-cli-123456890")
+        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-cli-123456890", entryType = listOf("1"))
         baseDirectoryEntry.domainID = listOf("gematik_test", TestClient::class.qualifiedName!!)
         baseDirectoryEntry.displayName = "Uniklinik Entenhausen"
         baseDirectoryEntry.organization = "Comics Krankenhaus"
@@ -69,7 +69,7 @@ class TestClient {
             displayName = "Uniklinik Entenhausen (modified)",
             domainID = directoryEntry.directoryEntryBase!!.domainID,
             postalCode = "54321",
-            holder = listOf("gematik_test")
+            holder = listOf("gematik_test"),
         )
 
         runBlocking { client?.modifyDirectoryEntry(dn.uid, updateDirectoryEntry) }

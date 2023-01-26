@@ -15,9 +15,9 @@ import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.cli.escape
-import de.gematik.ti.directory.util.ExtendedCertificateDataDERSerializer
-import de.gematik.ti.directory.util.OCSPResponseCertificateStatus
+import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
+import de.gematik.ti.directory.pki.OCSPResponseCertificateStatus
+import de.gematik.ti.directory.util.escape
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -30,23 +30,27 @@ import kotlinx.serialization.modules.contextual
 import me.tongfei.progressbar.ProgressBar
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
-import kotlin.io.path.*
+import kotlin.io.path.Path
+import kotlin.io.path.exists
+import kotlin.io.path.useLines
+import kotlin.io.path.writeBytes
 import kotlin.system.measureTimeMillis
 
-private val jsonExtended = Json {
+private val logger = KotlinLogging.logger {}
+
+var NDJSON = Json {
+    encodeDefaults = true
     serializersModule = SerializersModule {
         contextual(ExtendedCertificateDataDERSerializer)
     }
-    encodeDefaults = true
 }
-private val logger = KotlinLogging.logger {}
 
 class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the data dumps") {
     init {
         subcommands(
             DumpCreateCommand(),
             DumpOcspCommand(),
-            DumpSaveCert()
+            DumpSaveCert(),
         )
     }
 
@@ -58,13 +62,13 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         "-f",
         "--param-file",
         help = "Read parameter values from file",
-        metavar = "PARAM FILENAME"
+        metavar = "PARAM FILENAME",
     ).pair()
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
         metavar = "PARAM=VALUE",
-        help = "Specify query parameters to find matching entries"
+        help = "Specify query parameters to find matching entries",
     ).associate()
     private val cursorSize by option("-c", "--cursor-size", help = "Size of the cursor per HTTP Request")
         .int().default(500)
@@ -112,7 +116,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
                             semaphore.withPermit {
                                 expandOcspStatus(entry)
                                 logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
-                                println(jsonExtended.encodeToString(entry))
+                                println(NDJSON.encodeToString(entry))
                                 progressBar.step()
                                 entries++
                             }
@@ -142,7 +146,7 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
                 System.`in`.bufferedReader().lineSequence().forEach { line ->
                     launch {
                         semaphore.withPermit {
-                            val entry: DirectoryEntry = jsonExtended.decodeFromString(line)
+                            val entry: DirectoryEntry = JsonDirectoryEntryExt.decodeFromString(line)
                             entries++
                             logger.debug { "Processing TelematikID: ${entry.directoryEntryBase.telematikID}" }
                             entry.userCertificates?.mapNotNull { it.userCertificate }?.forEach { cert ->
@@ -152,7 +156,7 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
                                     cert.certificateInfo.ocspResponse = context.pkiClient.ocsp(cert)
                                 }
                             }
-                            println(jsonExtended.encodeToString(entry))
+                            println(NDJSON.encodeToString(entry))
                         }
                     }
                 }
@@ -173,7 +177,7 @@ class DumpSaveCert : CliktCommand(name = "save-cert", help = "Reads dump from ST
         val elapsed = measureTimeMillis {
             runBlocking {
                 System.`in`.bufferedReader().lineSequence().forEach { line ->
-                    val entry: DirectoryEntry = jsonExtended.decodeFromString(line)
+                    val entry: DirectoryEntry = JsonDirectoryEntryExt.decodeFromString(line)
                     entries++
                     entry.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.forEach { certInfo ->
                         val filename = "${certInfo.admissionStatement.registrationNumber.escape()}-${certInfo.serialNumber}.der"

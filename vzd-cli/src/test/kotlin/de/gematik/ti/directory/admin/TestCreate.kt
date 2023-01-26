@@ -1,6 +1,6 @@
 package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.pki.CertificateDataDER
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FeatureSpec
@@ -26,7 +26,7 @@ class TestCreate : FeatureSpec({
     feature("Erstellen eines neuen Eintrag") {
         scenario("Einfaches create mit nur TelematikID und domainID") {
             val entry = CreateDirectoryEntry()
-            entry.directoryEntryBase = BaseDirectoryEntry("1-" + TestCreate::class.qualifiedName!!)
+            entry.directoryEntryBase = BaseDirectoryEntry("1-" + TestCreate::class.qualifiedName!!, entryType = listOf("1"))
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
             val dn = client?.addDirectoryEntry(entry)
 
@@ -36,7 +36,7 @@ class TestCreate : FeatureSpec({
         }
         scenario("Eintrag mit existierenden TelematikID wird abgelehnt") {
             val entry = CreateDirectoryEntry()
-            entry.directoryEntryBase = BaseDirectoryEntry("1-" + TestCreate::class.qualifiedName!!)
+            entry.directoryEntryBase = BaseDirectoryEntry("1-" + TestCreate::class.qualifiedName!!, listOf("1"))
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
             shouldThrow<AdminResponseException> {
                 client?.addDirectoryEntry(entry)
@@ -68,7 +68,7 @@ class TestCreate : FeatureSpec({
                     client?.deleteDirectoryEntry(it.directoryEntryBase.dn?.uid!!)
                 }
             entry.directoryEntryBase =
-                BaseDirectoryEntry(certData.certificateInfo.admissionStatement.registrationNumber)
+                BaseDirectoryEntry(certData.certificateInfo.admissionStatement.registrationNumber, entryType = listOf("3"))
             entry.directoryEntryBase?.domainID = listOf(TestCreate::class.qualifiedName!!)
             val dn = client?.addDirectoryEntry(entry)
 

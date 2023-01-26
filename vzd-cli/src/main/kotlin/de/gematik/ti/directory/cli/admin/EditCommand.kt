@@ -24,9 +24,9 @@ class EditCommand : CliktCommand(name = "edit", help = "Edit base entry using te
     private val telematikID by argument()
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val format by option().switch(
-        "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML
-    ).default(OutputFormat.YAML)
+        "--json" to RepresentationFormat.JSON,
+        "--yaml" to RepresentationFormat.YAML,
+    ).default(RepresentationFormat.YAML)
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -35,16 +35,16 @@ class EditCommand : CliktCommand(name = "edit", help = "Edit base entry using te
         val entry = queryResult?.firstOrNull() ?: throw CliktError("Entry not found for TelematikID: $telematikID")
 
         val textToEdit = when (format) {
-            OutputFormat.YAML -> Yaml.encodeToString(entry.directoryEntryBase)
-            OutputFormat.JSON -> JsonPretty.encodeToString(entry.directoryEntryBase)
+            RepresentationFormat.YAML -> Yaml.encodeToString(entry.directoryEntryBase)
+            RepresentationFormat.JSON -> JsonPretty.encodeToString(entry.directoryEntryBase)
             else -> throw UsageError("Unsupported edit format: $format")
         }
 
         TermUi.editText(textToEdit, requireSave = true)?.let { edited ->
 
             val editedBaseDirectoryEntry: BaseDirectoryEntry = when (format) {
-                OutputFormat.YAML -> Yaml.decodeFromString(edited)
-                OutputFormat.JSON -> JsonPretty.decodeFromString(edited)
+                RepresentationFormat.YAML -> Yaml.decodeFromString(edited)
+                RepresentationFormat.JSON -> JsonPretty.decodeFromString(edited)
                 else -> throw UsageError("Unsupported edit format: $format")
             }
 
@@ -57,8 +57,8 @@ class EditCommand : CliktCommand(name = "edit", help = "Edit base entry using te
             val result = runBlocking { context.client.readDirectoryEntry(mapOf("uid" to uid)) }
 
             val entryAfterEdit = when (format) {
-                OutputFormat.YAML -> Yaml.encodeToString(result?.first()?.directoryEntryBase)
-                OutputFormat.JSON -> JsonPretty.encodeToString(result?.first()?.directoryEntryBase)
+                RepresentationFormat.YAML -> Yaml.encodeToString(result?.first()?.directoryEntryBase)
+                RepresentationFormat.JSON -> JsonPretty.encodeToString(result?.first()?.directoryEntryBase)
                 else -> throw UsageError("Unsupported edit format: $format")
             }
 

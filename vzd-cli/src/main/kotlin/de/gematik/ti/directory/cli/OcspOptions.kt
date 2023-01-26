@@ -7,7 +7,7 @@ import com.github.ajalt.clikt.parameters.options.option
 class OcspOptions : OptionGroup("OCSP options") {
     val enableOcsp: Boolean by option(
         "--ocsp",
-        help = "Validate certificates using OCSP"
+        help = "Validate certificates using OCSP",
     )
         .flag()
 }

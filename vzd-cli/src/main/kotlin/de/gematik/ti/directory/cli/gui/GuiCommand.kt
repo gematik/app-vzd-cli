@@ -5,7 +5,7 @@ import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
-import de.gematik.ti.directory.bff.directoryModule
+import de.gematik.ti.directory.cli.bff.directoryModule
 import de.gematik.ti.directory.cli.catching
 import io.ktor.server.application.*
 import io.ktor.server.engine.*

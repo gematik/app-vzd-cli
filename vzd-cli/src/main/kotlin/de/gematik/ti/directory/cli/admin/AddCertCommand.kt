@@ -11,7 +11,7 @@ import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.pki.CertificateDataDER
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -45,7 +45,7 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
                     try {
                         context.client.addDirectoryEntryCertificate(
                             it.directoryEntryBase.dn?.uid!!,
-                            userCertificate
+                            userCertificate,
                         )
                         echo("Added certificate: telematikID=${userCertificate.userCertificate?.certificateInfo?.admissionStatement?.registrationNumber} serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber}")
                     } catch (e: AdminResponseException) {

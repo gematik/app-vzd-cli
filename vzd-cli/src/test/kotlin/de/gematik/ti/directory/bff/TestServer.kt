@@ -1,5 +1,6 @@
 package de.gematik.ti.directory.bff
 
+import de.gematik.ti.directory.cli.bff.directoryModule
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*

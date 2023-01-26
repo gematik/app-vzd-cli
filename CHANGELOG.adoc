@@ -1,5 +1,17 @@
 = Changelog `vzd-cli`
 
+== Version 2.2.0
+- Quellcode wurde in Vorbereitung der Web-Version des Clients modularisiert und umstrukturiert
+- Microservice Client `directory-bff`
+- Rudimentäre Validierung der Basiseinträge
+- Versionen der Abhängigkeiten wurden aktualisiert
+- Kompatibilität mit VZD 3.2.0 und Admin API 1.9.4
+- `--human` Output Format ist jetzt deutlich kompakter und lesbar
+- Neue Output Formate: `--yaml-ext` und `--json-ext`
+- Zertifikate werden zu Smartcards gebündelt
+- Attribut `kind` um welchen Eintrag es sich handelt (z.B. Apotheke oder Krankenhaus)
+- `--meta` Option kann jetzt bei Anfragen genutzt werden
+
 == Version 2.1.0
 - CLI Interface wurde weitgehend überarbeiten un vereinfacht, s. Dokumentation
 - Self-Update Funktion wurde implementiert, s. `vzd-cli update`

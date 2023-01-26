@@ -13,18 +13,6 @@ class TestQuickSearch : FeatureSpec({
         client = createClient()
     }
 
-    feature("Tokenizer is able to detect multi-word locality") {
-        scenario("Support for 3 words localities") {
-            val tokens = Tokenizer.tokenize("Frankfurt am Main")
-            tokens.size shouldBe 1
-            tokens[0].type shouldBe TokenType.LocalityName
-        }
-        scenario("Tokenize by locality, which is present als plain name and name with additions") {
-            val tokens = Tokenizer.tokenize("Herzberg am Hartz")
-            println(tokens.map { "${it.type}=${it.value}" })
-        }
-    }
-
     feature("Quick Search") {
         scenario("Search by localityName") {
             runBlocking {

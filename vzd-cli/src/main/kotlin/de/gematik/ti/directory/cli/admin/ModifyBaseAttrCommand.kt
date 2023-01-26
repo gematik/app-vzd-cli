@@ -11,7 +11,8 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.UpdateBaseDirectoryEntry
-import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.cli.*
+import de.gematik.ti.directory.cli.toJsonPrettyNoDefaults
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -25,20 +26,20 @@ class ModifyBaseAttrCommand : CliktCommand(name = "modify-base-attr", help = "Mo
     private val context by requireObject<AdminCliEnvironmentContext>()
 
     private val format by option().switch(
-        "--yaml" to OutputFormat.YAML,
-        "--json" to OutputFormat.JSON
-    ).default(OutputFormat.YAML)
+        "--yaml" to RepresentationFormat.YAML,
+        "--json" to RepresentationFormat.JSON,
+    ).default(RepresentationFormat.YAML)
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
-        help = "Specify query parameters to find matching entries"
+        help = "Specify query parameters to find matching entries",
     ).associate()
     private val parameterOptions by ParameterOptions()
     private val attrs: Map<String, String> by option(
         "-s",
         "--set",
         metavar = "ATTR=VALUE",
-        help = "Set the attribute value in BaseDirectoryEntry."
+        help = "Set the attribute value in BaseDirectoryEntry.",
     ).associate()
 
     override fun run() = catching {
@@ -72,8 +73,8 @@ class ModifyBaseAttrCommand : CliktCommand(name = "modify-base-attr", help = "Mo
             val result = runBlocking { context.client.readDirectoryEntry(mapOf("uid" to dn.uid)) }
 
             when (format) {
-                OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)
-                OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
+                RepresentationFormat.JSON -> echo(result?.first()?.directoryEntryBase?.toJsonPrettyNoDefaults())
+                RepresentationFormat.YAML -> echo(result?.first()?.directoryEntryBase?.toYamlNoDefaults())
                 else -> throw UsageError("Unsupported format: $format")
             }
         }

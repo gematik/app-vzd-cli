@@ -15,10 +15,12 @@ import kotlinx.coroutines.runBlocking
 
 class ShowCommand : CliktCommand(name = "show", help = "Show all information about an entry") {
     private val outputFormat by option().switch(
-        "--human" to OutputFormat.HUMAN,
-        "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML
-    ).default(OutputFormat.HUMAN)
+        "--human" to RepresentationFormat.HUMAN,
+        "--json" to RepresentationFormat.JSON,
+        "--yaml" to RepresentationFormat.YAML,
+        "--yaml-ext" to RepresentationFormat.YAML_EXT,
+        "--json-ext" to RepresentationFormat.JSON_EXT,
+    ).default(RepresentationFormat.HUMAN)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val id by argument()
@@ -28,12 +30,10 @@ class ShowCommand : CliktCommand(name = "show", help = "Show all information abo
         val entry = runBlocking { client.readDirectoryEntryByTelematikID(id) }
             ?: throw CliktError("Entry with TelematikID '$id' not found")
 
-        val entryList = listOf(entry)
-
         if (ocspOptions.enableOcsp) {
-            runBlocking { context.adminAPI.expandOCSPStatus(entryList) }
+            runBlocking { context.adminAPI.expandOCSPStatus(listOf(entry)) }
         }
 
-        DirectoryEntryOutputMapping[outputFormat]?.invoke(emptyMap(), entryList)
+        echo(entry.toStringRepresentation(outputFormat))
     }
 }

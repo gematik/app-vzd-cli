@@ -15,7 +15,7 @@
     <div ibmCol [columnNumbers]="{'lg': 8}">
         <div ibmRow>
             <div ibmCol>
-                <h1>{{entry.DirectoryEntryBase.displayName}}</h1>
+                <h1>{{entry.base.displayName}}</h1>
             </div>
         </div>
         <ibm-tabs [isNavigation]="false">
@@ -28,7 +28,7 @@
                     Anzeige name
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.displayName"
+                        [(ngModel)]="entry.base.displayName"
                         readonly="true"
                     >
                 </ibm-label>
@@ -37,7 +37,7 @@
                     TelematikID
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.telematikID"
+                        [(ngModel)]="entry.base.telematikID"
                         readonly="true"
                     >
                 </ibm-label> 
@@ -46,7 +46,7 @@
                     Adresse
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.streetAddress"
+                        [(ngModel)]="entry.base.streetAddress"
                         readonly="true"
                     >
                 </ibm-label> 
@@ -59,7 +59,7 @@
                     Ort
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.localityName"
+                        [(ngModel)]="entry.base.localityName"
                         readonly="true"
                     >
                 </ibm-label>
@@ -70,7 +70,7 @@
                     PLZ
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.postalCode"
+                        [(ngModel)]="entry.base.postalCode"
                         readonly="true"
                     >
                 </ibm-label>
@@ -79,13 +79,15 @@
                     <ibm-structured-list [border]="false" [condensed]="true" [nowrap]="false">
                         <ibm-list-header>
                             <ibm-list-column [nowrap]="true">KIM-Adresse</ibm-list-column>
+                            <ibm-list-column>Version</ibm-list-column>
                             <ibm-list-column>Anbieter</ibm-list-column>
                         </ibm-list-header>
-                        <ibm-list-row *ngFor="let kimAddress of kimAddressList">
+                        <ibm-list-row *ngFor="let kimAddress of entry.kimAddresses">
                             <ibm-list-column>{{kimAddress?.mail}}</ibm-list-column>
-                            <ibm-list-column>{{kimAddress?.provider}}</ibm-list-column>
+                            <ibm-list-column>{{kimAddress?.version}}</ibm-list-column>
+                            <ibm-list-column>{{kimAddress?.provider?.display}}</ibm-list-column>
                         </ibm-list-row>
-                        <ibm-list-row *ngIf="kimAddressList === undefined || kimAddressList?.length === 0">
+                        <ibm-list-row *ngIf="entry.kimAddresses === undefined">
                             <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg> Keine KIM-Adressen</ibm-list-column>
                             <ibm-list-column></ibm-list-column>
                         </ibm-list-row>

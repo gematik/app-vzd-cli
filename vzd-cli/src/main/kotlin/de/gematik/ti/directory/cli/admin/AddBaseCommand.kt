@@ -12,6 +12,8 @@ import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.CreateDirectoryEntry
 import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.cli.toJsonPretty
+import de.gematik.ti.directory.cli.toYaml
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
@@ -30,7 +32,7 @@ fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<String, St
 
         if (property.propertyType == String::class.java) {
             property.writeMethod.invoke(baseDirectoryEntry, value)
-        } else if (property.propertyType == Int::class.java) {
+        } else if (property.propertyType == Int::class.java || property.propertyType == Integer::class.java) {
             property.writeMethod.invoke(baseDirectoryEntry, value.toInt())
         } else if (property.readMethod.genericReturnType.typeName == "java.util.List<java.lang.String>") {
             property.writeMethod.invoke(baseDirectoryEntry, value.split(',').map { it.trim() })
@@ -46,23 +48,23 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
         "-s",
         "--set",
         metavar = "ATTR=VALUE",
-        help = "Set the attribute value in BaseDirectoryEntry."
+        help = "Set the attribute value in BaseDirectoryEntry.",
     ).associate()
     private val deprecatedFile: String? by option(
         "--file",
         "-f",
         metavar = "FILENAME",
-        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN"
+        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN",
     ).deprecated("WARINING: -f / --file ist deprecated. Use argument without option instead.")
     private val inputFile by argument(
-        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN"
+        help = "Read the BaseDirectoryEntry from specified file, use - to read data from STDIN",
     ).path(mustExist = true, canBeDir = false, mustBeReadable = true).optional()
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (entry exists).").flag()
     private val format by option().switch(
-        "--yaml" to OutputFormat.YAML,
-        "--json" to OutputFormat.JSON
-    ).default(OutputFormat.YAML)
+        "--yaml" to RepresentationFormat.YAML,
+        "--json" to RepresentationFormat.JSON,
+    ).default(RepresentationFormat.YAML)
 
     override fun run() = catching {
         val input = inputFile ?: deprecatedFile
@@ -79,14 +81,16 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
 
         val baseDirectoryEntry: BaseDirectoryEntry = data?.let {
             when (format) {
-                OutputFormat.YAML -> Yaml.decodeFromString(it)
-                OutputFormat.JSON -> Json.decodeFromString(it)
+                RepresentationFormat.YAML -> Yaml.decodeFromString(it)
+                RepresentationFormat.JSON -> Json.decodeFromString(it)
                 else -> throw CliktError("Unsupported format: $format")
             }
         } ?: run {
-            val telematikID: String = attrs["telematikID"] ?: throw UsageError("Option --set telematikID=<VALUE> or --file is required")
+            val telematikID = attrs["telematikID"] ?: throw UsageError("Option --set telematikID=<VALUE> or --file is required")
+            val entryType = attrs["entryType"]?.toInt() ?: throw UsageError("Option --set entryType=<VALUE> or --file is required")
             BaseDirectoryEntry(
-                telematikID = telematikID
+                telematikID = telematikID,
+                entryType = listOf(entryType.toString()),
             )
         }
 
@@ -109,8 +113,8 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
         }
 
         when (format) {
-            OutputFormat.JSON -> Output.printJson(result?.first()?.directoryEntryBase)
-            OutputFormat.YAML -> Output.printYaml(result?.first()?.directoryEntryBase)
+            RepresentationFormat.JSON -> echo(result?.first()?.directoryEntryBase?.toJsonPretty())
+            RepresentationFormat.YAML -> echo(result?.first()?.directoryEntryBase?.toYaml())
             else -> throw UsageError("Cant load for editing in for format: $format")
         }
     }

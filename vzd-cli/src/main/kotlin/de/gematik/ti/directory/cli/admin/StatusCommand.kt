@@ -3,6 +3,7 @@ package de.gematik.ti.directory.cli.admin
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.cli.toYaml
 import kotlinx.coroutines.runBlocking
 
 class StatusCommand : CliktCommand(name = "status", help = "Show information about the API") {
@@ -10,7 +11,7 @@ class StatusCommand : CliktCommand(name = "status", help = "Show information abo
 
     override fun run() = catching {
         runBlocking {
-            Output.printYaml(context.adminAPI.status(true))
+            echo(context.adminAPI.status(true).toYaml())
         }
     }
 }

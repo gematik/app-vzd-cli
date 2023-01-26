@@ -402,7 +402,7 @@ vzd-cli admin ru list -f telematikID telematik.txt --table
 
 === `vzd-cli admin <tu|ru|pu> template`
 
-Generiert die Dateivorlagen für `add` oder `modify` Befehle.
+Generiert die Dateivorlagen für Entry, BaseEntry und UserCertificate.
 
 .Beispiel: Erzeugt eine Vorlage und schreibt es in eine YAML-Datei 
 [source,bash]
@@ -422,7 +422,7 @@ Neuen Verzeichnisdiensteintrag erstellen.
 
 *Beispiel:* einen leeren Eintrag mit angegebenen telematikID erstellen:
 ----
-vzd-cli admin ru add-base -s telematikID=9-TEST
+vzd-cli admin ru add-base -s telematikID=9-TEST -s entryType=4
 ----
 
 === `vzd-cli admin <tu|ru|pu> load-base`
@@ -452,7 +452,7 @@ Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinz
 [source,bash]
 ----
 # zuerst einen leeren Basiseintrag erzeugen
-vzd-cli admin ru add-base -s telematikID=1-123123
+vzd-cli admin ru add-base -s telematikID=1-123123 -s entryType=1
 # danach Zertifikat hinzufügen
 # Achtung: TelematikID beim Befehl admin add-base und im Zertifikat müssen identisch sein
 vzd-cli admin ru add-cert 1-123123.der

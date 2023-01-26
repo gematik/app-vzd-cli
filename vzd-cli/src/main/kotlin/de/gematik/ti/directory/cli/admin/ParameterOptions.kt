@@ -33,6 +33,8 @@ class ParameterOptions : OptionGroup(name = "Query parameters") {
     val changeDateTimeFrom by option("--changeDateTimeFrom", metavar = "ISODATE")
     val changeDateTimeTo by option("--changeDateTimeTo", metavar = "ISODATE")
     val baseEntryOnly by option("--baseEntryOnly").choice("true", "false")
+    val active by option().choice("true", "false")
+    val meta by option()
 
     fun toMap(): Map<String, String> {
         val self = this

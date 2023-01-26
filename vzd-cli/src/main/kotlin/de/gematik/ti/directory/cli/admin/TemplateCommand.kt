@@ -12,25 +12,28 @@ import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.util.CertificateDataDER
+import de.gematik.ti.directory.cli.toJsonPretty
+import de.gematik.ti.directory.cli.toYaml
+import de.gematik.ti.directory.pki.CertificateDataDER
 
 class TemplateCommand : CliktCommand(
     name = "template",
     help = """Create template for a resource
      
      Supported types: base, entry, cert
-"""
+""",
 ) {
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val outputFormat by option().switch(
-        "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML
-    ).default(OutputFormat.YAML)
+        "--json" to RepresentationFormat.JSON,
+        "--yaml" to RepresentationFormat.YAML,
+    ).default(RepresentationFormat.YAML)
     private val resourceType by argument(help = "Specify type of a resource").choice("base", "entry", "cert")
 
     override fun run() = catching {
         val base = BaseDirectoryEntry(
             telematikID = "1-x.1234567890",
+            entryType = listOf("1"),
             cn = "Name, Vorname",
             givenName = "Vorname",
             sn = "Nachname",
@@ -41,7 +44,7 @@ class TemplateCommand : CliktCommand(
             localityName = "Berlin",
             stateOrProvinceName = "Berlin",
             title = "Dr.",
-            domainID = listOf("vzd-cli")
+            domainID = listOf("vzd-cli"),
         )
         when (resourceType) {
             "base" -> {
@@ -54,32 +57,36 @@ class TemplateCommand : CliktCommand(
                         userCertificates = listOf(
                             UserCertificate(
                                 userCertificate = CertificateDataDER("BASE64"),
-                                description = "Benutzt Zertifikat in DES (CRT) Binärformat konfertiert nach String mittels BASE64"
+                                description = "Benutzt Zertifikat in DES (CRT) Binärformat konfertiert nach String mittels BASE64",
 
-                            )
-                        )
+                            ),
+                        ),
                     ),
-                    outputFormat
+                    outputFormat,
                 )
             }
             "cert" -> {
                 printTemplate(
                     UserCertificate(
                         userCertificate = CertificateDataDER("BASE64"),
-                        description = "Benutzt Zertifikat in DES (CRT) Binärformat konvertiert nach String mittels BASE64"
+                        description = "Benutzt Zertifikat in DES (CRT) Binärformat konvertiert nach String mittels BASE64",
 
                     ),
-                    outputFormat
+                    outputFormat,
                 )
             }
             else -> throw UsageError("Undefinded resource type: $resourceType")
         }
     }
 
-    private inline fun <reified T> printTemplate(template: T, outputFormat: OutputFormat) {
+    private fun printTemplate(template: Any, outputFormat: RepresentationFormat) {
         when (outputFormat) {
-            OutputFormat.JSON -> Output.printJson(template)
-            OutputFormat.YAML -> Output.printYaml(template)
+            RepresentationFormat.JSON -> when (template) {
+                is BaseDirectoryEntry -> echo(template.toJsonPretty())
+                is DirectoryEntry -> echo(template.toJsonPretty())
+                is UserCertificate -> echo(template.toJsonPretty())
+            }
+            RepresentationFormat.YAML -> echo(template.toYaml())
             else -> throw UsageError("Templates are not available for format: $outputFormat")
         }
     }

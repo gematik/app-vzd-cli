@@ -15,7 +15,7 @@ class DeleteCommand : CliktCommand(name = "delete", help = "Delete specified dir
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
-        help = "Specify query parameters to find matching entries"
+        help = "Specify query parameters to find matching entries",
     ).associate()
     private val parameterOptions by ParameterOptions()
 

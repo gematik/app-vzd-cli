@@ -23,22 +23,22 @@ private val logger = KotlinLogging.logger {}
 class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificates") {
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val outputFormat by option().switch(
-        "--human" to OutputFormat.HUMAN,
-        "--json" to OutputFormat.JSON,
-        "--yaml" to OutputFormat.YAML,
-        "--csv" to OutputFormat.CSV,
-        "--table" to OutputFormat.TABLE
-    ).default(OutputFormat.TABLE)
+        "--human" to RepresentationFormat.HUMAN,
+        "--json" to RepresentationFormat.JSON,
+        "--yaml" to RepresentationFormat.YAML,
+        "--csv" to RepresentationFormat.CSV,
+        "--table" to RepresentationFormat.TABLE,
+    ).default(RepresentationFormat.TABLE)
     private val paramFile: Pair<String, String>? by option(
         "-f",
         "--param-file",
         help = "Read parameter values from file",
-        metavar = "PARAM FILENAME"
+        metavar = "PARAM FILENAME",
     ).pair()
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
-        help = "Specify query parameters to find matching entries"
+        help = "Specify query parameters to find matching entries",
     ).associate()
     private val outfile by option("-o", "--outfile", help = "Write output to file").path(mustExist = false, canBeDir = false, canBeFile = true)
     private val parameterOptions by ParameterOptions()
@@ -64,12 +64,7 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
         val stdout = System.`out`
         try {
             outfile?.let { System.setOut(PrintStream(it.outputStream())) }
-
-            if (outputFormat == OutputFormat.CSV) {
-                print('\uFEFF')
-                Output.printCsv(UserCertificateCsvHeaders)
-            }
-            CertificateOutputMapping[outputFormat]?.invoke(params, entries)
+            echo(entries.toStringRepresentation(outputFormat))
         } finally {
             System.setOut(stdout)
         }
@@ -84,9 +79,9 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
 
         if (ocspOptions.enableOcsp) {
             result?.forEach {
-                it.userCertificate?.let {
-                    val ocspResponse = runBlocking { context.pkiClient.ocsp(it) }
-                    it.certificateInfo.ocspResponse = ocspResponse
+                it.userCertificate?.let { cert ->
+                    val ocspResponse = runBlocking { context.pkiClient.ocsp(cert) }
+                    cert.certificateInfo.ocspResponse = ocspResponse
                 }
             }
         }

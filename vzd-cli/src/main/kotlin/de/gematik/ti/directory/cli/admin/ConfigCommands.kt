@@ -55,7 +55,7 @@ val GET_PROPERTIES = mapOf(
     "environments" to { config: Config -> config.environments },
     "environments.pu" to { config: Config -> config.environments["pu"] },
     "environments.ru" to { config: Config -> config.environments["ru"] },
-    "environments.tu" to { config: Config -> config.environments["tu"] }
+    "environments.tu" to { config: Config -> config.environments["tu"] },
 )
 
 class ConfigGetCommand : CliktCommand(
@@ -64,7 +64,7 @@ class ConfigGetCommand : CliktCommand(
         
             ```${GET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
-            """
+            """,
 ) {
     private val context by requireObject<AdminCliContext>()
     private val property by argument().choice(GET_PROPERTIES).optional()

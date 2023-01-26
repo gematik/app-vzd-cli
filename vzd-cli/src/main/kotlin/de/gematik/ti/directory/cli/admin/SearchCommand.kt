@@ -18,7 +18,6 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for directory
         val result: List<DirectoryEntry> = runBlocking {
             context.client.quickSearch(queryString).directoryEntries
         }
-
-        DirectoryEntryOutputMapping[OutputFormat.TABLE]?.invoke(mapOf("query" to queryString), result)
+        echo(result.toTable())
     }
 }

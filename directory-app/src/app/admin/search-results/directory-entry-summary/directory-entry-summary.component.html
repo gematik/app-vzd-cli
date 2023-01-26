@@ -11,7 +11,7 @@
     <input readonly class="field" [value]="idValue">
   </div>
   <div class="column">
-    <input class="field" [value]="model.DirectoryEntryBase.holder?.join(', ')">
+    <input class="field" [value]="codeListDisplay(model.base.holder)">
   </div>
 </div>
 
@@ -25,9 +25,9 @@
 </div>
 <div class="row">
   <div class="column">
-    <input class="field" [value]="model.DirectoryEntryBase.domainID?.join(', ')">
+    <input class="field" [value]="model.base.domainID?.join(', ')">
   </div>
   <div class="column">
-    <input class="field" [value]="model.DirectoryEntryBase.professionOID?.join(', ')">
+    <input class="field" [value]="codeListDisplay(model.base.professionOID)">
   </div>
 </div>

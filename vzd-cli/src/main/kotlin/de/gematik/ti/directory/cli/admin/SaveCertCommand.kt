@@ -5,10 +5,13 @@ import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
-import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.options.associate
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.cli.escape
+import de.gematik.ti.directory.util.escape
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.bouncycastle.util.encoders.Base64
@@ -25,12 +28,12 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
         "-f",
         "--param-file",
         help = "Read parameter values from file",
-        metavar = "PARAM FILENAME"
+        metavar = "PARAM FILENAME",
     ).pair()
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",
-        help = "Specify query parameters to find matching entries"
+        help = "Specify query parameters to find matching entries",
     ).associate()
     private val parameterOptions by ParameterOptions()
     private val outputDir by option("-o", "--output-dir", metavar = "OUTPUT_DIR", help = "Output directory for certificate files. Default ist current directory.")
