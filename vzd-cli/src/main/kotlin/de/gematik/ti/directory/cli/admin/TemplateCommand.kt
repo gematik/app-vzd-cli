@@ -33,7 +33,7 @@ class TemplateCommand : CliktCommand(
     override fun run() = catching {
         val base = BaseDirectoryEntry(
             telematikID = "1-x.1234567890",
-            entryType = 1,
+            entryType = listOf("1"),
             cn = "Name, Vorname",
             givenName = "Vorname",
             sn = "Nachname",

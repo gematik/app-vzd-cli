@@ -15,7 +15,7 @@
     <div ibmCol [columnNumbers]="{'lg': 8}">
         <div ibmRow>
             <div ibmCol>
-                <h1>{{entry.DirectoryEntryBase.displayName}}</h1>
+                <h1>{{entry.base.displayName}}</h1>
             </div>
         </div>
         <ibm-tabs [isNavigation]="false">
@@ -28,7 +28,7 @@
                     Anzeige name
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.displayName"
+                        [(ngModel)]="entry.base.displayName"
                         readonly="true"
                     >
                 </ibm-label>
@@ -37,7 +37,7 @@
                     TelematikID
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.telematikID"
+                        [(ngModel)]="entry.base.telematikID"
                         readonly="true"
                     >
                 </ibm-label> 
@@ -46,7 +46,7 @@
                     Adresse
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.streetAddress"
+                        [(ngModel)]="entry.base.streetAddress"
                         readonly="true"
                     >
                 </ibm-label> 
@@ -59,7 +59,7 @@
                     Ort
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.localityName"
+                        [(ngModel)]="entry.base.localityName"
                         readonly="true"
                     >
                 </ibm-label>
@@ -70,7 +70,7 @@
                     PLZ
                     <input
                         ibmText
-                        [(ngModel)]="entry.DirectoryEntryBase.postalCode"
+                        [(ngModel)]="entry.base.postalCode"
                         readonly="true"
                     >
                 </ibm-label>

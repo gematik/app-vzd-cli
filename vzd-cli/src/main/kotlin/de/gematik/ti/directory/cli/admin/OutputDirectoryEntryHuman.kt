@@ -63,8 +63,7 @@ private class HumanDirectoryEntry(
     // Professional
     var professionOID: List<ElaborateProfessionOID>? = null,
     var specialization: List<ElaborateSpecialization>? = null,
-    @Serializable(with = TemporaryEntryTypeSerializer::class)
-    var entryType: Int? = null,
+    var entryType: List<String?>? = null,
 
     // System
     var holder: List<ElaborateHolder>? = null,
@@ -153,7 +152,7 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
             kind = entry.kind,
             active = entry.base.active,
 
-            validationResult = entry.validationResult
+            validationResult = entry.validationResult,
         )
 
         encoder.encodeSerializableValue(HumanDirectoryEntry.serializer(), surrogate)

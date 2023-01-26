@@ -2,7 +2,6 @@ package de.gematik.ti.directory.fhir
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 @Serializable
 class SimpleConcept(
@@ -19,7 +18,6 @@ class SimpleCodeSystem(
         return concept.firstOrNull { it.code == code }?.display
     }
 }
-
 
 private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem {
     return json.decodeFromString(SimpleCodeSystem::class.java.getResource("/de.gematik.fhir.directory/CodeSystem-$name.json")!!.readText())

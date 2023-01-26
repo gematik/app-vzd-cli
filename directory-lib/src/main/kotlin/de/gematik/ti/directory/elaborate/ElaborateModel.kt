@@ -47,7 +47,7 @@ data class ElaborateBaseDirectoryEntry(
     // Professional
     var professionOID: List<ElaborateProfessionOID>? = null,
     var specialization: List<ElaborateSpecialization>? = null,
-    var entryType: Int? = null,
+    var entryType: List<String?>? = null,
 
     // System
     var holder: List<ElaborateHolder>? = null,

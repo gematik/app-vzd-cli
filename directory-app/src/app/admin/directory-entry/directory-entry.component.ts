@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
-import { DirectoryEntry } from 'src/services/admin/admin.model';
+import { ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 
 interface KIMAddressInfo {
   mail: string
@@ -26,7 +26,7 @@ interface UserCertificateInfo {
 export class DirectoryEntryComponent implements OnInit {
   env!: string
   queryString: string | null = null
-  entry?: DirectoryEntry
+  entry?: ElaborateDirectoryEntry
   get rawData(): string { return JSON.stringify(this.entry, null, 2)}
   kimAddressList: KIMAddressInfo[] = []
   userCertificateList: UserCertificateInfo[] = []
@@ -54,7 +54,9 @@ export class DirectoryEntryComponent implements OnInit {
     })
   }
 
-  private createKIMAddressList(entry: DirectoryEntry): KIMAddressInfo[] {
+  private createKIMAddressList(entry: ElaborateDirectoryEntry): KIMAddressInfo[] {
+    return []
+    /*
     return this.entry?.Fachdaten 
     ?.map ( it => it.FAD1 )
     .flat()
@@ -68,9 +70,10 @@ export class DirectoryEntryComponent implements OnInit {
     }) 
     .flat() 
     .filter( x => x !== undefined) as KIMAddressInfo[]
+    */
   }
 
-  private createUserCertificateList(entry: DirectoryEntry): UserCertificateInfo[] {
+  private createUserCertificateList(entry: ElaborateDirectoryEntry): UserCertificateInfo[] {
     return entry.userCertificates?.map( certBlock => {
       const cert = certBlock.userCertificate 
       if (cert === undefined) {

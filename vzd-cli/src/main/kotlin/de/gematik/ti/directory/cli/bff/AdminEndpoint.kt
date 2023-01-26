@@ -1,6 +1,8 @@
 package de.gematik.ti.directory.cli.bff
 
 import de.gematik.ti.directory.admin.*
+import de.gematik.ti.directory.elaborate.ElaborateDirectoryEntry
+import de.gematik.ti.directory.elaborate.elaborate
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -44,6 +46,12 @@ class Admin {
     }
 }
 
+@Serializable
+data class ElaboratedSearchResults(
+    val searchQuery: String,
+    val directoryEntries: List<ElaborateDirectoryEntry>,
+)
+
 fun Route.adminRoutes() {
     get<Admin.Status> {
         call.respond(call.adminAPI.status())
@@ -70,14 +78,20 @@ fun Route.adminRoutes() {
 
     get<Admin.Env.Search> { search ->
         val adminAPI = application.attributes[AdminAPIKey]
-        call.respond(adminAPI.createClient(search.parent.env).quickSearch(search.q))
+        val searchResults = adminAPI.createClient(search.parent.env).quickSearch(search.q)
+        call.respond(
+            ElaboratedSearchResults(
+                searchQuery = searchResults.searchQuery,
+                directoryEntries = searchResults.directoryEntries.map { it.elaborate() },
+            ),
+        )
     }
 
     get<Admin.Env.Entry> { entry ->
         val adminAPI = application.attributes[AdminAPIKey]
         val result = adminAPI.createClient(entry.parent.env).readDirectoryEntryByTelematikID(entry.telematikID)
         if (result != null) {
-            call.respond(result)
+            call.respond(result.elaborate())
         }
         call.respond(HttpStatusCode.NotFound, Outcome("NOT_FOUND", "Entry with telematikID '${entry.telematikID}' not found in env '${entry.parent.env}'"))
     }

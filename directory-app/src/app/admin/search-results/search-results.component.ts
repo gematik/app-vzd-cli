@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { InlineLoadingState, Table, TableHeaderItem, TableItem, TableModel, TagType } from 'carbon-components-angular';
-import { BaseDirectoryEntry, DirectoryEntry } from 'src/services/admin/admin.model';
+import { ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 import { AdminBackendService } from '../../../services/admin/admin-backend.service';
 
 @Component({
@@ -55,11 +55,11 @@ export class SearchResultsComponent implements OnInit {
     this.loadingState = InlineLoadingState.Active
     this.adminBackend.search(this.env, this.queryString).then(searchResult => {
       this.rows = searchResult.directoryEntries.map( (entry) => {
-        entry.DirectoryEntryBase.displayName = entry.DirectoryEntryBase?.displayName?.replace("TEST-ONLY", "")
-        entry.DirectoryEntryBase.displayName = entry.DirectoryEntryBase?.displayName?.replace("NOT-VALID", "")
+        entry.base.displayName = entry.base?.displayName?.replace("TEST-ONLY", "")
+        entry.base.displayName = entry.base?.displayName?.replace("NOT-VALID", "")
         return [
           new TableItem({
-            data: entry.DirectoryEntryBase.displayName,
+            data: entry.base.displayName,
             expandedData: entry,
             expandedTemplate: this.expandedTemplate,
           }),
@@ -68,7 +68,7 @@ export class SearchResultsComponent implements OnInit {
             template: this.tagTemplate,
           }),
           new TableItem({
-            data: entry.DirectoryEntryBase,
+            data: entry.base,
             template: this.addressTemplate,
           }),
         ]
@@ -127,9 +127,9 @@ export class SearchResultsComponent implements OnInit {
 
   onRowClick(clickedRow: number) {
     const rowNum = (this.model.currentPage-1)*this.model.pageLength+clickedRow
-    const entry = this.rows[clickedRow][0].expandedData as DirectoryEntry
+    const entry = this.rows[clickedRow][0].expandedData as ElaborateDirectoryEntry
     this.router.navigate(
-      ["entry", entry.DirectoryEntryBase.telematikID, {"q": this.queryString}],
+      ["entry", entry.base.telematikID, {"q": this.queryString}],
       { relativeTo: this.route.parent }
     )
   }

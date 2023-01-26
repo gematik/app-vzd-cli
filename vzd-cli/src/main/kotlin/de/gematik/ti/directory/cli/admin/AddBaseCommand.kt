@@ -90,7 +90,7 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
             val entryType = attrs["entryType"]?.toInt() ?: throw UsageError("Option --set entryType=<VALUE> or --file is required")
             BaseDirectoryEntry(
                 telematikID = telematikID,
-                entryType = entryType,
+                entryType = listOf(entryType.toString()),
             )
         }
 

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { AdminStatus, DirectoryEntry, DirectoryEntryKind, Outcome, SearchResults } from './admin.model';
+import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryKind, Outcome, ElaborateSearchResults } from './admin.model';
 
 // TODO: how does one provide labels in Angular?
 const labels: Record<string, string> = {
@@ -61,7 +61,7 @@ export class AdminBackendService {
 
   search(env: string, queryString: string) {
     return firstValueFrom(
-      this.http.get<SearchResults> (
+      this.http.get<ElaborateSearchResults> (
         `/api/admin/${env}/search`, 
         { params: {"q": queryString} }
       )
@@ -80,15 +80,15 @@ export class AdminBackendService {
     )
   }
 
-  loadEntry(env: string, telematikID: string) : Promise<DirectoryEntry> {
+  loadEntry(env: string, telematikID: string) : Promise<ElaborateDirectoryEntry> {
     return firstValueFrom(
-      this.http.get<DirectoryEntry>(
+      this.http.get<ElaborateDirectoryEntry>(
         `/api/admin/${env}/entry/${telematikID}`
       )
     )
   }
 
-  getEntryKindColor(entry: DirectoryEntry) : string {
+  getEntryKindColor(entry: ElaborateDirectoryEntry) : string {
     switch(entry.kind) {
 
       case DirectoryEntryKind.Arzt:
@@ -110,7 +110,7 @@ export class AdminBackendService {
     }
   }
 
-  getEntryKindTitle(entry: DirectoryEntry) : string {
+  getEntryKindTitle(entry: ElaborateDirectoryEntry) : string {
     return entry.kind.toString()
   }
 

@@ -75,8 +75,14 @@ export interface CertificateInfo {
      ocspReponderURL?: string
      ocspResponse?: OCSPResponse
 }
- 
-export interface BaseDirectoryEntry {
+
+export interface CodeableConcept {
+  code: string,
+  display: string,
+  system?: string,
+}
+
+export interface ElaborateBaseDirectoryEntry {
   // Identifier
   telematikID: string
   domainID?: [string] 
@@ -99,12 +105,12 @@ export interface BaseDirectoryEntry {
   countryCode?: string 
 
   // Professional
-  professionOID?: [string] 
-  specialization?: [string] 
+  professionOID?: [CodeableConcept] 
+  specialization?: [CodeableConcept] 
   entryType?: [string] 
 
   // System
-  holder?: [string] 
+  holder?: [CodeableConcept] 
   dataFromAuthority?: boolean
   personalEntry?: boolean
   changeDateTime?: string 
@@ -125,23 +131,6 @@ export interface UserCertificate {
   active?: boolean
 }
 
-export interface KomLeData {
-  mail: string
-  version: string
-}
-
-export interface FAD1 {
-  dn: DistinguishedName
-  mail?: string[]
-  "KOM-LE_Version"?: string
-  komLeData?: [KomLeData]
-}
-
-export interface Fachdaten {   
-  dn: DistinguishedName
-  "FAD1": FAD1[]
-}
-
 export enum DirectoryEntryKind {
   Arzt = "Arzt",
   Arztpraxis = "Arztpraxis",
@@ -159,16 +148,15 @@ export enum DirectoryEntryKind {
   Weitere = "Weitere"
 }
 
-export interface DirectoryEntry {
-  "DirectoryEntryBase": BaseDirectoryEntry
+export interface ElaborateDirectoryEntry {
+  base: ElaborateBaseDirectoryEntry
   userCertificates?: UserCertificate[]
-  "Fachdaten"?: Fachdaten[]
   kind: DirectoryEntryKind
 }
 
-export interface SearchResults {
+export interface ElaborateSearchResults {
   queryString: string
-  directoryEntries: [DirectoryEntry]
+  directoryEntries: [ElaborateDirectoryEntry]
 }
 
 export interface Outcome {
