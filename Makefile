@@ -4,7 +4,7 @@ ktlint:
 dist: ktlint
 	./gradlew clean build -x test
 	java -jar ./vzd-cli/build/libs/vzd-cli-all.jar admin tu login
-	TEST_ACCESS_TOKEN=$(shell java -jar ./vzd-cli/build/libs/vzd-cli-all.jar admin tu token) ./gradlew build
+	TEST_ACCESS_TOKEN=$(shell java -jar ./vzd-cli/build/libs/vzd-cli-all.jar admin tu token) ./gradlew test
 
 release: 
 	$(eval VERSION := $(shell grep "^version=" gradle.properties | cut -d'=' -f2))
