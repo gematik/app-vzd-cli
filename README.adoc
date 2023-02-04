@@ -441,6 +441,16 @@ Modifiziert einzelne Attribute des Basiseintrags
 
 Löscht Einträge aus dem Verzeichnisdienst.
 
+=== `vzd-cli admin cert-info`
+
+Zeigt informationen aus Zertifikate (DER-Format) und führt OCSP-Abfragen durch.
+
+[source,bash]
+----
+vzd-cli admin cert-info cert1.der cert2.der --ocsp
+----
+
+
 === `vzd-cli admin <tu|ru|pu> list-cert`
 
 Suche und Anzeige von X509-Zertifikaten.

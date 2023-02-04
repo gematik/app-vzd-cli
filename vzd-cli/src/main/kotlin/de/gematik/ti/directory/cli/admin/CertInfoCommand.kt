@@ -23,7 +23,7 @@ class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of
         "--json" to RepresentationFormat.JSON,
     ).default(RepresentationFormat.YAML)
     private val ocspOptions by OcspOptions()
-    private val context by requireObject<AdminCliEnvironmentContext>()
+    private val context by requireObject<AdminCliContext>()
     override fun run() = catching {
         files.forEach {
             val certB64 = Base64.toBase64String(it.inputStream().readBytes())
