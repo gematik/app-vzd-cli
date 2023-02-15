@@ -530,7 +530,8 @@ Zusätzlich können die Ergebnisse nach Zeitperiode gefiltert werden:
 ----
 # zeigt alle Änderungen für die Einträge mit Prefix 9-
 vzd-cli admin ru log -t "9-*"
-# zeigt alle Änderungen für die Einträge mit Prefix 9-, die sich seit 1.02.2034 geändert haben
+# zeigt alle Änderungen für die Einträge mit Prefix 9-,
+# die sich seit 1.02.2023 geändert haben
 vzd-cli admin ru log -t "9-*" --logTimeFrom 2023-02-01T00:00:00Z
 ----
 
