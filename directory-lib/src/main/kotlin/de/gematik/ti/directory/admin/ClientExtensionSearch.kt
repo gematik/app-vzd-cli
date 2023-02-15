@@ -58,13 +58,6 @@ data class TokenizerResult(val tokens: List<String>, val positions: List<TokenPo
             index !in tokenPosition.range
         }.joinToString(" ")
     }
-
-    fun subset(subsetPositions: List<TokenPosition>): TokenizerResult {
-        val subsetTokens = tokens.filterIndexed { index, _ ->
-            subsetPositions.any { index in it.range }
-        }
-        return TokenizerResult(subsetTokens, subsetPositions)
-    }
 }
 
 object POSTokenizer {
@@ -146,7 +139,7 @@ private fun extractFixedParams(tokenizerResult: TokenizerResult): Pair<Map<Strin
         }
         put("baseEntryOnly", "true")
     }
-    return Pair(fixedParams, tokenizerResult.subset(namesAndLocalities))
+    return Pair(fixedParams, TokenizerResult(tokenizerResult.tokens, namesAndLocalities))
 }
 
 /**

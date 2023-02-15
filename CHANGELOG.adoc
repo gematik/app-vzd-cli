@@ -2,6 +2,7 @@
 
 == Version 2.3.0 (unreleased)
 - `vzd-cli admin cert-info` ersetzt `vzd-cli admin <ru|tu|pu> cert-info`
+- Abfrage der Änderungshistorie: `vzd-cli admin <ru|tu|pu> log`
 
 == Version 2.2.0
 - Quellcode wurde in Vorbereitung der Web-Version des Clients modularisiert und umstrukturiert

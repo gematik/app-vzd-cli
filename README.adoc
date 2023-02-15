@@ -521,6 +521,19 @@ Lädt große Mengen von Einträgen und schreibt sie in `STDOUT`, eine Zeile per 
 
 Liest die Einträga aus STDIN, stellt für jeden gefundenen Zertifikat eine OCSP-Abfrage.
 
+=== `vzd-cli admin <tu|ru|pu> log`
+
+Zeigt die Änderungshistorie der Einträge im VZD. Die Änderungen können nach UID, TelematikID (inkl. Pattern) abgefragt werden sowie nach ClientID oder Operation.
+Zusätzlich können die Ergebnisse nach Zeitperiode gefiltert werden:
+
+[source,bash]
+----
+# zeigt alle Änderungen für die Einträge mit Prefix 9-
+vzd-cli admin ru log -t "9-*"
+# zeigt alle Änderungen für die Einträge mit Prefix 9-, die sich seit 1.02.2034 geändert haben
+vzd-cli admin ru log -t "9-*" --logTimeFrom 2023-02-01T00:00:00Z
+----
+
 == `vzd-cli apo`: ApoVZD API
 
 === `vzd-cli apo config`

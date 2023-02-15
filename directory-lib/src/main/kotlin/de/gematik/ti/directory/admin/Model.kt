@@ -173,3 +173,47 @@ data class ReadDirectoryEntryForSyncResponse(
     var searchControlValue: SearchControlValue,
     var directoryEntries: List<DirectoryEntry>,
 )
+
+// ktlint-disable enum-entry-name-case
+@Serializable
+enum class Operation {
+    add_Directory_Entry,
+    modify_Directory_Entry,
+    delete_Directory_Entry,
+    add_Directory_Entry_Certificate,
+    delete_Directory_Entry_Certificate,
+
+    @SerialName("add_Directory_FA-Attributes")
+    add_Directory_FA_Attributes,
+
+    @SerialName("modify_Directory_FA-Attributes")
+    modify_Directory_FA_Attributes,
+
+    @SerialName("delete_Directory_FA-Attributes")
+    delete_Directory_FA_Attributes,
+
+    // TODO: not in OpenAPI
+    stateSwitch_Directory_Entry,
+}
+
+@Serializable
+data class LogEntry(
+    val clientID: String?,
+    val logTime: Instant,
+    val uid: String,
+    val telematikID: String,
+    val operation: Operation,
+    val noDataChanged: Boolean,
+)
+
+@Serializable
+data class Error(
+    val message: String,
+    val errors: List<InnerError>?,
+)
+
+@Serializable
+data class InnerError(
+    val attributeName: String,
+    val attributeError: String,
+)

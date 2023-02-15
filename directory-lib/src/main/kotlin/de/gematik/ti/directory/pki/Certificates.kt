@@ -1,5 +1,6 @@
 package de.gematik.ti.directory.pki
 
+import de.gematik.ti.directory.DirectoryException
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.KSerializer
@@ -9,7 +10,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax
@@ -197,7 +197,7 @@ data class NameInfo(
  */
 @Serializable
 data class AdmissionStatementInfo(
-    val admissionAuthority: String,
+    val admissionAuthority: String?,
     val professionItems: List<String>,
     val professionOids: List<String>,
     val registrationNumber: String,
@@ -207,25 +207,26 @@ data class AdmissionStatementInfo(
  * Port of gematik Java class to Kotlin.
  */
 class Admission(x509EeCert: X509Certificate) {
-    private val asn1Admission: ASN1Encodable
+    private val admissionSyntax: AdmissionSyntax
 
     init {
-        asn1Admission = X509CertificateHolder(x509EeCert.encoded)
+        val asn1Admission = X509CertificateHolder(x509EeCert.encoded)
             .extensions
             .getExtensionParsedValue(ISISMTTObjectIdentifiers.id_isismtt_at_admission)
+        admissionSyntax = AdmissionSyntax.getInstance(asn1Admission)
     }
 
     /**
      * Reading admission authority
      *
-     * @return String of the admission authority or an empty string if not present
+     * @return String of the admission authority or null
      */
-    val admissionAuthority: String
+    val admissionAuthority: String?
         get() {
             return try {
-                AdmissionSyntax.getInstance(asn1Admission).admissionAuthority.name.toString()
+                admissionSyntax.admissionAuthority.name.toString()
             } catch (e: NullPointerException) {
-                ""
+                null
             }
         }
 
@@ -236,9 +237,9 @@ class Admission(x509EeCert: X509Certificate) {
      */
     val professionItems: List<String>
         get() {
-            return AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos.map {
-                it.professionItems.map {
-                    it.string
+            return admissionSyntax.contentsOfAdmissions[0].professionInfos.map { professionInfo ->
+                professionInfo.professionItems.map { value ->
+                    value.string
                 }
             }.flatten()
         }
@@ -246,14 +247,14 @@ class Admission(x509EeCert: X509Certificate) {
     /**
      * Reading profession oid's
      *
-     * @return Non duplicate list of profession oid's of the first profession info of the first admission in the certificate
+     * @return Non duplicate list of profession oid's of the first admission in the certificate
      */
     val professionOids: List<String>
         get() {
 
-            return AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos.map {
-                it.professionOIDs.map {
-                    it.id
+            return admissionSyntax.contentsOfAdmissions[0].professionInfos.map { professionInfo ->
+                professionInfo.professionOIDs.map { oid ->
+                    oid.id
                 }
             }.flatten()
         }
@@ -265,6 +266,6 @@ class Admission(x509EeCert: X509Certificate) {
      */
     val registrationNumber: String
         get() {
-            return AdmissionSyntax.getInstance(asn1Admission).contentsOfAdmissions[0].professionInfos[0].registrationNumber
+            return admissionSyntax.contentsOfAdmissions[0].professionInfos[0].registrationNumber ?: throw DirectoryException("Certificate does not contain TelematikID (admissionStatement.registrationNumber)")
         }
 }

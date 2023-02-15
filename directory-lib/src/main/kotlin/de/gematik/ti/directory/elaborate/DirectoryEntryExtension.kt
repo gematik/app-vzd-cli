@@ -48,7 +48,7 @@ fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
         countryCode = base.countryCode,
 
         professionOID = base.professionOID?.map { elaborateProfessionOID(base, it) },
-        specialization = base.specialization?.map { elaborateSpecialization(base, it) },
+        specialization = base.specialization?.map { elaborateSpecialization(it) },
 
         holder = base.holder?.map { ElaborateHolder(it, it) },
         dataFromAuthority = base.dataFromAuthority,
@@ -74,7 +74,7 @@ fun elaborateProfessionOID(base: BaseDirectoryEntry, professionOID: String): Ela
 val PractitionerSpecializationRegex = Regex("^urn:as:([0-9\\.]+):(.*)$")
 val OrganisationSpecializationRegex = Regex("^urn:psc:([0-9\\.]+):(.*)$")
 
-fun elaborateSpecialization(base: BaseDirectoryEntry, specialization: String): ElaborateSpecialization {
+fun elaborateSpecialization(specialization: String): ElaborateSpecialization {
     val display = if (PractitionerSpecializationRegex.matches(specialization)) {
         PractitionerSpecializationRegex.matchEntire(specialization)?.let {
             PractitionerQualificationVS.displayFor("urn:oid:${it.groupValues[1]}", it.groupValues[2])
