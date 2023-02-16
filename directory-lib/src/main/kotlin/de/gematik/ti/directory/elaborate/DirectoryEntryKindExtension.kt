@@ -42,7 +42,8 @@ enum class DirectoryEntryKind(val matcher: (DirectoryEntry) -> Boolean) {
         }
     }),
     Krankenhaus({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("5-") }),
-    GKV({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("8-") }),
+    KTR({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("8-01") }),
+    KTRePA({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("8-03") }),
 
     HBAGematik({ directoryEntry ->
         directoryEntry.directoryEntryBase.telematikID.let {
