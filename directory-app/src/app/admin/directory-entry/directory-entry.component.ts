@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
-import { ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
+import { CodeableConcept, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 
 interface KIMAddressInfo {
   mail: string
@@ -51,6 +51,22 @@ export class DirectoryEntryComponent implements OnInit {
         }
       )
     })
+  }
+
+  protected codeIconName(code: CodeableConcept): string {
+    if (code.display != code.code) {
+     return "checkmark--filled"
+    } else {
+      return "error--filled"
+    }
+  }
+
+  protected codeIconClass(code: CodeableConcept): string {
+    if (code.display != code.code) {
+     return "success"
+    } else {
+      return "error"
+    }
   }
 
   private createUserCertificateList(entry: ElaborateDirectoryEntry): UserCertificateInfo[] {

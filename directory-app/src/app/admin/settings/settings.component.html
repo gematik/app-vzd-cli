@@ -9,22 +9,50 @@
         </ibm-inline-loading>
     </div>
 </div>
+
+<ibm-structured-list>
+    <ibm-list-header>
+        <ibm-list-column></ibm-list-column>
+        <ibm-list-column>Umgebung</ibm-list-column>
+        <ibm-list-column>Aktion</ibm-list-column>
+    </ibm-list-header>
+    <ibm-list-row *ngFor="let env of statusModel">
+        <ibm-list-column>
+            <svg [ibmIcon]="env.iconName" [class]="env.iconClass"></svg>
+        </ibm-list-column>
+        <ibm-list-column>
+            {{env.title}}
+        </ibm-list-column>
+        <ibm-list-column>
+            <button
+            *ngIf="env.status === 'success'"
+            size="sm" 
+            ibmButton="primary"
+            [routerLink]="['/admin', env.env]"
+            >
+            Suchen
+            <svg class="bx--btn__icon" ibmIcon="api" size="16"></svg>
+            </button>    
+            <button
+            *ngIf="env.status === 'error'"
+            size="sm" 
+            ibmButton="tertiary"
+            (click)="onLogin(env.env)"
+            >
+            Login
+            <svg class="bx--btn__icon" ibmIcon="login" size="16"></svg>
+            </button>    
+        </ibm-list-column>
+    </ibm-list-row>
+</ibm-structured-list>
+
+
 <div ibmRow *ngFor="let env of statusModel" class="row">
     <div ibmCol>
-        <p><svg [ibmIcon]="env.iconName" [class]="env.iconClass"></svg> {{env.title}}</p>
     </div>
     <div ibmCol>
         <p *ngIf="env.status === 'success'">
             <a [routerLink]="['/admin', env.env]">Gehe zu</a>
         </p>
-        <button
-        *ngIf="env.status === 'error'"
-        size="sm" 
-        ibmButton="tertiary"
-        (click)="onLogin(env.env)"
-        >
-        <svg class="bx--btn__icon" ibmIcon="add" size="16"></svg>
-        Login
-        </button>
     </div>
 </div>

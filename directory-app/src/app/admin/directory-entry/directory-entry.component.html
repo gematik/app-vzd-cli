@@ -11,8 +11,8 @@
     </div>
 </div>
 <div ibmRow *ngIf="entry">
-    <div ibmCol [columnNumbers]="{'lg': 4}"></div>
-    <div ibmCol [columnNumbers]="{'lg': 8}">
+    <div ibmCol [columnNumbers]="{'lg': 3}"></div>
+    <div ibmCol [columnNumbers]="{'lg': 10}">
         <div ibmRow>
             <div ibmCol>
                 <h1>{{entry.base.displayName}}</h1>
@@ -73,24 +73,63 @@
                     >
                 </ibm-label>
                 </div>
-                <div class="KIMAddressList">
-                    <ibm-structured-list [border]="false" [condensed]="true" [nowrap]="false">
-                        <ibm-list-header>
-                            <ibm-list-column [nowrap]="true">KIM-Adresse</ibm-list-column>
-                            <ibm-list-column>Version</ibm-list-column>
-                            <ibm-list-column>Anbieter</ibm-list-column>
-                        </ibm-list-header>
-                        <ibm-list-row *ngFor="let kimAddress of entry.kimAddresses">
-                            <ibm-list-column>{{kimAddress?.mail}}</ibm-list-column>
-                            <ibm-list-column>{{kimAddress?.version}}</ibm-list-column>
-                            <ibm-list-column>{{kimAddress?.provider?.display}}</ibm-list-column>
-                        </ibm-list-row>
-                        <ibm-list-row *ngIf="entry.kimAddresses === undefined">
-                            <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg> Keine KIM-Adressen</ibm-list-column>
-                            <ibm-list-column></ibm-list-column>
-                        </ibm-list-row>
-                    </ibm-structured-list>           
-                </div>
+
+                <h2>&nbsp;</h2>
+
+                <ibm-structured-list 
+                    [border]="false" [condensed]="true" [nowrap]="false">
+                    <ibm-list-header>
+                        <ibm-list-column></ibm-list-column>
+                        <ibm-list-column [nowrap]="true">ProfessionOID</ibm-list-column>
+                        <ibm-list-column>Code</ibm-list-column>
+                    </ibm-list-header>
+                    <ibm-list-row *ngFor="let code of entry.base.professionOID">
+                        <ibm-list-column><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
+                        <ibm-list-column>{{code?.display}}</ibm-list-column>
+                        <ibm-list-column>{{code?.code}}</ibm-list-column>
+                    </ibm-list-row>
+                    <ibm-list-row *ngIf="(entry.base.professionOID?.length ?? 0) == 0">
+                        <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                        <ibm-list-column>Keine ProfessionOID</ibm-list-column>
+                    </ibm-list-row>
+                </ibm-structured-list>
+
+                <ibm-structured-list
+                    [border]="false" [condensed]="true" [nowrap]="false">
+                    <ibm-list-header>
+                        <ibm-list-column></ibm-list-column>
+                        <ibm-list-column [nowrap]="true">Spezialisierung</ibm-list-column>
+                        <ibm-list-column>Code</ibm-list-column>
+                    </ibm-list-header>
+                    <ibm-list-row *ngFor="let code of entry.base.specialization">
+                        <ibm-list-column><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
+                        <ibm-list-column>{{code?.display}}</ibm-list-column>
+                        <ibm-list-column>{{code?.code}}</ibm-list-column>
+                    </ibm-list-row>
+                    <ibm-list-row *ngIf="(entry.base.specialization?.length ?? 0) == 0">
+                        <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                        <ibm-list-column>Keine Spezialisierung</ibm-list-column>
+                    </ibm-list-row>
+                </ibm-structured-list>
+
+                <ibm-structured-list [border]="false" [condensed]="true" [nowrap]="false">
+                    <ibm-list-header>
+                        <ibm-list-column></ibm-list-column>
+                        <ibm-list-column [nowrap]="true">KIM-Adresse</ibm-list-column>
+                        <ibm-list-column>Version</ibm-list-column>
+                        <ibm-list-column>Anbieter</ibm-list-column>
+                    </ibm-list-header>
+                    <ibm-list-row *ngFor="let kimAddress of entry.kimAddresses">
+                        <ibm-list-column><svg ibmIcon="checkmark--filled" class="success"></svg></ibm-list-column>
+                        <ibm-list-column>{{kimAddress?.mail}}</ibm-list-column>
+                        <ibm-list-column>{{kimAddress?.version}}</ibm-list-column>
+                        <ibm-list-column>{{kimAddress?.provider?.display}}</ibm-list-column>
+                    </ibm-list-row>
+                    <ibm-list-row *ngIf="entry.kimAddresses === undefined">
+                        <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                        <ibm-list-column>Keine KIM-Adressen</ibm-list-column>
+                    </ibm-list-row>
+                </ibm-structured-list>           
             </ibm-tab>
             <ibm-tab heading="Zertifikate">
                 <div class="UserCertificateList">
@@ -127,6 +166,6 @@
             </ibm-tab>
         </ibm-tabs>
     </div>
-    <div ibmCol [columnNumbers]="{'lg': 4}"></div>
+    <div ibmCol [columnNumbers]="{'lg': 3}"></div>
 </div>
   

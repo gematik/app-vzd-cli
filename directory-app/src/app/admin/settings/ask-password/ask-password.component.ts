@@ -6,7 +6,7 @@ import { BaseModal, Label, ModalService } from 'carbon-components-angular';
   templateUrl: './ask-password.component.html',
   styleUrls: ['./ask-password.component.scss']
 })
-export class AskPasswordComponent extends BaseModal implements AfterViewInit {
+export class AskPasswordComponent extends BaseModal {
   protected password: string = ""
   @ViewChild(Label) inputField?: Label
 
@@ -16,13 +16,6 @@ export class AskPasswordComponent extends BaseModal implements AfterViewInit {
     protected modalService: ModalService
   ) {
     super()
-  }
-
-  ngAfterViewInit(): void {
-    setTimeout(()=>{
-      // doesnt work for some reason
-      this.inputField?.wrapper.nativeElement.querySelector("input")?.focus()
-    },0);  
   }
 
   returnPassword() {
