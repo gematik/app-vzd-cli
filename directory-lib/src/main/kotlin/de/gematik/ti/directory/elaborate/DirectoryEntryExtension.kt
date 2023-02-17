@@ -3,10 +3,7 @@ package de.gematik.ti.directory.elaborate
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.elaborate.validation.validate
-import de.gematik.ti.directory.fhir.HealthcareServiceSpecialtyVS
-import de.gematik.ti.directory.fhir.OrganizationProfessionOID
-import de.gematik.ti.directory.fhir.PractitionerProfessionOID
-import de.gematik.ti.directory.fhir.PractitionerQualificationVS
+import de.gematik.ti.directory.fhir.*
 
 fun DirectoryEntry.elaborate(): ElaborateDirectoryEntry {
     val entry = this
@@ -50,7 +47,7 @@ fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
         professionOID = base.professionOID?.map { elaborateProfessionOID(base, it) },
         specialization = base.specialization?.map { elaborateSpecialization(it) },
 
-        holder = base.holder?.map { ElaborateHolder(it, it) },
+        holder = base.holder?.map { elaborateHolder(it) },
         dataFromAuthority = base.dataFromAuthority,
         personalEntry = base.personalEntry,
         changeDateTime = base.changeDateTime,
@@ -87,4 +84,11 @@ fun elaborateSpecialization(specialization: String): ElaborateSpecialization {
         specialization
     }
     return ElaborateSpecialization(specialization, display)
+}
+
+fun elaborateHolder(holder: String): ElaborateHolder {
+    return ElaborateHolder(
+        holder,
+        Holder.displayFor(holder) ?: holder
+    )
 }
