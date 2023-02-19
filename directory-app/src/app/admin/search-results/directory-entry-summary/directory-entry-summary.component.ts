@@ -31,7 +31,7 @@ export class DirectoryEntrySummaryComponent implements OnInit {
   }
 
   codeListDisplay(codeList: [CodeableConcept] | undefined) {
-    return codeList?.map(code => code.display).join(",")
+    return codeList?.map(code => code.display).join(", ")
   }
 
 }

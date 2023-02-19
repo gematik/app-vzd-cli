@@ -18,7 +18,7 @@
                 <h1>{{entry.base.displayName}}</h1>
             </div>
         </div>
-        <ibm-tabs [isNavigation]="false">
+        <ibm-tabs [isNavigation]="true" [followFocus]="true">
             <ibm-tab heading="Allgemein">
                 <h2>{{entry.kind}}</h2>
                 
@@ -31,6 +31,32 @@
                     >
                 </ibm-label>
                 
+                <div ibmRow *ngIf="entry.base.personalEntry == true">
+                    <ibm-label 
+                        ibmCol
+                        [columnNumbers]="{'lg': 8}"
+                    >
+                        Name
+                        <input
+                            ibmText
+                            [(ngModel)]="entry.base.sn"
+                            readonly="true"
+                        >
+                    </ibm-label>
+                    <ibm-label 
+                        ibmCol
+                        [columnNumbers]="{'lg': 8}"
+                    >
+                        Vorname(n)
+                        <input
+                            ibmText
+                            [(ngModel)]="entry.base.givenName"
+                            readonly="true"
+                        >
+                    </ibm-label>
+                    </div>
+    
+
                 <ibm-label>
                     TelematikID
                     <input
@@ -38,6 +64,13 @@
                         [(ngModel)]="entry.base.telematikID"
                         readonly="true"
                     >
+                </ibm-label> 
+                <ibm-label>
+                    DomainID
+                    <textarea
+                        ibmText
+                        readonly="true"
+                    >{{domainIDText}}</textarea>
                 </ibm-label> 
 
                 <ibm-label>
@@ -79,17 +112,35 @@
                 <ibm-structured-list 
                     [border]="false" [condensed]="true" [nowrap]="false">
                     <ibm-list-header>
-                        <ibm-list-column></ibm-list-column>
+                        <ibm-list-column class="icon"></ibm-list-column>
+                        <ibm-list-column [nowrap]="true">Holder</ibm-list-column>
+                        <ibm-list-column class="right">Code</ibm-list-column>
+                    </ibm-list-header>
+                    <ibm-list-row *ngFor="let code of entry.base.holder">
+                        <ibm-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
+                        <ibm-list-column>{{code?.display}}</ibm-list-column>
+                        <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
+                    </ibm-list-row>
+                    <ibm-list-row *ngIf="(entry.base.holder?.length ?? 0) == 0">
+                        <ibm-list-column class="icon"><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                        <ibm-list-column>Keine Holder</ibm-list-column>
+                    </ibm-list-row>
+                </ibm-structured-list>
+
+                <ibm-structured-list 
+                    [border]="false" [condensed]="true" [nowrap]="false">
+                    <ibm-list-header>
+                        <ibm-list-column class="icon"></ibm-list-column>
                         <ibm-list-column [nowrap]="true">ProfessionOID</ibm-list-column>
-                        <ibm-list-column>Code</ibm-list-column>
+                        <ibm-list-column class="right">Code</ibm-list-column>
                     </ibm-list-header>
                     <ibm-list-row *ngFor="let code of entry.base.professionOID">
-                        <ibm-list-column><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
+                        <ibm-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
                         <ibm-list-column>{{code?.display}}</ibm-list-column>
-                        <ibm-list-column>{{code?.code}}</ibm-list-column>
+                        <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
                     </ibm-list-row>
                     <ibm-list-row *ngIf="(entry.base.professionOID?.length ?? 0) == 0">
-                        <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                        <ibm-list-column class="icon"><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
                         <ibm-list-column>Keine ProfessionOID</ibm-list-column>
                     </ibm-list-row>
                 </ibm-structured-list>
@@ -97,14 +148,14 @@
                 <ibm-structured-list
                     [border]="false" [condensed]="true" [nowrap]="false">
                     <ibm-list-header>
-                        <ibm-list-column></ibm-list-column>
+                        <ibm-list-column class="icon"></ibm-list-column>
                         <ibm-list-column [nowrap]="true">Spezialisierung</ibm-list-column>
-                        <ibm-list-column>Code</ibm-list-column>
+                        <ibm-list-column class="right">Code</ibm-list-column>
                     </ibm-list-header>
                     <ibm-list-row *ngFor="let code of entry.base.specialization">
-                        <ibm-list-column><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
+                        <ibm-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
                         <ibm-list-column>{{code?.display}}</ibm-list-column>
-                        <ibm-list-column>{{code?.code}}</ibm-list-column>
+                        <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
                     </ibm-list-row>
                     <ibm-list-row *ngIf="(entry.base.specialization?.length ?? 0) == 0">
                         <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
@@ -116,14 +167,14 @@
                     <ibm-list-header>
                         <ibm-list-column></ibm-list-column>
                         <ibm-list-column [nowrap]="true">KIM-Adresse</ibm-list-column>
-                        <ibm-list-column>Version</ibm-list-column>
                         <ibm-list-column>Anbieter</ibm-list-column>
+                        <ibm-list-column class="right">Version</ibm-list-column>
                     </ibm-list-header>
                     <ibm-list-row *ngFor="let kimAddress of entry.kimAddresses">
                         <ibm-list-column><svg ibmIcon="checkmark--filled" class="success"></svg></ibm-list-column>
                         <ibm-list-column>{{kimAddress?.mail}}</ibm-list-column>
-                        <ibm-list-column>{{kimAddress?.version}}</ibm-list-column>
                         <ibm-list-column>{{kimAddress?.provider?.display}}</ibm-list-column>
+                        <ibm-list-column class="right">{{kimAddress?.version}}</ibm-list-column>
                     </ibm-list-row>
                     <ibm-list-row *ngIf="entry.kimAddresses === undefined">
                         <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
@@ -131,7 +182,16 @@
                     </ibm-list-row>
                 </ibm-structured-list>           
             </ibm-tab>
-            <ibm-tab heading="Zertifikate">
+            <ibm-tab heading="Karten und Zertifikate">
+                <h2>Alle Karten</h2>
+                <app-admin-directory-entry-smartcard 
+                    *ngFor="let smartcard of entry.smartcards" 
+                    [entry]="entry"
+                    [smartcard]="smartcard">
+                </app-admin-directory-entry-smartcard>
+
+                <h2>Alle Zertifikate</h2>
+
                 <div class="UserCertificateList">
                     <ibm-structured-list [border]="false" [condensed]="true">
                         <ibm-list-header>

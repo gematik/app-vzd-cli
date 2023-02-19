@@ -53,6 +53,12 @@ export class DirectoryEntryComponent implements OnInit {
     })
   }
 
+  protected get domainIDText() {
+    var text = ""
+    this.entry?.base.domainID?.forEach(id => text += `${id}\n`)
+    return text
+  }
+
   protected codeIconName(code: CodeableConcept): string {
     if (code.display != code.code) {
      return "checkmark--filled"

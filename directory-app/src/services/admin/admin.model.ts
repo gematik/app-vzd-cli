@@ -153,7 +153,8 @@ export interface ElaborateDirectoryEntry {
   base: ElaborateBaseDirectoryEntry
   userCertificates?: UserCertificate[]
   kind: DirectoryEntryKind
-  kimAddresses?: [ElaborateKIMAddress] 
+  kimAddresses?: [ElaborateKIMAddress]
+  smartcards?: [Smartcard]
 }
 
 export interface ElaborateKIMAddress {
@@ -170,4 +171,19 @@ export interface ElaborateSearchResults {
 export interface Outcome {
   code: string
   message: string
+}
+
+export enum  SmartcardType {
+  HBA = "HBA",
+  HBA2_1 = "HBA2_1",
+  SMCB = "SMCB",
+  SMCB2_1 = "SMCB2_1",
+}
+
+export interface Smartcard {
+    type: SmartcardType,
+    notBefore: string,
+    notAfter: string,
+    active: boolean,
+    certificateSerialNumbers: [string],
 }

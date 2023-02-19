@@ -45,14 +45,3 @@
         </ibm-list-column>
     </ibm-list-row>
 </ibm-structured-list>
-
-
-<div ibmRow *ngFor="let env of statusModel" class="row">
-    <div ibmCol>
-    </div>
-    <div ibmCol>
-        <p *ngIf="env.status === 'success'">
-            <a [routerLink]="['/admin', env.env]">Gehe zu</a>
-        </p>
-    </div>
-</div>
