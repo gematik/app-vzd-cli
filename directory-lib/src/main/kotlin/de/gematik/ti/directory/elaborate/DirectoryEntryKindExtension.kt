@@ -8,6 +8,7 @@ fun DirectoryEntry.infereKind(): DirectoryEntryKind {
     }
 }
 
+// ktlint-disable enum-entry-name-case
 enum class DirectoryEntryKind(val matcher: (DirectoryEntry) -> Boolean) {
     Arzt({ directoryEntry ->
         directoryEntry.directoryEntryBase.telematikID.let {
@@ -43,6 +44,7 @@ enum class DirectoryEntryKind(val matcher: (DirectoryEntry) -> Boolean) {
     }),
     Krankenhaus({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("5-") }),
     Krankenkasse({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("8-01") }),
+
     Krankenkasse_ePA({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("8-03") }),
 
     HBAGematik({ directoryEntry ->

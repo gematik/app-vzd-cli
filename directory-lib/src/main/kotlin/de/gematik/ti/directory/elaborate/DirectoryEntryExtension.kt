@@ -89,6 +89,6 @@ fun elaborateSpecialization(specialization: String): ElaborateSpecialization {
 fun elaborateHolder(holder: String): ElaborateHolder {
     return ElaborateHolder(
         holder,
-        Holder.displayFor(holder) ?: holder
+        Holder.displayFor(holder) ?: holder,
     )
 }
