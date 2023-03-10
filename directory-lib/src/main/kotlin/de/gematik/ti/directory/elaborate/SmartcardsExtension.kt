@@ -1,7 +1,6 @@
 package de.gematik.ti.directory.elaborate
 
 import de.gematik.ti.directory.admin.DirectoryEntry
-import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.pki.CertificateInfo
 import kotlin.math.abs
 
@@ -52,13 +51,13 @@ fun DirectoryEntry.infereSmartcards(): List<Smartcard>? {
  * The close ECC and RSA certificates are, they might build a pair.
  */
 fun identifyCertificatePairs(certs: List<CertificateInfo>): List<Pair<CertificateInfo, CertificateInfo?>> {
-    val pairs = certs.filter { it.publicKeyAlgorithm == "RSA" }.sortedBy { it.notBefore }.map { Pair<CertificateInfo,CertificateInfo?>(it, null) }.toTypedArray()
+    val pairs = certs.filter { it.publicKeyAlgorithm == "RSA" }.sortedBy { it.notBefore }.map { Pair<CertificateInfo, CertificateInfo?>(it, null) }.toTypedArray()
     // iterate all EC certificates and try to find the closest RSA cert to form a pair
-    certs.filter { it.publicKeyAlgorithm == "EC" }.sortedBy { it.notBefore }.forEach {eccert ->
+    certs.filter { it.publicKeyAlgorithm == "EC" }.sortedBy { it.notBefore }.forEach { eccert ->
         var closestIndex = -1
         var closestPair: Pair<CertificateInfo, CertificateInfo?>? = null
         pairs.forEachIndexed { index, pair ->
-            if (closestPair == null || abs(closestPair!!.first.notBefore.epochSeconds-eccert.notBefore.epochSeconds) > abs(pair.first.notBefore.epochSeconds-eccert.notBefore.epochSeconds)) {
+            if (closestPair == null || abs(closestPair!!.first.notBefore.epochSeconds - eccert.notBefore.epochSeconds) > abs(pair.first.notBefore.epochSeconds - eccert.notBefore.epochSeconds)) {
                 closestIndex = index
                 closestPair = pair
             }
