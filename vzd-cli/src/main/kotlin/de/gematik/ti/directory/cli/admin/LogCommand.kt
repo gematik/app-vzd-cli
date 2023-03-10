@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.groups.required
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.path
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import de.gematik.ti.directory.admin.LogEntry
 import de.gematik.ti.directory.admin.Operation
 import de.gematik.ti.directory.cli.catching
@@ -70,7 +71,7 @@ fun List<LogEntry>.toStringRepresentation(format: RepresentationFormat): String 
     return when (format) {
         RepresentationFormat.YAML -> this.toYamlNoDefaults()
         RepresentationFormat.JSON -> this.toJsonPretty()
-        RepresentationFormat.TABLE -> this.toTable()
+        RepresentationFormat.CSV -> this.toCsv()
         else -> this.toTable()
     }
 }
@@ -117,4 +118,42 @@ fun List<LogEntry>.toTable(): String {
     }
 
     return formatter.apply(this)
+}
+
+fun List<LogEntry>.toCsv(): String {
+    val csvWriter = csvWriter() {
+        delimiter = ';'
+    }
+    val list = this
+    return buildString {
+        append('\uFEFF')
+        append(
+            listToCsvLine(
+                csvWriter,
+                listOf(
+                    "logTime",
+                    "operation",
+                    "clientID",
+                    "telematikID",
+                    "uid",
+                    "noDataChanged",
+                ),
+            ),
+        )
+        list.forEach {
+            append(
+                listToCsvLine(
+                    csvWriter,
+                    listOf(
+                        it.logTime,
+                        it.operation,
+                        it.clientID,
+                        it.telematikID.escape(),
+                        it.uid,
+                        it.noDataChanged,
+                    ),
+                ),
+            )
+        }
+    }
 }
