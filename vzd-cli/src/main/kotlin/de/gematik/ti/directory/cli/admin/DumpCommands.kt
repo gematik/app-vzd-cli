@@ -12,16 +12,24 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
+import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.admin.Fachdaten
+import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.elaborate.elaborate
+import de.gematik.ti.directory.elaborate.validation.validate
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import de.gematik.ti.directory.pki.OCSPResponseCertificateStatus
 import de.gematik.ti.directory.util.escape
+import de.gematik.ti.directory.validation.Finding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -44,6 +52,16 @@ var NDJSON = Json {
         contextual(ExtendedCertificateDataDERSerializer)
     }
 }
+
+@Serializable
+class ElaboratedDumpDirectoryEntry(
+    @SerialName("DirectoryEntryBase")
+    var directoryEntryBase: BaseDirectoryEntry,
+    var userCertificates: List<UserCertificate>? = null,
+    @SerialName("Fachdaten")
+    var fachdaten: List<Fachdaten>? = null,
+    var validationResult: Map<String, List<Finding>>? = null,
+)
 
 class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the data dumps") {
     init {
@@ -116,7 +134,13 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
                             semaphore.withPermit {
                                 expandOcspStatus(entry)
                                 logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
-                                println(NDJSON.encodeToString(entry))
+                                val elaboratedEntry = ElaboratedDumpDirectoryEntry(
+                                    directoryEntryBase = entry.directoryEntryBase,
+                                    userCertificates = entry.userCertificates,
+                                    fachdaten = entry.fachdaten,
+                                    validationResult = entry.directoryEntryBase.elaborate().validate(),
+                                )
+                                println(NDJSON.encodeToString(elaboratedEntry))
                                 progressBar.step()
                                 entries++
                             }
