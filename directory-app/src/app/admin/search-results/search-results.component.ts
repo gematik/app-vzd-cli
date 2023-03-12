@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { InlineLoadingState, Table, TableHeaderItem, TableItem, TableModel, TagType } from 'carbon-components-angular';
+import { InlineLoadingState, TableHeaderItem, TableItem, TableModel } from 'carbon-components-angular';
 import { ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 import { AdminBackendService } from '../../../services/admin/admin-backend.service';
 

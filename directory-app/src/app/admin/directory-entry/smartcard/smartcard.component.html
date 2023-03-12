@@ -17,37 +17,12 @@
   </div>
   <div *ngFor="let cert of certificateInfoList">
     <h2>{{cert.publicKeyAlgorithm}}-Zertifikat</h2>
-    <div>
-      <span class="label">cn:</span>
-      <span class="value">{{cert.subjectInfo.cn}}</span>  
+    <div *ngFor="let field of cert.subjectInfo | objectToMap | keyvalue">
+      <span class="label">{{field.key}}</span>
+      <span class="value">{{field.value}}</span>  
     </div>
-    <div>
-      <span class="label">serialNumber:</span>
-      <span class="value">{{cert.subjectInfo.serialNumber}}</span>  
+    <div *ngFor="let field of cert.admissionStatement | objectToMap | keyvalue">
+      <span class="label">{{field.key}}</span>
+      <span class="value">{{field.value}}</span>  
     </div>
-    <div *ngIf="cert.subjectInfo?.givenName != null">
-      <span class="label">givenName:</span>
-      <span class="value">{{cert.subjectInfo.givenName}}</span>  
-    </div>
-    <div *ngIf="cert.subjectInfo?.sn != null">
-      <span class="label">sn:</span>
-      <span class="value">{{cert.subjectInfo.givenName}}</span>  
-    </div>
-    <div *ngIf="cert.subjectInfo?.streetAddress != null">
-      <span class="label">streetAddress:</span>
-      <span class="value">{{cert.subjectInfo.streetAddress}}</span>  
-    </div>
-    <div *ngIf="cert.subjectInfo?.postalCode != null">
-      <span class="label">postalCode:</span>
-      <span class="value">{{cert.subjectInfo.postalCode}}</span>  
-    </div>
-    <div *ngIf="cert.subjectInfo?.localityName != null">
-      <span class="label">localityName:</span>
-      <span class="value">{{cert.subjectInfo.localityName}}</span>  
-    </div>
-    <div *ngIf="cert.subjectInfo?.countryCode != null">
-      <span class="label">countryCode:</span>
-      <span class="value">{{cert.subjectInfo.countryCode}}</span>  
-    </div>
-  </div>
 </div>

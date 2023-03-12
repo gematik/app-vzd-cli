@@ -14,10 +14,22 @@ private fun infereSmartcardFrom(entry: DirectoryEntry, cert1: CertificateInfo, c
         SmartcardType.SMCB
     }
 
+    val notBefore = if (cert2 != null && cert2.notBefore > cert1.notBefore) {
+        cert2.notBefore
+    } else {
+        cert1.notBefore
+    }
+
+    val notAfter = if (cert2 != null && cert2.notAfter > cert1.notAfter) {
+        cert2.notAfter
+    } else {
+        cert1.notAfter
+    }
+
     return Smartcard(
         type = smartcardType,
-        notBefore = cert1.notBefore,
-        notAfter = cert1.notAfter,
+        notBefore = notBefore,
+        notAfter = notAfter,
         active = entry.userCertificates?.first { it.userCertificate?.certificateInfo?.serialNumber == cert1.serialNumber }?.active ?: false,
         certificateSerialNumbers = if (cert2 != null) listOf(cert1.serialNumber, cert2.serialNumber) else listOf(cert1.serialNumber),
     )

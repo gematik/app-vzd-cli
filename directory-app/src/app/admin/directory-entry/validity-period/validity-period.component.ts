@@ -36,12 +36,18 @@ export class ValidityPeriodComponent implements OnInit {
 
     const daysLeft = (end-now)/1000/60/60/24
     if (daysLeft < 90) {
-      this.text = "<3Mon"
+      this.text = "<3 Mon"
     } else if (daysLeft < 270) {
-      this.text = "<9Mon"
+      this.text = "<9 Mon"
     } else {
       const yearsLeft = daysLeft / 365
-      this.text = `>${Math.floor(yearsLeft)} Jahre`
+      if (Math.floor(yearsLeft) > 1) {
+        this.text = `>${Math.floor(yearsLeft)} Jahre`
+      } else if (Math.floor(yearsLeft) == 1) {
+        this.text = `>${Math.floor(yearsLeft)} Jahr`
+      } else {
+        this.text = `>${Math.floor(yearsLeft*12)} Mon`
+      }
     }
 
   }
