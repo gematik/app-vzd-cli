@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnippetType } from 'carbon-components-angular/code-snippet/code-snippet.component';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
-import { CodeableConcept, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
+import { Coding, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 
 interface KIMAddressInfo {
   mail: string
@@ -61,7 +61,7 @@ export class DirectoryEntryComponent implements OnInit {
     return text
   }
 
-  protected codeIconName(code: CodeableConcept): string {
+  protected codeIconName(code: Coding): string {
     if (code.display != code.code) {
      return "checkmark--filled"
     } else {
@@ -69,7 +69,7 @@ export class DirectoryEntryComponent implements OnInit {
     }
   }
 
-  protected codeIconClass(code: CodeableConcept): string {
+  protected codeIconClass(code: Coding): string {
     if (code.display != code.code) {
      return "success"
     } else {

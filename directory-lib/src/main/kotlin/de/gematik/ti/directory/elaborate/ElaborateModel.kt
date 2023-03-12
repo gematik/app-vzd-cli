@@ -2,9 +2,11 @@ package de.gematik.ti.directory.elaborate
 
 import de.gematik.ti.directory.admin.DistinguishedName
 import de.gematik.ti.directory.admin.UserCertificate
+import de.gematik.ti.directory.fhir.Coding
 import de.gematik.ti.directory.validation.Finding
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import org.hl7.fhir.r4.model.CodeableConcept
 
 @Serializable
 data class ElaborateDirectoryEntry(
@@ -45,12 +47,12 @@ data class ElaborateBaseDirectoryEntry(
     var countryCode: String? = null,
 
     // Professional
-    var professionOID: List<ElaborateProfessionOID>? = null,
-    var specialization: List<ElaborateSpecialization>? = null,
+    var professionOID: List<Coding>? = null,
+    var specialization: List<Coding>? = null,
     var entryType: List<String?>? = null,
 
     // System
-    var holder: List<ElaborateHolder>? = null,
+    var holder: List<Coding>? = null,
     var dataFromAuthority: Boolean? = null,
     var personalEntry: Boolean? = null,
     var changeDateTime: Instant? = null,
@@ -61,24 +63,6 @@ data class ElaborateBaseDirectoryEntry(
     // Misc
     var active: Boolean,
     var meta: List<String>? = null,
-)
-
-@Serializable
-data class ElaborateProfessionOID(
-    val code: String,
-    val display: String,
-)
-
-@Serializable
-data class ElaborateSpecialization(
-    val code: String,
-    val display: String,
-)
-
-@Serializable
-data class ElaborateHolder(
-    val code: String,
-    val display: String,
 )
 
 enum class SmartcardType {

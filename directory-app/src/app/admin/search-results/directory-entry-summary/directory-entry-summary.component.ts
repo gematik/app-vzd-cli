@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CodeableConcept, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
+import { Coding, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 
 @Component({
   selector: 'app-admin-directory-entry-summary',
@@ -30,7 +30,7 @@ export class DirectoryEntrySummaryComponent implements OnInit {
     }
   }
 
-  codeListDisplay(codeList: [CodeableConcept] | undefined) {
+  codeListDisplay(codeList: [Coding] | undefined) {
     return codeList?.map(code => code.display).join(", ")
   }
 

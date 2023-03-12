@@ -76,7 +76,7 @@ export interface CertificateInfo {
      ocspResponse?: OCSPResponse
 }
 
-export interface CodeableConcept {
+export interface Coding {
   code: string,
   display: string,
   system?: string,
@@ -105,12 +105,12 @@ export interface ElaborateBaseDirectoryEntry {
   countryCode?: string 
 
   // Professional
-  professionOID?: [CodeableConcept] 
-  specialization?: [CodeableConcept] 
+  professionOID?: [Coding] 
+  specialization?: [Coding] 
   entryType?: [string] 
 
   // System
-  holder?: [CodeableConcept] 
+  holder?: [Coding] 
   dataFromAuthority?: boolean
   personalEntry?: boolean
   changeDateTime?: string 
@@ -160,7 +160,7 @@ export interface ElaborateDirectoryEntry {
 export interface ElaborateKIMAddress {
     mail: string,
     version: string,
-    provider?: CodeableConcept,
+    provider?: Coding,
 }
 
 export interface ElaborateSearchResults {
