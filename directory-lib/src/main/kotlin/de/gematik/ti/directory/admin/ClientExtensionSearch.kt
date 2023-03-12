@@ -46,7 +46,7 @@ data class TokenPosition(val type: TokenType, val range: IntRange)
 
 data class TokenizerResult(val tokens: List<String>, val positions: List<TokenPosition>) {
     fun joinAll(): String {
-        return tokens.joinToString(" ")
+        return positions.joinToString(" ") { join(it) }
     }
 
     fun join(tokenPosition: TokenPosition): String {
@@ -54,9 +54,7 @@ data class TokenizerResult(val tokens: List<String>, val positions: List<TokenPo
     }
 
     fun joinAllExcept(tokenPosition: TokenPosition): String {
-        return tokens.filterIndexed { index, _ ->
-            index !in tokenPosition.range
-        }.joinToString(" ")
+        return positions.filter { it != tokenPosition }.joinToString(" ") { join(it) }
     }
 }
 
