@@ -182,15 +182,21 @@
                     </ibm-list-row>
                 </ibm-structured-list>           
             </ibm-tab>
-            <ibm-tab heading="Karten und Zertifikate">
-                <h2>Alle Karten</h2>
+            <ibm-tab heading="Karten">
+                <h2>Karten</h2>
                 <app-admin-directory-entry-smartcard 
                     *ngFor="let smartcard of entry.smartcards" 
                     [entry]="entry"
                     [smartcard]="smartcard">
                 </app-admin-directory-entry-smartcard>
+                <ibm-structured-list [border]="false" [condensed]="true">
+                    <ibm-list-row *ngIf="entry.smartcards === undefined || entry.smartcards.length == 0">
+                        <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                        <ibm-list-column>Keine Karten</ibm-list-column>
+                    </ibm-list-row>
+                </ibm-structured-list>
 
-                <h2>Alle Zertifikate</h2>
+                <h2>Zertifikate</h2>
 
                 <div class="UserCertificateList">
                     <ibm-structured-list [border]="false" [condensed]="true">
@@ -222,7 +228,7 @@
                 </div>
             </ibm-tab>
             <ibm-tab heading="Rohdaten">
-                <pre><code>{{rawData}}</code></pre>
+                <ibm-code-snippet [display]="snippetDisplay">{{rawData}}</ibm-code-snippet>
             </ibm-tab>
         </ibm-tabs>
     </div>

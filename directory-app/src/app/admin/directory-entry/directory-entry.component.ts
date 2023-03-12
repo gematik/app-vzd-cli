@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SnippetType } from 'carbon-components-angular/code-snippet/code-snippet.component';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
 import { CodeableConcept, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 
@@ -30,6 +31,7 @@ export class DirectoryEntryComponent implements OnInit {
   get rawData(): string { return JSON.stringify(this.entry, null, 2)}
   kimAddressList: KIMAddressInfo[] = []
   userCertificateList: UserCertificateInfo[] = []
+  snippetDisplay = "multi" as SnippetType
 
   constructor(
     private router: Router,

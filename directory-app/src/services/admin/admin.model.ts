@@ -27,7 +27,7 @@ export interface DistinguishedName {
   cn?: string
 }
 
- interface NameInfo {
+export interface NameInfo {
      cn?: string
      givenName?: string
      sn?: string
@@ -153,8 +153,8 @@ export interface ElaborateDirectoryEntry {
   base: ElaborateBaseDirectoryEntry
   userCertificates?: UserCertificate[]
   kind: DirectoryEntryKind
-  kimAddresses?: [ElaborateKIMAddress]
-  smartcards?: [Smartcard]
+  kimAddresses?: ElaborateKIMAddress[]
+  smartcards?: Smartcard[]
 }
 
 export interface ElaborateKIMAddress {

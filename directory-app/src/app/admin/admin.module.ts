@@ -16,6 +16,7 @@ import { AskPasswordComponent } from './settings/ask-password/ask-password.compo
 import { DirectoryEntrySummaryComponent } from './search-results/directory-entry-summary/directory-entry-summary.component';
 import { SmartcardComponent } from './directory-entry/smartcard/smartcard.component';
 import { ValidityPeriodComponent } from './directory-entry/validity-period/validity-period.component';
+import { ObjectToMapPipe } from '../object-to-map.pipe';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { ValidityPeriodComponent } from './directory-entry/validity-period/valid
     DirectoryEntrySummaryComponent,
     SmartcardComponent,
     ValidityPeriodComponent,
+    ObjectToMapPipe,
   ],
   imports: [
     // angular imports

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Pipe, PipeTransform } from '@angular/core';
 import { CertificateInfo, ElaborateDirectoryEntry, Smartcard, UserCertificate } from 'src/services/admin/admin.model';
 
 @Component({
