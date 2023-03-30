@@ -37,7 +37,7 @@ interface SpecialCase {
 }
 
 private val specialCases = listOf<SpecialCase>(
-    PharmacySpecializationSpecialCase()
+    PharmacySpecializationSpecialCase(),
 )
 
 fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
@@ -73,7 +73,6 @@ fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
         active = base.active,
         meta = base.meta,
     )
-
 }
 
 fun elaborateProfessionOID(base: BaseDirectoryEntry, professionOID: String): Coding {

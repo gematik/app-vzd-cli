@@ -5,7 +5,7 @@ import de.gematik.ti.directory.elaborate.ElaborateDirectoryEntry
 import de.gematik.ti.directory.elaborate.SpecialCase
 import de.gematik.ti.directory.fhir.PharacyTypeCS
 
-class PharmacySpecializationSpecialCase: SpecialCase {
+class PharmacySpecializationSpecialCase : SpecialCase {
     override fun apply(entry: ElaborateDirectoryEntry) {
         if (entry.kind == DirectoryEntryKind.Apotheke) {
             entry.base.specialization = entry.base.specialization?.map {

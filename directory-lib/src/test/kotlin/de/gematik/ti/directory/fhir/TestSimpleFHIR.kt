@@ -3,7 +3,6 @@ package de.gematik.ti.directory.fhir
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 
 class TestSimpleFHIR : FeatureSpec({
     feature("Very basic FHIR parser") {

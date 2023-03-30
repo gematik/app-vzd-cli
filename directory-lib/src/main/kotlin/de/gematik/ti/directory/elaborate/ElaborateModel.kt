@@ -6,7 +6,6 @@ import de.gematik.ti.directory.fhir.Coding
 import de.gematik.ti.directory.validation.Finding
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import org.hl7.fhir.r4.model.CodeableConcept
 
 @Serializable
 data class ElaborateDirectoryEntry(
