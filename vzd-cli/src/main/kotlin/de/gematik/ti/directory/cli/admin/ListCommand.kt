@@ -73,7 +73,13 @@ class ListCommand : CliktCommand(name = "list", help = "List directory entries")
 
     private fun runQuery(params: Map<String, String>): List<DirectoryEntry>? {
         val result: List<DirectoryEntry>? = if (sync) {
-            runBlocking { context.client.readDirectoryEntryForSync(params) }
+            runBlocking {
+                buildList {
+                    context.client.streamDirectoryEntriesPaging(params) {
+                        add(it)
+                    }
+                }
+            }
         } else {
             runBlocking { context.client.readDirectoryEntry(params) }
         }

@@ -2,6 +2,7 @@ package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.elaborate.*
+import de.gematik.ti.directory.fhir.Coding
 import de.gematik.ti.directory.pki.AdmissionStatementInfo
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import de.gematik.ti.directory.pki.NameInfo
@@ -61,12 +62,12 @@ private class HumanDirectoryEntry(
     var countryCode: String? = null,
 
     // Professional
-    var professionOID: List<ElaborateProfessionOID>? = null,
-    var specialization: List<ElaborateSpecialization>? = null,
+    var professionOID: List<Coding>? = null,
+    var specialization: List<Coding>? = null,
     var entryType: List<String?>? = null,
 
     // System
-    var holder: List<ElaborateHolder>? = null,
+    var holder: List<Coding>? = null,
     var dataFromAuthority: Boolean? = null,
     var personalEntry: Boolean? = null,
     var changeDateTime: Instant? = null,

@@ -14,6 +14,9 @@ import { DirectoryEntryComponent } from './directory-entry/directory-entry.compo
 import { SettingsComponent } from './settings/settings.component';
 import { AskPasswordComponent } from './settings/ask-password/ask-password.component';
 import { DirectoryEntrySummaryComponent } from './search-results/directory-entry-summary/directory-entry-summary.component';
+import { SmartcardComponent } from './directory-entry/smartcard/smartcard.component';
+import { ValidityPeriodComponent } from './directory-entry/validity-period/validity-period.component';
+import { ObjectToMapPipe } from '../object-to-map.pipe';
 
 @NgModule({
   declarations: [
@@ -23,6 +26,9 @@ import { DirectoryEntrySummaryComponent } from './search-results/directory-entry
     SettingsComponent,
     AskPasswordComponent,
     DirectoryEntrySummaryComponent,
+    SmartcardComponent,
+    ValidityPeriodComponent,
+    ObjectToMapPipe,
   ],
   imports: [
     // angular imports

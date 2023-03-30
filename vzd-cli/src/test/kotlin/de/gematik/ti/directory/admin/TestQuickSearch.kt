@@ -50,5 +50,18 @@ class TestQuickSearch : FeatureSpec({
                 result.first().directoryEntryBase.displayName shouldContain "St. Vincenz"
             }
         }
+
+        scenario("Search by 'Berlin 5-'") {
+            runBlocking {
+                val result = client?.quickSearch("Berlin 5-")?.directoryEntries ?: emptyList()
+                result.size shouldBeGreaterThan 0
+            }
+        }
+        scenario("Search by '5- Berlin'") {
+            runBlocking {
+                val result = client?.quickSearch("5- Berlin")?.directoryEntries ?: emptyList()
+                result.size shouldBeGreaterThan 0
+            }
+        }
     }
 })

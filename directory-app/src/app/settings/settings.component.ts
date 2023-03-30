@@ -1,6 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { InlineLoadingState } from 'carbon-components-angular';
-import { firstValueFrom } from 'rxjs';
 import { BackendService } from 'src/services/backend.service';
 import { GlobalConfig } from 'src/services/global.model';
 import { NavigationService } from '../../services/navigation.service';

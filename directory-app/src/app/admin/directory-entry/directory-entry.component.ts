@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SnippetType } from 'carbon-components-angular/code-snippet/code-snippet.component';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
-import { ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
+import { Coding, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 
 interface KIMAddressInfo {
   mail: string
@@ -30,6 +31,7 @@ export class DirectoryEntryComponent implements OnInit {
   get rawData(): string { return JSON.stringify(this.entry, null, 2)}
   kimAddressList: KIMAddressInfo[] = []
   userCertificateList: UserCertificateInfo[] = []
+  snippetDisplay = "multi" as SnippetType
 
   constructor(
     private router: Router,
@@ -51,6 +53,28 @@ export class DirectoryEntryComponent implements OnInit {
         }
       )
     })
+  }
+
+  protected get domainIDText() {
+    var text = ""
+    this.entry?.base.domainID?.forEach(id => text += `${id}\n`)
+    return text
+  }
+
+  protected codeIconName(code: Coding): string {
+    if (code.display != code.code) {
+     return "checkmark--filled"
+    } else {
+      return "error--filled"
+    }
+  }
+
+  protected codeIconClass(code: Coding): string {
+    if (code.display != code.code) {
+     return "success"
+    } else {
+      return "error"
+    }
   }
 
   private createUserCertificateList(entry: ElaborateDirectoryEntry): UserCertificateInfo[] {

@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { InlineLoadingState, ModalService, NotificationService } from 'carbon-components-angular';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
 import { AskPasswordComponent } from './ask-password/ask-password.component';
-
+import { IconService } from 'carbon-components-angular';
+import { Login16, Api16 } from "@carbon/icons";
 interface EnvironmentStatusModel {
   env: string,
   status: "success" | "error"
@@ -21,12 +22,15 @@ export class SettingsComponent implements OnInit {
   protected loadingState = InlineLoadingState.Hidden
 
   constructor(
+    private iconService: IconService,
     private adminBackend: AdminBackendService,
     private notificationService: NotificationService,
     private modalService: ModalService,
   ) { }
 
   ngOnInit(): void {
+    this.iconService.register(Login16)
+    this.iconService.register(Api16)
     const self = this
     this.adminBackend.status$.subscribe({
       next(adminStatus) {

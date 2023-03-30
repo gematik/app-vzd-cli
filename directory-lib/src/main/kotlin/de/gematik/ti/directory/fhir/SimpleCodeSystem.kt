@@ -10,12 +10,23 @@ class SimpleConcept(
 )
 
 @Serializable
+data class Coding(
+    val code: String,
+    val display: String,
+    val system: String? = null,
+)
+
+@Serializable
 class SimpleCodeSystem(
     val name: String,
+    val url: String,
     val concept: List<SimpleConcept>,
 ) {
-    fun displayFor(code: String): String? {
-        return concept.firstOrNull { it.code == code }?.display
+
+    fun resolveCode(code: String): Coding? {
+        return concept.firstOrNull { it.code == code }?.let {
+            Coding(code, it.display, url)
+        }
     }
 }
 
@@ -25,3 +36,5 @@ private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem {
 
 val OrganizationProfessionOID = loadSimpleCodeSystem("OrganizationProfessionOID")
 val PractitionerProfessionOID = loadSimpleCodeSystem("PractitionerProfessionOID")
+val PharacyTypeCS = loadSimpleCodeSystem("PharmacyTypeCS")
+val Holder = loadSimpleCodeSystem("HolderCS")

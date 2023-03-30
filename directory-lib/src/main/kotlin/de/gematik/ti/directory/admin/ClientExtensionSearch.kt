@@ -46,7 +46,7 @@ data class TokenPosition(val type: TokenType, val range: IntRange)
 
 data class TokenizerResult(val tokens: List<String>, val positions: List<TokenPosition>) {
     fun joinAll(): String {
-        return tokens.joinToString(" ")
+        return positions.joinToString(" ") { join(it) }
     }
 
     fun join(tokenPosition: TokenPosition): String {
@@ -54,16 +54,7 @@ data class TokenizerResult(val tokens: List<String>, val positions: List<TokenPo
     }
 
     fun joinAllExcept(tokenPosition: TokenPosition): String {
-        return tokens.filterIndexed { index, _ ->
-            index !in tokenPosition.range
-        }.joinToString(" ")
-    }
-
-    fun subset(subsetPositions: List<TokenPosition>): TokenizerResult {
-        val subsetTokens = tokens.filterIndexed { index, _ ->
-            subsetPositions.any { index in it.range }
-        }
-        return TokenizerResult(subsetTokens, subsetPositions)
+        return positions.filter { it != tokenPosition }.joinToString(" ") { join(it) }
     }
 }
 
@@ -146,7 +137,7 @@ private fun extractFixedParams(tokenizerResult: TokenizerResult): Pair<Map<Strin
         }
         put("baseEntryOnly", "true")
     }
-    return Pair(fixedParams, tokenizerResult.subset(namesAndLocalities))
+    return Pair(fixedParams, TokenizerResult(tokenizerResult.tokens, namesAndLocalities))
 }
 
 /**

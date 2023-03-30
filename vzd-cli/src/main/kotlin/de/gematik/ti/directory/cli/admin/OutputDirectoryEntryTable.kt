@@ -1,13 +1,14 @@
 package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.util.escape
 import hu.vissy.texttable.dsl.tableFormatter
 
 fun List<DirectoryEntry>.toTable(): String {
     val formatter = tableFormatter<DirectoryEntry> {
         labeled<String>("TelematikID", "Gesamt") {
             extractor { directoryEntry ->
-                directoryEntry.directoryEntryBase.telematikID
+                directoryEntry.directoryEntryBase.telematikID.escape()
             }
         }
 
@@ -22,11 +23,7 @@ fun List<DirectoryEntry>.toTable(): String {
                 maxWidth = 24
             }
             aggregator { _, state ->
-                if (state.count > 99) {
-                    "99+"
-                } else {
-                    state.count.toString()
-                }
+                state.count.toString()
             }
         }
 

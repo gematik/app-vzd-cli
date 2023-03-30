@@ -27,7 +27,7 @@ export interface DistinguishedName {
   cn?: string
 }
 
- interface NameInfo {
+export interface NameInfo {
      cn?: string
      givenName?: string
      sn?: string
@@ -76,7 +76,7 @@ export interface CertificateInfo {
      ocspResponse?: OCSPResponse
 }
 
-export interface CodeableConcept {
+export interface Coding {
   code: string,
   display: string,
   system?: string,
@@ -105,12 +105,12 @@ export interface ElaborateBaseDirectoryEntry {
   countryCode?: string 
 
   // Professional
-  professionOID?: [CodeableConcept] 
-  specialization?: [CodeableConcept] 
+  professionOID?: [Coding] 
+  specialization?: [Coding] 
   entryType?: [string] 
 
   // System
-  holder?: [CodeableConcept] 
+  holder?: [Coding] 
   dataFromAuthority?: boolean
   personalEntry?: boolean
   changeDateTime?: string 
@@ -140,7 +140,8 @@ export enum DirectoryEntryKind {
   Apotheker = "Apotheker",
   Psychotherapeut = "Psychotherapeut",
   Krankenhaus = "Krankenhaus",
-  GKV = "GKV",
+  Krankenkasse = "Krankenkasse",
+  Krankenkasse_ePA = "Krankenkasse_ePA",
   HBAGematik = "HBAGematik",
   SMCBGematik = "SMCBGematik",
   HBAeGBR = "HBAeGBR",
@@ -152,13 +153,14 @@ export interface ElaborateDirectoryEntry {
   base: ElaborateBaseDirectoryEntry
   userCertificates?: UserCertificate[]
   kind: DirectoryEntryKind
-  kimAddresses?: [ElaborateKIMAddress] 
+  kimAddresses?: ElaborateKIMAddress[]
+  smartcards?: Smartcard[]
 }
 
 export interface ElaborateKIMAddress {
     mail: string,
     version: string,
-    provider?: CodeableConcept,
+    provider?: Coding,
 }
 
 export interface ElaborateSearchResults {
@@ -169,4 +171,19 @@ export interface ElaborateSearchResults {
 export interface Outcome {
   code: string
   message: string
+}
+
+export enum  SmartcardType {
+  HBA = "HBA",
+  HBA2_1 = "HBA2_1",
+  SMCB = "SMCB",
+  SMCB2_1 = "SMCB2_1",
+}
+
+export interface Smartcard {
+    type: SmartcardType,
+    notBefore: string,
+    notAfter: string,
+    active: boolean,
+    certificateSerialNumbers: [string],
 }

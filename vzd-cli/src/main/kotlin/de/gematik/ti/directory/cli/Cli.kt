@@ -19,6 +19,7 @@ import de.gematik.ti.directory.cli.gui.GuiCommand
 import de.gematik.ti.directory.cli.pers.PersCommand
 import de.gematik.ti.directory.cli.util.VaultException
 import io.ktor.client.network.sockets.*
+import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
@@ -55,7 +56,11 @@ fun catching(throwingBlock: () -> Unit = {}) {
     } catch (e: DirectoryException) {
         throw CliktError(e.message)
     } catch (e: AdminResponseException) {
-        throw CliktError(e.details)
+        if (e.response.status == HttpStatusCode.Unauthorized) {
+            throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin <ru|tu|pu> login` or provide token by other means.")
+        } else {
+            throw CliktError(e.details)
+        }
     } catch (e: SerializationException) {
         throw CliktError(e.message)
     } catch (e: VaultException) {
@@ -68,13 +73,6 @@ fun catching(throwingBlock: () -> Unit = {}) {
         // another InterOp Issue with REST API
         if (e.message.contains("Expected `=` after parameter key ''")) {
             throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin <ru|tu|pu> login`.")
-        } else {
-            throw e
-        }
-    } catch (e: IllegalStateException) {
-        // dirty, but no other way atm
-        if (e.message?.contains("Unsupported byte code, first byte is 0xfc") == true) {
-            throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin login`.")
         } else {
             throw e
         }

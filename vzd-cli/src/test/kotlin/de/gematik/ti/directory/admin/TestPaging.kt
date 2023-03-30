@@ -15,6 +15,7 @@ class TestPaging : FeatureSpec({
     feature("Suche nach Einträgen mit Paging") {
         scenario("Suche und finde mehr als 3 Einträge in 3er Blocks") {
             runBlocking {
+                @Suppress("DEPRECATION")
                 val withOutPaging = client?.readDirectoryEntryForSync(
                     mapOf(
                         "telematikID" to "9-*",

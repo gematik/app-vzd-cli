@@ -105,6 +105,8 @@ export class AdminBackendService {
           return "cyan"
       case DirectoryEntryKind.Apotheke: 
         return "purple"
+      case DirectoryEntryKind.Krankenkasse: 
+        return "outline"
       default:
         return "warm-gray"
     }

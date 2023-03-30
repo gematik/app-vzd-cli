@@ -1,0 +1,9 @@
+# test proxy server
+version: "3"
+
+services:
+  httpProxy:
+    image: hinata/nginx-forward-proxy:latest
+    ports:
+      - 3128:3128
+

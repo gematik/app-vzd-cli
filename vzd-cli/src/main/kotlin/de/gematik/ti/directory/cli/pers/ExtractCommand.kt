@@ -111,7 +111,7 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
     private fun writeCert(cert: CertificateDataDER) {
         echo("└── ${cert.certificateInfo.serialNumber}")
         val filenameBase =
-            "${cert.certificateInfo.admissionStatement.registrationNumber.escape()}-${cert.certificateInfo.serialNumber}"
+            "${cert.certificateInfo.admissionStatement.registrationNumber.trim()}-${cert.certificateInfo.serialNumber}"
         outputDir.resolve("$filenameBase.der").writeBytes(Base64.decode(cert.base64String))
         outputDir.resolve("$filenameBase.certinfo.yaml").writeText(cert.certificateInfo.toYamlNoDefaults())
     }

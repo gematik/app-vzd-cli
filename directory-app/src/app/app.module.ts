@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { SettingsComponent } from './settings/settings.component';
 import { MainComponent } from './main/main.component';
 import { AdminModule } from './admin/admin.module';
+import { ObjectToMapPipe } from './object-to-map.pipe';
 
 @NgModule({
   declarations: [

@@ -149,6 +149,7 @@ class Client(block: Configuration.() -> Unit = {}) {
     /**
      * Implements GET /DirectoryEntriesSync (read_Directory_Entry_for_Sync)
      */
+    @Deprecated("Use streamDirectoryEntriesPaging instaed")
     suspend fun readDirectoryEntryForSync(parameters: Map<String, String>): List<DirectoryEntry>? {
         return readDirectoryEntry(parameters, "/DirectoryEntriesSync")
     }
@@ -184,7 +185,7 @@ class Client(block: Configuration.() -> Unit = {}) {
      */
     suspend fun streamDirectoryEntriesPaging(
         parameters: Map<String, String>,
-        cursorSize: Int = 100,
+        cursorSize: Int = 500,
         sink: (entry: DirectoryEntry) -> Unit,
     ) {
         var cookie: String? = null
@@ -292,5 +293,22 @@ class Client(block: Configuration.() -> Unit = {}) {
         if (response.status != HttpStatusCode.OK) {
             throw AdminResponseException(response, "Unable to delete entry $certificateEntryID")
         }
+    }
+
+    /**
+     * Implements GET /Log (readLog)
+     */
+    suspend fun readLog(parameters: Map<String, String>): List<LogEntry> {
+        val response = http.get("/Log") {
+            for (param in parameters.entries) {
+                parameter(param.key, param.value)
+            }
+        }
+
+        if (response.status != HttpStatusCode.OK) {
+            throw AdminResponseException(response, "Unable to get log $parameters")
+        }
+
+        return response.body()
     }
 }
