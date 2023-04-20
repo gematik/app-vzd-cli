@@ -9,8 +9,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.ByteArrayOutputStream
-import java.time.ZoneId
-import java.time.ZoneOffset
 
 val DirectoryEntryCsvHeaders = listOf(
     "telematikID",
@@ -61,9 +59,6 @@ fun List<DirectoryEntry>.toCsv(): String {
         delimiter = ';'
     }
 
-
-
-
     val list = this
     return buildString {
         append('\uFEFF')
@@ -108,7 +103,7 @@ fun List<DirectoryEntry>.toCsv(): String {
                         it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
                             ?.flatten()?.joinToString("|"),
                         it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.komLeData } } }?.flatten()
-                            ?.flatten()?.joinToString("|") { "${it.version},${it.mail}"},
+                            ?.flatten()?.joinToString("|") { "${it.version},${it.mail}" },
                         it.fachdaten?.let { it.mapNotNull { it.fad1 }.flatten().mapNotNull { it.dn.ou?.firstOrNull() }.joinToString("|") },
                     ),
                 ),

@@ -4,7 +4,6 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.cli.util.TokenStore
 
