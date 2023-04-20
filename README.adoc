@@ -82,6 +82,7 @@ Dieser Password funktioniert analog zu den privaten Passwörtern bei den Passwor
 Die Vault Implementierung befinden sich in der Datei `Vault.kt` und verwendet von NIST emfohlene Verschlüsselung.
 
 Falls das Speichern der Credentials nicht erwünscht ist, kann die Anmeldung direkt mit Client ID und Client Secret erfolgen, s. `vzd-cli admin login-cred`.
+Zusätzlich kann man einen vorhanden Token direkt setzen s. `vzd-cli admin <tu|ru|pu> token`.
 
 [source,bash]
 ----
@@ -269,7 +270,7 @@ vzd-cli admin ru login-cred -c myclient
 
 === `vzd-cli admin <tu|ru|pu> token`
 
-Zeigt den aktuellen `ACCESS_TOKEN` zurück. Token kann danach in der Umgebungsvariable `ADMIN_ACCESS_TOKEN` gespeichert werden, damit weitere Client-Aufrufe keine erneute explizite Authentisierung durchführen müssen.
+Zeigt oder setzt den `ACCESS_TOKEN` für die angegebene Umgebung.
 
 .*Beispiel:* Speichert den ACCESS_TOKEN in die Umgebungsvariable und führt anschließend eine Query mit curl.
 [source,bash]
@@ -279,6 +280,12 @@ export ADMIN_ACCESS_TOKEN=$(vzd-cli admin ru token)
 curl -H "Accept: application/json" \
   -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
   https://vzdpflege-ref.vzd.ti-dienste.de:9543/DirectoryEntries?baseEntryOnly=true
+----
+
+.*Beispiel:* Setzt den ACCESS_TOKEN
+[source,bash]
+----
+vzd-cli admin ru token -s <ACCESS_TOKEN>
 ----
 
 === `vzd-cli admin <tu|ru|pu> search`

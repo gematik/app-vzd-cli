@@ -110,18 +110,18 @@ class AdminAPI(val globalAPI: GlobalAPI) {
 
     fun login(env: AdminEnvironment, clientID: String, clientSecret: String): Map<String, String> {
         val tokenStore = TokenStore()
-        val envcfg = environmentConfig(env)
+        val envConfig = environmentConfig(env)
 
         val auth = ClientCredentialsAuthenticator(
-            envcfg.authURL,
+            envConfig.authURL,
             if (globalAPI.config.httpProxy.enabled) globalAPI.config.httpProxy.proxyURL else null,
         )
         val authResponse = runBlocking { auth.authenticate(clientID, clientSecret) }
 
-        tokenStore.addAccessToken(envcfg.apiURL, authResponse.accessToken)
+        tokenStore.addAccessToken(envConfig.apiURL, authResponse.accessToken)
 
         logger.info { "Login successful: env:$env , clientID:$clientID" }
-        return tokenStore.claimsFor(envcfg.apiURL)!!
+        return tokenStore.claimsFor(envConfig.apiURL)!!
     }
 
     suspend fun expandOCSPStatus(entries: List<DirectoryEntry>?) {
