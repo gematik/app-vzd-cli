@@ -6,8 +6,6 @@ import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.util.escape
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.ByteArrayOutputStream
 
 val DirectoryEntryCsvHeaders = listOf(
@@ -98,7 +96,7 @@ fun List<DirectoryEntry>.toCsv(): String {
                         it.directoryEntryBase.maxKOMLEadr,
 
                         it.directoryEntryBase.active,
-                        it.directoryEntryBase.meta?.map { Json.encodeToString(it) }?.joinToString("|"),
+                        it.directoryEntryBase.meta?.joinToString("|"),
 
                         it.userCertificates?.count { it.userCertificate != null } ?: 0,
                         it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.count() ?: 0,
