@@ -36,6 +36,7 @@ private class CertificateShortInfo(
     val notAfter: Instant,
     val active: Boolean,
     var ocspResponse: OCSPResponse? = null,
+    var thumbprint: String? = null,
 )
 
 @Serializable
@@ -143,6 +144,7 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
                         notAfter = certInfo.notAfter,
                         active = it.active ?: true,
                         ocspResponse = certInfo.ocspResponse,
+                        thumbprint = certInfo.thumbprint,
                     )
                 }
             },

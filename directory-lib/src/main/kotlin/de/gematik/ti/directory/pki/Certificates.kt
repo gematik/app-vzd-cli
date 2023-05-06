@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.x509.AuthorityInformationAccess
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers
 import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.util.encoders.Base64
+import java.security.MessageDigest
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 
@@ -44,6 +45,7 @@ data class CertificateInfo(
     val certData: String,
     val ocspReponderURL: String? = null,
     var ocspResponse: OCSPResponse? = null,
+    var thumbprint: String? = null,
 )
 
 /**
@@ -69,6 +71,10 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 }
             }
 
+            val md = MessageDigest.getInstance("SHA-256")
+            val thumbprintBytes = md.digest(certificate.publicKey.encoded)
+            val thumbprintStr = thumbprintBytes.joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
+
             val admission = Admission(certificate)
             val admissionInfo = AdmissionStatementInfo(
                 admissionAuthority = admission.admissionAuthority,
@@ -90,6 +96,8 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
                 admissionInfo,
                 base64String,
                 ocspResponderURL,
+                null,
+                thumbprintStr,
             )
         }
     }
