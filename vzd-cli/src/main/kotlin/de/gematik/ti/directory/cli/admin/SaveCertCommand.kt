@@ -63,9 +63,11 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
 
         val result = runBlocking { context.client.readDirectoryCertificates(params) }
 
+        var num = 1
         result?.forEach {
             val cert = it.userCertificate?.certificateInfo ?: return
-            val filename = "${cert.admissionStatement.registrationNumber.escape()}-${cert.serialNumber}.der"
+            val filename = "${cert.admissionStatement.registrationNumber.escape()}-$num.der"
+            num++
             val path = outputDir.resolve(filename)
             path.writeBytes(Base64.decode(it.userCertificate?.base64String))
             logger.info { "Written certificate to file ${path.toRealPath()}" }
