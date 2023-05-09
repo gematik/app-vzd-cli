@@ -502,24 +502,6 @@ WARNING: Nicht implementiert. Bitte `vzd-cli admin clear-cert` verwenden.
 
 Löscht einen X509-Zertifikat.
 
-=== `vzd-cli admin <tu|ru|pu> cmd`
-
-Aktiviert link:COMPATIBILITY_MODE.adoc[Kompatibilitätsmodus zur VZDClient 1.6]
-
-----
-Usage: vzd-cli admin cmd [OPTIONS]
-
-  Compatibility mode: support for VZDClient XML-commands
-
-Options:
-  -p, --params CONF_FILE       Configuration file containing the config
-                               parameters
-  -c, --cred CREDENTIALS_FILE  File containing the access credentials
-                               (deprecated)
-  -b, --batch COMMANDS_FILE    XML file containing the commands
-  -h, --help                   Show this message and exit
-----
-
 === `vzd-cli admin <tu|ru|pu> dump create`
 
 Lädt große Mengen von Einträgen und schreibt sie in `STDOUT`, eine Zeile per Eintrag als JSON. So erzeugte Dumps können durch weitere Tools verarbeitet werden, z.B. https://gnupg.org[GnuPG] oder https://github.com/antonmedv/fx[FX].
