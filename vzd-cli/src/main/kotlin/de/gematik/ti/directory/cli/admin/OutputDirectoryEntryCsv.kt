@@ -60,7 +60,7 @@ fun List<DirectoryEntry>.toCsv(): String {
 
     val list = this
     return buildString {
-        // append('\uFEFF')
+        append('\uFEFF')
         append(listToCsvLine(csvWriter, DirectoryEntryCsvHeaders))
         list.forEach {
             append(
