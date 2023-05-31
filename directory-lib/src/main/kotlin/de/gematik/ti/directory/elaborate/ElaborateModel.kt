@@ -64,7 +64,7 @@ data class ElaborateBaseDirectoryEntry(
     // Misc
     var active: Boolean,
     var meta: List<String>? = null,
-    )
+)
 
 enum class SmartcardType {
     HBA,

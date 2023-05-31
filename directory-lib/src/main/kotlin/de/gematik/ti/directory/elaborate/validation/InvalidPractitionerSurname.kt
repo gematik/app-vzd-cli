@@ -7,7 +7,8 @@ import de.gematik.ti.directory.validation.ValidationRule
 
 object InvalidPractitionerSurname : ValidationRule<ElaborateBaseDirectoryEntry>({
     if (it.fhirResourceType == DirectoryEntryResourceType.Practitioner &&
-        (it.sn == null || it.sn?.trim() == "" || it.sn == "-")) {
+        (it.sn == null || it.sn?.trim() == "" || it.sn == "-")
+    ) {
         addFinding(ElaborateBaseDirectoryEntry::sn, FindingSeverity.ERROR)
     }
 })

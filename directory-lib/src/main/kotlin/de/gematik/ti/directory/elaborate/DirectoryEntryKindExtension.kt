@@ -1,7 +1,6 @@
 package de.gematik.ti.directory.elaborate
 
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
-import de.gematik.ti.directory.admin.DirectoryEntry
 
 fun BaseDirectoryEntry.infereKind(): DirectoryEntryKind {
     return DirectoryEntryKind.values().first {
@@ -11,7 +10,7 @@ fun BaseDirectoryEntry.infereKind(): DirectoryEntryKind {
 
 enum class DirectoryEntryResourceType {
     Organization,
-    Practitioner
+    Practitioner,
 }
 
 // ktlint-disable enum-entry-name-case
