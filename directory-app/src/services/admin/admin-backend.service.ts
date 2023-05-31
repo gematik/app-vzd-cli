@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryKind, Outcome, ElaborateSearchResults } from './admin.model';
+import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryFHIRResourceType, DirectoryEntryKind, Outcome, ElaborateSearchResults } from './admin.model';
 
 // TODO: how does one provide labels in Angular?
 const labels: Record<string, string> = {
@@ -116,4 +116,11 @@ export class AdminBackendService {
     return entry.kind.toString()
   }
 
+  getEntryKindIcon(entry: ElaborateDirectoryEntry) : string {
+    if (entry.base.fhirResourceType == DirectoryEntryFHIRResourceType.Practitioner) {
+      return "user"
+    } else {
+      return "hospital"
+    }
+  }
 }

@@ -34,7 +34,7 @@
                         >
                 </ibm-label>
                 
-                <div ibmRow *ngIf="entry.base.personalEntry == true">
+                <div ibmRow *ngIf="entry.base.fhirResourceType == 'Practitioner'">
                     <ibm-label 
                         ibmCol
                         [columnNumbers]="{'lg': 8}"
@@ -54,7 +54,6 @@
                         [columnNumbers]="{'lg': 8}"
                         [invalid]="validateBaseField('givenName')"
                         [invalidText]="'Ungültiger Vorname'">
-                        >
                         Vorname(n)
                         <input
                             ibmText
@@ -176,7 +175,7 @@
                         <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
                     </ibm-list-row>
                     <ibm-list-row *ngIf="(entry.base.professionOID?.length ?? 0) == 0">
-                        <ibm-list-column class="icon"><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                        <ibm-list-column class="icon"><svg ibmIcon="error--filled" class="error"></svg></ibm-list-column>
                         <ibm-list-column>Keine ProfessionOID</ibm-list-column>
                     </ibm-list-row>
                 </ibm-structured-list>

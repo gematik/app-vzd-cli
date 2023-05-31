@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { InlineLoadingState, TableHeaderItem, TableItem, TableModel } from 'carbon-components-angular';
 import { ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 import { AdminBackendService } from '../../../services/admin/admin-backend.service';
+import { IconService } from 'carbon-components-angular';
+import { Hospital16, User16 } from "@carbon/icons";
 
 @Component({
   selector: 'app-admin-search-results',
@@ -32,7 +34,8 @@ export class SearchResultsComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private adminBackend: AdminBackendService
+    private adminBackend: AdminBackendService,
+    private iconService: IconService,
   ) { 
 
   }
@@ -49,6 +52,9 @@ export class SearchResultsComponent implements OnInit {
       this.queryString = params['q'] || ""
       this.search()
     })
+
+    this.iconService.register(Hospital16)
+    this.iconService.register(User16)
   }
 
   search() {
@@ -64,7 +70,11 @@ export class SearchResultsComponent implements OnInit {
             expandedTemplate: this.expandedTemplate,
           }),
           new TableItem({
-            data: { color: this.adminBackend.getEntryKindColor(entry), text: this.adminBackend.getEntryKindTitle(entry) },
+            data: { 
+              color: this.adminBackend.getEntryKindColor(entry), 
+              text: this.adminBackend.getEntryKindTitle(entry),
+              icon: this.adminBackend.getEntryKindIcon(entry),
+            },
             template: this.tagTemplate,
           }),
           new TableItem({

@@ -14,6 +14,7 @@ fun ElaborateBaseDirectoryEntry.validate(): Map<String, List<Finding>>? {
             InvalidProfessionOID,
             InvalidPractitionerGivenName,
             InvalidPractitionerSurname,
+            MissingProfessionOID,
         ),
         this,
     ).validate()

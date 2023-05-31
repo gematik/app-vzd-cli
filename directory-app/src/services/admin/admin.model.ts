@@ -82,7 +82,32 @@ export interface Coding {
   system?: string,
 }
 
+export enum DirectoryEntryKind {
+  Arzt = "Arzt",
+  Arztpraxis = "Arztpraxis",
+  Zahnarzt = "Zahnarzt",
+  Zahnarztpraxis = "Zahnarztpraxis",
+  Apotheke = "Apotheke",
+  Apotheker = "Apotheker",
+  Psychotherapeut = "Psychotherapeut",
+  Krankenhaus = "Krankenhaus",
+  Krankenkasse = "Krankenkasse",
+  Krankenkasse_ePA = "Krankenkasse_ePA",
+  HBAGematik = "HBAGematik",
+  SMCBGematik = "SMCBGematik",
+  HBAeGBR = "HBAeGBR",
+  SMCBeGBR = "SMCBeGBR",
+  Weitere = "Weitere"
+}
+
+export enum DirectoryEntryFHIRResourceType {
+  Practitioner = "Practitioner",
+  Organization = "Organization",
+}
 export interface ElaborateBaseDirectoryEntry {
+  // types
+  kind: DirectoryEntryKind
+  fhirResourceType: DirectoryEntryFHIRResourceType
   // Identifier
   telematikID: string
   domainID?: [string] 
@@ -129,24 +154,6 @@ export interface UserCertificate {
   userCertificate?: CertificateInfo
   description?: string
   active?: boolean
-}
-
-export enum DirectoryEntryKind {
-  Arzt = "Arzt",
-  Arztpraxis = "Arztpraxis",
-  Zahnarzt = "Zahnarzt",
-  Zahnarztpraxis = "Zahnarztpraxis",
-  Apotheke = "Apotheke",
-  Apotheker = "Apotheker",
-  Psychotherapeut = "Psychotherapeut",
-  Krankenhaus = "Krankenhaus",
-  Krankenkasse = "Krankenkasse",
-  Krankenkasse_ePA = "Krankenkasse_ePA",
-  HBAGematik = "HBAGematik",
-  SMCBGematik = "SMCBGematik",
-  HBAeGBR = "HBAeGBR",
-  SMCBeGBR = "SMCBeGBR",
-  Weitere = "Weitere"
 }
 
 export interface ElaborateDirectoryEntry {
