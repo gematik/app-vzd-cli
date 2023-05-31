@@ -55,6 +55,13 @@ export class DirectoryEntryComponent implements OnInit {
     })
   }
 
+  validateBaseField(field: string): boolean {
+    if (this.entry?.validationResult?.base[field] != undefined) {
+      return true
+    }
+    return false
+  }
+
   protected get domainIDText() {
     var text = ""
     this.entry?.base.domainID?.forEach(id => text += `${id}\n`)

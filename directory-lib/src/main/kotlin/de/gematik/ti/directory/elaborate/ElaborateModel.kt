@@ -24,11 +24,13 @@ data class ValidationResult(
 
 @Serializable
 data class ElaborateBaseDirectoryEntry(
+    var kind: DirectoryEntryKind,
+    var fhirResourceType: DirectoryEntryResourceType,
+
     // Identifier
     var telematikID: String,
     var domainID: List<String>? = null,
     var dn: DistinguishedName? = null,
-
     // Names
     var displayName: String? = null,
     var cn: String? = null,
@@ -62,7 +64,7 @@ data class ElaborateBaseDirectoryEntry(
     // Misc
     var active: Boolean,
     var meta: List<String>? = null,
-)
+    )
 
 enum class SmartcardType {
     HBA,

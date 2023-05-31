@@ -155,6 +155,7 @@ export interface ElaborateDirectoryEntry {
   kind: DirectoryEntryKind
   kimAddresses?: ElaborateKIMAddress[]
   smartcards?: Smartcard[]
+  validationResult?: any
 }
 
 export interface ElaborateKIMAddress {

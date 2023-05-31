@@ -22,36 +22,45 @@
             <ibm-tab heading="Allgemein">
                 <h2>{{entry.kind}}</h2>
                 
-                <ibm-label>
-                    Anzeige name
+                <ibm-label
+                    [invalid]="validateBaseField('displayName')"
+                    [invalidText]="'Ungültiger Anzeigename'">
+                    Anzeigename
                     <input
                         ibmText
                         [(ngModel)]="entry.base.displayName"
                         readonly="true"
-                    >
+                        [invalid]="validateBaseField('displayName')"
+                        >
                 </ibm-label>
                 
                 <div ibmRow *ngIf="entry.base.personalEntry == true">
                     <ibm-label 
                         ibmCol
                         [columnNumbers]="{'lg': 8}"
-                    >
+                        [invalid]="validateBaseField('sn')"
+                        [invalidText]="'Ungültiger Nachname'">
+
                         Name
                         <input
                             ibmText
                             [(ngModel)]="entry.base.sn"
                             readonly="true"
+                            [invalid]="validateBaseField('sn')"
                         >
                     </ibm-label>
                     <ibm-label 
                         ibmCol
                         [columnNumbers]="{'lg': 8}"
-                    >
+                        [invalid]="validateBaseField('givenName')"
+                        [invalidText]="'Ungültiger Vorname'">
+                        >
                         Vorname(n)
                         <input
                             ibmText
                             [(ngModel)]="entry.base.givenName"
                             readonly="true"
+                            [invalid]="validateBaseField('givenName')"
                         >
                     </ibm-label>
                     </div>
@@ -106,7 +115,34 @@
                     >
                 </ibm-label>
                 </div>
-
+                <div ibmRow>
+                    <ibm-label 
+                        ibmCol
+                        [columnNumbers]="{'lg': 11}"
+                    >
+                        Bundesland
+                        <input
+                            ibmText
+                            [(ngModel)]="entry.base.stateOrProvinceName"
+                            readonly="true"
+                        >
+                    </ibm-label>
+                    <ibm-label 
+                        ibmCol
+                        [columnNumbers]="{'lg': 5}"
+                        [invalid]="validateBaseField('countryCode')"
+                        [invalidText]="'Ungültiger Landescode'"
+                    >
+                        Landescode
+                        <input
+                            ibmText
+                            [(ngModel)]="entry.base.countryCode"
+                            readonly="true"
+                            [invalid]="validateBaseField('countryCode')"
+                        >
+                    </ibm-label>
+                    </div>
+    
                 <h2>&nbsp;</h2>
 
                 <ibm-structured-list 

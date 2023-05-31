@@ -10,9 +10,9 @@ fun DirectoryEntry.elaborate(): ElaborateDirectoryEntry {
     val entry = this
     val base = entry.directoryEntryBase.elaborate()
     val elaborateEntry = ElaborateDirectoryEntry(
-        kind = infereKind(),
+        kind = base.kind,
         base = base,
-        userCertificates = entry.userCertificates?.mapNotNull { it },
+        userCertificates = entry.userCertificates?.map { it },
         kimAddresses = infereKIMAddresses(),
         smartcards = infereSmartcards(),
     )
@@ -42,10 +42,14 @@ private val specialCases = listOf<SpecialCase>(
 
 fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
     val base = this
+    val kind = infereKind()
     return ElaborateBaseDirectoryEntry(
+        kind = kind,
+        fhirResourceType = kind.fhirResourceType,
         telematikID = base.telematikID,
         domainID = base.domainID,
         dn = base.dn,
+
         displayName = base.displayName,
         cn = base.cn,
         otherName = base.otherName,
