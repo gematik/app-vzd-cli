@@ -18,7 +18,10 @@ import de.gematik.ti.directory.admin.Fachdaten
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.elaborate.DirectoryEntryKind
+import de.gematik.ti.directory.elaborate.DirectoryEntryResourceType
 import de.gematik.ti.directory.elaborate.elaborate
+import de.gematik.ti.directory.elaborate.infereKind
 import de.gematik.ti.directory.elaborate.validation.validate
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import de.gematik.ti.directory.pki.OCSPResponseCertificateStatus
@@ -61,6 +64,8 @@ class ElaboratedDumpDirectoryEntry(
     @SerialName("Fachdaten")
     var fachdaten: List<Fachdaten>? = null,
     var validationResult: Map<String, List<Finding>>? = null,
+    var kind: DirectoryEntryKind,
+    var fhirResourceType: DirectoryEntryResourceType,
 )
 
 class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the data dumps") {
@@ -134,11 +139,14 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
                             semaphore.withPermit {
                                 expandOcspStatus(entry)
                                 logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
+                                val kind = entry.directoryEntryBase.infereKind()
                                 val elaboratedEntry = ElaboratedDumpDirectoryEntry(
                                     directoryEntryBase = entry.directoryEntryBase,
                                     userCertificates = entry.userCertificates,
                                     fachdaten = entry.fachdaten,
                                     validationResult = entry.directoryEntryBase.elaborate().validate(),
+                                    kind = kind,
+                                    fhirResourceType = kind.fhirResourceType,
                                 )
                                 println(NDJSON.encodeToString(elaboratedEntry))
                                 progressBar.step()

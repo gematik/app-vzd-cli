@@ -17,35 +17,24 @@ enum class DirectoryEntryResourceType {
 enum class DirectoryEntryKind(val fhirResourceType: DirectoryEntryResourceType, val matcher: (BaseDirectoryEntry) -> Boolean) {
     Arzt(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry ->
         baseDirectoryEntry.telematikID.let {
-            it.startsWith("1-1") ||
-                (it.startsWith("1-") && baseDirectoryEntry.personalEntry == true)
+            it.startsWith("1-1")
         }
     }),
     Arztpraxis(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
         baseDirectoryEntry.telematikID.let {
-            it.startsWith("1-2") ||
-                (it.startsWith("1-") && baseDirectoryEntry.personalEntry == false) ||
-                (it.startsWith("4-") && baseDirectoryEntry.personalEntry == false)
+            it.startsWith("1-20")
         }
     }),
     Zahnarzt(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.matches("^2-0?1.*".toRegex()) }),
     Zahnarztpraxis(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
-        baseDirectoryEntry.telematikID.let {
-            it.startsWith("2-2") ||
-                (it.startsWith("2-") && baseDirectoryEntry.personalEntry == false)
-        }
+        baseDirectoryEntry.telematikID.startsWith("2-2")
     }),
     Apotheke(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
-        baseDirectoryEntry.telematikID.let {
-            it.matches("^3-...2.*".toRegex()) ||
-                (it.startsWith("3-") && baseDirectoryEntry.personalEntry == false)
-        }
+        baseDirectoryEntry.telematikID.matches("^3-...2.*".toRegex())
     }),
     Apotheker(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.startsWith("3-") }),
     Psychotherapeut(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry ->
-        baseDirectoryEntry.telematikID.let {
-            it.startsWith("4-") && baseDirectoryEntry.personalEntry == true
-        }
+        baseDirectoryEntry.telematikID.startsWith("4-")
     }),
     Krankenhaus(DirectoryEntryResourceType.Organization, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.startsWith("5-") }),
     Krankenkasse(DirectoryEntryResourceType.Organization, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.startsWith("8-01") }),
@@ -53,24 +42,16 @@ enum class DirectoryEntryKind(val fhirResourceType: DirectoryEntryResourceType, 
     Krankenkasse_ePA(DirectoryEntryResourceType.Organization, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.startsWith("8-03") }),
 
     HBAGematik(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry ->
-        baseDirectoryEntry.telematikID.let {
-            it.startsWith("9-1")
-        }
+        baseDirectoryEntry.telematikID.startsWith("9-1")
     }),
     SMCBGematik(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
-        baseDirectoryEntry.telematikID.let {
-            it.startsWith("9-2")
-        }
+        baseDirectoryEntry.telematikID.startsWith("9-2")
     }),
     HBAeGBR(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry ->
-        baseDirectoryEntry.telematikID.let {
-            it.startsWith("10-67.23")
-        }
+        baseDirectoryEntry.telematikID.startsWith("10-67.23")
     }),
     SMCBeGBR(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
-        baseDirectoryEntry.telematikID.let {
-            it.startsWith("10-67.24")
-        }
+        baseDirectoryEntry.telematikID.startsWith("10-67.24")
     }),
 
     Weitere(DirectoryEntryResourceType.Organization, { _ -> true }),
