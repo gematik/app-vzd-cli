@@ -18,15 +18,10 @@ import de.gematik.ti.directory.admin.Fachdaten
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.elaborate.DirectoryEntryKind
-import de.gematik.ti.directory.elaborate.DirectoryEntryResourceType
-import de.gematik.ti.directory.elaborate.elaborate
-import de.gematik.ti.directory.elaborate.infereKind
-import de.gematik.ti.directory.elaborate.validation.validate
+import de.gematik.ti.directory.elaborate.*
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import de.gematik.ti.directory.pki.OCSPResponseCertificateStatus
 import de.gematik.ti.directory.util.escape
-import de.gematik.ti.directory.validation.Finding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -63,7 +58,7 @@ class ElaboratedDumpDirectoryEntry(
     var userCertificates: List<UserCertificate>? = null,
     @SerialName("Fachdaten")
     var fachdaten: List<Fachdaten>? = null,
-    var validationResult: Map<String, List<Finding>>? = null,
+    var validationResult: ValidationResult?,
     var kind: DirectoryEntryKind,
     var fhirResourceType: DirectoryEntryResourceType,
 )
@@ -139,14 +134,14 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
                             semaphore.withPermit {
                                 expandOcspStatus(entry)
                                 logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
-                                val kind = entry.directoryEntryBase.infereKind()
+                                val elaboratedDumpDirectoryEntry = entry.elaborate()
                                 val elaboratedEntry = ElaboratedDumpDirectoryEntry(
                                     directoryEntryBase = entry.directoryEntryBase,
                                     userCertificates = entry.userCertificates,
                                     fachdaten = entry.fachdaten,
-                                    validationResult = entry.directoryEntryBase.elaborate().validate(),
-                                    kind = kind,
-                                    fhirResourceType = kind.fhirResourceType,
+                                    validationResult = elaboratedDumpDirectoryEntry.validationResult,
+                                    kind = elaboratedDumpDirectoryEntry.base.kind,
+                                    fhirResourceType = elaboratedDumpDirectoryEntry.base.fhirResourceType,
                                 )
                                 println(NDJSON.encodeToString(elaboratedEntry))
                                 progressBar.step()
