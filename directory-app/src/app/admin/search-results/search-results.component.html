@@ -68,7 +68,7 @@
 
 
 <ng-template #tagTemplate let-data="data">
-  <ibm-tag [type]="data.color" size="md">{{data.text}}</ibm-tag>
+  <ibm-tag [type]="data.color" size="md"><svg [ibmIcon]="data.icon"></svg>&nbsp;{{data.text}}</ibm-tag>
 </ng-template>
 
 <ng-template #addressTemplate let-data="data">

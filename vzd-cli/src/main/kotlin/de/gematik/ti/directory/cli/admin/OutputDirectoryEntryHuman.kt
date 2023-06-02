@@ -84,6 +84,7 @@ private class HumanDirectoryEntry(
     var kim: List<ElaborateKIMAddress>? = null,
 
     var kind: DirectoryEntryKind? = null,
+    var fhirResourceType: DirectoryEntryResourceType? = null,
 
     var active: Boolean? = null,
 
@@ -152,7 +153,8 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
             smartcards = entry.smartcards,
 
             kim = entry.kimAddresses,
-            kind = entry.kind,
+            kind = entry.base.kind,
+            fhirResourceType = entry.base.fhirResourceType,
             active = entry.base.active,
 
             validationResult = entry.validationResult,

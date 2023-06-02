@@ -82,7 +82,32 @@ export interface Coding {
   system?: string,
 }
 
+export enum DirectoryEntryKind {
+  Arzt = "Arzt",
+  Arztpraxis = "Arztpraxis",
+  Zahnarzt = "Zahnarzt",
+  Zahnarztpraxis = "Zahnarztpraxis",
+  Apotheke = "Apotheke",
+  Apotheker = "Apotheker",
+  Psychotherapeut = "Psychotherapeut",
+  Krankenhaus = "Krankenhaus",
+  Krankenkasse = "Krankenkasse",
+  Krankenkasse_ePA = "Krankenkasse_ePA",
+  HBAGematik = "HBAGematik",
+  SMCBGematik = "SMCBGematik",
+  HBAeGBR = "HBAeGBR",
+  SMCBeGBR = "SMCBeGBR",
+  Weitere = "Weitere"
+}
+
+export enum DirectoryEntryFHIRResourceType {
+  Practitioner = "Practitioner",
+  Organization = "Organization",
+}
 export interface ElaborateBaseDirectoryEntry {
+  // types
+  kind: DirectoryEntryKind
+  fhirResourceType: DirectoryEntryFHIRResourceType
   // Identifier
   telematikID: string
   domainID?: [string] 
@@ -131,30 +156,13 @@ export interface UserCertificate {
   active?: boolean
 }
 
-export enum DirectoryEntryKind {
-  Arzt = "Arzt",
-  Arztpraxis = "Arztpraxis",
-  Zahnarzt = "Zahnarzt",
-  Zahnarztpraxis = "Zahnarztpraxis",
-  Apotheke = "Apotheke",
-  Apotheker = "Apotheker",
-  Psychotherapeut = "Psychotherapeut",
-  Krankenhaus = "Krankenhaus",
-  Krankenkasse = "Krankenkasse",
-  Krankenkasse_ePA = "Krankenkasse_ePA",
-  HBAGematik = "HBAGematik",
-  SMCBGematik = "SMCBGematik",
-  HBAeGBR = "HBAeGBR",
-  SMCBeGBR = "SMCBeGBR",
-  Weitere = "Weitere"
-}
-
 export interface ElaborateDirectoryEntry {
   base: ElaborateBaseDirectoryEntry
   userCertificates?: UserCertificate[]
   kind: DirectoryEntryKind
   kimAddresses?: ElaborateKIMAddress[]
   smartcards?: Smartcard[]
+  validationResult?: any
 }
 
 export interface ElaborateKIMAddress {

@@ -1,72 +1,58 @@
 package de.gematik.ti.directory.elaborate
 
-import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.admin.BaseDirectoryEntry
 
-fun DirectoryEntry.infereKind(): DirectoryEntryKind {
+fun BaseDirectoryEntry.infereKind(): DirectoryEntryKind {
     return DirectoryEntryKind.values().first {
         it.matcher.invoke(this)
     }
 }
 
+enum class DirectoryEntryResourceType {
+    Organization,
+    Practitioner,
+}
+
 // ktlint-disable enum-entry-name-case
-enum class DirectoryEntryKind(val matcher: (DirectoryEntry) -> Boolean) {
-    Arzt({ directoryEntry ->
-        directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("1-1") ||
-                (it.startsWith("1-") && directoryEntry.directoryEntryBase.personalEntry == true)
+enum class DirectoryEntryKind(val fhirResourceType: DirectoryEntryResourceType, val matcher: (BaseDirectoryEntry) -> Boolean) {
+    Arzt(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry ->
+        baseDirectoryEntry.telematikID.let {
+            it.startsWith("1-1")
         }
     }),
-    Arztpraxis({ directoryEntry ->
-        directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("1-2") ||
-                (it.startsWith("1-") && directoryEntry.directoryEntryBase.personalEntry == false) ||
-                (it.startsWith("4-") && directoryEntry.directoryEntryBase.personalEntry == false)
+    Arztpraxis(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
+        baseDirectoryEntry.telematikID.let {
+            it.startsWith("1-20")
         }
     }),
-    Zahnarzt({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.matches("^2-0?1.*".toRegex()) }),
-    Zahnarztpraxis({ directoryEntry ->
-        directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("2-2") ||
-                (it.startsWith("2-") && directoryEntry.directoryEntryBase.personalEntry == false)
-        }
+    Zahnarzt(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.matches("^2-0?1.*".toRegex()) }),
+    Zahnarztpraxis(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
+        baseDirectoryEntry.telematikID.startsWith("2-2")
     }),
-    Apotheke({ directoryEntry ->
-        directoryEntry.directoryEntryBase.telematikID.let {
-            it.matches("^3-...2.*".toRegex()) ||
-                (it.startsWith("3-") && directoryEntry.directoryEntryBase.personalEntry == false)
-        }
+    Apotheke(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
+        baseDirectoryEntry.telematikID.matches("^3-...2.*".toRegex())
     }),
-    Apotheker({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("3-") }),
-    Psychotherapeut({ directoryEntry ->
-        directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("4-") && directoryEntry.directoryEntryBase.personalEntry == true
-        }
+    Apotheker(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.startsWith("3-") }),
+    Psychotherapeut(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry ->
+        baseDirectoryEntry.telematikID.startsWith("4-")
     }),
-    Krankenhaus({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("5-") }),
-    Krankenkasse({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("8-01") }),
+    Krankenhaus(DirectoryEntryResourceType.Organization, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.startsWith("5-") }),
+    Krankenkasse(DirectoryEntryResourceType.Organization, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.startsWith("8-01") }),
 
-    Krankenkasse_ePA({ directoryEntry -> directoryEntry.directoryEntryBase.telematikID.startsWith("8-03") }),
+    Krankenkasse_ePA(DirectoryEntryResourceType.Organization, { baseDirectoryEntry -> baseDirectoryEntry.telematikID.startsWith("8-03") }),
 
-    HBAGematik({ directoryEntry ->
-        directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("9-1")
-        }
+    HBAGematik(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry ->
+        baseDirectoryEntry.telematikID.startsWith("9-1")
     }),
-    SMCBGematik({ directoryEntry ->
-        directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("9-2")
-        }
+    SMCBGematik(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
+        baseDirectoryEntry.telematikID.startsWith("9-2")
     }),
-    HBAeGBR({ directoryEntry ->
-        directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("10-67.23")
-        }
+    HBAeGBR(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry ->
+        baseDirectoryEntry.telematikID.startsWith("10-67.23")
     }),
-    SMCBeGBR({ directoryEntry ->
-        directoryEntry.directoryEntryBase.telematikID.let {
-            it.startsWith("10-67.24")
-        }
+    SMCBeGBR(DirectoryEntryResourceType.Organization, { baseDirectoryEntry ->
+        baseDirectoryEntry.telematikID.startsWith("10-67.24")
     }),
 
-    Weitere({ _ -> true }),
+    Weitere(DirectoryEntryResourceType.Organization, { _ -> true }),
 }

@@ -36,5 +36,5 @@ private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem {
 
 val OrganizationProfessionOID = loadSimpleCodeSystem("OrganizationProfessionOID")
 val PractitionerProfessionOID = loadSimpleCodeSystem("PractitionerProfessionOID")
-val PharacyTypeCS = loadSimpleCodeSystem("PharmacyTypeCS")
+val PharmacyTypeCS = loadSimpleCodeSystem("PharmacyTypeCS")
 val Holder = loadSimpleCodeSystem("HolderCS")
