@@ -83,7 +83,7 @@ private class HumanDirectoryEntry(
 
     var kim: List<ElaborateKIMAddress>? = null,
 
-    var kind: DirectoryEntryKind? = null,
+    var kind: String? = null,
     var fhirResourceType: DirectoryEntryResourceType? = null,
 
     var active: Boolean? = null,

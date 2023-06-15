@@ -1,10 +1,15 @@
 package de.gematik.ti.directory.elaborate
 
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
+import de.gematik.ti.directory.fhir.SimpleValueSet
+import de.gematik.ti.directory.fhir.json
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.decodeFromString
 
-fun BaseDirectoryEntry.infereKind(): DirectoryEntryKind {
-    return DirectoryEntryKind.values().first {
-        it.matcher.invoke(this)
+fun BaseDirectoryEntry.infereKind(): TelematikIDMapping {
+    return TelematikIDMappings.instance.mapping.first {
+        it.matches(this)
     }
 }
 
@@ -13,8 +18,34 @@ enum class DirectoryEntryResourceType {
     Practitioner,
 }
 
+@Serializable
+data class TelematikIDMapping(
+    val pattern: String,
+    val fhirResourceType: DirectoryEntryResourceType,
+    val code: String,
+    val displayShort: String,
+    val display: String? = null
+) {
+    @Transient
+    val regex = Regex(pattern)
+    fun matches(baseDirectoryEntry: BaseDirectoryEntry): Boolean {
+        return baseDirectoryEntry.telematikID.matches(regex)
+    }
+}
+
+@Serializable
+data class TelematikIDMappings(
+    val mapping: List<TelematikIDMapping>
+) {
+    companion object {
+        val instance: TelematikIDMappings by lazy {
+            json.decodeFromString(SimpleValueSet::class.java.getResource("/mappings/TelematikID.mapping.json")!!.readText())
+        }
+    }
+}
+
 // ktlint-disable enum-entry-name-case
-enum class DirectoryEntryKind(val fhirResourceType: DirectoryEntryResourceType, val matcher: (BaseDirectoryEntry) -> Boolean) {
+enum class DirectoryEntryKind2(val fhirResourceType: DirectoryEntryResourceType, val matcher: (BaseDirectoryEntry) -> Boolean) {
     Arzt(DirectoryEntryResourceType.Practitioner, { baseDirectoryEntry ->
         baseDirectoryEntry.telematikID.let {
             it.startsWith("1-1")

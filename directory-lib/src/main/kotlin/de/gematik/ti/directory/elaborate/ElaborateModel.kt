@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ElaborateDirectoryEntry(
-    val kind: DirectoryEntryKind,
+    val kind: String,
     val base: ElaborateBaseDirectoryEntry,
     val userCertificates: List<UserCertificate>? = null,
     val kimAddresses: List<ElaborateKIMAddress>? = null,
@@ -24,7 +24,7 @@ data class ValidationResult(
 
 @Serializable
 data class ElaborateBaseDirectoryEntry(
-    var kind: DirectoryEntryKind,
+    var kind: String,
     var fhirResourceType: DirectoryEntryResourceType,
 
     // Identifier

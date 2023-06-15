@@ -42,10 +42,10 @@ private val specialCases = listOf<SpecialCase>(
 
 fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
     val base = this
-    val kind = infereKind()
+    val mapping = infereKind()
     return ElaborateBaseDirectoryEntry(
-        kind = kind,
-        fhirResourceType = kind.fhirResourceType,
+        kind = mapping.code,
+        fhirResourceType = mapping.fhirResourceType,
         telematikID = base.telematikID,
         domainID = base.domainID,
         dn = base.dn,
