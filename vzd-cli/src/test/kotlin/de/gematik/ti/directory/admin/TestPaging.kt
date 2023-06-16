@@ -26,7 +26,7 @@ class TestPaging : FeatureSpec({
                     mapOf(
                         "telematikID" to "9-*",
                     ),
-                    3,
+                    100,
                 ) {
                     withPaging++
                 }
