@@ -139,6 +139,12 @@
       "displayShort": "DiGA"
     },
     {
+      "pattern": "^9-2.245.*",
+      "fhirResourceType": "Organization",
+      "code": "Pflege",
+      "displayShort": "Pflege"
+    },
+    {
       "pattern": "^9-2.*",
       "fhirResourceType": "Organization",
       "code": "Organisation",
