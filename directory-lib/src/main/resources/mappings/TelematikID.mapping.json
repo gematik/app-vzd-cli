@@ -205,7 +205,7 @@
       "displayShort": "Gesundheitsberuf"
     },
     {
-      "pattern": ".*",
+      "pattern": "(?s)^.*$",
       "fhirResourceType": "Organization",
       "code": "Weitere",
       "displayShort": "Weitere"
