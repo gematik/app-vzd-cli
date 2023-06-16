@@ -113,7 +113,8 @@ export class AdminBackendService {
   }
 
   getEntryKindTitle(entry: ElaborateDirectoryEntry) : string {
-    return entry.kind.toString()
+    // replace _ with space
+    return entry.kind.replace("_", " ")
   }
 
   getEntryKindIcon(entry: ElaborateDirectoryEntry) : string {

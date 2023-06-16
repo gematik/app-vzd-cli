@@ -84,6 +84,13 @@ export class DirectoryEntryComponent implements OnInit {
     }
   }
 
+  protected get entryKindTitle() {
+    if (this.entry == undefined) {
+      return ""
+    }
+    return this.adminBackend.getEntryKindTitle(this.entry)
+  }
+
   private createUserCertificateList(entry: ElaborateDirectoryEntry): UserCertificateInfo[] {
     return entry.userCertificates?.map( certBlock => {
       const cert = certBlock.userCertificate 
