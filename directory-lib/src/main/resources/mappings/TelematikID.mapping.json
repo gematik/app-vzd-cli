@@ -183,8 +183,8 @@
     {
       "pattern": "^10-67.234.*",
       "fhirResourceType": "Practitioner",
-      "code": "Pflegerin",
-      "displayShort": "Pfleger:in"
+      "code": "Pfleger",
+      "displayShort": "Pfleger"
     },
     {
       "pattern": "^10-67.235.*",
