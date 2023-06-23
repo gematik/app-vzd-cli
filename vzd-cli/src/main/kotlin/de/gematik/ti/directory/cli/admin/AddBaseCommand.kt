@@ -36,6 +36,8 @@ fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<String, St
             property.writeMethod.invoke(baseDirectoryEntry, value.toInt())
         } else if (property.readMethod.genericReturnType.typeName == "java.util.List<java.lang.String>") {
             property.writeMethod.invoke(baseDirectoryEntry, value.split(',').map { it.trim() })
+        } else if (property.propertyType == Boolean::class.java) {
+            property.writeMethod.invoke(baseDirectoryEntry, value.toBoolean())
         } else {
             throw UsageError("Unsupported property type '$name': ${property.readMethod.genericReturnType.typeName}")
         }

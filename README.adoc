@@ -524,6 +524,24 @@ vzd-cli admin ru log -t "9-*"
 vzd-cli admin ru log -t "9-*" --logTimeFrom 2023-02-01T00:00:00Z
 ----
 
+=== `vzd-cli admin <tu|ru|pu> activate`
+
+Aktiviert den Eintrag in dem das Attribut `active` auf `true` gesetzt wird
+
+[source,bash]
+----
+vzd-cli admin ru activate -t "9-12345678"
+----
+
+=== `vzd-cli admin <tu|ru|pu> deactivate`
+
+Deaktiviert den Eintrag in dem das Attribut `active` auf `false` gesetzt wird
+
+[source,bash]
+----
+vzd-cli admin ru deactivate -t "9-12345678"
+----
+
 == `vzd-cli apo`: ApoVZD API
 
 === `vzd-cli apo config`

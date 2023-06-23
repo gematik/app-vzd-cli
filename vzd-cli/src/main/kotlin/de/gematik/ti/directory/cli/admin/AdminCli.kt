@@ -71,6 +71,8 @@ class EnvironmentCommands(env: AdminEnvironment) : CliktCommand(name = env.name,
             ClearCertCommand(),
             DumpCommand(),
             LogCommand(),
+            DeactivateCommand(),
+            ActivateCommand(),
         )
     }
 

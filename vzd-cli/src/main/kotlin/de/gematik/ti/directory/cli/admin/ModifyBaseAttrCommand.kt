@@ -59,11 +59,20 @@ class ModifyBaseAttrCommand : CliktCommand(name = "modify-base-attr", help = "Mo
 
         val dn = baseToUpdate?.dn
 
-        setAttributes(baseToUpdate, attrs)
-
-        logger.debug { "Data will to send to server: $baseToUpdate" }
-
         if (dn != null) {
+            if (attrs.containsKey("active")) {
+                if (attrs.size > 1) {
+                    throw UsageError("Attribute 'activate' cannot be changed at the same time with other attributes")
+                }
+                logger.warn { "Attribute cannot be set as all other attributes. Please use activate/deactivate commands" }
+                runBlocking { context.client.stateSwitch(dn.uid, attrs.get("active").toBoolean()) }
+                return@catching
+            }
+
+            setAttributes(baseToUpdate, attrs)
+
+            logger.debug { "Data will to send to server: $baseToUpdate" }
+
             val jsonData = Json.encodeToString(baseToUpdate)
             val updateBaseDirectoryEntry =
                 JSON.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
