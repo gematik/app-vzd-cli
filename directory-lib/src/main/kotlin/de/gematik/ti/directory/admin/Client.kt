@@ -311,4 +311,18 @@ class Client(block: Configuration.() -> Unit = {}) {
 
         return response.body()
     }
+
+    /**
+     * PUT /DirectoryEntries/{uid}/active
+     */
+    suspend fun stateSwitch(uid: String, active: Boolean) {
+        val response = http.put("/DirectoryEntries/$uid/active") {
+            contentType(ContentType.Application.Json)
+            parameter("active", active)
+        }
+
+        if (response.status != HttpStatusCode.OK) {
+            throw AdminResponseException(response, "Unable to switch state of the entry")
+        }
+    }
 }

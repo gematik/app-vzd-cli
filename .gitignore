@@ -8,3 +8,4 @@ bin
 *.log
 vzd-cli/logs
 .vscode
+.fleet
