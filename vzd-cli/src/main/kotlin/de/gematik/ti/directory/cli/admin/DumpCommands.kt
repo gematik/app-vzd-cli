@@ -18,7 +18,9 @@ import de.gematik.ti.directory.admin.Fachdaten
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.elaborate.*
+import de.gematik.ti.directory.elaborate.DirectoryEntryResourceType
+import de.gematik.ti.directory.elaborate.ValidationResult
+import de.gematik.ti.directory.elaborate.elaborate
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import de.gematik.ti.directory.pki.OCSPResponseCertificateStatus
 import de.gematik.ti.directory.util.escape
@@ -59,7 +61,7 @@ class ElaboratedDumpDirectoryEntry(
     @SerialName("Fachdaten")
     var fachdaten: List<Fachdaten>? = null,
     var validationResult: ValidationResult?,
-    var kind: DirectoryEntryKind,
+    var kind: String,
     var fhirResourceType: DirectoryEntryResourceType,
 )
 

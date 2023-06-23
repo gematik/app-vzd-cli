@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RestrictedDirectoryEntry(
-    val kind: DirectoryEntryKind,
+    val kind: String,
     val base: ElaborateBaseDirectoryEntry,
     val userCertificateInfos: List<RestrictedCertificateInfo>? = null,
     val kimAddresses: List<ElaborateKIMAddress>? = null,
