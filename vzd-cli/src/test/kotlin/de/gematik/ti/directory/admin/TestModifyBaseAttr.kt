@@ -64,6 +64,7 @@ class TestModifyBaseAttr : FeatureSpec({
         }
 
         scenario("Befehl 'admin modify-base-attr' kann eintrag deaktivieren") {
+            val displayName = System.currentTimeMillis().toString() + "active"
             state?.apply {
                 runCLI(
                     listOf(
@@ -73,11 +74,14 @@ class TestModifyBaseAttr : FeatureSpec({
                         "-t",
                         telematikID,
                         "-s",
+                        "displayName=$displayName",
+                        "-s",
                         "active=false",
                     ),
                 )
                 val modifiedEntry = client.readDirectoryEntry(mapOf("uid" to uid))?.first()
                 modifiedEntry?.directoryEntryBase?.active shouldBe false
+                modifiedEntry?.directoryEntryBase?.displayName shouldBe displayName
             }
         }
     }

@@ -60,15 +60,6 @@ class ModifyBaseAttrCommand : CliktCommand(name = "modify-base-attr", help = "Mo
         val dn = baseToUpdate?.dn
 
         if (dn != null) {
-            if (attrs.containsKey("active")) {
-                if (attrs.size > 1) {
-                    throw UsageError("Attribute 'activate' cannot be changed at the same time with other attributes")
-                }
-                logger.warn { "Attribute cannot be set as all other attributes. Please use activate/deactivate commands" }
-                runBlocking { context.client.stateSwitch(dn.uid, attrs.get("active").toBoolean()) }
-                return@catching
-            }
-
             setAttributes(baseToUpdate, attrs)
 
             logger.debug { "Data will to send to server: $baseToUpdate" }
@@ -76,8 +67,6 @@ class ModifyBaseAttrCommand : CliktCommand(name = "modify-base-attr", help = "Mo
             val jsonData = Json.encodeToString(baseToUpdate)
             val updateBaseDirectoryEntry =
                 JSON.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
-            // server bug: when updating telematikID with no certificates the exception is thrown
-            updateBaseDirectoryEntry.telematikID = null
             runBlocking { context.client.modifyDirectoryEntry(dn.uid, updateBaseDirectoryEntry) }
             val result = runBlocking { context.client.readDirectoryEntry(mapOf("uid" to dn.uid)) }
 
