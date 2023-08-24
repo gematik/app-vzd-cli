@@ -98,6 +98,7 @@ data class UpdateBaseDirectoryEntry(
     var otherName: String? = null,
     var specialization: List<String>? = null,
     var domainID: List<String>? = null,
+    var entryType: List<String?>? = null,
     var holder: List<String>? = null,
     var maxKOMLEadr: Int? = null,
     var active: Boolean? = true,
@@ -173,10 +174,11 @@ data class SearchControlValue(
 data class ReadDirectoryEntryForSyncResponse(
     var searchControlValue: SearchControlValue,
     var directoryEntries: List<DirectoryEntry>,
+
 )
 
-// ktlint-disable enum-entry-name-case
 @Serializable
+@Suppress("ktlint:standard:enum-entry-name-case")
 enum class Operation {
     add_Directory_Entry,
     modify_Directory_Entry,
