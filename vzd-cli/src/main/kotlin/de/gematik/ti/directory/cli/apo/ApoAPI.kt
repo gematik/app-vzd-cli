@@ -7,15 +7,10 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-// ktlint-disable enum-entry-name-case
+@Suppress("ktlint:standard:enum-entry-name-case")
 enum class ApoInstance {
     test,
     prod,
-    ;
-
-    fun lowercase(): String {
-        return toString().lowercase()
-    }
 }
 
 class ApoAPI(val globalAPI: GlobalAPI) {
