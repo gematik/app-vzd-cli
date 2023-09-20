@@ -35,10 +35,11 @@ class ParameterOptions : OptionGroup(name = "Query parameters") {
     val baseEntryOnly by option("--baseEntryOnly").choice("true", "false")
     val active by option().choice("true", "false")
     val meta by option()
+    val mail by option()
 
     fun toMap(): Map<String, String> {
         val self = this
-        return buildMap<String, String>() {
+        return buildMap<String, String> {
             for (field in ParameterOptions::class.java.declaredFields) {
                 if (!field.name.endsWith("\$delegate")) {
                     continue

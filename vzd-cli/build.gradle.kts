@@ -1,14 +1,21 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+val bcVersion: String by project
+
 plugins {
     id("de.gematik.directory.app-conventions")
-    kotlin("plugin.serialization") version "1.7.10"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+    kotlin("plugin.serialization") version "1.8.10"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.0"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-    disabledRules.set(setOf("no-wildcard-imports"))
+    disabledRules.set(setOf("indent", "no-wildcard-imports", "trailing-comma-on-call-site", "trailing-comma-on-declaration-site", "standard:max-line-length"))
 }
 
 dependencies {
@@ -74,11 +81,10 @@ dependencies {
     implementation("io.konform:konform-jvm:0.4.0")
 
     // Bouncy castle fpr crypto and certificates processing
-    val bcVersion: String by project
     shadow("org.bouncycastle:bcprov-jdk15on:$bcVersion")
     shadow("org.bouncycastle:bcpkix-jdk15on:$bcVersion")
 
-    // Bouncy Castle again, now only for tests
+    // bouncy castle again, just for unit tests
     testImplementation("org.bouncycastle:bcprov-jdk15on:$bcVersion")
     testImplementation("org.bouncycastle:bcpkix-jdk15on:$bcVersion")
 }
@@ -111,6 +117,10 @@ tasks.named("startScripts") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    exclude("org/bouncycastle/**")
+    exclude("META-INF/versions/**")
+    exclude("META-INF/java.security.Provider")
+    exclude("BC*")
     dependsOn("copyShadowLibs")
     archiveVersion.set("")
 }
