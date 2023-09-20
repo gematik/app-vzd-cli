@@ -9,23 +9,25 @@ import de.gematik.ti.directory.fhir.*
 fun DirectoryEntry.elaborate(): ElaborateDirectoryEntry {
     val entry = this
     val base = entry.directoryEntryBase.elaborate()
-    val elaborateEntry = ElaborateDirectoryEntry(
-        kind = base.kind,
-        base = base,
-        userCertificates = entry.userCertificates?.map { it },
-        kimAddresses = infereKIMAddresses(),
-        smartcards = infereSmartcards(),
-    )
+    val elaborateEntry =
+        ElaborateDirectoryEntry(
+            kind = base.kind,
+            base = base,
+            userCertificates = entry.userCertificates?.map { it },
+            kimAddresses = infereKIMAddresses(),
+            smartcards = infereSmartcards(),
+        )
 
     // apply special cases
     specialCases.forEach { it.apply(elaborateEntry) }
 
     val baseValidationResult = base.validate()
-    val validationResult = if (baseValidationResult?.isNotEmpty() == true) {
-        ValidationResult(base = baseValidationResult)
-    } else {
-        null
-    }
+    val validationResult =
+        if (baseValidationResult?.isNotEmpty() == true) {
+            ValidationResult(base = baseValidationResult)
+        } else {
+            null
+        }
 
     elaborateEntry.validationResult = validationResult
 
@@ -36,9 +38,10 @@ interface SpecialCase {
     fun apply(entry: ElaborateDirectoryEntry)
 }
 
-private val specialCases = listOf<SpecialCase>(
-    PharmacySpecializationSpecialCase(),
-)
+private val specialCases =
+    listOf<SpecialCase>(
+        PharmacySpecializationSpecialCase(),
+    )
 
 fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
     val base = this
@@ -49,7 +52,6 @@ fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
         telematikID = base.telematikID,
         domainID = base.domainID,
         dn = base.dn,
-
         displayName = base.displayName,
         cn = base.cn,
         otherName = base.otherName,
@@ -57,34 +59,33 @@ fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
         givenName = base.givenName,
         sn = base.sn,
         title = base.title,
-
         streetAddress = base.streetAddress,
         postalCode = base.postalCode,
         localityName = base.localityName,
         stateOrProvinceName = base.stateOrProvinceName,
         countryCode = base.countryCode,
-
         professionOID = base.professionOID?.map { elaborateProfessionOID(base, it) },
         specialization = base.specialization?.map { elaborateSpecialization(it) },
-
         holder = base.holder?.map { elaborateHolder(it) },
         dataFromAuthority = base.dataFromAuthority,
         personalEntry = base.personalEntry,
         changeDateTime = base.changeDateTime,
-
         maxKOMLEadr = base.maxKOMLEadr,
-
         active = base.active,
         meta = base.meta,
     )
 }
 
-fun elaborateProfessionOID(base: BaseDirectoryEntry, professionOID: String): Coding {
-    val coding = if (base.personalEntry == true) {
-        PractitionerProfessionOID.resolveCode(professionOID)
-    } else {
-        OrganizationProfessionOID.resolveCode(professionOID)
-    }
+fun elaborateProfessionOID(
+    base: BaseDirectoryEntry,
+    professionOID: String,
+): Coding {
+    val coding =
+        if (base.personalEntry == true) {
+            PractitionerProfessionOID.resolveCode(professionOID)
+        } else {
+            OrganizationProfessionOID.resolveCode(professionOID)
+        }
     return Coding(professionOID, coding?.display ?: professionOID, coding?.system)
 }
 
@@ -92,17 +93,18 @@ val PractitionerSpecializationRegex = Regex("^urn:as:([0-9\\.]+):(.*)$")
 val OrganisationSpecializationRegex = Regex("^urn:psc:([0-9\\.]+):(.*)$")
 
 fun elaborateSpecialization(specialization: String): Coding {
-    val coding = if (PractitionerSpecializationRegex.matches(specialization)) {
-        PractitionerSpecializationRegex.matchEntire(specialization)?.let {
-            PractitionerQualificationVS.resolveCode("urn:oid:${it.groupValues[1]}", it.groupValues[2])
+    val coding =
+        if (PractitionerSpecializationRegex.matches(specialization)) {
+            PractitionerSpecializationRegex.matchEntire(specialization)?.let {
+                PractitionerQualificationVS.resolveCode("urn:oid:${it.groupValues[1]}", it.groupValues[2])
+            }
+        } else if (OrganisationSpecializationRegex.matches(specialization)) {
+            OrganisationSpecializationRegex.matchEntire(specialization)?.let {
+                HealthcareServiceSpecialtyVS.resolveCode("urn:oid:${it.groupValues[1]}", it.groupValues[2])
+            }
+        } else {
+            null
         }
-    } else if (OrganisationSpecializationRegex.matches(specialization)) {
-        OrganisationSpecializationRegex.matchEntire(specialization)?.let {
-            HealthcareServiceSpecialtyVS.resolveCode("urn:oid:${it.groupValues[1]}", it.groupValues[2])
-        }
-    } else {
-        null
-    }
     return coding ?: Coding(specialization, specialization)
 }
 

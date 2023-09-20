@@ -17,7 +17,6 @@ class AdminCliEnvironmentContext(
     val adminAPI: AdminAPI,
     var env: AdminEnvironment,
 ) {
-
     val client by lazy {
         adminAPI.createClient(env)
     }
@@ -27,11 +26,11 @@ class AdminCliEnvironmentContext(
 
 class AdminCli :
     CliktCommand(name = "admin", help = """CLI for DirectoryAdministration API""".trimMargin()) {
-
-    override fun run() = catching {
-        val adminAPI = AdminAPI(GlobalAPI())
-        currentContext.obj = AdminCliContext(adminAPI)
-    }
+    override fun run() =
+        catching {
+            val adminAPI = AdminAPI(GlobalAPI())
+            currentContext.obj = AdminCliContext(adminAPI)
+        }
 
     init {
         subcommands(
@@ -76,7 +75,8 @@ class EnvironmentCommands(env: AdminEnvironment) : CliktCommand(name = env.name,
         )
     }
 
-    override fun run() = catching {
-        currentContext.obj = AdminCliEnvironmentContext(context.adminAPI, AdminEnvironment.valueOf(commandName))
-    }
+    override fun run() =
+        catching {
+            currentContext.obj = AdminCliEnvironmentContext(context.adminAPI, AdminEnvironment.valueOf(commandName))
+        }
 }

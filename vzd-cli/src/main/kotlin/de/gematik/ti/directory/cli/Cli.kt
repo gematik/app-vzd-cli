@@ -33,18 +33,23 @@ import kotlin.io.path.absolute
 import kotlin.io.path.setPosixFilePermissions
 
 private val JsonPretty = Json { prettyPrint = true }
+
 internal inline fun <reified T> T.toJsonPretty(): String = JsonPretty.encodeToString(this)
 
-private val JsonPrettyNoDefaults = Json {
-    prettyPrint = true
-    encodeDefaults = false
-}
+private val JsonPrettyNoDefaults =
+    Json {
+        prettyPrint = true
+        encodeDefaults = false
+    }
+
 internal inline fun <reified T> T.toJsonPrettyNoDefaults(): String = JsonPrettyNoDefaults.encodeToString(this)
 
 private val YamlNoDefaults = Yaml { encodeDefaultValues = false }
+
 internal fun Any.toYamlNoDefaults(): String = YamlNoDefaults.encodeToString(this)
 
 private val yaml = Yaml {}
+
 internal fun Any.toYaml(): String = yaml.encodeToString(this)
 
 /**
@@ -57,7 +62,9 @@ fun catching(throwingBlock: () -> Unit = {}) {
         throw CliktError(e.message)
     } catch (e: AdminResponseException) {
         if (e.response.status == HttpStatusCode.Unauthorized) {
-            throw CliktError("ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin <ru|tu|pu> login` or provide token by other means.")
+            throw CliktError(
+                "ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin <ru|tu|pu> login` or provide token by other means.",
+            )
         } else {
             throw CliktError(e.details)
         }
@@ -86,10 +93,11 @@ class CliContext(
 class Cli : CliktCommand(name = "vzd-cli") {
     init {
         context {
-            helpFormatter = CliktHelpFormatter(
-                requiredOptionMarker = "*",
-                showDefaultValues = true,
-            )
+            helpFormatter =
+                CliktHelpFormatter(
+                    requiredOptionMarker = "*",
+                    showDefaultValues = true,
+                )
         }
     }
 
@@ -118,7 +126,8 @@ class Cli : CliktCommand(name = "vzd-cli") {
                     PosixFilePermission.OWNER_EXECUTE,
                 ),
             )
-        } catch (e: UnsupportedOperationException) {} // ignore this exception on windows
+        } catch (e: UnsupportedOperationException) {
+        } // ignore this exception on windows
     }
 
     override fun run() {
@@ -144,7 +153,10 @@ class Cli : CliktCommand(name = "vzd-cli") {
         try {
             val version = runBlocking { globalAPI.dailyUpdateCheck() }
             if (version > BuildConfig.APP_VERSION) {
-                echo("Update is available: $version (current: ${BuildConfig.APP_VERSION}). Please update using `vzd-cli update`", err = true)
+                echo(
+                    "Update is available: $version (current: ${BuildConfig.APP_VERSION}). Please update using `vzd-cli update`",
+                    err = true,
+                )
             }
         } catch (e: Exception) {
             // ignore error when checking for update
@@ -152,5 +164,6 @@ class Cli : CliktCommand(name = "vzd-cli") {
     }
 }
 
-fun main(args: Array<String>) = Cli()
-    .main(args)
+fun main(args: Array<String>) =
+    Cli()
+        .main(args)

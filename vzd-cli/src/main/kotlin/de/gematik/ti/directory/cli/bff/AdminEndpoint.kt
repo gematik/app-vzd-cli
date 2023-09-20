@@ -64,7 +64,10 @@ fun Route.adminRoutes() {
         val credential = vault.get(body.env.toString().lowercase())
 
         if (credential == null) {
-            call.respond(HttpStatusCode.BadRequest, Outcome("VAULT_CREDENTIALS_MISSING", "Credentials für '${body.env}' are not configured in vault."))
+            call.respond(
+                HttpStatusCode.BadRequest,
+                Outcome("VAULT_CREDENTIALS_MISSING", "Credentials für '${body.env}' are not configured in vault."),
+            )
             return@post
         }
 
@@ -72,7 +75,10 @@ fun Route.adminRoutes() {
             call.adminAPI.login(body.env, credential.name, credential.secret)
             call.respond(HttpStatusCode.OK, Outcome("VAULT_LOGIN_OK", "Logged in to '${body.env}'"))
         } catch (e: IOException) {
-            call.respond(HttpStatusCode.BadGateway, Outcome("DOWNSTREAM_CONNECTION_ERROR", "Unable to connect to backend. Check proxy settings."))
+            call.respond(
+                HttpStatusCode.BadGateway,
+                Outcome("DOWNSTREAM_CONNECTION_ERROR", "Unable to connect to backend. Check proxy settings."),
+            )
         }
     }
 
@@ -93,6 +99,9 @@ fun Route.adminRoutes() {
         if (result != null) {
             call.respond(result.elaborate())
         }
-        call.respond(HttpStatusCode.NotFound, Outcome("NOT_FOUND", "Entry with telematikID '${entry.telematikID}' not found in env '${entry.parent.env}'"))
+        call.respond(
+            HttpStatusCode.NotFound,
+            Outcome("NOT_FOUND", "Entry with telematikID '${entry.telematikID}' not found in env '${entry.parent.env}'"),
+        )
     }
 }

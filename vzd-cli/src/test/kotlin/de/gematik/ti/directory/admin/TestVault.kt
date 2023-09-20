@@ -12,10 +12,11 @@ class TestVault : FeatureSpec({
     val vaultDir = createTempDirectory()
     val vaultPath = Path(vaultDir.toString(), "directory-vault-test.keystore")
     val badPassword = "BadPassword"
-    val longSecret = """
+    val longSecret =
+        """
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eget mattis ipsum. 
         Phasellus eleifend feugiat nisl vitae pellentesque. Sed viverra a ex et sagittis.
-    """.trimIndent()
+        """.trimIndent()
 
     beforeSpec {
         vaultPath.deleteIfExists()
@@ -69,12 +70,12 @@ class TestVault : FeatureSpec({
             vault2.get("pu") shouldBe null
         }
         scenario("Regex") {
-            val SERVICE_NAME = "urn:gematik:directory:admin"
-            val REGEX = "^$SERVICE_NAME:([\\w\\p{L}\\-_]+):([\\w\\p{L}\\-_]+)".toRegex()
+            val serviceName = "urn:gematik:directory:admin"
+            val regex = "^$serviceName:([\\w\\p{L}\\-_]+):([\\w\\p{L}\\-_]+)".toRegex()
             val s = "urn:gematik:directory:admin:rü:test_1-a-üäß"
-            REGEX.matches(s) shouldBe true
-            REGEX.matchEntire(s)?.groups?.get(1)?.value shouldBe "rü"
-            REGEX.matchEntire(s)?.groups?.get(2)?.value shouldBe "test_1-a-üäß"
+            regex.matches(s) shouldBe true
+            regex.matchEntire(s)?.groups?.get(1)?.value shouldBe "rü"
+            regex.matchEntire(s)?.groups?.get(2)?.value shouldBe "test_1-a-üäß"
         }
     }
 

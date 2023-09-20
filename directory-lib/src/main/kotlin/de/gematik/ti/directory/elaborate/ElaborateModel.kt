@@ -26,7 +26,6 @@ data class ValidationResult(
 data class ElaborateBaseDirectoryEntry(
     var kind: String,
     var fhirResourceType: DirectoryEntryResourceType,
-
     // Identifier
     var telematikID: String,
     var domainID: List<String>? = null,
@@ -39,28 +38,23 @@ data class ElaborateBaseDirectoryEntry(
     var givenName: String? = null,
     var sn: String? = null,
     var title: String? = null,
-
     // Addresses
     var streetAddress: String? = null,
     var postalCode: String? = null,
     var localityName: String? = null,
     var stateOrProvinceName: String? = null,
     var countryCode: String? = null,
-
     // Professional
     var professionOID: List<Coding>? = null,
     var specialization: List<Coding>? = null,
     var entryType: List<String?>? = null,
-
     // System
     var holder: List<Coding>? = null,
     var dataFromAuthority: Boolean? = null,
     var personalEntry: Boolean? = null,
     var changeDateTime: Instant? = null,
-
     // Internal
     var maxKOMLEadr: Int? = null,
-
     // Misc
     var active: Boolean,
     var meta: List<String>? = null,

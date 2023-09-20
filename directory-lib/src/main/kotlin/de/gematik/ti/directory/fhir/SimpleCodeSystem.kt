@@ -22,7 +22,6 @@ class SimpleCodeSystem(
     val url: String,
     val concept: List<SimpleConcept>,
 ) {
-
     fun resolveCode(code: String): Coding? {
         return concept.firstOrNull { it.code == code }?.let {
             Coding(code, it.display, url)

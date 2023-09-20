@@ -8,9 +8,10 @@ fun DirectoryEntry.infereKIMAddresses(): List<ElaborateKIMAddress>? {
             .map { fad1List ->
                 fad1List.map { fad1 ->
                     fad1.komLeData?.map {
-                        val provider = fad1.dn.ou?.first()?.let { fad ->
-                            ElaborateKIMProvider(fad, fad)
-                        }
+                        val provider =
+                            fad1.dn.ou?.first()?.let { fad ->
+                                ElaborateKIMProvider(fad, fad)
+                            }
                         ElaborateKIMAddress(
                             it.mail,
                             it.version,

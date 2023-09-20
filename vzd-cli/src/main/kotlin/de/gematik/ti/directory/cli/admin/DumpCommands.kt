@@ -46,12 +46,14 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
-var NDJSON = Json {
-    encodeDefaults = true
-    serializersModule = SerializersModule {
-        contextual(ExtendedCertificateDataDERSerializer)
+var ndjson =
+    Json {
+        encodeDefaults = true
+        serializersModule =
+            SerializersModule {
+                contextual(ExtendedCertificateDataDERSerializer)
+            }
     }
-}
 
 @Serializable
 class ElaboratedDumpDirectoryEntry(
@@ -76,6 +78,7 @@ class DumpCommand : CliktCommand(name = "dump", help = "Create and manage the da
 
     override fun run() = Unit
 }
+
 class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetching the data from server") {
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val paramFile: Pair<String, String>? by option(
@@ -92,25 +95,30 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
     ).associate()
     private val cursorSize by option("-c", "--cursor-size", help = "Size of the cursor per HTTP Request")
         .int().default(500)
-    private val expectedTotal by option("-e", "--expected-count", help = "Expected total count of entries. Used only for cosmetics to display the progressbar.").int().default(-1)
+    private val expectedTotal by option(
+        "-e",
+        "--expected-count",
+        help = "Expected total count of entries. Used only for cosmetics to display the progressbar.",
+    ).int().default(-1)
     private val parameterOptions by ParameterOptions()
     private val ocspOptions by OcspOptions()
 
-    override fun run() = catching() {
-        val params = parameterOptions.toMap() + customParams
-        logger.info { "Requesting entries for dump: $params" }
-        paramFile?.let { paramFile ->
-            val file = Path(paramFile.second)
-            if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
-            file.useLines { line ->
-                line.forEach {
-                    runQuery(params + Pair(paramFile.first, it))
+    override fun run() =
+        catching {
+            val params = parameterOptions.toMap() + customParams
+            logger.info { "Requesting entries for dump: $params" }
+            paramFile?.let { paramFile ->
+                val file = Path(paramFile.second)
+                if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
+                file.useLines { line ->
+                    line.forEach {
+                        runQuery(params + Pair(paramFile.first, it))
+                    }
                 }
+            } ?: run {
+                runQuery(params)
             }
-        } ?: run {
-            runQuery(params)
         }
-    }
 
     fun runQuery(params: Map<String, String>) {
         runQueryWithPaging(params)
@@ -127,36 +135,38 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
     private fun runQueryWithPaging(params: Map<String, String>) {
         var entries = 0
         val semaphore = Semaphore(20)
-        val elapsed = measureTimeMillis {
-            val progressBar = ProgressBar("Query $params", expectedTotal.toLong())
-            try {
-                runBlocking {
-                    context.client.streamDirectoryEntriesPaging(params, cursorSize) { entry ->
-                        launch {
-                            semaphore.withPermit {
-                                expandOcspStatus(entry)
-                                logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
-                                val elaboratedDumpDirectoryEntry = entry.elaborate()
-                                val elaboratedEntry = ElaboratedDumpDirectoryEntry(
-                                    directoryEntryBase = entry.directoryEntryBase,
-                                    userCertificates = entry.userCertificates,
-                                    fachdaten = entry.fachdaten,
-                                    validationResult = elaboratedDumpDirectoryEntry.validationResult,
-                                    kind = elaboratedDumpDirectoryEntry.base.kind,
-                                    fhirResourceType = elaboratedDumpDirectoryEntry.base.fhirResourceType,
-                                )
-                                println(NDJSON.encodeToString(elaboratedEntry))
-                                progressBar.step()
-                                entries++
+        val elapsed =
+            measureTimeMillis {
+                val progressBar = ProgressBar("Query $params", expectedTotal.toLong())
+                try {
+                    runBlocking {
+                        context.client.streamDirectoryEntriesPaging(params, cursorSize) { entry ->
+                            launch {
+                                semaphore.withPermit {
+                                    expandOcspStatus(entry)
+                                    logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
+                                    val elaboratedDumpDirectoryEntry = entry.elaborate()
+                                    val elaboratedEntry =
+                                        ElaboratedDumpDirectoryEntry(
+                                            directoryEntryBase = entry.directoryEntryBase,
+                                            userCertificates = entry.userCertificates,
+                                            fachdaten = entry.fachdaten,
+                                            validationResult = elaboratedDumpDirectoryEntry.validationResult,
+                                            kind = elaboratedDumpDirectoryEntry.base.kind,
+                                            fhirResourceType = elaboratedDumpDirectoryEntry.base.fhirResourceType,
+                                        )
+                                    println(ndjson.encodeToString(elaboratedEntry))
+                                    progressBar.step()
+                                    entries++
+                                }
                             }
                         }
                     }
+                } finally {
+                    progressBar.maxHint(progressBar.current)
+                    progressBar.close()
                 }
-            } finally {
-                progressBar.maxHint(progressBar.current)
-                progressBar.close()
             }
-        }
         logger.info { "Dumped $entries entries in ${elapsed / 1000} seconds" }
     }
 }
@@ -164,61 +174,68 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
 class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests for each entry in the dump") {
     private val context by requireObject<AdminCliEnvironmentContext>()
 
-    override fun run() = catching {
-        val semaphore = Semaphore(20)
+    override fun run() =
+        catching {
+            val semaphore = Semaphore(20)
 
-        var entries = 0
-        // initialize lazy variable before coroutines
-        context.pkiClient.tsl
-        val elapsed = measureTimeMillis {
-            runBlocking {
-                System.`in`.bufferedReader().lineSequence().forEach { line ->
-                    launch {
-                        semaphore.withPermit {
-                            val entry: DirectoryEntry = JsonDirectoryEntryExt.decodeFromString(line)
-                            entries++
-                            logger.debug { "Processing TelematikID: ${entry.directoryEntryBase.telematikID}" }
-                            entry.userCertificates?.mapNotNull { it.userCertificate }?.forEach { cert ->
-                                if (cert.certificateInfo.ocspResponse?.status == OCSPResponseCertificateStatus.GOOD) {
-                                    logger.debug { "Certificate already GOOD: ${cert.certificateInfo.serialNumber}" }
-                                } else {
-                                    cert.certificateInfo.ocspResponse = context.pkiClient.ocsp(cert)
+            var entries = 0
+            // initialize lazy variable before coroutines
+            context.pkiClient.tsl
+            val elapsed =
+                measureTimeMillis {
+                    runBlocking {
+                        System.`in`.bufferedReader().lineSequence().forEach { line ->
+                            launch {
+                                semaphore.withPermit {
+                                    val entry: DirectoryEntry = JsonDirectoryEntryExt.decodeFromString(line)
+                                    entries++
+                                    logger.debug { "Processing TelematikID: ${entry.directoryEntryBase.telematikID}" }
+                                    entry.userCertificates?.mapNotNull { it.userCertificate }?.forEach { cert ->
+                                        if (cert.certificateInfo.ocspResponse?.status == OCSPResponseCertificateStatus.GOOD) {
+                                            logger.debug { "Certificate already GOOD: ${cert.certificateInfo.serialNumber}" }
+                                        } else {
+                                            cert.certificateInfo.ocspResponse = context.pkiClient.ocsp(cert)
+                                        }
+                                    }
+                                    println(ndjson.encodeToString(entry))
                                 }
                             }
-                            println(NDJSON.encodeToString(entry))
                         }
                     }
                 }
-            }
+            logger.info { "Processed $entries entries in ${elapsed / 1000} seconds" }
         }
-        logger.info { "Processed $entries entries in ${elapsed / 1000} seconds" }
-    }
 }
 
-class DumpSaveCert : CliktCommand(name = "save-cert", help = "Reads dump from STDIN and saves all X509 certificate to specified directory") {
+class DumpSaveCert : CliktCommand(
+    name = "save-cert",
+    help = "Reads dump from STDIN and saves all X509 certificate to specified directory",
+) {
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val destination by argument().path(mustExist = true, mustBeWritable = true, canBeFile = false)
 
-    override fun run() = catching {
-        var entries = 0
-        // initialize lazy variable before coroutines
-        context.pkiClient.tsl
-        val elapsed = measureTimeMillis {
-            runBlocking {
-                System.`in`.bufferedReader().lineSequence().forEach { line ->
-                    val entry: DirectoryEntry = JsonDirectoryEntryExt.decodeFromString(line)
-                    entries++
-                    entry.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.forEach { certInfo ->
-                        val filename = "${certInfo.admissionStatement.registrationNumber.escape()}-${certInfo.serialNumber}.der"
-                        val path = destination.resolve(filename)
-                        path.writeBytes(Base64.decode(certInfo.certData))
-                        logger.info { "Written certificate to file ${path.toRealPath()}" }
-                    }
+    override fun run() =
+        catching {
+            var entries = 0
+            // initialize lazy variable before coroutines
+            context.pkiClient.tsl
+            val elapsed =
+                measureTimeMillis {
+                    runBlocking {
+                        System.`in`.bufferedReader().lineSequence().forEach { line ->
+                            val entry: DirectoryEntry = JsonDirectoryEntryExt.decodeFromString(line)
+                            entries++
+                            entry.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.forEach { certInfo ->
+                                val filename = "${certInfo.admissionStatement.registrationNumber.escape()}-${certInfo.serialNumber}.der"
+                                val path = destination.resolve(filename)
+                                path.writeBytes(Base64.decode(certInfo.certData))
+                                logger.info { "Written certificate to file ${path.toRealPath()}" }
+                            }
 
-                    logger.debug { "Processing TelematikID: ${entry.directoryEntryBase.telematikID}" }
+                            logger.debug { "Processing TelematikID: ${entry.directoryEntryBase.telematikID}" }
+                        }
+                    }
                 }
-            }
+            logger.info { "Processed $entries entries in ${elapsed / 1000} seconds" }
         }
-        logger.info { "Processed $entries entries in ${elapsed / 1000} seconds" }
-    }
 }

@@ -7,13 +7,14 @@ import de.gematik.ti.directory.fhir.PharmacyTypeCS
 class PharmacySpecializationSpecialCase : SpecialCase {
     override fun apply(entry: ElaborateDirectoryEntry) {
         if (entry.kind == "Apotheke") {
-            entry.base.specialization = entry.base.specialization?.map {
-                if (it.system != null) {
-                    it
-                } else {
-                    PharmacyTypeCS.resolveCode(it.code) ?: it
+            entry.base.specialization =
+                entry.base.specialization?.map {
+                    if (it.system != null) {
+                        it
+                    } else {
+                        PharmacyTypeCS.resolveCode(it.code) ?: it
+                    }
                 }
-            }
         }
     }
 }

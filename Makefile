@@ -1,5 +1,5 @@
 ktlint:
-	ktlint -F --disabled_rules=no-wildcard-imports */src/**/*.kt
+	ktlint -F --disabled_rules=no-wildcard-imports,trailing-comma-on-declaration-site,standard:max-line-length */src/**/*.kt
 
 dist: ktlint
 	./gradlew clean build -x test

@@ -17,7 +17,6 @@ private const val DEFAULT_SERVICE_NAME = "urn:gematik:directory:admin"
 class VaultException(message: String) : Exception(message)
 
 class KeyStoreVaultProvider(val customVaultPath: Path? = null) {
-
     private val defaultVaultPath = Path(System.getProperty("user.home"), ".telematik", "directory-vault.keystore")
     private val vaultPath get() = customVaultPath ?: defaultVaultPath
 
@@ -36,13 +35,17 @@ class KeyStoreVaultProvider(val customVaultPath: Path? = null) {
         vaultPath.deleteIfExists()
     }
 
-    fun open(password: String, serviceName: String = DEFAULT_SERVICE_NAME): KeyStoreVault {
+    fun open(
+        password: String,
+        serviceName: String = DEFAULT_SERVICE_NAME,
+    ): KeyStoreVault {
         return KeyStoreVault(password, vaultPath, serviceName)
     }
 }
 
 class KeyStoreVault(private val password: String, private val keystorePath: Path, private val serviceName: String) {
     private val pattern = "^$serviceName:([\\w\\p{L}\\-_]+):([\\w\\p{L}\\-_]+)".toRegex()
+
     fun clear() {
         keyStore.aliases().asSequence().filter {
             pattern.matches(it)
@@ -67,7 +70,11 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
         }
     }
 
-    fun store(environment: String, name: String, secret: String) {
+    fun store(
+        environment: String,
+        name: String,
+        secret: String,
+    ) {
         val protection = KeyStore.PasswordProtection(keystorePassword)
         val secretSpec = SecretKeySpec(secret.toByteArray(Charsets.UTF_8), "AES")
         keyStore.aliases().asSequence().filter {
@@ -91,8 +98,9 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
     }
 
     fun get(environment: String): Secret? {
-        val alias = keyStore.aliases().asSequence().find { it.startsWith("$serviceName:$environment") }
-            ?: return null
+        val alias =
+            keyStore.aliases().asSequence().find { it.startsWith("$serviceName:$environment") }
+                ?: return null
 
         logger.debug { "Found vault entry: $alias" }
 

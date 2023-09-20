@@ -28,15 +28,17 @@ internal class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjec
     "directory-global.yaml",
     {
         GlobalConfig(
-            httpProxy = HttpProxyConfig(
-                proxyURL = "http://192.168.110.10:3128/",
-                enabled = false,
-            ),
-            updates = UpdatesConfig(
-                preReleasesEnabled = false,
-                lastCheck = -1,
-                latestRelease = BuildConfig.APP_VERSION,
-            ),
+            httpProxy =
+                HttpProxyConfig(
+                    proxyURL = "http://192.168.110.10:3128/",
+                    enabled = false,
+                ),
+            updates =
+                UpdatesConfig(
+                    preReleasesEnabled = false,
+                    lastCheck = -1,
+                    latestRelease = BuildConfig.APP_VERSION,
+                ),
         )
     },
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },

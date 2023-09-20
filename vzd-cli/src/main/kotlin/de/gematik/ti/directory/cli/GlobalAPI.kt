@@ -39,32 +39,38 @@ data class Release(
 
 const val GITHUB_RELEASES_URL = "https://api.github.com/repos/gematik/app-vzd-cli/releases"
 
-private val JSON = Json {
-    ignoreUnknownKeys = true
-}
+private val JSON =
+    Json {
+        ignoreUnknownKeys = true
+    }
 
 class GlobalAPI {
     val config by lazy { loadConfig() }
+
     fun loadConfig(): GlobalConfig {
         return GlobalConfigFileStore().value
     }
+
     fun updateConfig() {
         val store = GlobalConfigFileStore()
         store.value = config
         store.save()
     }
+
     fun resetConfig(): GlobalConfig {
         val store = GlobalConfigFileStore()
         return store.reset()
     }
+
     private fun createHttpClient(): HttpClient {
-        val httpClient = HttpClient(CIO) {
-            engine {
-                if (config.httpProxy.enabled) {
-                    proxy = ProxyBuilder.http(config.httpProxy.proxyURL)
+        val httpClient =
+            HttpClient(CIO) {
+                engine {
+                    if (config.httpProxy.enabled) {
+                        proxy = ProxyBuilder.http(config.httpProxy.proxyURL)
+                    }
                 }
             }
-        }
         return httpClient
     }
 
@@ -76,11 +82,12 @@ class GlobalAPI {
         val jsonString = httpClient.get(GITHUB_RELEASES_URL).body<String>()
         val releases = JSON.decodeFromString<List<Release>>(jsonString)
 
-        val latestRelease = if (config.updates.preReleasesEnabled) {
-            releases.first()
-        } else {
-            releases.first { it.preRelease == false }
-        }
+        val latestRelease =
+            if (config.updates.preReleasesEnabled) {
+                releases.first()
+            } else {
+                releases.first { it.preRelease == false }
+            }
 
         config.updates.lastCheck = Instant.now().epochSecond
         config.updates.latestRelease = latestRelease.name
@@ -96,18 +103,22 @@ class GlobalAPI {
         return config.updates.latestRelease
     }
 
-    suspend fun installVersion(version: String, progressListener: ProgressListener?) {
+    suspend fun installVersion(
+        version: String,
+        progressListener: ProgressListener?,
+    ) {
         if (version < "2.1.0") {
             throw DirectoryException("Updates only supported from version 2.1.0")
         }
 
         logger.debug { "Trying to determine APP_HOME" }
 
-        var appHome = runCatching {
-            Path(Cli::class.java.protectionDomain.codeSource.location.file).parent.parent
-        }.recover {
-            Path(Cli::class.java.protectionDomain.codeSource.location.file.substring(1)).parent.parent
-        }.getOrThrow()
+        var appHome =
+            runCatching {
+                Path(Cli::class.java.protectionDomain.codeSource.location.file).parent.parent
+            }.recover {
+                Path(Cli::class.java.protectionDomain.codeSource.location.file.substring(1)).parent.parent
+            }.getOrThrow()
 
         logger.info { "Updating app in $appHome" }
 
@@ -116,9 +127,10 @@ class GlobalAPI {
 
         logger.debug { "Downloading update from $updateUrl" }
 
-        val response = httpClient.get(updateUrl) {
-            onDownload(progressListener)
-        }
+        val response =
+            httpClient.get(updateUrl) {
+                onDownload(progressListener)
+            }
         if (response.status != HttpStatusCode.OK) {
             throw DirectoryException("Version not found: $version")
         }
@@ -181,7 +193,7 @@ class GlobalAPI {
         }
     }
 
-    private val YAML = Yaml { }
+    private val yaml = Yaml { }
 
     val cachePath = Path(System.getProperty("user.home"), ".telematik", "tsl-cache.yaml")
 
@@ -189,7 +201,7 @@ class GlobalAPI {
         return if (!cachePath.toFile().exists()) {
             null
         } else {
-            val cache: ListOfTrustedServiceLists = YAML.decodeFromString(cachePath.readText())
+            val cache: ListOfTrustedServiceLists = yaml.decodeFromString(cachePath.readText())
             if ((Instant.now().epochSecond - cache.lastModified) > 24 * 60 * 60) {
                 logger.info { "TSL cache ist older than 24 Hours. Removing it." }
                 cachePath.deleteExisting()
@@ -201,6 +213,6 @@ class GlobalAPI {
     }
 
     fun saveCache(tslCache: ListOfTrustedServiceLists) {
-        cachePath.writeText(YAML.encodeToString(tslCache))
+        cachePath.writeText(yaml.encodeToString(tslCache))
     }
 }

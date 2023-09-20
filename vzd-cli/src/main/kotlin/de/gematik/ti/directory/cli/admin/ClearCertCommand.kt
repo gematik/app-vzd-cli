@@ -33,20 +33,21 @@ class ClearCertCommand : CliktCommand(name = "clear-cert", help = "Clear all cer
 
     private val context by requireObject<AdminCliEnvironmentContext>()
 
-    override fun run() = catching {
-        val params = parameterOptions.toMap() + customParams
-        paramFile?.let { paramFile ->
-            val file = Path(paramFile.second)
-            if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
-            file.useLines { line ->
-                line.forEach {
-                    runSingleCommand(params + Pair(paramFile.first, it))
+    override fun run() =
+        catching {
+            val params = parameterOptions.toMap() + customParams
+            paramFile?.let { paramFile ->
+                val file = Path(paramFile.second)
+                if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
+                file.useLines { line ->
+                    line.forEach {
+                        runSingleCommand(params + Pair(paramFile.first, it))
+                    }
                 }
+            } ?: run {
+                runSingleCommand(params)
             }
-        } ?: run {
-            runSingleCommand(params)
         }
-    }
 
     private fun runSingleCommand(params: Map<String, String>) {
         if (params.isEmpty()) {

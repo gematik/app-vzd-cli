@@ -27,36 +27,44 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (certificate exists).").flag()
 
     private val context by requireObject<AdminCliEnvironmentContext>()
-    override fun run() = catching {
-        files.forEach {
-            val certB64 = Base64.toBase64String(it.inputStream().readBytes())
-            val certDER = CertificateDataDER(certB64)
 
-            val userCertificate = UserCertificate(userCertificate = certDER, telematikID = certDER.certificateInfo.admissionStatement.registrationNumber)
-            logger.info { "Adding Certificate ${Yaml.encodeToString(userCertificate.userCertificate?.certificateInfo)}" }
+    override fun run() =
+        catching {
+            files.forEach {
+                val certB64 = Base64.toBase64String(it.inputStream().readBytes())
+                val certDER = CertificateDataDER(certB64)
 
-            val entries = runBlocking {
-                context.client.readDirectoryEntry(mapOf("telematikID" to certDER.certificateInfo.admissionStatement.registrationNumber))
-            }
+                val userCertificate =
+                    UserCertificate(userCertificate = certDER, telematikID = certDER.certificateInfo.admissionStatement.registrationNumber)
+                logger.info { "Adding Certificate ${Yaml.encodeToString(userCertificate.userCertificate?.certificateInfo)}" }
 
-            entries?.first()?.let {
-                logger.info { "Found matching Entry: ${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.displayName}" }
-                runBlocking {
-                    try {
-                        context.client.addDirectoryEntryCertificate(
-                            it.directoryEntryBase.dn?.uid!!,
-                            userCertificate,
+                val entries =
+                    runBlocking {
+                        context.client.readDirectoryEntry(
+                            mapOf("telematikID" to certDER.certificateInfo.admissionStatement.registrationNumber),
                         )
-                        echo("Added certificate: telematikID=${userCertificate.userCertificate?.certificateInfo?.admissionStatement?.registrationNumber} serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber}")
-                    } catch (e: AdminResponseException) {
-                        if (!ignore || e.response.status != HttpStatusCode.Conflict) {
-                            throw e
+                    }
+
+                entries?.first()?.let {
+                    logger.info { "Found matching Entry: ${it.directoryEntryBase.dn?.uid} ${it.directoryEntryBase.displayName}" }
+                    runBlocking {
+                        try {
+                            context.client.addDirectoryEntryCertificate(
+                                it.directoryEntryBase.dn?.uid!!,
+                                userCertificate,
+                            )
+                            echo("Added certificate: telematikID=${userCertificate.userCertificate?.certificateInfo?.admissionStatement?.registrationNumber} serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber}")
+                        } catch (e: AdminResponseException) {
+                            if (!ignore || e.response.status != HttpStatusCode.Conflict) {
+                                throw e
+                            }
+                            logger.warn {
+                                "Certificate with serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber} already exists. Ignoring conflict."
+                            }
                         }
-                        logger.warn { "Certificate with serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber} already exists. Ignoring conflict." }
                     }
                 }
+                    ?: run { throw CliktError("Entry with telematikID ${certDER.certificateInfo.admissionStatement.registrationNumber} not found.") }
             }
-                ?: run { throw CliktError("Entry with telematikID ${certDER.certificateInfo.admissionStatement.registrationNumber} not found.") }
         }
-    }
 }

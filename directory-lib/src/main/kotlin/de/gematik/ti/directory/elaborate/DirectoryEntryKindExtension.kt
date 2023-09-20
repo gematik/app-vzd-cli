@@ -29,6 +29,7 @@ data class TelematikIDMapping(
     // DOT_MATCHES_ALL required to match the TelematikID with special characters like \n
     @Transient
     val regex = Regex(pattern, setOf(RegexOption.DOT_MATCHES_ALL))
+
     fun matches(baseDirectoryEntry: BaseDirectoryEntry): Boolean {
         return baseDirectoryEntry.telematikID.matches(regex)
     }

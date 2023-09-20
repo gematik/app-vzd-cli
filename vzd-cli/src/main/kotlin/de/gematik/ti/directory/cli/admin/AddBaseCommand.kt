@@ -23,7 +23,10 @@ import net.mamoe.yamlkt.Yaml
 import java.beans.Introspector
 import java.io.File
 
-fun setAttributes(baseDirectoryEntry: BaseDirectoryEntry?, attrs: Map<String, String>) {
+fun setAttributes(
+    baseDirectoryEntry: BaseDirectoryEntry?,
+    attrs: Map<String, String>,
+) {
     attrs.forEach { (name, value) ->
 
         val beanInfo = Introspector.getBeanInfo(BaseDirectoryEntry::class.java)
@@ -68,56 +71,60 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
         "--json" to RepresentationFormat.JSON,
     ).default(RepresentationFormat.YAML)
 
-    override fun run() = catching {
-        val input = inputFile ?: deprecatedFile
+    override fun run() =
+        catching {
+            val input = inputFile ?: deprecatedFile
 
-        val data = if (input != null && input == "-") {
-            logger.debug { "Loading from STDIN" }
-            generateSequence(::readLine).joinToString("\n")
-        } else if (input != null) {
-            logger.debug { "Loading file: $input" }
-            File(input.toString()).readText(Charsets.UTF_8)
-        } else {
-            null
-        }
+            val data =
+                if (input != null && input == "-") {
+                    logger.debug { "Loading from STDIN" }
+                    generateSequence(::readLine).joinToString("\n")
+                } else if (input != null) {
+                    logger.debug { "Loading file: $input" }
+                    File(input.toString()).readText(Charsets.UTF_8)
+                } else {
+                    null
+                }
 
-        val baseDirectoryEntry: BaseDirectoryEntry = data?.let {
+            val baseDirectoryEntry: BaseDirectoryEntry =
+                data?.let {
+                    when (format) {
+                        RepresentationFormat.YAML -> Yaml.decodeFromString(it)
+                        RepresentationFormat.JSON -> Json.decodeFromString(it)
+                        else -> throw CliktError("Unsupported format: $format")
+                    }
+                } ?: run {
+                    val telematikID = attrs["telematikID"] ?: throw UsageError("Option --set telematikID=<VALUE> or --file is required")
+                    val entryType = attrs["entryType"]?.toInt() ?: throw UsageError("Option --set entryType=<VALUE> or --file is required")
+                    BaseDirectoryEntry(
+                        telematikID = telematikID,
+                        entryType = listOf(entryType.toString()),
+                    )
+                }
+
+            setAttributes(baseDirectoryEntry, attrs)
+
+            logger.debug { "Creating new directory entry with telematikID: ${baseDirectoryEntry.telematikID}" }
+
+            val result =
+                try {
+                    val dn = runBlocking { context.client.addDirectoryEntry(CreateDirectoryEntry(baseDirectoryEntry)) }
+                    logger.info("Created new DirectoryEntry: ${dn.uid}")
+
+                    val query = mapOf("uid" to dn.uid)
+                    runBlocking { context.client.readDirectoryEntry(query) }
+                } catch (e: AdminResponseException) {
+                    if (!ignore || e.response.status != HttpStatusCode.Conflict) {
+                        throw e
+                    }
+                    logger.warn { "Entry with telematikID=${baseDirectoryEntry.telematikID} already exists. Ignoring conflict." }
+                    runBlocking { context.client.readDirectoryEntry(mapOf("telematikID" to baseDirectoryEntry.telematikID)) }
+                }
+
             when (format) {
-                RepresentationFormat.YAML -> Yaml.decodeFromString(it)
-                RepresentationFormat.JSON -> Json.decodeFromString(it)
-                else -> throw CliktError("Unsupported format: $format")
+                RepresentationFormat.JSON -> echo(result?.first()?.directoryEntryBase?.toJsonPretty())
+                RepresentationFormat.YAML -> echo(result?.first()?.directoryEntryBase?.toYaml())
+                else -> throw UsageError("Cant load for editing in for format: $format")
             }
-        } ?: run {
-            val telematikID = attrs["telematikID"] ?: throw UsageError("Option --set telematikID=<VALUE> or --file is required")
-            val entryType = attrs["entryType"]?.toInt() ?: throw UsageError("Option --set entryType=<VALUE> or --file is required")
-            BaseDirectoryEntry(
-                telematikID = telematikID,
-                entryType = listOf(entryType.toString()),
-            )
         }
-
-        setAttributes(baseDirectoryEntry, attrs)
-
-        logger.debug { "Creating new directory entry with telematikID: ${baseDirectoryEntry.telematikID}" }
-
-        val result = try {
-            val dn = runBlocking { context.client.addDirectoryEntry(CreateDirectoryEntry(baseDirectoryEntry)) }
-            logger.info("Created new DirectoryEntry: ${dn.uid}")
-
-            val query = mapOf("uid" to dn.uid)
-            runBlocking { context.client.readDirectoryEntry(query) }
-        } catch (e: AdminResponseException) {
-            if (!ignore || e.response.status != HttpStatusCode.Conflict) {
-                throw e
-            }
-            logger.warn { "Entry with telematikID=${baseDirectoryEntry.telematikID} already exists. Ignoring conflict." }
-            runBlocking { context.client.readDirectoryEntry(mapOf("telematikID" to baseDirectoryEntry.telematikID)) }
-        }
-
-        when (format) {
-            RepresentationFormat.JSON -> echo(result?.first()?.directoryEntryBase?.toJsonPretty())
-            RepresentationFormat.YAML -> echo(result?.first()?.directoryEntryBase?.toYaml())
-            else -> throw UsageError("Cant load for editing in for format: $format")
-        }
-    }
 }

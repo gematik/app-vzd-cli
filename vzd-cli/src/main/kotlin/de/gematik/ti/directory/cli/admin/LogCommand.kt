@@ -31,7 +31,11 @@ class LogCommand : CliktCommand(name = "log", help = "Show logs") {
         "--json" to RepresentationFormat.JSON,
         "--csv" to RepresentationFormat.CSV,
     ).default(RepresentationFormat.TABLE)
-    private val outfile by option("-o", "--outfile", help = "Write output to file").path(mustExist = false, canBeDir = false, canBeFile = true)
+    private val outfile by option(
+        "-o",
+        "--outfile",
+        help = "Write output to file",
+    ).path(mustExist = false, canBeDir = false, canBeFile = true)
 
     private val primaryParam by mutuallyExclusiveOptions<Pair<String, String>>(
         option("-u", "--uid", help = "UID of an entry").convert { Pair("uid", it) },
@@ -48,23 +52,25 @@ class LogCommand : CliktCommand(name = "log", help = "Show logs") {
     private val logTimeFrom by option("--logTimeFrom").convert { Instant.parse(it) }
     private val logTimeTo by option("--logTimeTo").convert { Instant.parse(it) }
 
-    override fun run() = catching {
-        val params = buildMap {
-            put(primaryParam.first, primaryParam.second)
-            logTimeFrom?.let { put("logTimeFrom", it.toString()) }
-            logTimeTo?.let { put("logTimeTo", it.toString()) }
-        }
+    override fun run() =
+        catching {
+            val params =
+                buildMap {
+                    put(primaryParam.first, primaryParam.second)
+                    logTimeFrom?.let { put("logTimeFrom", it.toString()) }
+                    logTimeTo?.let { put("logTimeTo", it.toString()) }
+                }
 
-        val logEntries = runBlocking { context.client.readLog(params) }.sortedBy { it.logTime }
+            val logEntries = runBlocking { context.client.readLog(params) }.sortedBy { it.logTime }
 
-        val stdout = System.`out`
-        try {
-            outfile?.let { System.setOut(PrintStream(it.outputStream())) }
-            echo(logEntries.toStringRepresentation(outputFormat))
-        } finally {
-            System.setOut(stdout)
+            val stdout = System.`out`
+            try {
+                outfile?.let { System.setOut(PrintStream(it.outputStream())) }
+                echo(logEntries.toStringRepresentation(outputFormat))
+            } finally {
+                System.setOut(stdout)
+            }
         }
-    }
 }
 
 fun List<LogEntry>.toStringRepresentation(format: RepresentationFormat): String {
@@ -77,53 +83,55 @@ fun List<LogEntry>.toStringRepresentation(format: RepresentationFormat): String 
 }
 
 fun List<LogEntry>.toTable(): String {
-    val formatter = tableFormatter<LogEntry> {
-        labeled<String>("TelematikID", "Gesamt") {
-            extractor { logEntry ->
-                logEntry.telematikID.escape()
+    val formatter =
+        tableFormatter<LogEntry> {
+            labeled<String>("TelematikID", "Gesamt") {
+                extractor { logEntry ->
+                    logEntry.telematikID.escape()
+                }
             }
-        }
 
-        class State(var count: Int = 0)
-        stateful<String, State>("ClientID") {
-            initState { State() }
-            extractor { logEntry, state ->
-                state.count += 1
-                logEntry.clientID
+            class State(var count: Int = 0)
+            stateful<String, State>("ClientID") {
+                initState { State() }
+                extractor { logEntry, state ->
+                    state.count += 1
+                    logEntry.clientID
+                }
+                aggregator { _, state ->
+                    state.count.toString()
+                }
             }
-            aggregator { _, state ->
-                state.count.toString()
-            }
-        }
 
-        stateless("Operation") {
-            extractor {
-                it.operation
+            stateless("Operation") {
+                extractor {
+                    it.operation
+                }
             }
-        }
 
-        stateless("Timestamp") {
-            extractor {
-                it.logTime
+            stateless("Timestamp") {
+                extractor {
+                    it.logTime
+                }
             }
-        }
 
-        stateless("") {
-            extractor {
-                it.noDataChanged
+            stateless("") {
+                extractor {
+                    it.noDataChanged
+                }
             }
-        }
 
-        showAggregation = true
-    }
+            showAggregation = true
+        }
 
     return formatter.apply(this)
 }
 
 fun List<LogEntry>.toCsv(): String {
-    val csvWriter = csvWriter() {
-        delimiter = ';'
-    }
+    val csvWriter =
+        csvWriter {
+            delimiter = ';'
+        }
     val list = this
     return buildString {
         append('\uFEFF')

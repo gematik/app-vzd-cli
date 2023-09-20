@@ -22,7 +22,11 @@ import java.security.MessageDigest
 private val logger = KotlinLogging.logger {}
 
 enum class OCSPResponseCertificateStatus {
-    GOOD, REVOKED, UNKNOWN, CERT_HASH_ERROR, ERROR
+    GOOD,
+    REVOKED,
+    UNKNOWN,
+    CERT_HASH_ERROR,
+    ERROR,
 }
 
 fun loadAllEnvironments(httpClient: HttpClient): ListOfTrustedServiceLists {
@@ -52,25 +56,27 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
 
     init {
         block(this.config)
-        this.httpClient = HttpClient(CIO) {
-            engine {
-                config.httpProxyURL?.let {
-                    logger.debug { "PKI client is using proxy: $it" }
-                    proxy = ProxyBuilder.http(it)
+        this.httpClient =
+            HttpClient(CIO) {
+                engine {
+                    config.httpProxyURL?.let {
+                        logger.debug { "PKI client is using proxy: $it" }
+                        proxy = ProxyBuilder.http(it)
+                    }
+                }
+
+                val l = logger
+
+                install(Logging) {
+                    logger = Logger.DEFAULT
+                    level =
+                        if (l.isDebugEnabled) {
+                            LogLevel.INFO
+                        } else {
+                            LogLevel.NONE
+                        }
                 }
             }
-
-            val l = logger
-
-            install(Logging) {
-                logger = Logger.DEFAULT
-                level = if (l.isDebugEnabled) {
-                    LogLevel.INFO
-                } else {
-                    LogLevel.NONE
-                }
-            }
-        }
         this.loader = this.config.loader
     }
 
@@ -79,35 +85,40 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
     }
 
     suspend fun ocsp(eeCertDER: CertificateDataDER): OCSPResponse {
-        val ocspResponderURL = eeCertDER.ocspResponderURL ?: run {
-            logger.error { "Certificate has no OCSP URL: ${eeCertDER.certificateInfo.subject}" }
-            return OCSPResponse(OCSPResponseCertificateStatus.ERROR, "Certificate has no OCSP URL")
-        }
+        val ocspResponderURL =
+            eeCertDER.ocspResponderURL ?: run {
+                logger.error { "Certificate has no OCSP URL: ${eeCertDER.certificateInfo.subject}" }
+                return OCSPResponse(OCSPResponseCertificateStatus.ERROR, "Certificate has no OCSP URL")
+            }
         try {
             val eeCert = eeCertDER.certificate
             logger.debug { "Looking for CA Certificate for ${eeCert.issuerX500Principal}" }
             val issuerCert =
                 tsl.caServices.first { it.caCertificate.certificate.subjectX500Principal == eeCert.issuerX500Principal }.caCertificate.certificate
 
-            logger.info { "Verifying '${eeCert.subjectX500Principal}' from '${issuerCert.subjectX500Principal}' using OCSP Responder: '$ocspResponderURL'" }
+            logger.info {
+                "Verifying '${eeCert.subjectX500Principal}' from '${issuerCert.subjectX500Principal}' using OCSP Responder: '$ocspResponderURL'"
+            }
 
-            val certificateID = CertificateID(
-                digestCalculator,
-                JcaX509CertificateHolder(issuerCert),
-                eeCert.serialNumber,
-            )
+            val certificateID =
+                CertificateID(
+                    digestCalculator,
+                    JcaX509CertificateHolder(issuerCert),
+                    eeCert.serialNumber,
+                )
 
             val builder = OCSPReqBuilder()
             builder.addRequest(certificateID)
             val ocspReq = builder.build()
 
             logger.debug { "Verifying OCSP serialNumber: ${ocspReq.requestList[0].certID.serialNumber}, responder: $ocspResponderURL" }
-            val response = httpClient.post(ocspResponderURL) {
-                headers {
-                    append(HttpHeaders.ContentType, "application/ocsp-request")
+            val response =
+                httpClient.post(ocspResponderURL) {
+                    headers {
+                        append(HttpHeaders.ContentType, "application/ocsp-request")
+                    }
+                    setBody(ocspReq.encoded)
                 }
-                setBody(ocspReq.encoded)
-            }
 
             if (response.status != HttpStatusCode.OK) {
                 throw Exception("OCSP server returned bad response: \n${response.body<String>()}")
@@ -118,43 +129,53 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
             val basicOcspResp = OCSPResp(body).responseObject as BasicOCSPResp
             val ocspResp = basicOcspResp.responses.first()
 
-            val result = when (val certStatus = ocspResp.certStatus) {
-                CertificateStatus.GOOD -> {
-                    if (ocspResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash) == null) {
-                        logger.error { "Cert hash extension is missing in response" }
-                        return OCSPResponse(OCSPResponseCertificateStatus.CERT_HASH_ERROR)
-                    }
-                    val asn1CertHash = CertHash.getInstance(ocspResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash).parsedValue)
-                    val digest = MessageDigest.getInstance("SHA-256")
+            val result =
+                when (val certStatus = ocspResp.certStatus) {
+                    CertificateStatus.GOOD -> {
+                        if (ocspResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash) == null) {
+                            logger.error { "Cert hash extension is missing in response" }
+                            return OCSPResponse(OCSPResponseCertificateStatus.CERT_HASH_ERROR)
+                        }
+                        val asn1CertHash =
+                            CertHash.getInstance(
+                                ocspResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash).parsedValue,
+                            )
+                        val digest = MessageDigest.getInstance("SHA-256")
 
-                    if (!asn1CertHash.certificateHash.contentEquals(digest.digest(eeCert.encoded))) {
-                        logger.error { "Cert hash does not match ${asn1CertHash.certificateHash.encodeBase64()} != ${digest.digest(eeCert.encoded).encodeBase64()}" }
-                        return OCSPResponse(OCSPResponseCertificateStatus.CERT_HASH_ERROR)
-                    } else {
-                        logger.info { "Cert hash matches: ${asn1CertHash.certificateHash.encodeBase64()}" }
+                        if (!asn1CertHash.certificateHash.contentEquals(digest.digest(eeCert.encoded))) {
+                            logger.error {
+                                "Cert hash does not match ${asn1CertHash.certificateHash.encodeBase64()} != ${digest.digest(
+                                    eeCert.encoded,
+                                ).encodeBase64()}"
+                            }
+                            return OCSPResponse(OCSPResponseCertificateStatus.CERT_HASH_ERROR)
+                        } else {
+                            logger.info { "Cert hash matches: ${asn1CertHash.certificateHash.encodeBase64()}" }
+                        }
+                        return OCSPResponse(OCSPResponseCertificateStatus.GOOD)
                     }
-                    return OCSPResponse(OCSPResponseCertificateStatus.GOOD)
+                    is UnknownStatus -> {
+                        logger.info {
+                            "Certificate is unknown by the OCSP server subject='${eeCert.subjectX500Principal}', serialNumber='${ocspReq.requestList[0].certID.serialNumber}', issuer='${issuerCert.subjectX500Principal}'"
+                        }
+                        OCSPResponse(
+                            OCSPResponseCertificateStatus.UNKNOWN,
+                            "Certificate is unknown by the OCSP server",
+                        )
+                    }
+                    is RevokedStatus -> {
+                        val reason = if (certStatus.hasRevocationReason()) certStatus.revocationReason else "none"
+                        OCSPResponse(
+                            OCSPResponseCertificateStatus.REVOKED,
+                            "Revocation reason: '$reason' at ${certStatus.revocationTime}",
+                        )
+                    }
+                    else ->
+                        OCSPResponse(
+                            OCSPResponseCertificateStatus.ERROR,
+                            "Unknown status: $certStatus",
+                        )
                 }
-                is UnknownStatus -> {
-                    logger.info { "Certificate is unknown by the OCSP server subject='${eeCert.subjectX500Principal}', serialNumber='${ocspReq.requestList[0].certID.serialNumber}', issuer='${issuerCert.subjectX500Principal}'" }
-                    OCSPResponse(
-                        OCSPResponseCertificateStatus.UNKNOWN,
-                        "Certificate is unknown by the OCSP server",
-                    )
-                }
-                is RevokedStatus -> {
-                    val reason = if (certStatus.hasRevocationReason()) certStatus.revocationReason else "none"
-                    OCSPResponse(
-                        OCSPResponseCertificateStatus.REVOKED,
-
-                        "Revocation reason: '$reason' at ${certStatus.revocationTime}",
-                    )
-                }
-                else -> OCSPResponse(
-                    OCSPResponseCertificateStatus.ERROR,
-                    "Unknown status: $certStatus",
-                )
-            }
 
             return result
         } catch (e: UnresolvedAddressException) {

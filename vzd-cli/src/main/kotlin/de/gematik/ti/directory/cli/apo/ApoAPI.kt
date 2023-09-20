@@ -7,14 +7,13 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-@Suppress("ktlint:standard:enum-entry-name-case")
+@Suppress("ktlint:enum-entry-name-case")
 enum class ApoInstance {
     test,
     prod,
 }
 
 class ApoAPI(val globalAPI: GlobalAPI) {
-
     private fun loadConfig() = ApoConfigFileStore().value
 
     fun updateConfig() {

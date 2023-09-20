@@ -42,69 +42,73 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
     // private val force by option("-f", "--force").flag(default = false)
     private val context by requireObject<AdminCliEnvironmentContext>()
 
-    override fun run() = catching {
-        val params = parameterOptions.toMap() + customParams
-        if (params.isEmpty()) {
-            throw UsageError("Specify at least one query parameter")
-        }
+    override fun run() =
+        catching {
+            val params = parameterOptions.toMap() + customParams
+            if (params.isEmpty()) {
+                throw UsageError("Specify at least one query parameter")
+            }
 
-        val result = runBlocking { context.client.readDirectoryEntry(params) }
+            val result = runBlocking { context.client.readDirectoryEntry(params) }
 
-        if (result.isNullOrEmpty()) {
-            logger.info { "Entry not found: $params" }
-            throw CliktError("Entry not found: $params")
-        }
+            if (result.isNullOrEmpty()) {
+                logger.info { "Entry not found: $params" }
+                throw CliktError("Entry not found: $params")
+            }
 
-        // Make sure we clear only one Entry per run. Just to be safe.
-        if (result.size > 1) {
-            logger.error { "Query matches too many entries: $params" }
-            throw CliktError("Query matches too many entries: $params")
-        }
+            // Make sure we clear only one Entry per run. Just to be safe.
+            if (result.size > 1) {
+                logger.error { "Query matches too many entries: $params" }
+                throw CliktError("Query matches too many entries: $params")
+            }
 
-        val entry = result.first()
+            val entry = result.first()
 
-        var deletedCount = 0
-        entry.userCertificates?.filter { it.userCertificate?.certificateInfo != null }?.forEach certLoop@{ userCertificate ->
-            val cert = userCertificate.userCertificate!!.certificateInfo
-            val certText = Yaml.encodeToString(cert)
-            val matches = if (match.isNotEmpty()) {
-                match.firstOrNull {
-                    // val matches = Regex(it, RegexOption.MULTILINE).matches(certText)
-                    val matches = Regex(it, setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)).containsMatchIn(certText)
+            var deletedCount = 0
+            entry.userCertificates?.filter { it.userCertificate?.certificateInfo != null }?.forEach certLoop@{ userCertificate ->
+                val cert = userCertificate.userCertificate!!.certificateInfo
+                val certText = Yaml.encodeToString(cert)
+                val matches =
+                    if (match.isNotEmpty()) {
+                        match.firstOrNull {
+                            // val matches = Regex(it, RegexOption.MULTILINE).matches(certText)
+                            val matches = Regex(it, setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)).containsMatchIn(certText)
 
-                    if (matches) {
-                        logger.debug { "Found matching certificate: $it" }
+                            if (matches) {
+                                logger.debug { "Found matching certificate: $it" }
+                            }
+
+                            matches
+                        } != null
+                    } else {
+                        true
                     }
+                if (!matches) {
+                    echo("Skipping certificate: ${cert.serialNumber} ${cert.subjectInfo.serialNumber ?: ""}")
+                    return@certLoop
+                }
+                logger.debug { "Deleting certificate: $certText" }
+                echo("Deleting certificate telematikID=${entry.directoryEntryBase.telematikID} serialNumber=${cert.serialNumber}")
+                backupDir.let {
+                    val filename = "${cert.admissionStatement.registrationNumber.escape()}-${cert.serialNumber}.der"
+                    val path = backupDir.resolve(filename)
+                    path.writeBytes(Base64.decode(cert.certData))
+                    logger.info { "Written certificate to file ${path.toRealPath()}" }
+                }
+                deletedCount += 1
+                if (dryRun) {
+                    logger.debug { "Dry run: not deleting the certificate" }
+                } else {
+                    runBlocking { context.client.deleteDirectoryEntryCertificate(userCertificate.dn?.uid!!, userCertificate.dn?.cn!!) }
+                }
+            }
 
-                    matches
-                } != null
-            } else {
-                true
-            }
-            if (!matches) {
-                echo("Skipping certificate: ${cert.serialNumber} ${cert.subjectInfo.serialNumber ?: ""}")
-                return@certLoop
-            }
-            logger.debug { "Deleting certificate: $certText" }
-            echo("Deleting certificate telematikID=${entry.directoryEntryBase.telematikID} serialNumber=${cert.serialNumber}")
-            backupDir.let {
-                val filename = "${cert.admissionStatement.registrationNumber.escape()}-${cert.serialNumber}.der"
-                val path = backupDir.resolve(filename)
-                path.writeBytes(Base64.decode(cert.certData))
-                logger.info { "Written certificate to file ${path.toRealPath()}" }
-            }
-            deletedCount += 1
             if (dryRun) {
-                logger.debug { "Dry run: not deleting the certificate" }
+                echo(
+                    "Would have deleted $deletedCount of ${entry.userCertificates?.count { it.userCertificate != null }} certificates (dry run)",
+                )
             } else {
-                runBlocking { context.client.deleteDirectoryEntryCertificate(userCertificate.dn?.uid!!, userCertificate.dn?.cn!!) }
+                echo("Deleted $deletedCount of ${entry.userCertificates?.count { it.userCertificate != null }} certificates")
             }
         }
-
-        if (dryRun) {
-            echo("Would have deleted $deletedCount of ${entry.userCertificates?.count { it.userCertificate != null }} certificates (dry run)")
-        } else {
-            echo("Deleted $deletedCount of ${entry.userCertificates?.count { it.userCertificate != null }} certificates")
-        }
-    }
 }

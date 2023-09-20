@@ -29,7 +29,10 @@ class Validation<T>(val rules: List<ValidationRule<T>>, val value: T) {
         return findings.ifEmpty { null }
     }
 
-    fun addFinding(property: KProperty1<T, *>, finding: Finding) {
+    fun addFinding(
+        property: KProperty1<T, *>,
+        finding: Finding,
+    ) {
         findings.getOrPut(property.name) { mutableListOf() }.add(finding)
     }
 }

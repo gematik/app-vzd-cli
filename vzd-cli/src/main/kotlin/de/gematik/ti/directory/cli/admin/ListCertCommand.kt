@@ -40,35 +40,41 @@ class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificat
         "--param",
         help = "Specify query parameters to find matching entries",
     ).associate()
-    private val outfile by option("-o", "--outfile", help = "Write output to file").path(mustExist = false, canBeDir = false, canBeFile = true)
+    private val outfile by option(
+        "-o",
+        "--outfile",
+        help = "Write output to file",
+    ).path(mustExist = false, canBeDir = false, canBeFile = true)
     private val parameterOptions by ParameterOptions()
     private val ocspOptions by OcspOptions()
 
-    override fun run() = catching {
-        val params = parameterOptions.toMap() + customParams
+    override fun run() =
+        catching {
+            val params = parameterOptions.toMap() + customParams
 
-        val entries = buildList {
-            paramFile?.let { paramFile ->
-                val file = Path(paramFile.second)
-                if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
-                file.useLines { line ->
-                    line.forEach {
-                        runQuery(params + Pair(paramFile.first, it))?.let { addAll(it) }
+            val entries =
+                buildList {
+                    paramFile?.let { paramFile ->
+                        val file = Path(paramFile.second)
+                        if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
+                        file.useLines { line ->
+                            line.forEach {
+                                runQuery(params + Pair(paramFile.first, it))?.let { addAll(it) }
+                            }
+                        }
+                    } ?: run {
+                        runQuery(params)?.let { addAll(it) }
                     }
                 }
-            } ?: run {
-                runQuery(params)?.let { addAll(it) }
+
+            val stdout = System.`out`
+            try {
+                outfile?.let { System.setOut(PrintStream(it.outputStream())) }
+                echo(entries.toStringRepresentation(outputFormat))
+            } finally {
+                System.setOut(stdout)
             }
         }
-
-        val stdout = System.`out`
-        try {
-            outfile?.let { System.setOut(PrintStream(it.outputStream())) }
-            echo(entries.toStringRepresentation(outputFormat))
-        } finally {
-            System.setOut(stdout)
-        }
-    }
 
     private fun runQuery(params: Map<String, String>): List<UserCertificate>? {
         if (params.isEmpty()) {

@@ -11,15 +11,18 @@ class TokenCommand : CliktCommand(name = "token", help = "Get or set access toke
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val token by option("-s", "--set", metavar = "ACCESS_TOKEN", help = "Sets OAuth2 Access Token", envvar = "VZD_CLI_ACCESS_TOKEN")
 
-    override fun run() = catching {
-        val config = context.adminAPI.config
+    override fun run() =
+        catching {
+            val config = context.adminAPI.config
 
-        val envConfig = config.environment(context.env)
+            val envConfig = config.environment(context.env)
 
-        val tokenStore = TokenStore()
+            val tokenStore = TokenStore()
 
-        token?.let { tokenStore.addAccessToken(envConfig.apiURL, it) }
+            token?.let { tokenStore.addAccessToken(envConfig.apiURL, it) }
 
-        echo(tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw CliktError("No token available for environment: ${context.env}"))
-    }
+            echo(
+                tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw CliktError("No token available for environment: ${context.env}"),
+            )
+        }
 }

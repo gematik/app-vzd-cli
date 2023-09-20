@@ -22,10 +22,12 @@ class ConfigCommand : CliktCommand(name = "config", help = "Manage configuration
 
 class ConfigResetCommand : CliktCommand(name = "reset", help = "Reset configuration to defaults") {
     private val context by requireObject<AdminCliContext>()
-    override fun run() = catching {
-        val config = context.adminAPI.resetConfig()
-        echo(YAML.encodeToString(config))
-    }
+
+    override fun run() =
+        catching {
+            val config = context.adminAPI.resetConfig()
+            echo(YAML.encodeToString(config))
+        }
 }
 
 /*
@@ -51,12 +53,13 @@ class ConfigSetCommand : CliktCommand(
 }
 */
 
-val GET_PROPERTIES = mapOf(
-    "environments" to { config: Config -> config.environments },
-    "environments.pu" to { config: Config -> config.environments["pu"] },
-    "environments.ru" to { config: Config -> config.environments["ru"] },
-    "environments.tu" to { config: Config -> config.environments["tu"] },
-)
+val GET_PROPERTIES =
+    mapOf(
+        "environments" to { config: Config -> config.environments },
+        "environments.pu" to { config: Config -> config.environments["pu"] },
+        "environments.ru" to { config: Config -> config.environments["ru"] },
+        "environments.tu" to { config: Config -> config.environments["tu"] },
+    )
 
 class ConfigGetCommand : CliktCommand(
     name = "get",
@@ -68,6 +71,7 @@ class ConfigGetCommand : CliktCommand(
 ) {
     private val context by requireObject<AdminCliContext>()
     private val property by argument().choice(GET_PROPERTIES).optional()
+
     override fun run() {
         val config = context.adminAPI.config
         val value = property?.let { it(config) } ?: config

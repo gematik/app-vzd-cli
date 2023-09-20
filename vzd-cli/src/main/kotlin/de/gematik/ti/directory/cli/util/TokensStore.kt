@@ -23,12 +23,14 @@ class TokenStore(customConfigPath: Path? = null) : FileObjectStore<List<TokenSto
     { yaml, stringValue -> yaml.decodeFromString(stringValue) },
     customConfigPath,
 ) {
-
     fun accessTokenFor(url: String): TokenStoreItem? {
-        return value.firstOrNull() { it.url == url }
+        return value.firstOrNull { it.url == url }
     }
 
-    fun addAccessToken(url: String, accessToken: String) {
+    fun addAccessToken(
+        url: String,
+        accessToken: String,
+    ) {
         val item = TokenStoreItem(url, accessToken)
         value = value.filter { it.url != url } + item
         save()
@@ -52,16 +54,17 @@ class TokenStore(customConfigPath: Path? = null) : FileObjectStore<List<TokenSto
 
     fun removeExpired() {
         val now = Date().time
-        val validItems = value.filter { item ->
-            try {
-                val claims = tokenToClaims(item.accessToken)
-                claims["exp"]?.toLong()?.let {
-                    (it * 1000) + GRACE_PERIOD_MILLIS >= now
-                } ?: false
-            } catch (e: Exception) {
-                false
+        val validItems =
+            value.filter { item ->
+                try {
+                    val claims = tokenToClaims(item.accessToken)
+                    claims["exp"]?.toLong()?.let {
+                        (it * 1000) + GRACE_PERIOD_MILLIS >= now
+                    } ?: false
+                } catch (e: Exception) {
+                    false
+                }
             }
-        }
 
         if (validItems != value) {
             logger.debug { "Some tokens have expired, updating the token store" }

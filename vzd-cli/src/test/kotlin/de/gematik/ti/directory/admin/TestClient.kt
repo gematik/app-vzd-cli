@@ -64,13 +64,14 @@ class TestClient {
         assertNotNull(dn)
         logger.info { "Created directory entry: $dn" }
 
-        val updateDirectoryEntry = UpdateBaseDirectoryEntry(
-            // telematikID = "vzd-cli-123456890",
-            displayName = "Uniklinik Entenhausen (modified)",
-            domainID = directoryEntry.directoryEntryBase!!.domainID,
-            postalCode = "54321",
-            holder = listOf("gematik_test"),
-        )
+        val updateDirectoryEntry =
+            UpdateBaseDirectoryEntry(
+                // telematikID = "vzd-cli-123456890",
+                displayName = "Uniklinik Entenhausen (modified)",
+                domainID = directoryEntry.directoryEntryBase!!.domainID,
+                postalCode = "54321",
+                holder = listOf("gematik_test"),
+            )
 
         runBlocking { client?.modifyDirectoryEntry(dn.uid, updateDirectoryEntry) }
     }
