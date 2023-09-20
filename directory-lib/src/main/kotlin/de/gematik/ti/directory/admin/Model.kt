@@ -171,7 +171,7 @@ data class ReadDirectoryEntryForSyncResponse(
 )
 
 @Serializable
-@Suppress("ktlint:enum-entry-name-case")
+@Suppress("ktlint:standard:enum-entry-name-case")
 enum class Operation {
     add_Directory_Entry,
     modify_Directory_Entry,

@@ -1,17 +1,12 @@
 
 plugins {
     id("de.gematik.directory.library-conventions")
-    id("org.jlleitschuh.gradle.ktlint") version "11.6.0"
     kotlin("plugin.serialization") version "1.8.20"
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
-}
-
-configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-    disabledRules.set(setOf("indent", "no-wildcard-imports", "trailing-comma-on-call-site", "trailing-comma-on-declaration-site", "standard:max-line-length"))
 }
 
 dependencies {

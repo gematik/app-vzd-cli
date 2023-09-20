@@ -6,16 +6,11 @@ plugins {
     id("de.gematik.directory.app-conventions")
     kotlin("plugin.serialization") version "1.8.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("org.jlleitschuh.gradle.ktlint") version "11.6.0"
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
-}
-
-configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-    disabledRules.set(setOf("indent", "no-wildcard-imports", "trailing-comma-on-call-site", "trailing-comma-on-declaration-site", "standard:max-line-length"))
 }
 
 dependencies {
@@ -150,7 +145,7 @@ tasks.test {
 
 tasks {
     val projectProps by registering(WriteProperties::class) {
-        outputFile = file("$buildDir/vzd-cli.properties")
+        destinationFile.set(file("${layout.buildDirectory}/vzd-cli.properties"))
         comment = "vzd-cli BuildConfig"
         property("project.version", project.version)
     }

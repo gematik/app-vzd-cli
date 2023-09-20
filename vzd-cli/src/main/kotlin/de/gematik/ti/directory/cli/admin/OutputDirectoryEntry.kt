@@ -24,7 +24,7 @@ fun DirectoryEntry.toYamlExt(): String = yamlDirectoryEntryExt.encodeToString(th
 
 fun List<DirectoryEntry>.toYamlExt(): String = yamlDirectoryEntryExt.encodeToString(this)
 
-var JsonDirectoryEntryExt =
+var jsonDirectoryEntryExt =
     Json {
         encodeDefaults = true
         prettyPrint = true
@@ -34,9 +34,9 @@ var JsonDirectoryEntryExt =
             }
     }
 
-fun DirectoryEntry.toJsonExt(): String = JsonDirectoryEntryExt.encodeToString(this.elaborate())
+fun DirectoryEntry.toJsonExt(): String = jsonDirectoryEntryExt.encodeToString(this.elaborate())
 
-fun List<DirectoryEntry>.toJsonExt(): String = JsonDirectoryEntryExt.encodeToString(this.map { it.elaborate() })
+fun List<DirectoryEntry>.toJsonExt(): String = jsonDirectoryEntryExt.encodeToString(this.map { it.elaborate() })
 
 fun DirectoryEntry.toStringRepresentation(format: RepresentationFormat): String {
     return when (format) {

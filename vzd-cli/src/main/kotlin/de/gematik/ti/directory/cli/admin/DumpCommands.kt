@@ -187,7 +187,7 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
                         System.`in`.bufferedReader().lineSequence().forEach { line ->
                             launch {
                                 semaphore.withPermit {
-                                    val entry: DirectoryEntry = JsonDirectoryEntryExt.decodeFromString(line)
+                                    val entry: DirectoryEntry = jsonDirectoryEntryExt.decodeFromString(line)
                                     entries++
                                     logger.debug { "Processing TelematikID: ${entry.directoryEntryBase.telematikID}" }
                                     entry.userCertificates?.mapNotNull { it.userCertificate }?.forEach { cert ->
@@ -223,7 +223,7 @@ class DumpSaveCert : CliktCommand(
                 measureTimeMillis {
                     runBlocking {
                         System.`in`.bufferedReader().lineSequence().forEach { line ->
-                            val entry: DirectoryEntry = JsonDirectoryEntryExt.decodeFromString(line)
+                            val entry: DirectoryEntry = jsonDirectoryEntryExt.decodeFromString(line)
                             entries++
                             entry.userCertificates?.mapNotNull { it.userCertificate?.certificateInfo }?.forEach { certInfo ->
                                 val filename = "${certInfo.admissionStatement.registrationNumber.escape()}-${certInfo.serialNumber}.der"

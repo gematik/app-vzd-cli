@@ -7,7 +7,7 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-@Suppress("ktlint:enum-entry-name-case")
+@Suppress("ktlint:standard:enum-entry-name-case")
 enum class ApoInstance {
     test,
     prod,
