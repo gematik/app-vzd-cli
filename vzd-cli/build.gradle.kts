@@ -145,7 +145,7 @@ tasks.test {
 
 tasks {
     val projectProps by registering(WriteProperties::class) {
-        destinationFile.set(file("${layout.buildDirectory}/vzd-cli.properties"))
+        destinationFile.set(File(layout.buildDirectory.asFile.get(), "vzd-cli.properties"))
         comment = "vzd-cli BuildConfig"
         property("project.version", project.version)
     }
