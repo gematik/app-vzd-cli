@@ -122,10 +122,10 @@ Die Anmeldung muss alle 6 Stunden wiederholt werden.
 ----
 # Anmelden in die Referenzumgebung (ru)
 # es folgt eine Vault-Passwortabfrage
-vzd.cli admin ru login
+vzd-cli admin ru login
 # Anmelden in die Referenzumgebung (pu)
 # es folgt eine Vault-Passwortabfrage
-vzd.cli admin pu login
+vzd-cli admin pu login
 ----
 
 Für vollautomatisierte Nutzung des `vzd-cli`, auch bei der Anmeldung, wird das setzten der Umgebungsvariable `VAULT_PASSWORD` empfohlen.
