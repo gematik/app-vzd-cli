@@ -1,8 +1,12 @@
 
 plugins {
     id("de.gematik.directory.library-conventions")
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
-    kotlin("plugin.serialization") version "1.7.10"
+    kotlin("plugin.serialization") version "1.8.20"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 dependencies {
@@ -22,14 +26,10 @@ dependencies {
     api("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     // Bouncy castle fpr crypto and certificates processing
     val bcVersion: String by project
-    api("org.bouncycastle:bcprov-jdk15on:$bcVersion")
-    api("org.bouncycastle:bcpkix-jdk15on:$bcVersion")
+    implementation("org.bouncycastle:bcprov-jdk15on:$bcVersion")
+    implementation("org.bouncycastle:bcpkix-jdk15on:$bcVersion")
     // HAPI-FHIR Model classes
     val hapiVersion: String by project
     api("ca.uhn.hapi.fhir:hapi-fhir-base:$hapiVersion")
     api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiVersion")
-}
-
-configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-    disabledRules.set(setOf("no-wildcard-imports"))
 }

@@ -8,7 +8,10 @@ data class SimpleValueSet(
     val name: String,
     val compose: ComposeBackboneElement? = null,
 ) {
-    fun resolveCode(system: String, code: String): Coding? {
+    fun resolveCode(
+        system: String,
+        code: String,
+    ): Coding? {
         return compose?.include?.firstOrNull { it.system == system }?.concept?.firstOrNull { it.code == code }?.let {
             Coding(it.code, it.display, system)
         }

@@ -12,30 +12,36 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
 
-val UserCertificateCsvHeaders = listOf(
-    "uid",
-    "telematikID",
-    "entryType",
-    "publicKeyAlgorithm",
-    "subject",
-    "notBefore",
-    "notAfter",
-    "ocspResponse",
-)
+val UserCertificateCsvHeaders =
+    listOf(
+        "uid",
+        "telematikID",
+        "entryType",
+        "publicKeyAlgorithm",
+        "subject",
+        "notBefore",
+        "notAfter",
+        "ocspResponse",
+    )
 
-private var HumanUserCertificateYaml = Yaml {
-    encodeDefaultValues = false
-    serializersModule = SerializersModule {
-        contextual(ExtendedCertificateDataDERSerializer)
+private var humanUserCertificateYaml =
+    Yaml {
+        encodeDefaultValues = false
+        serializersModule =
+            SerializersModule {
+                contextual(ExtendedCertificateDataDERSerializer)
+            }
     }
-}
-fun UserCertificate.toHuman() = HumanUserCertificateYaml.encodeToString(this)
-fun List<UserCertificate>.toHuman() = HumanUserCertificateYaml.encodeToString(this)
+
+fun UserCertificate.toHuman() = humanUserCertificateYaml.encodeToString(this)
+
+fun List<UserCertificate>.toHuman() = humanUserCertificateYaml.encodeToString(this)
 
 fun List<UserCertificate>.toCsv(): String {
-    val csvWriter = csvWriter() {
-        delimiter = ';'
-    }
+    val csvWriter =
+        csvWriter {
+            delimiter = ';'
+        }
     val list = this
     return buildString {
         append('\uFEFF')
@@ -63,65 +69,69 @@ fun List<UserCertificate>.toCsv(): String {
 }
 
 fun List<UserCertificate>.toTable(): String {
-    val formatter = tableFormatter<CertificateDataDER> {
-        labeled("Serial", "Gesamt") {
-            extractor { cert ->
-                cert.certificateInfo.serialNumber
-            }
-            cellFormatter {
-                maxWidth = 24
-            }
-        }
-
-        class State(var count: Int = 0)
-        stateful<String, State>("Alg") {
-            initState { State() }
-            extractor { cert, state ->
-                state.count += 1
-                cert.certificateInfo.publicKeyAlgorithm
-            }
-            cellFormatter {
-                maxWidth = 3
-            }
-            aggregator { _, state ->
-                if (state.count > 99) {
-                    "99+"
-                } else {
-                    state.count.toString()
+    val formatter =
+        tableFormatter<CertificateDataDER> {
+            labeled("Serial", "Gesamt") {
+                extractor { cert ->
+                    cert.certificateInfo.serialNumber
+                }
+                cellFormatter {
+                    maxWidth = 24
                 }
             }
-        }
 
-        labeled("Subject") {
-            extractor { cert ->
-                cert.certificateInfo.subjectInfo.cn
+            class State(var count: Int = 0)
+            stateful<String, State>("Alg") {
+                initState { State() }
+                extractor { cert, state ->
+                    state.count += 1
+                    cert.certificateInfo.publicKeyAlgorithm
+                }
+                cellFormatter {
+                    maxWidth = 3
+                }
+                aggregator { _, state ->
+                    if (state.count > 99) {
+                        "99+"
+                    } else {
+                        state.count.toString()
+                    }
+                }
             }
-            cellFormatter {
-                maxWidth = 30
-            }
-        }
 
-        labeled("OCSP") {
-            extractor { cert ->
-                cert.certificateInfo.ocspResponse?.status
+            labeled("Subject") {
+                extractor { cert ->
+                    cert.certificateInfo.subjectInfo.cn
+                }
+                cellFormatter {
+                    maxWidth = 30
+                }
             }
-        }
 
-        labeled("Not After") {
-            extractor { cert ->
-                runCatching {
-                    cert.certificateInfo.notAfter
-                }.getOrNull()
+            labeled("OCSP") {
+                extractor { cert ->
+                    cert.certificateInfo.ocspResponse?.status
+                }
             }
-        }
 
-        showAggregation = true
-    }
+            labeled("Not After") {
+                extractor { cert ->
+                    runCatching {
+                        cert.certificateInfo.notAfter
+                    }.getOrNull()
+                }
+            }
+
+            showAggregation = true
+        }
 
     return formatter.apply(mapNotNull { it.userCertificate })
 }
 
-fun UserCertificate.toStringRepresentation(format: RepresentationFormat, limitTo: List<RepresentationFormat>? = null): String {
+fun UserCertificate.toStringRepresentation(
+    format: RepresentationFormat,
+    limitTo: List<RepresentationFormat>? = null,
+): String {
     limitTo?.let {
         if (!limitTo.contains(format)) throw UsageError("Cant use '$format' in this command")
     }

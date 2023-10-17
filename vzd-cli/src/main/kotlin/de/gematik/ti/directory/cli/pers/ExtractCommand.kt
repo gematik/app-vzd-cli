@@ -28,13 +28,17 @@ fun NodeList.forEach(action: (Node) -> Unit) {
         .map { this.item(it) }
         .forEach { action(it) }
 }
+
 fun NodeList.asSequence(): Sequence<Node> {
     return (0 until this.length)
         .asSequence()
         .map { this.item(it) }
 }
 
-class ExtractCommand : CliktCommand(name = "extract", help = """Extract data from SMC-B/HBA Exports and ObjectSystem files""".trimMargin()) {
+class ExtractCommand : CliktCommand(
+    name = "extract",
+    help = """Extract data from SMC-B/HBA Exports and ObjectSystem files""".trimMargin(),
+) {
     private val logger = KotlinLogging.logger {}
     private val sourceFiles by argument().path(mustBeReadable = true).multiple(required = true)
     private val outputDir by option("-o", "--output-dir", metavar = "OUTPUT_DIR", help = "Output directory for files")
@@ -63,11 +67,12 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
             }
 
             // gematik card file
-            val objects = xpath.evaluate(
-                "//child[@id='EF.C.HCI.ENC.R2048' or @id='EF.C.HCI.ENC.E256']/attributes/attribute[@id='body']/text()",
-                doc,
-                XPathConstants.NODESET,
-            ) as NodeList
+            val objects =
+                xpath.evaluate(
+                    "//child[@id='EF.C.HCI.ENC.R2048' or @id='EF.C.HCI.ENC.E256']/attributes/attribute[@id='body']/text()",
+                    doc,
+                    XPathConstants.NODESET,
+                ) as NodeList
 
             var firstCert = true
 
@@ -117,7 +122,12 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
     }
 
     private fun certificates(antrag: Node): Sequence<CertificateDataDER> {
-        val certs = xpath.evaluate(".//*[local-name(.)='Zertifikate'][starts-with(CertificateSem, 'C.HCI.ENC')]", antrag, XPathConstants.NODESET) as NodeList
+        val certs =
+            xpath.evaluate(
+                ".//*[local-name(.)='Zertifikate'][starts-with(CertificateSem, 'C.HCI.ENC')]",
+                antrag,
+                XPathConstants.NODESET,
+            ) as NodeList
 
         return certs.asSequence().map { certNode ->
             val der = evalString("CertificateValue", certNode)
@@ -135,7 +145,10 @@ class ExtractCommand : CliktCommand(name = "extract", help = """Extract data fro
         return base
     }
 
-    private fun evalString(xpathExpr: String, node: Node): String {
+    private fun evalString(
+        xpathExpr: String,
+        node: Node,
+    ): String {
         return xpath.evaluate(xpathExpr, node).trim()
     }
 }

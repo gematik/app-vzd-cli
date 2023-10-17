@@ -46,7 +46,6 @@ data class BaseDirectoryEntry(
     // TODO: YAML decode is not working when I add this
     // @Contextual
     var dn: DistinguishedName? = null,
-
     // Names
     var displayName: String? = null,
     var cn: String? = null,
@@ -55,28 +54,23 @@ data class BaseDirectoryEntry(
     var givenName: String? = null,
     var sn: String? = null,
     var title: String? = null,
-
     // Addresses
     var streetAddress: String? = null,
     var postalCode: String? = null,
     var localityName: String? = null,
     var stateOrProvinceName: String? = null,
     var countryCode: String? = null,
-
     // Professional
     var professionOID: List<String>? = null,
     var specialization: List<String>? = null,
     var entryType: List<String?>? = null,
-
     // System
     var holder: List<String>? = null,
     var dataFromAuthority: Boolean? = null,
     var personalEntry: Boolean? = null,
     var changeDateTime: Instant? = null,
-
     // Internal
     var maxKOMLEadr: Int? = null,
-
     // Misc
     var active: Boolean = true,
     var meta: List<String>? = null,
@@ -174,7 +168,6 @@ data class SearchControlValue(
 data class ReadDirectoryEntryForSyncResponse(
     var searchControlValue: SearchControlValue,
     var directoryEntries: List<DirectoryEntry>,
-
 )
 
 @Serializable

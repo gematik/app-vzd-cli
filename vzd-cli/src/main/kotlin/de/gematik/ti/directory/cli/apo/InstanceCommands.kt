@@ -24,10 +24,11 @@ class InstanceCommands(inst: ApoInstance) : CliktCommand(name = inst.toString(),
 
     override fun run() {
         val instance = ApoInstance.valueOf(commandName)
-        currentContext.obj = ApoInstanceCliContext(
-            context.apoAPI,
-            instance,
-            context.apoAPI.createClient(instance),
-        )
+        currentContext.obj =
+            ApoInstanceCliContext(
+                context.apoAPI,
+                instance,
+                context.apoAPI.createClient(instance),
+            )
     }
 }

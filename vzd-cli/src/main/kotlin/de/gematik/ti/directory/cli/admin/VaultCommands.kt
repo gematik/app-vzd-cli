@@ -48,11 +48,12 @@ abstract class AbstractVaultCommand(name: String, help: String) : CliktCommand(n
                 vaultProvider.open(promptPassword)
             } else {
                 logger.info { "Creating new vault" }
-                val newPassword = prompt(
-                    "*** Creating new Vault.\nEnter new Vault password",
-                    hideInput = true,
-                    requireConfirmation = true,
-                ) ?: throw CliktError()
+                val newPassword =
+                    prompt(
+                        "*** Creating new Vault.\nEnter new Vault password",
+                        hideInput = true,
+                        requireConfirmation = true,
+                    ) ?: throw CliktError()
                 vaultProvider.open(newPassword)
             }
         }
@@ -60,42 +61,50 @@ abstract class AbstractVaultCommand(name: String, help: String) : CliktCommand(n
 }
 
 class VaultResetCommand : AbstractVaultCommand(name = "purge", help = "Remove Vault") {
-    override fun run() = catching {
-        if (confirm("Are you sure you want to delete ALL secrets stored in the vault?") == true) {
-            vaultProvider.purge()
-            echo("Vault purged.")
-        } else {
-            echo("Abort. Vault left intact.")
+    override fun run() =
+        catching {
+            if (confirm("Are you sure you want to delete ALL secrets stored in the vault?") == true) {
+                vaultProvider.purge()
+                echo("Vault purged.")
+            } else {
+                echo("Abort. Vault left intact.")
+            }
         }
-    }
 }
 
 class VaultListCommand : AbstractVaultCommand(name = "list", help = "List configured OAuth2 credentials") {
-
-    override fun run() = catching {
-        if (!vaultProvider.exists()) {
-            throw CliktError("Vault does not exist.")
+    override fun run() =
+        catching {
+            if (!vaultProvider.exists()) {
+                throw CliktError("Vault does not exist.")
+            }
+            val vault = openOrCreateVault()
+            echo("Env ClientID             Secret")
+            echo("=== ==================== ======")
+            vault.list().forEach {
+                echo("%-3s %-20s ******".format(it.variant, it.name))
+            }
         }
-        val vault = openOrCreateVault()
-        echo("Env ClientID             Secret")
-        echo("=== ==================== ======")
-        vault.list().forEach {
-            echo("%-3s %-20s ******".format(it.variant, it.name))
-        }
-    }
 }
 
 class VaultStoreCommand : AbstractVaultCommand(name = "store", help = "Store OAuth2 client credentials") {
-    private val env by option("-e", "--env", help = "Environment. Either tu, ru or pu", envvar = "VAULT_ENV").enum<AdminEnvironment>(ignoreCase = true)
+    private val env by option(
+        "-e",
+        "--env",
+        help = "Environment. Either tu, ru or pu",
+        envvar = "VAULT_ENV",
+    ).enum<AdminEnvironment>(ignoreCase = true)
         .prompt("Environment")
     private val clientID by option("-c", "--client-id", help = "OAuth2 ClientID", envvar = "VAULT_CLIENT_ID")
         .prompt("OAuth2 ClientID")
     private val secret by option("-s", "--secret", help = "OAuth2 Client Secret", envvar = "VAULT_CLIENT_SECRET")
         .prompt("OAuth2 Client Secret", hideInput = true)
-    override fun run() = catching {
-        val vault = openOrCreateVault()
-        vault.store(env.name, clientID, secret)
-    }
+
+    override fun run() =
+        catching {
+            val vault = openOrCreateVault()
+            vault.store(env.name, clientID, secret)
+        }
 }
 
 class VaultExportCommand : AbstractVaultCommand(name = "export", help = "Export Vault to a file for backup or transfer.") {
@@ -103,17 +112,18 @@ class VaultExportCommand : AbstractVaultCommand(name = "export", help = "Export 
     private val transferPassword by option("-t", "--transfer-password")
         .prompt("Enter Vault transfer password", hideInput = true)
 
-    override fun run() = catching {
-        logger.info { "Exporting Vault to $output" }
-        val transferVaultProvider = KeyStoreVaultProvider(customVaultPath = output)
-        val transferVault = transferVaultProvider.open(transferPassword)
-        val vault = openOrCreateVault()
+    override fun run() =
+        catching {
+            logger.info { "Exporting Vault to $output" }
+            val transferVaultProvider = KeyStoreVaultProvider(customVaultPath = output)
+            val transferVault = transferVaultProvider.open(transferPassword)
+            val vault = openOrCreateVault()
 
-        vault.list().forEach {
-            logger.info { "Exporting ${it.variant}:${it.name}" }
-            transferVault.store(it.variant, it.name, it.secret)
+            vault.list().forEach {
+                logger.info { "Exporting ${it.variant}:${it.name}" }
+                transferVault.store(it.variant, it.name, it.secret)
+            }
         }
-    }
 }
 
 class VaultImportCommand : AbstractVaultCommand(name = "import", help = "Import credentials from another Vault") {
@@ -121,14 +131,15 @@ class VaultImportCommand : AbstractVaultCommand(name = "import", help = "Import 
     private val transferPassword by option("-t", "--transfer-password")
         .prompt("Enter TRANSFER Vault password", hideInput = true)
 
-    override fun run() = catching {
-        logger.info { "Importing Vault from $input" }
-        val transferVault = KeyStoreVaultProvider(customVaultPath = input).open(transferPassword)
-        val vault = openOrCreateVault()
+    override fun run() =
+        catching {
+            logger.info { "Importing Vault from $input" }
+            val transferVault = KeyStoreVaultProvider(customVaultPath = input).open(transferPassword)
+            val vault = openOrCreateVault()
 
-        transferVault.list().forEach {
-            logger.debug { "Import ${it.variant}:${it.name}" }
-            vault.store(it.variant, it.name, it.secret)
+            transferVault.list().forEach {
+                logger.debug { "Import ${it.variant}:${it.name}" }
+                vault.store(it.variant, it.name, it.secret)
+            }
         }
-    }
 }

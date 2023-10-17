@@ -11,24 +11,32 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
 
-var YamlDirectoryEntryExt = Yaml {
-    encodeDefaultValues = false
-    serializersModule = SerializersModule {
-        contextual(ExtendedCertificateDataDERSerializer)
+var yamlDirectoryEntryExt =
+    Yaml {
+        encodeDefaultValues = false
+        serializersModule =
+            SerializersModule {
+                contextual(ExtendedCertificateDataDERSerializer)
+            }
     }
-}
-fun DirectoryEntry.toYamlExt(): String = YamlDirectoryEntryExt.encodeToString(this)
-fun List<DirectoryEntry>.toYamlExt(): String = YamlDirectoryEntryExt.encodeToString(this)
 
-var JsonDirectoryEntryExt = Json {
-    encodeDefaults = true
-    prettyPrint = true
-    serializersModule = SerializersModule {
-        contextual(ExtendedCertificateDataDERSerializer)
+fun DirectoryEntry.toYamlExt(): String = yamlDirectoryEntryExt.encodeToString(this)
+
+fun List<DirectoryEntry>.toYamlExt(): String = yamlDirectoryEntryExt.encodeToString(this)
+
+var jsonDirectoryEntryExt =
+    Json {
+        encodeDefaults = true
+        prettyPrint = true
+        serializersModule =
+            SerializersModule {
+                contextual(ExtendedCertificateDataDERSerializer)
+            }
     }
-}
-fun DirectoryEntry.toJsonExt(): String = JsonDirectoryEntryExt.encodeToString(this.elaborate())
-fun List<DirectoryEntry>.toJsonExt(): String = JsonDirectoryEntryExt.encodeToString(this.map { it.elaborate() })
+
+fun DirectoryEntry.toJsonExt(): String = jsonDirectoryEntryExt.encodeToString(this.elaborate())
+
+fun List<DirectoryEntry>.toJsonExt(): String = jsonDirectoryEntryExt.encodeToString(this.map { it.elaborate() })
 
 fun DirectoryEntry.toStringRepresentation(format: RepresentationFormat): String {
     return when (format) {

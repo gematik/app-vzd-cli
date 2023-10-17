@@ -76,12 +76,13 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
             val thumbprintStr = thumbprintBytes.joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
             val admission = Admission(certificate)
-            val admissionInfo = AdmissionStatementInfo(
-                admissionAuthority = admission.admissionAuthority,
-                professionItems = admission.professionItems,
-                professionOids = admission.professionOids,
-                registrationNumber = admission.registrationNumber,
-            )
+            val admissionInfo =
+                AdmissionStatementInfo(
+                    admissionAuthority = admission.admissionAuthority,
+                    professionItems = admission.professionItems,
+                    professionOids = admission.professionOids,
+                    registrationNumber = admission.registrationNumber,
+                )
 
             CertificateInfo(
                 certificate.subjectX500Principal.name,
@@ -134,7 +135,10 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
 object CertificateDataDERSerializer : KSerializer<CertificateDataDER> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: CertificateDataDER) {
+    override fun serialize(
+        encoder: Encoder,
+        value: CertificateDataDER,
+    ) {
         encoder.encodeString(value.base64String)
     }
 
@@ -149,7 +153,10 @@ object CertificateDataDERSerializer : KSerializer<CertificateDataDER> {
 object ExtendedCertificateDataDERSerializer : KSerializer<CertificateDataDER> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("CertificateDataDER", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: CertificateDataDER) {
+    override fun serialize(
+        encoder: Encoder,
+        value: CertificateDataDER,
+    ) {
         val surrogate = value.certificateInfo
         encoder.encodeSerializableValue(CertificateInfo.serializer(), surrogate)
     }
@@ -190,7 +197,10 @@ data class NameInfo(
         this.countryCode = valueOf(rdns, BCStyle.C)
     }
 
-    private fun valueOf(rdns: Array<AttributeTypeAndValue>, type: ASN1ObjectIdentifier): String? {
+    private fun valueOf(
+        rdns: Array<AttributeTypeAndValue>,
+        type: ASN1ObjectIdentifier,
+    ): String? {
         val value = rdns.firstOrNull { it.type == type }?.value
         return value?.let {
             IETFUtils.valueToString(value)
@@ -218,9 +228,10 @@ class Admission(x509EeCert: X509Certificate) {
     private val admissionSyntax: AdmissionSyntax
 
     init {
-        val asn1Admission = X509CertificateHolder(x509EeCert.encoded)
-            .extensions
-            .getExtensionParsedValue(ISISMTTObjectIdentifiers.id_isismtt_at_admission)
+        val asn1Admission =
+            X509CertificateHolder(x509EeCert.encoded)
+                .extensions
+                .getExtensionParsedValue(ISISMTTObjectIdentifiers.id_isismtt_at_admission)
         admissionSyntax = AdmissionSyntax.getInstance(asn1Admission)
     }
 

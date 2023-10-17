@@ -34,44 +34,50 @@ data class TokenResponse(
 )
 
 class ClientCredentialsAuthenticator(private val authURL: String, private val httpProxyUrl: String?) {
-    suspend fun authenticate(clientId: String, clientSecret: String): BearerTokens {
+    suspend fun authenticate(
+        clientId: String,
+        clientSecret: String,
+    ): BearerTokens {
         logger.debug { "Authenticating at: $authURL, client_id: $clientId" }
-        val authClient = HttpClient(CIO) {
-            httpProxyUrl?.let {
-                engine {
-                    logger.debug { "Using proxy: $it" }
-                    proxy = ProxyBuilder.http(it)
-                }
-            }
-            install(Logging) {
-                logger = Logger.DEFAULT
-                level = LogLevel.NONE
-            }
-            install(Auth) {
-                basic {
-                    sendWithoutRequest {
-                        true
-                    }
-                    credentials {
-                        BasicAuthCredentials(clientId, clientSecret)
+        val authClient =
+            HttpClient(CIO) {
+                httpProxyUrl?.let {
+                    engine {
+                        logger.debug { "Using proxy: $it" }
+                        proxy = ProxyBuilder.http(it)
                     }
                 }
+                install(Logging) {
+                    logger = Logger.DEFAULT
+                    level = LogLevel.NONE
+                }
+                install(Auth) {
+                    basic {
+                        sendWithoutRequest {
+                            true
+                        }
+                        credentials {
+                            BasicAuthCredentials(clientId, clientSecret)
+                        }
+                    }
+                }
+                install(ContentNegotiation) {
+                    json(
+                        Json {
+                            ignoreUnknownKeys = true
+                        },
+                    )
+                }
             }
-            install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                    },
-                )
-            }
-        }
 
-        var response = authClient.submitForm(
-            url = authURL,
-            formParameters = Parameters.build {
-                append("grant_type", "client_credentials")
-            },
-        )
+        var response =
+            authClient.submitForm(
+                url = authURL,
+                formParameters =
+                    Parameters.build {
+                        append("grant_type", "client_credentials")
+                    },
+            )
 
         if (response.status != HttpStatusCode.OK) {
             throw AdminResponseException(response, "Authentication failed: ${response.body<String>()}")
@@ -83,28 +89,30 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
     }
 }
 
-val DirectoryAuthPlugin = createClientPlugin("DirectoryAuthPlugin", ::DirectoryAuthPluginConfig) {
+val DirectoryAuthPlugin =
+    createClientPlugin("DirectoryAuthPlugin", ::DirectoryAuthPluginConfig) {
 
-    var accessToken = runBlocking { pluginConfig.accessTokenCallback() }
+        var accessToken = runBlocking { pluginConfig.accessTokenCallback() }
 
-    on(Send) { request ->
-        request.headers.append("Authorization", "Bearer $accessToken")
-        val originalCall = proceed(request)
-        if (pluginConfig.retry && originalCall.response.status == HttpStatusCode.Unauthorized) {
-            logger.debug { "Token was refused by the server. Probably expired, obtain new token and retry." }
-            // try to obtain the accessToken again and retry
-            accessToken = runBlocking { pluginConfig.accessTokenCallback() }
-            request.headers["Authorization"] = "Bearer $accessToken"
-            proceed(request)
-        } else {
-            originalCall
+        on(Send) { request ->
+            request.headers.append("Authorization", "Bearer $accessToken")
+            val originalCall = proceed(request)
+            if (pluginConfig.retry && originalCall.response.status == HttpStatusCode.Unauthorized) {
+                logger.debug { "Token was refused by the server. Probably expired, obtain new token and retry." }
+                // try to obtain the accessToken again and retry
+                accessToken = runBlocking { pluginConfig.accessTokenCallback() }
+                request.headers["Authorization"] = "Bearer $accessToken"
+                proceed(request)
+            } else {
+                originalCall
+            }
         }
     }
-}
 
 class DirectoryAuthPluginConfig {
     var retry = true
     internal var accessTokenCallback: suspend () -> String? = { null }
+
     fun accessToken(block: suspend () -> String?) {
         accessTokenCallback = block
     }

@@ -59,13 +59,14 @@ data class TokenizerResult(val tokens: List<String>, val positions: List<TokenPo
 }
 
 object POSTokenizer {
-    private val LOCALITY_NAMES = lazy {
-        object {}.javaClass.getResourceAsStream("/PLZ_2021.csv")
-            ?.bufferedReader()
-            ?.readLines()
-            ?.map { it.split(",")[1].lowercase() }
-            ?.toSet()
-    }
+    private val LOCALITY_NAMES =
+        lazy {
+            object {}.javaClass.getResourceAsStream("/PLZ_2021.csv")
+                ?.bufferedReader()
+                ?.readLines()
+                ?.map { it.split(",")[1].lowercase() }
+                ?.toSet()
+        }
 
     fun tokenize(query: String): TokenizerResult {
         val tokens = query.split(Regex(" ")).filter { it != "" }
@@ -118,25 +119,26 @@ object POSTokenizer {
 
 private fun extractFixedParams(tokenizerResult: TokenizerResult): Pair<Map<String, String>, TokenizerResult> {
     val namesAndLocalities = mutableListOf<TokenPosition>()
-    val fixedParams = buildMap<String, String> {
-        tokenizerResult.positions.forEach { position ->
-            when (position.type) {
-                TokenType.TelematikID -> {
-                    put("telematikID", tokenizerResult.tokens[position.range.first].trailingAsterisk())
-                }
-                TokenType.PostalCode -> {
-                    put("postalCode", tokenizerResult.tokens[position.range.first])
-                }
-                TokenType.DomainID -> {
-                    put("domainID", tokenizerResult.tokens[position.range.first].trailingAsterisk())
-                }
-                else -> {
-                    namesAndLocalities.add(position)
+    val fixedParams =
+        buildMap<String, String> {
+            tokenizerResult.positions.forEach { position ->
+                when (position.type) {
+                    TokenType.TelematikID -> {
+                        put("telematikID", tokenizerResult.tokens[position.range.first].trailingAsterisk())
+                    }
+                    TokenType.PostalCode -> {
+                        put("postalCode", tokenizerResult.tokens[position.range.first])
+                    }
+                    TokenType.DomainID -> {
+                        put("domainID", tokenizerResult.tokens[position.range.first].trailingAsterisk())
+                    }
+                    else -> {
+                        namesAndLocalities.add(position)
+                    }
                 }
             }
+            put("baseEntryOnly", "true")
         }
-        put("baseEntryOnly", "true")
-    }
     return Pair(fixedParams, TokenizerResult(tokenizerResult.tokens, namesAndLocalities))
 }
 
@@ -155,61 +157,65 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
     logger.debug { "Detected names and localities: $namesAndLocalities" }
 
     val self = this
-    val entries = buildList {
-        val entriesList = this
-        withContext(Dispatchers.IO) {
-            if (!namesAndLocalities.positions.any { it.type == TokenType.LocalityName }) {
-                // no localities in search query
-                self.readDirectoryEntry(
-                    buildMap {
-                        putAll(fixedParams)
-                        if (namesAndLocalities.positions.isNotEmpty()) {
-                            put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
-                        }
-                    },
-                )?.apply { addAll(this) }
-            } else {
-                // for each locality token query the API
-                // queries are fired in parallel using co-routines
-                buildList {
-                    namesAndLocalities.positions.filter { it.type == TokenType.LocalityName }.forEach { localityPos ->
-                        add(
-                            launch {
-                                self.readDirectoryEntry(
-                                    buildMap {
-                                        putAll(fixedParams)
-                                        put("localityName", namesAndLocalities.join(localityPos).trailingAsterisk())
-                                        if (namesAndLocalities.positions.size > 1) {
-                                            put("displayName", namesAndLocalities.joinAllExcept(localityPos).leadindAndTrailingAsterisks())
-                                        }
-                                    },
-                                )?.apply {
-                                    entriesList.addAll(this)
-                                }
-                            },
-                        )
-                        // finish with query without localityName
-                        if (tokenizerResult.positions.size > 0) {
+    val entries =
+        buildList {
+            val entriesList = this
+            withContext(Dispatchers.IO) {
+                if (!namesAndLocalities.positions.any { it.type == TokenType.LocalityName }) {
+                    // no localities in search query
+                    self.readDirectoryEntry(
+                        buildMap {
+                            putAll(fixedParams)
+                            if (namesAndLocalities.positions.isNotEmpty()) {
+                                put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
+                            }
+                        },
+                    )?.apply { addAll(this) }
+                } else {
+                    // for each locality token query the API
+                    // queries are fired in parallel using co-routines
+                    buildList {
+                        namesAndLocalities.positions.filter { it.type == TokenType.LocalityName }.forEach { localityPos ->
                             add(
                                 launch {
                                     self.readDirectoryEntry(
                                         buildMap {
                                             putAll(fixedParams)
-                                            put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
+                                            put("localityName", namesAndLocalities.join(localityPos).trailingAsterisk())
+                                            if (namesAndLocalities.positions.size > 1) {
+                                                put(
+                                                    "displayName",
+                                                    namesAndLocalities.joinAllExcept(localityPos).leadindAndTrailingAsterisks(),
+                                                )
+                                            }
                                         },
                                     )?.apply {
                                         entriesList.addAll(this)
                                     }
                                 },
                             )
+                            // finish with query without localityName
+                            if (tokenizerResult.positions.size > 0) {
+                                add(
+                                    launch {
+                                        self.readDirectoryEntry(
+                                            buildMap {
+                                                putAll(fixedParams)
+                                                put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
+                                            },
+                                        )?.apply {
+                                            entriesList.addAll(this)
+                                        }
+                                    },
+                                )
+                            }
                         }
-                    }
-                }.apply {
-                    logger.info { "Executing $size Admin API calls" }
-                }.joinAll()
+                    }.apply {
+                        logger.info { "Executing $size Admin API calls" }
+                    }.joinAll()
+                }
             }
         }
-    }
 
     return SearchResults(
         searchQuery = searchQuery,

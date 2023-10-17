@@ -16,7 +16,9 @@ import javax.xml.xpath.XPathFactory
 private val logger = KotlinLogging.logger {}
 
 enum class TrustEnvironment {
-    TU, RU, PU
+    TU,
+    RU,
+    PU,
 }
 
 object TrustServiceListAddresses {
@@ -64,7 +66,10 @@ data class ListOfTrustedServiceLists(
 private val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 private val xpath = XPathFactory.newInstance().newXPath()
 
-fun ListOfTrustedServiceLists.Companion.loadFromServer(httpClient: HttpClient, env: TrustEnvironment): TrustedServiceList {
+fun ListOfTrustedServiceLists.Companion.loadFromServer(
+    httpClient: HttpClient,
+    env: TrustEnvironment,
+): TrustedServiceList {
     val caServices = mutableListOf<CAService>()
     runBlocking {
         val response = httpClient.get(TrustServiceListAddresses.url(env))
@@ -72,7 +77,12 @@ fun ListOfTrustedServiceLists.Companion.loadFromServer(httpClient: HttpClient, e
         val document = documentBuilder.parse(InputSource(body.reader()))
 
         // TODO: implement namespaces
-        val serviceNodeList = xpath.evaluate("/TrustServiceStatusList/TrustServiceProviderList/TrustServiceProvider/TSPServices/TSPService[ServiceInformation/ServiceTypeIdentifier='${TrustServiceType.CA_NON_QES.uri}']", document, XPathConstants.NODESET) as NodeList
+        val serviceNodeList =
+            xpath.evaluate(
+                "/TrustServiceStatusList/TrustServiceProviderList/TrustServiceProvider/TSPServices/TSPService[ServiceInformation/ServiceTypeIdentifier='${TrustServiceType.CA_NON_QES.uri}']",
+                document,
+                XPathConstants.NODESET,
+            ) as NodeList
 
         var i = 0
         while (i < serviceNodeList.length) {

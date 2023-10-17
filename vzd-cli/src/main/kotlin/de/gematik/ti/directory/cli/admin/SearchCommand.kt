@@ -13,11 +13,13 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for directory
     private val arguments by argument().multiple()
     private val context by requireObject<AdminCliEnvironmentContext>()
 
-    override fun run() = catching {
-        val queryString = arguments.joinToString(" ")
-        val result: List<DirectoryEntry> = runBlocking {
-            context.client.quickSearch(queryString).directoryEntries
+    override fun run() =
+        catching {
+            val queryString = arguments.joinToString(" ")
+            val result: List<DirectoryEntry> =
+                runBlocking {
+                    context.client.quickSearch(queryString).directoryEntries
+                }
+            echo(result.toTable())
         }
-        echo(result.toTable())
-    }
 }

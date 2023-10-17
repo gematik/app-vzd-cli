@@ -34,6 +34,7 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
             FhirR4()
         }
     }
+
     class Configuration {
         var apiURL = ""
         var apiKey = ""
@@ -57,13 +58,14 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
     }
 
     fun search(queryString: String): Pair<String, Bundle> {
-        val request = HttpRequest.newBuilder()
-            .uri(
-                URL(URL(config.apiURL), "Location?name=${queryString.encodeURLParameter()}").toURI(),
-            )
-            .header("X-API-KEY", config.apiKey)
-            .GET()
-            .build()
+        val request =
+            HttpRequest.newBuilder()
+                .uri(
+                    URL(URL(config.apiURL), "Location?name=${queryString.encodeURLParameter()}").toURI(),
+                )
+                .header("X-API-KEY", config.apiKey)
+                .GET()
+                .build()
 
         logger.info { request }
 
@@ -94,13 +96,14 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
     }
 
     fun getLocationByTelematikID(telematikID: String): Pair<String, Location> {
-        val request = HttpRequest.newBuilder()
-            .uri(
-                URL(URL(config.apiURL), "Location?identifier=${telematikID.encodeURLParameter()}").toURI(),
-            )
-            .header("X-API-KEY", config.apiKey)
-            .GET()
-            .build()
+        val request =
+            HttpRequest.newBuilder()
+                .uri(
+                    URL(URL(config.apiURL), "Location?identifier=${telematikID.encodeURLParameter()}").toURI(),
+                )
+                .header("X-API-KEY", config.apiKey)
+                .GET()
+                .build()
 
         logger.info { request }
 
@@ -127,9 +130,10 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
         val ctx = FhirContext.forR4()
         val parser = ctx.newJsonParser()
         val bundle = parser.parseResource(Bundle::class.java, body)
-        val location = (
-            bundle.entry.firstOrNull()?.resource
-                ?: throw DirectoryException("Pharmacy with TelematikID '$telematikID' not found")
+        val location =
+            (
+                bundle.entry.firstOrNull()?.resource
+                    ?: throw DirectoryException("Pharmacy with TelematikID '$telematikID' not found")
             ) as Location
         return Pair(body, location)
     }

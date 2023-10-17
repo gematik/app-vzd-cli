@@ -27,23 +27,25 @@ class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of
     ).default(RepresentationFormat.YAML)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliContext>()
-    override fun run() = catching {
-        files.forEach {
-            logger.info { "Processing ${it.name}" }
-            val certB64 = Base64.toBase64String(it.inputStream().readBytes())
-            val userCertificate = CertificateDataDER(certB64)
-            val certificateInfo = userCertificate.certificateInfo
 
-            if (ocspOptions.enableOcsp) {
-                certificateInfo.ocspResponse =
-                    runBlocking { context.adminAPI.globalAPI.pkiClient.ocsp(userCertificate) }
-            }
+    override fun run() =
+        catching {
+            files.forEach {
+                logger.info { "Processing ${it.name}" }
+                val certB64 = Base64.toBase64String(it.inputStream().readBytes())
+                val userCertificate = CertificateDataDER(certB64)
+                val certificateInfo = userCertificate.certificateInfo
 
-            when (outputFormat) {
-                RepresentationFormat.JSON -> echo(certificateInfo.toJsonPrettyNoDefaults())
-                RepresentationFormat.YAML -> echo(certificateInfo.toYamlNoDefaults())
-                else -> throw UsageError("Cant use output format: $outputFormat")
+                if (ocspOptions.enableOcsp) {
+                    certificateInfo.ocspResponse =
+                        runBlocking { context.adminAPI.globalAPI.pkiClient.ocsp(userCertificate) }
+                }
+
+                when (outputFormat) {
+                    RepresentationFormat.JSON -> echo(certificateInfo.toJsonPrettyNoDefaults())
+                    RepresentationFormat.YAML -> echo(certificateInfo.toYamlNoDefaults())
+                    else -> throw UsageError("Cant use output format: $outputFormat")
+                }
             }
         }
-    }
 }

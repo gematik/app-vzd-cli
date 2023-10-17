@@ -35,12 +35,13 @@ class LoginCommand : CliktCommand(name = "login", help = "Login to OAuth2 Server
         envvar = "VAULT_PASSWORD",
     ).prompt("Enter Vault Password", hideInput = true)
 
-    override fun run() = catching {
-        val env = context.env
-        val vault = context.adminAPI.openVault(password)
-        val secret = vault.get(env.toString()) ?: throw CliktError("Secret for env '$env' not found in Vault")
-        doLogin(context, env, secret.name, secret.secret)
-    }
+    override fun run() =
+        catching {
+            val env = context.env
+            val vault = context.adminAPI.openVault(password)
+            val secret = vault.get(env.toString()) ?: throw CliktError("Secret for env '$env' not found in Vault")
+            doLogin(context, env, secret.name, secret.secret)
+        }
 }
 
 class LoginCredCommand : CliktCommand(name = "login-cred", help = "Login using the client credentials") {
@@ -48,7 +49,8 @@ class LoginCredCommand : CliktCommand(name = "login-cred", help = "Login using t
     private val clientId by option("-c", "--client-id", help = "OAuth2 client id", envvar = "CLIENT_ID").required()
     private val clientSecret by option("-s", "--secret", help = "OAuth2 client secret", envvar = "CLIENT_SECRET").required()
 
-    override fun run() = catching {
-        doLogin(context, context.env, clientId, clientSecret)
-    }
+    override fun run() =
+        catching {
+            doLogin(context, context.env, clientId, clientSecret)
+        }
 }

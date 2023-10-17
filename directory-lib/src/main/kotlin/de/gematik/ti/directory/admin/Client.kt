@@ -20,13 +20,13 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 
-private val JSON = Json {
-    ignoreUnknownKeys = true
-    prettyPrint = true
-}
+private val JSON =
+    Json {
+        ignoreUnknownKeys = true
+        prettyPrint = true
+    }
 
 class AdminResponseException(response: HttpResponse, message: String) : ResponseException(response, message) {
-
     val details: String
         get() {
             var details = "Bad response: $response"
@@ -51,11 +51,13 @@ class AdminResponseException(response: HttpResponse, message: String) : Response
  */
 class Client(block: Configuration.() -> Unit = {}) {
     val logger = KotlinLogging.logger {}
+
     class Configuration {
         var apiURL = ""
         var httpProxyURL: String? = null
 
         internal var authConfigurator: DirectoryAuthPluginConfig.() -> Unit = {}
+
         fun auth(block: DirectoryAuthPluginConfig.() -> Unit) {
             authConfigurator = block
         }
@@ -66,42 +68,43 @@ class Client(block: Configuration.() -> Unit = {}) {
 
     init {
         block(config)
-        this.http = HttpClient(CIO) {
-            engine {
-                config.httpProxyURL?.let {
-                    logger.debug { "Using proxy: $it" }
-                    proxy = ProxyBuilder.http(it)
+        this.http =
+            HttpClient(CIO) {
+                engine {
+                    config.httpProxyURL?.let {
+                        logger.debug { "Using proxy: $it" }
+                        proxy = ProxyBuilder.http(it)
+                    }
+                }
+
+                expectSuccess = false
+
+                val l = logger
+
+                install(HttpTimeout) {
+                    requestTimeoutMillis = 1000 * 60 * 60
+                }
+
+                install(Logging) {
+                    logger = Logger.DEFAULT
+                    if (l.isDebugEnabled) {
+                        level = LogLevel.ALL
+                    } else if (l.isInfoEnabled) {
+                        level = LogLevel.INFO
+                    }
+                }
+
+                install(DirectoryAuthPlugin) {
+                    config.authConfigurator(this)
+                }
+
+                install(ContentNegotiation) {
+                    json(JSON)
+                }
+                defaultRequest {
+                    url(config.apiURL)
                 }
             }
-
-            expectSuccess = false
-
-            val l = logger
-
-            install(HttpTimeout) {
-                requestTimeoutMillis = 1000 * 60 * 60
-            }
-
-            install(Logging) {
-                logger = Logger.DEFAULT
-                if (l.isDebugEnabled) {
-                    level = LogLevel.ALL
-                } else if (l.isInfoEnabled) {
-                    level = LogLevel.INFO
-                }
-            }
-
-            install(DirectoryAuthPlugin) {
-                config.authConfigurator(this)
-            }
-
-            install(ContentNegotiation) {
-                json(JSON)
-            }
-            defaultRequest {
-                url(config.apiURL)
-            }
-        }
 
         logger.debug { "Client created ${config.apiURL}" }
     }
@@ -110,13 +113,17 @@ class Client(block: Configuration.() -> Unit = {}) {
      * Implements POST /DirectoryEntries (add_Directory_Entry)
      */
     suspend fun addDirectoryEntry(directoryEntry: CreateDirectoryEntry): DistinguishedName {
-        val response = http.post("/DirectoryEntries") {
-            contentType(ContentType.Application.Json)
-            setBody(directoryEntry)
-        }
+        val response =
+            http.post("/DirectoryEntries") {
+                contentType(ContentType.Application.Json)
+                setBody(directoryEntry)
+            }
 
         if (response.status != HttpStatusCode.Created) {
-            throw AdminResponseException(response, "Unable to create directory entry: ${response.status.description} ${response.status.description}")
+            throw AdminResponseException(
+                response,
+                "Unable to create directory entry: ${response.status.description} ${response.status.description}",
+            )
         }
 
         return response.body()
@@ -162,11 +169,12 @@ class Client(block: Configuration.() -> Unit = {}) {
         path: String = "/DirectoryEntries",
     ): List<DirectoryEntry>? {
         logger.info { "readDirectoryEntry $parameters" }
-        val response = http.get(path) {
-            for (param in parameters.entries) {
-                parameter(param.key, param.value)
+        val response =
+            http.get(path) {
+                for (param in parameters.entries) {
+                    parameter(param.key, param.value)
+                }
             }
-        }
 
         if (response.status == HttpStatusCode.NotFound) {
             logger.debug { "Server returned 404 Not Found" }
@@ -193,7 +201,9 @@ class Client(block: Configuration.() -> Unit = {}) {
             do {
                 logger.info { "Requesting $cursorSize entries, cookie: '$cookie'" }
                 val syncResponse = fetchNextEntries(parameters, cursorSize, cookie)
-                logger.info { "Got ${syncResponse?.directoryEntries?.size ?: 0} entries, new cookie: '${syncResponse?.searchControlValue?.cookie ?: "none"}'" }
+                logger.info {
+                    "Got ${syncResponse?.directoryEntries?.size ?: 0} entries, new cookie: '${syncResponse?.searchControlValue?.cookie ?: "none"}'"
+                }
                 launch {
                     syncResponse?.directoryEntries?.forEach { sink(it) }
                 }
@@ -202,17 +212,22 @@ class Client(block: Configuration.() -> Unit = {}) {
         }
     }
 
-    private suspend fun fetchNextEntries(parameters: Map<String, String>, cursorSize: Int, cookie: String?): ReadDirectoryEntryForSyncResponse? {
-        val response = http.get("/v2/DirectoryEntriesSync") {
-            expectSuccess = false
-            for (param in parameters.entries) {
-                parameter(param.key, param.value)
+    private suspend fun fetchNextEntries(
+        parameters: Map<String, String>,
+        cursorSize: Int,
+        cookie: String?,
+    ): ReadDirectoryEntryForSyncResponse? {
+        val response =
+            http.get("/v2/DirectoryEntriesSync") {
+                expectSuccess = false
+                for (param in parameters.entries) {
+                    parameter(param.key, param.value)
+                }
+                parameter("size", cursorSize)
+                if (cookie != null) {
+                    parameter("cookie", cookie)
+                }
             }
-            parameter("size", cursorSize)
-            if (cookie != null) {
-                parameter("cookie", cookie)
-            }
-        }
         if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.NotFound) {
             throw AdminResponseException(response, "Unable to get entries")
         } else if (response.status == HttpStatusCode.NotFound) {
@@ -237,11 +252,15 @@ class Client(block: Configuration.() -> Unit = {}) {
     /**
      * Implements PUT /DirectoryEntries/{uid}/baseDirectoryEntries (modify_Directory_Entry)
      */
-    suspend fun modifyDirectoryEntry(uid: String, baseDirectoryEntry: UpdateBaseDirectoryEntry): DistinguishedName {
-        val response = http.put("/DirectoryEntries/$uid/baseDirectoryEntries") {
-            contentType(ContentType.Application.Json)
-            setBody(baseDirectoryEntry)
-        }
+    suspend fun modifyDirectoryEntry(
+        uid: String,
+        baseDirectoryEntry: UpdateBaseDirectoryEntry,
+    ): DistinguishedName {
+        val response =
+            http.put("/DirectoryEntries/$uid/baseDirectoryEntries") {
+                contentType(ContentType.Application.Json)
+                setBody(baseDirectoryEntry)
+            }
 
         if (response.status != HttpStatusCode.OK) {
             throw AdminResponseException(response, "Unable to modify entry")
@@ -253,11 +272,15 @@ class Client(block: Configuration.() -> Unit = {}) {
     /**
      * Implements POST /DirectoryEntries/{uid}/Certificates (add_Directory_Entry_Certificate)
      */
-    suspend fun addDirectoryEntryCertificate(uid: String, userCertificate: UserCertificate): DistinguishedName {
-        val response = http.post("/DirectoryEntries/$uid/Certificates") {
-            contentType(ContentType.Application.Json)
-            setBody(userCertificate)
-        }
+    suspend fun addDirectoryEntryCertificate(
+        uid: String,
+        userCertificate: UserCertificate,
+    ): DistinguishedName {
+        val response =
+            http.post("/DirectoryEntries/$uid/Certificates") {
+                contentType(ContentType.Application.Json)
+                setBody(userCertificate)
+            }
 
         if (response.status != HttpStatusCode.Created) {
             throw AdminResponseException(response, "Unable to modify entry")
@@ -270,11 +293,12 @@ class Client(block: Configuration.() -> Unit = {}) {
      * Implements GET /DirectoryEntries/Certificates (read_Directory_Certificates)
      */
     suspend fun readDirectoryCertificates(parameters: Map<String, String>): List<UserCertificate>? {
-        val response = http.get("/DirectoryEntries/Certificates") {
-            for (param in parameters.entries) {
-                parameter(param.key, param.value)
+        val response =
+            http.get("/DirectoryEntries/Certificates") {
+                for (param in parameters.entries) {
+                    parameter(param.key, param.value)
+                }
             }
-        }
 
         if (response.status == HttpStatusCode.NotFound) {
             logger.debug { "Server returned 404 Not Found" }
@@ -287,7 +311,10 @@ class Client(block: Configuration.() -> Unit = {}) {
     /**
      * Implements DELETE /DirectoryEntries/{uid}/Certificates/{certificateEntryID} (delete_Directory_Entry_Certificate)
      */
-    suspend fun deleteDirectoryEntryCertificate(uid: String, certificateEntryID: String) {
+    suspend fun deleteDirectoryEntryCertificate(
+        uid: String,
+        certificateEntryID: String,
+    ) {
         val response = http.delete("/DirectoryEntries/$uid/Certificates/$certificateEntryID")
 
         if (response.status != HttpStatusCode.OK) {
@@ -299,11 +326,12 @@ class Client(block: Configuration.() -> Unit = {}) {
      * Implements GET /Log (readLog)
      */
     suspend fun readLog(parameters: Map<String, String>): List<LogEntry> {
-        val response = http.get("/Log") {
-            for (param in parameters.entries) {
-                parameter(param.key, param.value)
+        val response =
+            http.get("/Log") {
+                for (param in parameters.entries) {
+                    parameter(param.key, param.value)
+                }
             }
-        }
 
         if (response.status != HttpStatusCode.OK) {
             throw AdminResponseException(response, "Unable to get log $parameters")
@@ -315,11 +343,15 @@ class Client(block: Configuration.() -> Unit = {}) {
     /**
      * PUT /DirectoryEntries/{uid}/active
      */
-    suspend fun stateSwitch(uid: String, active: Boolean) {
-        val response = http.put("/DirectoryEntries/$uid/active") {
-            contentType(ContentType.Application.Json)
-            parameter("active", active)
-        }
+    suspend fun stateSwitch(
+        uid: String,
+        active: Boolean,
+    ) {
+        val response =
+            http.put("/DirectoryEntries/$uid/active") {
+                contentType(ContentType.Application.Json)
+                parameter("active", active)
+            }
 
         if (response.status != HttpStatusCode.OK) {
             throw AdminResponseException(response, "Unable to switch state of the entry")

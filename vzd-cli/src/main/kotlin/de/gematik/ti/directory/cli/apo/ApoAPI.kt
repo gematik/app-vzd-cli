@@ -14,7 +14,6 @@ enum class ApoInstance {
 }
 
 class ApoAPI(val globalAPI: GlobalAPI) {
-
     private fun loadConfig() = ApoConfigFileStore().value
 
     fun updateConfig() {

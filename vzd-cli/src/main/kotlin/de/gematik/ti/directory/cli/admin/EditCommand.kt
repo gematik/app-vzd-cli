@@ -30,39 +30,43 @@ class EditCommand : CliktCommand(name = "edit", help = "Edit base entry using te
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    override fun run() = catching {
-        val queryResult = runBlocking { context.client.readDirectoryEntry(mapOf("telematikID" to telematikID)) }
-        val entry = queryResult?.firstOrNull() ?: throw CliktError("Entry not found for TelematikID: $telematikID")
+    override fun run() =
+        catching {
+            val queryResult = runBlocking { context.client.readDirectoryEntry(mapOf("telematikID" to telematikID)) }
+            val entry = queryResult?.firstOrNull() ?: throw CliktError("Entry not found for TelematikID: $telematikID")
 
-        val textToEdit = when (format) {
-            RepresentationFormat.YAML -> Yaml.encodeToString(entry.directoryEntryBase)
-            RepresentationFormat.JSON -> JsonPretty.encodeToString(entry.directoryEntryBase)
-            else -> throw UsageError("Unsupported edit format: $format")
-        }
+            val textToEdit =
+                when (format) {
+                    RepresentationFormat.YAML -> Yaml.encodeToString(entry.directoryEntryBase)
+                    RepresentationFormat.JSON -> JsonPretty.encodeToString(entry.directoryEntryBase)
+                    else -> throw UsageError("Unsupported edit format: $format")
+                }
 
-        TermUi.editText(textToEdit, requireSave = true)?.let { edited ->
+            TermUi.editText(textToEdit, requireSave = true)?.let { edited ->
 
-            val editedBaseDirectoryEntry: BaseDirectoryEntry = when (format) {
-                RepresentationFormat.YAML -> Yaml.decodeFromString(edited)
-                RepresentationFormat.JSON -> JsonPretty.decodeFromString(edited)
-                else -> throw UsageError("Unsupported edit format: $format")
+                val editedBaseDirectoryEntry: BaseDirectoryEntry =
+                    when (format) {
+                        RepresentationFormat.YAML -> Yaml.decodeFromString(edited)
+                        RepresentationFormat.JSON -> JsonPretty.decodeFromString(edited)
+                        else -> throw UsageError("Unsupported edit format: $format")
+                    }
+
+                val uid = editedBaseDirectoryEntry.dn?.uid ?: throw CliktError("UID ist not specified")
+                val jsonData = json.encodeToString(editedBaseDirectoryEntry)
+                val updateBaseDirectoryEntry = json.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
+
+                runBlocking { context.client.modifyDirectoryEntry(uid, updateBaseDirectoryEntry) }
+
+                val result = runBlocking { context.client.readDirectoryEntry(mapOf("uid" to uid)) }
+
+                val entryAfterEdit =
+                    when (format) {
+                        RepresentationFormat.YAML -> Yaml.encodeToString(result?.first()?.directoryEntryBase)
+                        RepresentationFormat.JSON -> JsonPretty.encodeToString(result?.first()?.directoryEntryBase)
+                        else -> throw UsageError("Unsupported edit format: $format")
+                    }
+
+                echo(entryAfterEdit)
             }
-
-            val uid = editedBaseDirectoryEntry.dn?.uid ?: throw CliktError("UID ist not specified")
-            val jsonData = json.encodeToString(editedBaseDirectoryEntry)
-            val updateBaseDirectoryEntry = json.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
-
-            runBlocking { context.client.modifyDirectoryEntry(uid, updateBaseDirectoryEntry) }
-
-            val result = runBlocking { context.client.readDirectoryEntry(mapOf("uid" to uid)) }
-
-            val entryAfterEdit = when (format) {
-                RepresentationFormat.YAML -> Yaml.encodeToString(result?.first()?.directoryEntryBase)
-                RepresentationFormat.JSON -> JsonPretty.encodeToString(result?.first()?.directoryEntryBase)
-                else -> throw UsageError("Unsupported edit format: $format")
-            }
-
-            echo(entryAfterEdit)
         }
-    }
 }

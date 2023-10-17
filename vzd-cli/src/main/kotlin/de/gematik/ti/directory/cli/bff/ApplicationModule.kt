@@ -33,9 +33,10 @@ fun Application.directoryModule() {
             Json {
                 prettyPrint = true
                 isLenient = true
-                serializersModule = SerializersModule {
-                    contextual(ExtendedCertificateDataDERSerializer)
-                }
+                serializersModule =
+                    SerializersModule {
+                        contextual(ExtendedCertificateDataDERSerializer)
+                    }
             },
         )
     }

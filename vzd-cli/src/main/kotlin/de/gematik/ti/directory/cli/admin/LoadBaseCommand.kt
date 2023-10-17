@@ -27,29 +27,33 @@ class LoadBaseCommand : CliktCommand(name = "load-base", help = "Load the base e
         "--yaml" to RepresentationFormat.YAML,
     ).default(RepresentationFormat.YAML)
 
-    private val json = Json {
-        prettyPrint = true
-        encodeDefaults = true
-    }
-
-    private val yaml = Yaml {
-        encodeDefaultValues = true
-    }
-
-    override fun run() = catching {
-        val params = parameterOptions.toMap() + customParams
-        val result = runBlocking {
-            context.client.readDirectoryEntry(params)
+    private val json =
+        Json {
+            prettyPrint = true
+            encodeDefaults = true
         }
 
-        if (result?.size != 1) {
-            throw UsageError("The query must return exactly one value. Got: ${result?.size}")
+    private val yaml =
+        Yaml {
+            encodeDefaultValues = true
         }
 
-        when (format) {
-            RepresentationFormat.JSON -> println(json.encodeToString(result.first().directoryEntryBase))
-            RepresentationFormat.HUMAN, RepresentationFormat.YAML -> println(yaml.encodeToString(result.first().directoryEntryBase))
-            else -> throw UsageError("Unable to load for editing in for format: $format")
+    override fun run() =
+        catching {
+            val params = parameterOptions.toMap() + customParams
+            val result =
+                runBlocking {
+                    context.client.readDirectoryEntry(params)
+                }
+
+            if (result?.size != 1) {
+                throw UsageError("The query must return exactly one value. Got: ${result?.size}")
+            }
+
+            when (format) {
+                RepresentationFormat.JSON -> println(json.encodeToString(result.first().directoryEntryBase))
+                RepresentationFormat.HUMAN, RepresentationFormat.YAML -> println(yaml.encodeToString(result.first().directoryEntryBase))
+                else -> throw UsageError("Unable to load for editing in for format: $format")
+            }
         }
-    }
 }

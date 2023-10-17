@@ -36,25 +36,31 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
         help = "Specify query parameters to find matching entries",
     ).associate()
     private val parameterOptions by ParameterOptions()
-    private val outputDir by option("-o", "--output-dir", metavar = "OUTPUT_DIR", help = "Output directory for certificate files. Default ist current directory.")
+    private val outputDir by option(
+        "-o",
+        "--output-dir",
+        metavar = "OUTPUT_DIR",
+        help = "Output directory for certificate files. Default ist current directory.",
+    )
         .path(mustExist = true, canBeFile = false)
         .default(Paths.get(""))
     private val context by requireObject<AdminCliEnvironmentContext>()
 
-    override fun run() = catching {
-        val params = parameterOptions.toMap() + customParams
-        paramFile?.let { paramFile ->
-            val file = Path(paramFile.second)
-            if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
-            file.useLines { line ->
-                line.forEach {
-                    runQuery(params + Pair(paramFile.first, it))
+    override fun run() =
+        catching {
+            val params = parameterOptions.toMap() + customParams
+            paramFile?.let { paramFile ->
+                val file = Path(paramFile.second)
+                if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
+                file.useLines { line ->
+                    line.forEach {
+                        runQuery(params + Pair(paramFile.first, it))
+                    }
                 }
+            } ?: run {
+                runQuery(params)
             }
-        } ?: run {
-            runQuery(params)
         }
-    }
 
     private fun runQuery(params: Map<String, String>) {
         if (params.isEmpty()) {

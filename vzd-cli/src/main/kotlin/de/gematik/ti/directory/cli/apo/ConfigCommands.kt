@@ -23,20 +23,23 @@ class ConfigCommand : CliktCommand(name = "config", help = "Manage configuration
 
 class ConfigResetCommand : CliktCommand(name = "reset", help = "Reset configuration to defaults") {
     private val context by requireObject<ApoCliContext>()
-    override fun run() = catching {
-        val newConfig = context.apoAPI.resetConfig()
-        echo(YAML.encodeToString(newConfig))
-    }
+
+    override fun run() =
+        catching {
+            val newConfig = context.apoAPI.resetConfig()
+            echo(YAML.encodeToString(newConfig))
+        }
 }
 
-val SET_PROPERTIES = mapOf(
-    "apiKeys.test" to { config: ApoConfig, value: String ->
-        config.apiKeys = config.apiKeys + Pair(ApoInstance.test, value)
-    },
-    "apiKeys.prod" to { config: ApoConfig, value: String ->
-        config.apiKeys = config.apiKeys + Pair(ApoInstance.prod, value)
-    },
-)
+val SET_PROPERTIES =
+    mapOf(
+        "apiKeys.test" to { config: ApoConfig, value: String ->
+            config.apiKeys = config.apiKeys + Pair(ApoInstance.test, value)
+        },
+        "apiKeys.prod" to { config: ApoConfig, value: String ->
+            config.apiKeys = config.apiKeys + Pair(ApoInstance.prod, value)
+        },
+    )
 
 class ConfigSetCommand : CliktCommand(
     name = "set",
@@ -49,6 +52,7 @@ class ConfigSetCommand : CliktCommand(
     private val context by requireObject<ApoCliContext>()
     private val property by argument().choice(SET_PROPERTIES)
     private val value by argument()
+
     override fun run() {
         val config = context.apoAPI.config
         property(config, value)
@@ -57,14 +61,15 @@ class ConfigSetCommand : CliktCommand(
     }
 }
 
-val GET_PROPERTIES = mapOf(
-    "emvironments" to { config: ApoConfig -> config.environments },
-    "emvironments.test" to { config: ApoConfig -> config.environments[ApoInstance.test] },
-    "emvironments.prod" to { config: ApoConfig -> config.environments[ApoInstance.prod] },
-    "apiKeys" to { config: ApoConfig -> config.apiKeys },
-    "apiKeys.test" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] },
-    "apiKeys.prod" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] },
-)
+val GET_PROPERTIES =
+    mapOf(
+        "emvironments" to { config: ApoConfig -> config.environments },
+        "emvironments.test" to { config: ApoConfig -> config.environments[ApoInstance.test] },
+        "emvironments.prod" to { config: ApoConfig -> config.environments[ApoInstance.prod] },
+        "apiKeys" to { config: ApoConfig -> config.apiKeys },
+        "apiKeys.test" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] },
+        "apiKeys.prod" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] },
+    )
 
 class ConfigGetCommand : CliktCommand(
     name = "get",
@@ -76,6 +81,7 @@ class ConfigGetCommand : CliktCommand(
 ) {
     private val context by requireObject<ApoCliContext>()
     private val property by argument().choice(GET_PROPERTIES).optional()
+
     override fun run() {
         val config = context.apoAPI.config
         val value = property?.let { it(config) } ?: config

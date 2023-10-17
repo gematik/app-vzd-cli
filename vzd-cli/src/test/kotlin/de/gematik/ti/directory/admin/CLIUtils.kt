@@ -6,7 +6,10 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
-fun runCLI(args: List<String>, data: String? = null): String {
+fun runCLI(
+    args: List<String>,
+    data: String? = null,
+): String {
     val stdin = System.`in`
     val stdout = System.`out`
     try {
@@ -21,6 +24,9 @@ fun runCLI(args: List<String>, data: String? = null): String {
     }
 }
 
-fun TestScope.cli(vararg args: String, test: (output: String) -> Unit) {
+fun TestScope.cli(
+    vararg args: String,
+    test: (output: String) -> Unit,
+) {
     test(runCLI(args.asList()))
 }

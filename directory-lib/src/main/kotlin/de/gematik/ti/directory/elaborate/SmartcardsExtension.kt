@@ -4,28 +4,35 @@ import de.gematik.ti.directory.admin.DirectoryEntry
 import de.gematik.ti.directory.pki.CertificateInfo
 import kotlin.math.abs
 
-private fun infereSmartcardFrom(entry: DirectoryEntry, cert1: CertificateInfo, cert2: CertificateInfo? = null): Smartcard {
-    val smartcardType = if (cert2 != null && entry.directoryEntryBase.personalEntry == true) {
-        SmartcardType.HBA2_1
-    } else if (cert2 != null) {
-        SmartcardType.SMCB2_1
-    } else if (entry.directoryEntryBase.personalEntry == true) {
-        SmartcardType.HBA
-    } else {
-        SmartcardType.SMCB
-    }
+private fun infereSmartcardFrom(
+    entry: DirectoryEntry,
+    cert1: CertificateInfo,
+    cert2: CertificateInfo? = null,
+): Smartcard {
+    val smartcardType =
+        if (cert2 != null && entry.directoryEntryBase.personalEntry == true) {
+            SmartcardType.HBA2_1
+        } else if (cert2 != null) {
+            SmartcardType.SMCB2_1
+        } else if (entry.directoryEntryBase.personalEntry == true) {
+            SmartcardType.HBA
+        } else {
+            SmartcardType.SMCB
+        }
 
-    val notBefore = if (cert2 != null && cert2.notBefore < cert1.notBefore) {
-        cert2.notBefore
-    } else {
-        cert1.notBefore
-    }
+    val notBefore =
+        if (cert2 != null && cert2.notBefore < cert1.notBefore) {
+            cert2.notBefore
+        } else {
+            cert1.notBefore
+        }
 
-    val notAfter = if (cert2 != null && cert2.notAfter > cert1.notAfter) {
-        cert2.notAfter
-    } else {
-        cert1.notAfter
-    }
+    val notAfter =
+        if (cert2 != null && cert2.notAfter > cert1.notAfter) {
+            cert2.notAfter
+        } else {
+            cert1.notAfter
+        }
 
     return Smartcard(
         type = smartcardType,
@@ -51,7 +58,10 @@ fun DirectoryEntry.infereSmartcards(): List<Smartcard>? {
  * The close ECC and RSA certificates are, they might build a pair.
  */
 fun identifyCertificatePairs(certs: List<CertificateInfo>): List<Pair<CertificateInfo, CertificateInfo?>> {
-    val pairs = certs.filter { it.publicKeyAlgorithm == "RSA" }.sortedBy { it.notBefore }.map { Pair<CertificateInfo, CertificateInfo?>(it, null) }.toTypedArray()
+    val pairs =
+        certs.filter {
+            it.publicKeyAlgorithm == "RSA"
+        }.sortedBy { it.notBefore }.map { Pair<CertificateInfo, CertificateInfo?>(it, null) }.toTypedArray()
     // iterate all EC certificates and try to find the closest RSA cert to form a pair
     certs.filter { it.publicKeyAlgorithm == "EC" }.sortedBy { it.notBefore }.forEach { eccert ->
         var closestIndex = -1

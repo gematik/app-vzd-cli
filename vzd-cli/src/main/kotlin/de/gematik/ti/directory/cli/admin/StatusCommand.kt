@@ -9,9 +9,10 @@ import kotlinx.coroutines.runBlocking
 class StatusCommand : CliktCommand(name = "status", help = "Show information about the API") {
     private val context by requireObject<AdminCliContext>()
 
-    override fun run() = catching {
-        runBlocking {
-            echo(context.adminAPI.status(true).toYaml())
+    override fun run() =
+        catching {
+            runBlocking {
+                echo(context.adminAPI.status(true).toYaml())
+            }
         }
-    }
 }
