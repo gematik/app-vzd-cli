@@ -1,4 +1,8 @@
 = Changelog `vzd-cli`
+== Version 2.6.0
+
+- Abhängigkeiten und Build-Tools-Versionen aktualisiert
+- Bugfixes
 
 == Version 2.3.0
 - `vzd-cli admin cert-info` ersetzt `vzd-cli admin <ru|tu|pu> cert-info`
