@@ -285,6 +285,8 @@ class Admission(x509EeCert: X509Certificate) {
      */
     val registrationNumber: String
         get() {
-            return admissionSyntax.contentsOfAdmissions[0].professionInfos[0].registrationNumber ?: throw DirectoryException("Certificate does not contain TelematikID (admissionStatement.registrationNumber)")
+            return admissionSyntax.contentsOfAdmissions[0].professionInfos[0].registrationNumber ?: throw DirectoryException(
+                "Certificate does not contain TelematikID (admissionStatement.registrationNumber)",
+            )
         }
 }

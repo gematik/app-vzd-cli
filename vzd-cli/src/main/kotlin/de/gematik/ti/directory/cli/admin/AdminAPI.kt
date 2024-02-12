@@ -51,7 +51,9 @@ class AdminAPI(val globalAPI: GlobalAPI) {
                 apiURL = envConfig.apiURL
                 auth {
                     accessToken {
-                        tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
+                        tokenStore.accessTokenFor(
+                            envConfig.apiURL,
+                        )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
                     }
                 }
                 if (globalAPI.config.httpProxy.enabled) {

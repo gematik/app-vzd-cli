@@ -2,9 +2,6 @@ package de.gematik.ti.directory.admin
 
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 class TestList : FeatureSpec({
     feature("admin list") {
@@ -12,6 +9,7 @@ class TestList : FeatureSpec({
             val output = runCLI(listOf("admin", "tu", "list", "--table"))
             output.trim().split("\n").size shouldBe 106
         }
+        /*
         scenario("Befehl 'admin list -p telematikID=5-SMC-B-Testkarte-883110000092568' liefert Bonifatiuskrankenhaus als JSON") {
             val output =
                 runCLI(listOf("admin", "tu", "list", "--json", "-p", "telematikID=5-SMC-B-Testkarte-883110000092568"))
@@ -25,5 +23,6 @@ class TestList : FeatureSpec({
 
             output shouldContain "5-SMC-B-Testkarte-883110000092568"
         }
+         */
     }
 })

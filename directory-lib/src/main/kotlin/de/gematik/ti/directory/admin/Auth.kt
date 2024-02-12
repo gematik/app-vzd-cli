@@ -26,11 +26,11 @@ data class TokenResponse(
     val token_type: String,
     @SerialName("not-before-policy")
     val not_before_policy: Int,
-    val session_state: String,
+    val session_state: String? = null,
     val scope: String,
     val expires_in: Int,
     val refresh_expires_in: Int,
-    val refresh_token: String,
+    val refresh_token: String? = null,
 )
 
 class ClientCredentialsAuthenticator(private val authURL: String, private val httpProxyUrl: String?) {
@@ -85,7 +85,7 @@ class ClientCredentialsAuthenticator(private val authURL: String, private val ht
 
         val tokenResponse: TokenResponse = response.body()
 
-        return BearerTokens(tokenResponse.access_token, tokenResponse.refresh_token)
+        return BearerTokens(tokenResponse.access_token, tokenResponse.refresh_token ?: "")
     }
 }
 

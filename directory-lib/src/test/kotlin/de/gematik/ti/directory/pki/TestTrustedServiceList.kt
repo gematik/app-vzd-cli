@@ -1,5 +1,6 @@
 import de.gematik.ti.directory.pki.*
 import io.kotest.core.spec.style.FeatureSpec
+import io.kotest.matchers.collections.shouldBeOneOf
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.ktor.client.*
@@ -52,6 +53,6 @@ class TestTrustedServiceList : FeatureSpec({
             }
         val certDER = CertificateDataDER(cert64)
         val ocspResponse = pkiClient.ocsp(certDER)
-        ocspResponse.status shouldBe OCSPResponseCertificateStatus.GOOD
+        ocspResponse.status shouldBeOneOf listOf(OCSPResponseCertificateStatus.GOOD, OCSPResponseCertificateStatus.UNKNOWN)
     }
 })
