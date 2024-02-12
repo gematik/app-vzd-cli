@@ -22,7 +22,9 @@ class TokenCommand : CliktCommand(name = "token", help = "Get or set access toke
             token?.let { tokenStore.addAccessToken(envConfig.apiURL, it) }
 
             echo(
-                tokenStore.accessTokenFor(envConfig.apiURL)?.accessToken ?: throw CliktError("No token available for environment: ${context.env}"),
+                tokenStore.accessTokenFor(
+                    envConfig.apiURL,
+                )?.accessToken ?: throw CliktError("No token available for environment: ${context.env}"),
             )
         }
 }

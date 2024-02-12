@@ -67,7 +67,10 @@ fun identifyCertificatePairs(certs: List<CertificateInfo>): List<Pair<Certificat
         var closestIndex = -1
         var closestPair: Pair<CertificateInfo, CertificateInfo?>? = null
         pairs.forEachIndexed { index, pair ->
-            if (closestPair == null || abs(closestPair!!.first.notBefore.epochSeconds - eccert.notBefore.epochSeconds) > abs(pair.first.notBefore.epochSeconds - eccert.notBefore.epochSeconds)) {
+            if (closestPair == null || abs(
+                    closestPair!!.first.notBefore.epochSeconds - eccert.notBefore.epochSeconds,
+                ) > abs(pair.first.notBefore.epochSeconds - eccert.notBefore.epochSeconds)
+            ) {
                 closestIndex = index
                 closestPair = pair
             }

@@ -138,7 +138,10 @@ class ExtractCommand : CliktCommand(
     private fun institutionToBaseEntry(antrag: Node): BaseDirectoryEntry {
         val base = BaseDirectoryEntry(xpath.evaluate("Institution/TelematikID", antrag), entryType = listOf("1"))
         base.displayName = evalString("Institution/InstName", antrag)
-        base.streetAddress = evalString("Institution/Anschrift/StrassenAdresse/Strasse", antrag) + " " + evalString("Institution/Anschrift/StrassenAdresse/Hausnummer", antrag)
+        base.streetAddress = evalString(
+            "Institution/Anschrift/StrassenAdresse/Strasse",
+            antrag,
+        ) + " " + evalString("Institution/Anschrift/StrassenAdresse/Hausnummer", antrag)
         base.postalCode = evalString("Institution/Anschrift/StrassenAdresse/Postleitzahl", antrag)
         base.localityName = evalString("Institution/Anschrift/StrassenAdresse/Ort", antrag)
         base.countryCode = evalString("Institution/Anschrift/StrassenAdresse/Land", antrag)

@@ -53,7 +53,9 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
                                 it.directoryEntryBase.dn?.uid!!,
                                 userCertificate,
                             )
-                            echo("Added certificate: telematikID=${userCertificate.userCertificate?.certificateInfo?.admissionStatement?.registrationNumber} serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber}")
+                            echo(
+                                "Added certificate: telematikID=${userCertificate.userCertificate?.certificateInfo?.admissionStatement?.registrationNumber} serialNumber=${userCertificate.userCertificate?.certificateInfo?.serialNumber}",
+                            )
                         } catch (e: AdminResponseException) {
                             if (!ignore || e.response.status != HttpStatusCode.Conflict) {
                                 throw e
@@ -64,7 +66,11 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificate t
                         }
                     }
                 }
-                    ?: run { throw CliktError("Entry with telematikID ${certDER.certificateInfo.admissionStatement.registrationNumber} not found.") }
+                    ?: run {
+                        throw CliktError(
+                            "Entry with telematikID ${certDER.certificateInfo.admissionStatement.registrationNumber} not found.",
+                        )
+                    }
             }
         }
 }
