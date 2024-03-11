@@ -87,7 +87,7 @@ fun List<LogEntry>.toTable(): String {
         tableFormatter<LogEntry> {
             labeled<String>("TelematikID", "Gesamt") {
                 extractor { logEntry ->
-                    logEntry.telematikID.escape()
+                    logEntry.telematikID?.escape()
                 }
             }
 
@@ -156,7 +156,7 @@ fun List<LogEntry>.toCsv(): String {
                         it.logTime,
                         it.operation,
                         it.clientID,
-                        it.telematikID.escape(),
+                        it.telematikID?.escape(),
                         it.uid,
                         it.noDataChanged,
                     ),
