@@ -197,7 +197,7 @@ data class LogEntry(
     val clientID: String?,
     val logTime: Instant,
     val uid: String,
-    val telematikID: String,
+    val telematikID: String?,
     val operation: Operation,
     val noDataChanged: Boolean,
 )

@@ -1,5 +1,12 @@
 = Changelog `vzd-cli`
 
+== Version 2.6.2
+- TelematikID ist jetzt optional in `vzd-cli admin <ru|tu|pu> log`
+
+== Version 2.6.1
+- Set Februar/2024 werden OAuth2 Felder  refresh_token und session_state nicht mehr unterstützt. Beide Felder wurden optional gemacht.
+- ktlint wurde auf die neueste Version aktualisiert
+
 == Version 2.6.0
 - Set Februar/2024 werden OAuth2 Felder  `refresh_token` und `session_state` nicht mehr unterstützt. Beide Felder wurden optional gemacht.
 - ktlint wurde auf die neueste Version aktualisiert
