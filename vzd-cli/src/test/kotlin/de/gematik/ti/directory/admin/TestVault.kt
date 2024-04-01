@@ -9,6 +9,7 @@ import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteIfExists
 
 class TestVault : FeatureSpec({
+    val TEST_SERVICE_NAME = "directory-vault-test"
     val vaultDir = createTempDirectory()
     val vaultPath = Path(vaultDir.toString(), "directory-vault-test.keystore")
     val badPassword = "BadPassword"
@@ -25,38 +26,38 @@ class TestVault : FeatureSpec({
     feature("Secrets verwalten") {
         scenario("Credentials KeyStore wird automatisch erzeugt") {
             vaultPath.toFile().exists() shouldBe false
-            val vault = KeyStoreVaultProvider(vaultPath).open(badPassword)
+            val vault = KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME)
             vault.store("ru", "test1", longSecret)
             vaultPath.toFile().exists() shouldBe true
-            val vault2 = KeyStoreVaultProvider(vaultPath).open(badPassword)
+            val vault2 = KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME)
             vault2.get("ru")?.secret shouldBe longSecret
         }
         scenario("Löschen von existierenden Secret") {
-            val vault = KeyStoreVaultProvider(vaultPath).open(badPassword)
+            val vault = KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME)
             vault.store("ru", "test-to-be-deleted", "secret")
-            val vault2 = KeyStoreVaultProvider(vaultPath).open(badPassword)
+            val vault2 = KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME)
             vault2.get("ru") shouldNotBe null
             vault2.delete("ru")
             vault2.get("ru") shouldBe null
-            val vault3 = KeyStoreVaultProvider(vaultPath).open(badPassword)
+            val vault3 = KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME)
             vault3.get("ru") shouldBe null
         }
         scenario("Credentials leeren") {
-            val vault = KeyStoreVaultProvider(vaultPath).open(badPassword)
+            val vault = KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME)
             vault.store("ru", "id1", "secret1")
             vault.store("tu", "id2", "secret2")
             vault.store("pu", "id2", "secret3")
             vault.get("ru") shouldNotBe null
             vault.get("tu") shouldNotBe null
             vault.get("pu") shouldNotBe null
-            KeyStoreVaultProvider(vaultPath).open(badPassword).clear()
-            val vault2 = KeyStoreVaultProvider(vaultPath).open(badPassword)
+            KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME).clear()
+            val vault2 = KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME)
             vault2.get("ru") shouldBe null
             vault2.get("tu") shouldBe null
             vault2.get("pu") shouldBe null
         }
         scenario("Credentials zurücksetzen") {
-            val vault = KeyStoreVaultProvider(vaultPath).open(badPassword)
+            val vault = KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME)
             vault.store("ru", "id1", "secret1")
             vault.store("tu", "id2", "secret2")
             vault.store("pu", "id2", "secret3")
@@ -64,7 +65,7 @@ class TestVault : FeatureSpec({
             vault.get("tu") shouldNotBe null
             vault.get("pu") shouldNotBe null
             KeyStoreVaultProvider(vaultPath).purge()
-            val vault2 = KeyStoreVaultProvider(vaultPath).open(badPassword)
+            val vault2 = KeyStoreVaultProvider(vaultPath).open(badPassword, TEST_SERVICE_NAME)
             vault2.get("ru") shouldBe null
             vault2.get("tu") shouldBe null
             vault2.get("pu") shouldBe null

@@ -1,7 +1,7 @@
-package de.gematik.ti.directory.admin
+package de.gematik.ti.directory
 
 @Suppress("ktlint:standard:enum-entry-name-case")
-enum class AdminEnvironment {
+enum class DirectoryEnvironment {
     ru,
     tu,
     pu,
