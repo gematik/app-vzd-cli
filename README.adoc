@@ -31,7 +31,9 @@ Options:
 Commands:
   config               Manage configuration
   update               Updates this software
+  login                Logins into all configured APIs
   admin                CLI for DirectoryAdministration API
+  fhir                 CLI for FHIR Directory
   apo                  CLI for ApoVZD API
   gui                  Starts HTTP Server with GUI
   pers                 Process gematik SMC-B/HBA Exports
@@ -68,6 +70,8 @@ vzd-cli config set httpProxy.enabled true
 
 * Directory Admin API
 * Apo API (ApoVZD)
+* FHIR FDV Search API
+* FHIR Search API (nur mit einem speziellen Token, s. https://directory-beta.ccs.gematik.solutions)
 
 Für die Nutzung dieser APIs sind jeweils entsprechende Geheimnisse bzw. Credentials erforderlich.
 Diese werden von der gematik *den bereichtigten Organistionen* bereitgestellt.
@@ -113,6 +117,22 @@ vzd-cli apo config set apiKeys.test <API_KEY_TEST>
 vzd-cli apo config set apiKeys.prod <API_KEY_PROD>
 ----
 
+
+=== (Neu) FHIR FDV Search API Credentials
+
+Zugriff auf FHIR FDV Search API wird mittels OAuth2 Client Credentials Flow geschützt. Die berechtige Dienstanbieter erhalten die Client ID und Client Secret von der gematik.
+
+[source,bash]
+----
+# Secret für die Referenzumgebung speichern
+# es folgt eine Vault Passwortabfrage für persönliche Vault
+vzd-cli fhir fdv-vault store -e ru -c <CLIEND_ID> -s <CLIENT_SECRET>
+
+# Secret für die Produktivumgebung speichern
+# es folgt eine Vault Passwortabfrage für persönliche Vault
+vzd-cli fhir fdv-vault store -e pu -c <CLIEND_ID> -s <CLIENT_SECRET>
+----
+
 == Erste Schritte
 
 Befor die Directory Admin API genutzt werden kann, muss eine Anmeldung erfolgen.
@@ -122,10 +142,10 @@ Die Anmeldung muss alle 6 Stunden wiederholt werden.
 ----
 # Anmelden in die Referenzumgebung (ru)
 # es folgt eine Vault-Passwortabfrage
-vzd-cli admin ru login
+vzd-cli login ru
 # Anmelden in die Referenzumgebung (pu)
 # es folgt eine Vault-Passwortabfrage
-vzd-cli admin pu login
+vzd-cli login pu
 ----
 
 Für vollautomatisierte Nutzung des `vzd-cli`, auch bei der Anmeldung, wird das setzten der Umgebungsvariable `VAULT_PASSWORD` empfohlen.
@@ -154,6 +174,16 @@ vzd-cli admin ru search Müller Berlin
 [source,bash]
 ----
 vzd-cli admin ru show 1-SMC-B-Testkarte-883110000117729
+----
+
+.*(Neu) Beispiel:* Suche nach einträgen in der FHIR FDV Search API in der Produktivumgebung (`pu`)
+[source,bash]
+----
+vzd-cli fhir pu fdv search healthcare-service -t <TelematikID>
+vzd-cli fhir pu fdv search practitioner-role -t <TelematikID>
+# oder in Kurzform
+vzd-cli fhir pu fdv search hs -t <TelematikID>
+vzd-cli fhir pu fdv search pr -t <TelematikID>
 ----
 
 == Übergreifende Befehle
