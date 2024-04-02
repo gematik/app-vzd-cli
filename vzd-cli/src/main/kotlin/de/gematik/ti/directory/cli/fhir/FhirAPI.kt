@@ -11,6 +11,7 @@ import de.gematik.ti.directory.fhir.Client
 import de.gematik.ti.directory.fhir.DefaultConfig
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -108,6 +109,12 @@ class FhirAPI(val globalAPI: GlobalAPI) {
                             ignoreUnknownKeys = true
                         },
                     )
+                }
+                if (globalAPI.config.httpProxy.enabled) {
+                    engine {
+                        logger.debug { "Using proxy: ${globalAPI.config.httpProxy.proxyURL} for FHIR authorization" }
+                        proxy = ProxyBuilder.http(globalAPI.config.httpProxy.proxyURL)
+                    }
                 }
             }
         val token = authResponse.accessToken

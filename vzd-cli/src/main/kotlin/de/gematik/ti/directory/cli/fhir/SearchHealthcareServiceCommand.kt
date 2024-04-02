@@ -2,6 +2,8 @@ package de.gematik.ti.directory.cli.fhir
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -39,6 +41,8 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
         "--exclude-endpoint" to "",
     ).default("PractitionerRole:endpoint")
 
+    private val textArguments by argument("SEARCH_TEXT").multiple(required = false)
+
     private val telematikID by option("--telematik-id", "-t", help = "Telematik-ID of the Organization")
 
     override fun run() =
@@ -53,6 +57,10 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
             }
 
             query.addParam("organization.active", active.toString())
+
+            if (textArguments.isNotEmpty()) {
+                query.addParam("_text", textArguments.joinToString(" "))
+            }
 
             if (telematikID != null) {
                 query.addParam("organization.identifier", "https://gematik.de/fhir/sid/telematik-id|$telematikID")
