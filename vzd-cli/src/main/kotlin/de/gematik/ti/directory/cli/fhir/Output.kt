@@ -6,18 +6,18 @@ import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
 import org.hl7.fhir.r4.model.*
 
-
 val yamlOutputFormatter =
     Yaml {
         encodeDefaultValues = false
         serializersModule = FHIRSerializerModule
     }
 
-val jsonOutputFormatter = Json {
-    encodeDefaults = true
-    prettyPrint = true
-    serializersModule = FHIRSerializerModule
-}
+val jsonOutputFormatter =
+    Json {
+        encodeDefaults = true
+        prettyPrint = true
+        serializersModule = FHIRSerializerModule
+    }
 
 enum class OutputFormat {
     JSON,

@@ -12,7 +12,7 @@ import de.gematik.ti.directory.fhir.SearchResource
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 
-class SearchHealthcareServiceCommand: CliktCommand(name = "healthcare-service", help = "Search HealthcareService resources (alias: hs)") {
+class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service", help = "Search HealthcareService resources (alias: hs)") {
     private val logger = KotlinLogging.logger {}
     private val context by requireObject<SearchCommand.SearchContext>()
 

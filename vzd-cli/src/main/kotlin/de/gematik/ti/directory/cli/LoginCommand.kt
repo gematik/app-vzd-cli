@@ -12,7 +12,7 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-class LoginCommand: CliktCommand(name = "login", help = "Logins into all configured APIs") {
+class LoginCommand : CliktCommand(name = "login", help = "Logins into all configured APIs") {
     private val environments by argument().multiple(default = listOf("pu", "ru", "tu"))
     private val password by option(
         "--password",

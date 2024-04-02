@@ -1,25 +1,14 @@
 package de.gematik.ti.directory.cli.fhir
 
-
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
-import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.help
-import com.github.ajalt.clikt.parameters.arguments.multiple
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.switch
-import com.github.ajalt.clikt.parameters.types.enum
 import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.VaultCommand
 import de.gematik.ti.directory.cli.catching
-import de.gematik.ti.directory.fhir.SearchQuery
-import de.gematik.ti.directory.fhir.SearchResource
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 
 val logger = KotlinLogging.logger {}
@@ -35,7 +24,6 @@ class FhirCliEnvironmentContext(
     val client by lazy {
         fhirAPI.createClient(env)
     }
-
 }
 
 class FhirCli :
@@ -64,7 +52,7 @@ class EnvironmentCommands(env: DirectoryEnvironment) : CliktCommand(name = env.n
             FdvCommands(),
             SearchTokenCommand(),
             SearchCommand { ctx, query ->
-                    ctx.client.search(query)
+                ctx.client.search(query)
             },
         )
     }
@@ -75,17 +63,16 @@ class EnvironmentCommands(env: DirectoryEnvironment) : CliktCommand(name = env.n
         }
 }
 
-class SearchTokenCommand: CliktCommand(name = "token", help = "Set or get Access Token for SearchAPI") {
+class SearchTokenCommand : CliktCommand(name = "token", help = "Set or get Access Token for SearchAPI") {
     private val context by requireObject<FhirCliEnvironmentContext>()
     private val token by option("-s", "--set", metavar = "ACCESS_TOKEN", help = "Sets OAuth2 Access Token", envvar = "SEARCH_ACCESS_TOKEN")
 
     override fun run() =
         catching {
-
             token?.let { context.fhirAPI.storeAccessTokenSearch(context.env, it) }
 
             echo(
-                context.fhirAPI.retrieveAccessTokenSearch(context.env)
+                context.fhirAPI.retrieveAccessTokenSearch(context.env),
             )
         }
 }

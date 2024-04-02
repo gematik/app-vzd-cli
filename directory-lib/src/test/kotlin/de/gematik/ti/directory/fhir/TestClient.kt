@@ -1,7 +1,5 @@
 package de.gematik.ti.directory.fhir
 
-import de.gematik.ti.directory.ClientCredentialsAuthenticator
-import de.gematik.ti.directory.DirectoryEnvironment
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 import org.hl7.fhir.r4.model.IdType

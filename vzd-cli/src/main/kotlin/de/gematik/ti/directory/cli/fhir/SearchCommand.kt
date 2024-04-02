@@ -7,7 +7,10 @@ import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.fhir.SearchQuery
 import org.hl7.fhir.r4.model.Bundle
 
-class SearchCommand(val search: suspend (FhirCliEnvironmentContext, SearchQuery) -> Bundle): CliktCommand(name = "search", help = "Search FHIR Directory") {
+class SearchCommand(val search: suspend (FhirCliEnvironmentContext, SearchQuery) -> Bundle) : CliktCommand(
+    name = "search",
+    help = "Search FHIR Directory",
+) {
     private val context by requireObject<FhirCliEnvironmentContext>()
 
     class SearchContext(val search: suspend (FhirCliEnvironmentContext, SearchQuery) -> Bundle, val ctx: FhirCliEnvironmentContext)
@@ -19,12 +22,14 @@ class SearchCommand(val search: suspend (FhirCliEnvironmentContext, SearchQuery)
         )
     }
 
-    override fun aliases(): Map<String, List<String>> = mapOf(
-        "hs" to listOf("healthcare-service"),
-        "pr" to listOf("practitioner-role"),
-    )
+    override fun aliases(): Map<String, List<String>> =
+        mapOf(
+            "hs" to listOf("healthcare-service"),
+            "pr" to listOf("practitioner-role"),
+        )
 
-    override fun run() = catching {
-        currentContext.obj = SearchContext(search, context)
-    }
+    override fun run() =
+        catching {
+            currentContext.obj = SearchContext(search, context)
+        }
 }

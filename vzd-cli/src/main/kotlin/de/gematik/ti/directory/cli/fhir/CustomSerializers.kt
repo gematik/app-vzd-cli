@@ -9,20 +9,20 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
-import org.checkerframework.checker.units.qual.Prefix
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 
-val FHIRSerializerModule = SerializersModule {
-    contextual(CodingSerializer)
-    contextual(IdentifierSerializer)
-    contextual(HumanNameSerializer)
-    contextual(AddressSerializer)
-    contextual(LocationSerializer)
-    contextual(EndpointSerializer)
-}
+val FHIRSerializerModule =
+    SerializersModule {
+        contextual(CodingSerializer)
+        contextual(IdentifierSerializer)
+        contextual(HumanNameSerializer)
+        contextual(AddressSerializer)
+        contextual(LocationSerializer)
+        contextual(EndpointSerializer)
+    }
 
 /**
  * Elaborate Serializer für FHIR Coding
@@ -42,11 +42,12 @@ object CodingSerializer : KSerializer<Coding> {
         encoder: Encoder,
         value: Coding,
     ) {
-        val surrogate = CodingSurrogate(
-            system = value.system,
-            code = value.code,
-            display = value.display
-        )
+        val surrogate =
+            CodingSurrogate(
+                system = value.system,
+                code = value.code,
+                display = value.display,
+            )
         encoder.encodeSerializableValue(CodingSurrogate.serializer(), surrogate)
     }
 
@@ -72,10 +73,11 @@ object IdentifierSerializer : KSerializer<Identifier> {
         encoder: Encoder,
         value: Identifier,
     ) {
-        val surrogate = IdentifierSurrogate(
-            system = value.system,
-            value = value.value
-        )
+        val surrogate =
+            IdentifierSurrogate(
+                system = value.system,
+                value = value.value,
+            )
         encoder.encodeSerializableValue(IdentifierSurrogate.serializer(), surrogate)
     }
 
@@ -105,14 +107,15 @@ object HumanNameSerializer : KSerializer<HumanName> {
         encoder: Encoder,
         value: HumanName,
     ) {
-        val surrogate = HumanNameSurrogate(
-            family = value.family,
-            given = value.given.map { it.value }.ifEmpty { null },
-            prefix = value.prefix.map { it.value }.ifEmpty { null },
-            suffix = value.suffix.map { it.value }.ifEmpty { null },
-            use = value.use?.name?.lowercase(),
-            text = value.text
-        )
+        val surrogate =
+            HumanNameSurrogate(
+                family = value.family,
+                given = value.given.map { it.value }.ifEmpty { null },
+                prefix = value.prefix.map { it.value }.ifEmpty { null },
+                suffix = value.suffix.map { it.value }.ifEmpty { null },
+                use = value.use?.name?.lowercase(),
+                text = value.text,
+            )
         encoder.encodeSerializableValue(HumanNameSurrogate.serializer(), surrogate)
     }
 
@@ -146,18 +149,19 @@ object AddressSerializer : KSerializer<Address> {
         encoder: Encoder,
         value: Address,
     ) {
-        val surrogate = AddressSurrogate(
-            use = value.use?.name?.lowercase(),
-            type = value.type?.name?.lowercase(),
-            text = value.text,
-            line = value.line.map { it.value },
-            city = value.city,
-            district = value.district,
-            state = value.state,
-            postalCode = value.postalCode,
-            country = value.country,
-            period = value.period?.start?.toString(),
-        )
+        val surrogate =
+            AddressSurrogate(
+                use = value.use?.name?.lowercase(),
+                type = value.type?.name?.lowercase(),
+                text = value.text,
+                line = value.line.map { it.value },
+                city = value.city,
+                district = value.district,
+                state = value.state,
+                postalCode = value.postalCode,
+                country = value.country,
+                period = value.period?.start?.toString(),
+            )
         encoder.encodeSerializableValue(AddressSurrogate.serializer(), surrogate)
     }
 
@@ -185,12 +189,13 @@ object LocationSerializer : KSerializer<org.hl7.fhir.r4.model.Location> {
         encoder: Encoder,
         value: org.hl7.fhir.r4.model.Location,
     ) {
-        val surrogate = LocationSurrogate(
-            id = value.idElement.idPart,
-            identifier = value.identifier.ifEmpty { null },
-            name = value.name,
-            address = value.address
-        )
+        val surrogate =
+            LocationSurrogate(
+                id = value.idElement.idPart,
+                identifier = value.identifier.ifEmpty { null },
+                name = value.name,
+                address = value.address,
+            )
         encoder.encodeSerializableValue(LocationSurrogate.serializer(), surrogate)
     }
 
@@ -223,17 +228,18 @@ object EndpointSerializer : KSerializer<org.hl7.fhir.r4.model.Endpoint> {
         encoder: Encoder,
         value: org.hl7.fhir.r4.model.Endpoint,
     ) {
-        val surrogate = EndpointSurrogate(
-            id = value.idElement.idPart,
-            identifier = value.identifier.ifEmpty { null },
-            connectionType = value.connectionType,
-            name = value.name,
-            status = value.status?.name?.lowercase(),
-            payloadType = value.payloadType.flatMap { it.coding }.ifEmpty { null },
-            payloadMimeType = value.payloadMimeType.map { it.value }.ifEmpty { null },
-            address = value.address,
-            header = value.header.map { it.value }.ifEmpty { null }
-        )
+        val surrogate =
+            EndpointSurrogate(
+                id = value.idElement.idPart,
+                identifier = value.identifier.ifEmpty { null },
+                connectionType = value.connectionType,
+                name = value.name,
+                status = value.status?.name?.lowercase(),
+                payloadType = value.payloadType.flatMap { it.coding }.ifEmpty { null },
+                payloadMimeType = value.payloadMimeType.map { it.value }.ifEmpty { null },
+                address = value.address,
+                header = value.header.map { it.value }.ifEmpty { null },
+            )
         encoder.encodeSerializableValue(EndpointSurrogate.serializer(), surrogate)
     }
 

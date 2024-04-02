@@ -12,7 +12,7 @@ import de.gematik.ti.directory.fhir.SearchResource
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 
-class SearchPractitionerRoleCommand: CliktCommand(name = "practitioner-role", help = "Search PractitionerRole resources (alias: pr)") {
+class SearchPractitionerRoleCommand : CliktCommand(name = "practitioner-role", help = "Search PractitionerRole resources (alias: pr)") {
     private val logger = KotlinLogging.logger {}
     private val context by requireObject<FhirCliEnvironmentContext>()
 

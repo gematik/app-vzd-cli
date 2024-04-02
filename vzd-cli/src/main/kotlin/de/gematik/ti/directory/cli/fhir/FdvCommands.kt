@@ -16,4 +16,3 @@ class FdvCommands : CliktCommand(name = "fdv", help = "Commands for FDVSearchAPI
         // no-op
     }
 }
-

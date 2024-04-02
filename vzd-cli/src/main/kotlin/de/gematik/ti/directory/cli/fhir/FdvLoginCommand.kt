@@ -7,7 +7,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import de.gematik.ti.directory.cli.catching
 
-class FdvLoginCommand: CliktCommand(name = "login", help = "Login to FDVSearchAPI") {
+class FdvLoginCommand : CliktCommand(name = "login", help = "Login to FDVSearchAPI") {
     private val context by requireObject<FhirCliEnvironmentContext>()
     private val password by option(
         "--password",

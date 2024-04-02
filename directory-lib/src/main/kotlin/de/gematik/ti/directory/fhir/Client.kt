@@ -30,45 +30,50 @@ private val JSON =
         prettyPrint = true
     }
 
-
 val DefaultConfig =
     Config(
         environments =
-        mapOf(
-            "tu" to
+            mapOf(
+                "tu" to
                     EnvironmentConfig(
-                        search = SearchConfig(
-                            apiURL = "https://fhir-directory-test.vzd.ti-dienste.de/search",
-                        ),
-                        fdv = FdvConfig(
-                            apiURL = "https://fhir-directory-test.vzd.ti-dienste.de/fdv/search",
-                            authenticationEndpoint = "https://auth-test.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
-                            authorizationEndpoint = "https://fhir-directory-test.vzd.ti-dienste.de/service-authenticate",
-                        ),
+                        search =
+                            SearchConfig(
+                                apiURL = "https://fhir-directory-test.vzd.ti-dienste.de/search",
+                            ),
+                        fdv =
+                            FdvConfig(
+                                apiURL = "https://fhir-directory-test.vzd.ti-dienste.de/fdv/search",
+                                authenticationEndpoint = "https://auth-test.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
+                                authorizationEndpoint = "https://fhir-directory-test.vzd.ti-dienste.de/service-authenticate",
+                            ),
                     ),
-            "ru" to
+                "ru" to
                     EnvironmentConfig(
-                        search = SearchConfig(
-                            apiURL = "https://fhir-directory-ref.vzd.ti-dienste.de/search",
-                        ),
-                        fdv = FdvConfig(
-                            apiURL = "https://fhir-directory-ref.vzd.ti-dienste.de/fdv/search",
-                            authenticationEndpoint = "https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
-                            authorizationEndpoint = "https://fhir-directory-ref.vzd.ti-dienste.de/service-authenticate",
-                        ),
+                        search =
+                            SearchConfig(
+                                apiURL = "https://fhir-directory-ref.vzd.ti-dienste.de/search",
+                            ),
+                        fdv =
+                            FdvConfig(
+                                apiURL = "https://fhir-directory-ref.vzd.ti-dienste.de/fdv/search",
+                                authenticationEndpoint = "https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
+                                authorizationEndpoint = "https://fhir-directory-ref.vzd.ti-dienste.de/service-authenticate",
+                            ),
                     ),
-            "pu" to
+                "pu" to
                     EnvironmentConfig(
-                        search = SearchConfig(
-                            apiURL = "https://fhir-directory.vzd.ti-dienste.de/search",
-                        ),
-                        fdv = FdvConfig(
-                            apiURL = "https://fhir-directory.vzd.ti-dienste.de/fdv/search",
-                            authenticationEndpoint = "https://auth.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
-                            authorizationEndpoint = "https://fhir-directory.vzd.ti-dienste.de/service-authenticate",
-                        ),
+                        search =
+                            SearchConfig(
+                                apiURL = "https://fhir-directory.vzd.ti-dienste.de/search",
+                            ),
+                        fdv =
+                            FdvConfig(
+                                apiURL = "https://fhir-directory.vzd.ti-dienste.de/fdv/search",
+                                authenticationEndpoint = "https://auth.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
+                                authorizationEndpoint = "https://fhir-directory.vzd.ti-dienste.de/service-authenticate",
+                            ),
                     ),
-        ),
+            ),
     )
 
 class ConfigException(message: String, cause: Throwable? = null) : DirectoryException(message, cause)
@@ -102,8 +107,12 @@ enum class SearchResource {
     PractitionerRole,
     HealthcareService,
 }
+
 class SearchQuery(val resource: SearchResource, val params: MutableMap<String, List<String>> = mutableMapOf()) {
-    fun addParam(key: String, value: String) {
+    fun addParam(
+        key: String,
+        value: String
+    ) {
         if (params.containsKey(key)) {
             params[key] = params[key]!!.plus(value)
         } else {
@@ -140,7 +149,10 @@ class Client(block: Configurator.() -> Unit = {}) {
         }
     }
 
-    fun createHttpClient(defaultURL: String, authBlock: DirectoryAuthPluginConfig.() -> Unit): HttpClient {
+    fun createHttpClient(
+        defaultURL: String,
+        authBlock: DirectoryAuthPluginConfig.() -> Unit
+    ): HttpClient {
         return HttpClient(CIO) {
             engine {
                 configurator.httpProxyURL?.let {
@@ -178,6 +190,7 @@ class Client(block: Configurator.() -> Unit = {}) {
             }
         }
     }
+
     init {
         block(configurator)
         this.envConfig = configurator.envConfig ?: throw ConfigException("No environment configured")
@@ -185,30 +198,29 @@ class Client(block: Configurator.() -> Unit = {}) {
 
     suspend fun search(query: SearchQuery): Bundle {
         logger.debug { "Searching ${query.resource.name} with query: ${query.params}" }
-        val response = httpClientSearch.get("/search/${query.resource.name}") {
-            query.params.forEach { (key, values) ->
-                values.forEach { value ->
-                    parameter(key, value)
+        val response =
+            httpClientSearch.get("/search/${query.resource.name}") {
+                query.params.forEach { (key, values) ->
+                    values.forEach { value ->
+                        parameter(key, value)
+                    }
                 }
             }
-        }
         return handleSearchResponse(response)
     }
 
     private suspend fun handleSearchResponse(response: HttpResponse): Bundle {
-
         val body = response.body<String>()
         val parser = FHIR_R4.newJsonParser()
 
         if (response.status != HttpStatusCode.OK) {
-
-            var exc: DirectoryException? = null
+            var exc: DirectoryException?
 
             try {
                 val outcome = parser.parseResource(OperationOutcome::class.java, body)
                 exc = DirectoryException(outcome.issue.joinToString { it.diagnostics })
             } catch (e: Exception) {
-                exc =  DirectoryException("Search failed: ${response.status} $body")
+                exc = DirectoryException("Search failed: ${response.status} $body")
             }
 
             throw exc!!
@@ -216,17 +228,18 @@ class Client(block: Configurator.() -> Unit = {}) {
         val bundle = parser.parseResource(Bundle::class.java, body)
         logger.debug { "Got search response bundle with ${bundle.total} resources." }
         return bundle
-
     }
+
     suspend fun searchFdv(query: SearchQuery): Bundle {
         logger.debug { "Searching ${query.resource.name} with query: ${query.params}" }
-        val response = httpClientFdv.get("/fdv/search/${query.resource.name}") {
-            query.params.forEach { (key, values) ->
-                values.forEach { value ->
-                    parameter(key, value)
+        val response =
+            httpClientFdv.get("/fdv/search/${query.resource.name}") {
+                query.params.forEach { (key, values) ->
+                    values.forEach { value ->
+                        parameter(key, value)
+                    }
                 }
             }
-        }
         return handleSearchResponse(response)
     }
 }

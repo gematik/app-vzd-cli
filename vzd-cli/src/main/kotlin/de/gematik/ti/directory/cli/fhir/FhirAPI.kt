@@ -51,7 +51,10 @@ class FhirAPI(val globalAPI: GlobalAPI) {
         return KeyStoreVaultProvider().open(vaultPassword, FDV_SEARCH_SERVICE_NAME)
     }
 
-    fun storeAccessTokenSearch(env: DirectoryEnvironment, accessToken: String) {
+    fun storeAccessTokenSearch(
+        env: DirectoryEnvironment,
+        accessToken: String
+    ) {
         val tokenStore = TokenStore()
         val envConfig = config.environment(env)
         tokenStore.addAccessToken(envConfig.search.apiURL, accessToken)
@@ -60,10 +63,15 @@ class FhirAPI(val globalAPI: GlobalAPI) {
     fun retrieveAccessTokenSearch(env: DirectoryEnvironment): String {
         val tokenStore = TokenStore()
         val envConfig = config.environment(env)
-        return tokenStore.accessTokenFor(envConfig.search.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment (SearchAPI): $env")
+        return tokenStore.accessTokenFor(
+            envConfig.search.apiURL,
+        )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment (SearchAPI): $env")
     }
 
-    fun storeAccessTokenFdv(env: DirectoryEnvironment, accessToken: String) {
+    fun storeAccessTokenFdv(
+        env: DirectoryEnvironment,
+        accessToken: String
+    ) {
         val tokenStore = TokenStore()
         val envConfig = config.environment(env)
         tokenStore.addAccessToken(envConfig.fdv.apiURL, accessToken)
@@ -72,42 +80,55 @@ class FhirAPI(val globalAPI: GlobalAPI) {
     fun retrieveAccessTokenFdv(env: DirectoryEnvironment): String {
         val tokenStore = TokenStore()
         val envConfig = config.environment(env)
-        return tokenStore.accessTokenFor(envConfig.fdv.apiURL)?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment (FDVSearchAPI): $env")
+        return tokenStore.accessTokenFor(
+            envConfig.fdv.apiURL,
+        )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment (FDVSearchAPI): $env")
     }
 
-    fun loginFdv(env: DirectoryEnvironment, clientID: String, clientSecret: String): Map<String, String> {
+    fun loginFdv(
+        env: DirectoryEnvironment,
+        clientID: String,
+        clientSecret: String
+    ): Map<String, String> {
         val tokenStore = TokenStore()
         val envConfig = config.environment(env)
 
-        val auth = ClientCredentialsAuthenticator(
-            envConfig.fdv.authenticationEndpoint,
-            if (globalAPI.config.httpProxy.enabled) globalAPI.config.httpProxy.proxyURL else null,
-        )
+        val auth =
+            ClientCredentialsAuthenticator(
+                envConfig.fdv.authenticationEndpoint,
+                if (globalAPI.config.httpProxy.enabled) globalAPI.config.httpProxy.proxyURL else null,
+            )
         val authResponse = runBlocking { auth.authenticate(clientID, clientSecret) }
 
-        val httpClient = HttpClient(CIO) {
-            install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                })
+        val httpClient =
+            HttpClient(CIO) {
+                install(ContentNegotiation) {
+                    json(
+                        Json {
+                            ignoreUnknownKeys = true
+                        },
+                    )
+                }
             }
-        }
         val token = authResponse.accessToken
 
-        val authzResponse:JsonObject = runBlocking {
-            val response =
-                httpClient.get(envConfig.fdv.authorizationEndpoint) {
-                    headers {
-                        append("Authorization", "Bearer $token")
+        val authzResponse: JsonObject =
+            runBlocking {
+                val response =
+                    httpClient.get(envConfig.fdv.authorizationEndpoint) {
+                        headers {
+                            append("Authorization", "Bearer $token")
+                        }
                     }
-                }
 
-            if (response.status.value != 200) {
-                val body: String = response.body()
-                throw DirectoryAuthException("Login failed: env:$env , clientID:$clientID, url:${envConfig.fdv.authorizationEndpoint}, status:${response.status.value}, body:$body")
+                if (response.status.value != 200) {
+                    val body: String = response.body()
+                    throw DirectoryAuthException(
+                        "Login failed: env:$env , clientID:$clientID, url:${envConfig.fdv.authorizationEndpoint}, status:${response.status.value}, body:$body",
+                    )
+                }
+                response.body()
             }
-            response.body()
-        }
 
         if (authzResponse["access_token"] == null) {
             throw DirectoryAuthException("Login failed: env:$env , clientID:$clientID, url:${envConfig.fdv.apiURL}")
@@ -117,5 +138,4 @@ class FhirAPI(val globalAPI: GlobalAPI) {
         logger.info { "Login successful: env:$env , clientID:$clientID, url:${envConfig.fdv.apiURL}" }
         return tokenStore.claimsFor(envConfig.fdv.apiURL)!!
     }
-
 }
