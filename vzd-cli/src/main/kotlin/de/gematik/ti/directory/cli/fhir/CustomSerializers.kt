@@ -21,6 +21,7 @@ val FHIRSerializerModule = SerializersModule {
     contextual(HumanNameSerializer)
     contextual(AddressSerializer)
     contextual(LocationSerializer)
+    contextual(EndpointSerializer)
 }
 
 /**
@@ -32,7 +33,7 @@ object CodingSerializer : KSerializer<Coding> {
     data class CodingSurrogate(
         val system: String,
         val code: String,
-        val display: String,
+        val display: String? = null,
     )
 
     override val descriptor: SerialDescriptor = CodingSurrogate.serializer().descriptor
@@ -106,9 +107,9 @@ object HumanNameSerializer : KSerializer<HumanName> {
     ) {
         val surrogate = HumanNameSurrogate(
             family = value.family,
-            given = value.given.map { it.value },
-            prefix = value.prefix.map { it.value },
-            suffix = value.suffix.map { it.value },
+            given = value.given.map { it.value }.ifEmpty { null },
+            prefix = value.prefix.map { it.value }.ifEmpty { null },
+            suffix = value.suffix.map { it.value }.ifEmpty { null },
             use = value.use?.name?.lowercase(),
             text = value.text
         )
@@ -186,7 +187,7 @@ object LocationSerializer : KSerializer<org.hl7.fhir.r4.model.Location> {
     ) {
         val surrogate = LocationSurrogate(
             id = value.idElement.idPart,
-            identifier = value.identifier,
+            identifier = value.identifier.ifEmpty { null },
             name = value.name,
             address = value.address
         )
@@ -194,6 +195,49 @@ object LocationSerializer : KSerializer<org.hl7.fhir.r4.model.Location> {
     }
 
     override fun deserialize(decoder: Decoder): org.hl7.fhir.r4.model.Location {
+        throw NotImplementedError()
+    }
+}
+
+/**
+ * Elaborate Serializer for FHIR Endpoint
+ */
+object EndpointSerializer : KSerializer<org.hl7.fhir.r4.model.Endpoint> {
+    @Serializable
+    @SerialName("Endpoint")
+    data class EndpointSurrogate(
+        val id: String,
+        val identifier: List<@Contextual Identifier>? = null,
+        val connectionType: @Contextual Coding? = null,
+        val name: String? = null,
+        val status: String? = null,
+        val payloadType: List<@Contextual Coding>? = null,
+        val payloadMimeType: List<String>? = null,
+        val address: String? = null,
+        val header: List<String>? = null,
+    )
+
+    override val descriptor: SerialDescriptor = EndpointSurrogate.serializer().descriptor
+
+    override fun serialize(
+        encoder: Encoder,
+        value: org.hl7.fhir.r4.model.Endpoint,
+    ) {
+        val surrogate = EndpointSurrogate(
+            id = value.idElement.idPart,
+            identifier = value.identifier.ifEmpty { null },
+            connectionType = value.connectionType,
+            name = value.name,
+            status = value.status?.name?.lowercase(),
+            payloadType = value.payloadType.flatMap { it.coding }.ifEmpty { null },
+            payloadMimeType = value.payloadMimeType.map { it.value }.ifEmpty { null },
+            address = value.address,
+            header = value.header.map { it.value }.ifEmpty { null }
+        )
+        encoder.encodeSerializableValue(EndpointSurrogate.serializer(), surrogate)
+    }
+
+    override fun deserialize(decoder: Decoder): org.hl7.fhir.r4.model.Endpoint {
         throw NotImplementedError()
     }
 }

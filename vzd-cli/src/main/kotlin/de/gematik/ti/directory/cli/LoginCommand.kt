@@ -39,7 +39,7 @@ class LoginCommand: CliktCommand(name = "login", help = "Logins into all configu
             }
 
             val fhirAPI = FhirAPI(globalAPI)
-            val fhirVault = fhirAPI.openVault(password)
+            val fhirVault = fhirAPI.openVaultFdv(password)
 
             fhirVault.list().forEach {
                 if (environments.contains(it.variant)) {

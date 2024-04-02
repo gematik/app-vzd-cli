@@ -4,16 +4,21 @@ import de.gematik.ti.directory.ClientCredentialsAuthenticator
 import de.gematik.ti.directory.DirectoryAuthException
 import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.cli.GlobalAPI
-import de.gematik.ti.directory.cli.util.FileObjectStore
 import de.gematik.ti.directory.cli.util.KeyStoreVault
 import de.gematik.ti.directory.cli.util.KeyStoreVaultProvider
 import de.gematik.ti.directory.cli.util.TokenStore
 import de.gematik.ti.directory.fhir.Client
-import de.gematik.ti.directory.fhir.Config
 import de.gematik.ti.directory.fhir.DefaultConfig
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
-import java.nio.file.Path
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 const val FDV_SEARCH_SERVICE_NAME = "urn:gematik:directory:fhir:fdv-search"
 
@@ -42,7 +47,7 @@ class FhirAPI(val globalAPI: GlobalAPI) {
         return client
     }
 
-    fun openVault(vaultPassword: String): KeyStoreVault {
+    fun openVaultFdv(vaultPassword: String): KeyStoreVault {
         return KeyStoreVaultProvider().open(vaultPassword, FDV_SEARCH_SERVICE_NAME)
     }
 
@@ -80,7 +85,34 @@ class FhirAPI(val globalAPI: GlobalAPI) {
         )
         val authResponse = runBlocking { auth.authenticate(clientID, clientSecret) }
 
-        tokenStore.addAccessToken(envConfig.fdv.apiURL, authResponse.accessToken)
+        val httpClient = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                })
+            }
+        }
+        val token = authResponse.accessToken
+
+        val authzResponse:JsonObject = runBlocking {
+            val response =
+                httpClient.get(envConfig.fdv.authorizationEndpoint) {
+                    headers {
+                        append("Authorization", "Bearer $token")
+                    }
+                }
+
+            if (response.status.value != 200) {
+                val body: String = response.body()
+                throw DirectoryAuthException("Login failed: env:$env , clientID:$clientID, url:${envConfig.fdv.authorizationEndpoint}, status:${response.status.value}, body:$body")
+            }
+            response.body()
+        }
+
+        if (authzResponse["access_token"] == null) {
+            throw DirectoryAuthException("Login failed: env:$env , clientID:$clientID, url:${envConfig.fdv.apiURL}")
+        }
+        tokenStore.addAccessToken(envConfig.fdv.apiURL, authzResponse["access_token"]!!.jsonPrimitive.content)
 
         logger.info { "Login successful: env:$env , clientID:$clientID, url:${envConfig.fdv.apiURL}" }
         return tokenStore.claimsFor(envConfig.fdv.apiURL)!!

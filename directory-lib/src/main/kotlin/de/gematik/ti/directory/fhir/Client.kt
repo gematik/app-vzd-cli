@@ -13,6 +13,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
@@ -64,7 +65,7 @@ val DefaultConfig =
                         fdv = FdvConfig(
                             apiURL = "https://fhir-directory.vzd.ti-dienste.de/fdv/search",
                             authenticationEndpoint = "https://auth.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
-                            authorizationEndpoint = "https://fhir-directory.vzd.ti-dienste.de/tim-authenticate",
+                            authorizationEndpoint = "https://fhir-directory.vzd.ti-dienste.de/service-authenticate",
                         ),
                     ),
         ),
@@ -101,7 +102,14 @@ enum class SearchResource {
     PractitionerRole,
     HealthcareService,
 }
-class SearchQuery(val params: MutableMap<String, List<String>> = mutableMapOf()) {
+class SearchQuery(val resource: SearchResource, val params: MutableMap<String, List<String>> = mutableMapOf()) {
+    fun addParam(key: String, value: String) {
+        if (params.containsKey(key)) {
+            params[key] = params[key]!!.plus(value)
+        } else {
+            params[key] = listOf(value)
+        }
+    }
 }
 
 class Client(block: Configurator.() -> Unit = {}) {
@@ -175,23 +183,19 @@ class Client(block: Configurator.() -> Unit = {}) {
         this.envConfig = configurator.envConfig ?: throw ConfigException("No environment configured")
     }
 
-    suspend fun search(resource: SearchResource, query: SearchQuery, active: Boolean = true): Bundle {
-        when (resource) {
-            SearchResource.PractitionerRole -> {
-                query.params.put("practitioner.active", listOf(active.toString()))
-            }
-            SearchResource.HealthcareService -> {
-                query.params.put("organization.active", listOf(active.toString()))
-            }
-        }
-        logger.debug { "Searching ${resource.name} with query: ${query.params}" }
-        val response = httpClientSearch.get("/search/${resource.name}") {
+    suspend fun search(query: SearchQuery): Bundle {
+        logger.debug { "Searching ${query.resource.name} with query: ${query.params}" }
+        val response = httpClientSearch.get("/search/${query.resource.name}") {
             query.params.forEach { (key, values) ->
                 values.forEach { value ->
                     parameter(key, value)
                 }
             }
         }
+        return handleSearchResponse(response)
+    }
+
+    private suspend fun handleSearchResponse(response: HttpResponse): Bundle {
 
         val body = response.body<String>()
         val parser = FHIR_R4.newJsonParser()
@@ -210,13 +214,19 @@ class Client(block: Configurator.() -> Unit = {}) {
             throw exc!!
         }
         val bundle = parser.parseResource(Bundle::class.java, body)
+        logger.debug { "Got search response bundle with ${bundle.total} resources." }
         return bundle
 
     }
-    suspend fun fdvSearch(query: String) {
-        val response = httpClientFdv.get("/fdv/search/PractitionerRole") {
-
+    suspend fun searchFdv(query: SearchQuery): Bundle {
+        logger.debug { "Searching ${query.resource.name} with query: ${query.params}" }
+        val response = httpClientFdv.get("/fdv/search/${query.resource.name}") {
+            query.params.forEach { (key, values) ->
+                values.forEach { value ->
+                    parameter(key, value)
+                }
+            }
         }
-        logger.info { "FDV Search response: ${response.status}" }
+        return handleSearchResponse(response)
     }
 }

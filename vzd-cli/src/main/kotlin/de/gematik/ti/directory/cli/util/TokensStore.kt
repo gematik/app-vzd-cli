@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonPrimitive
 import mu.KotlinLogging
 import java.nio.file.Path
@@ -48,7 +49,11 @@ class TokenStore(customConfigPath: Path? = null) : FileObjectStore<List<TokenSto
         val tokenBody = String(Base64.getUrlDecoder().decode(tokenParts[1]), Charsets.UTF_8)
         val jsonObject = Json.decodeFromString<JsonObject>(tokenBody)
         return jsonObject.map { entry ->
-            Pair(entry.key, entry.value.jsonPrimitive.content)
+            if (entry.value is JsonPrimitive) {
+                Pair(entry.key, entry.value.jsonPrimitive.content)
+            } else {
+                Pair(entry.key, entry.value.toString())
+            }
         }.toMap()
     }
 

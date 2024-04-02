@@ -1,6 +1,7 @@
 package de.gematik.ti.directory.cli.fhir
 
 import ca.uhn.fhir.context.FhirContext
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
 import org.hl7.fhir.r4.model.*
@@ -20,7 +21,8 @@ val jsonOutputFormatter = Json {
 
 enum class OutputFormat {
     JSON,
-    HUMAN,
+    JSON_EXT,
+    YAML_EXT,
 }
 
 var ctx = FhirContext.forR4()
@@ -34,25 +36,17 @@ fun Bundle.toPrettyJson(): String {
 fun Bundle.toStringOutput(format: OutputFormat): String {
     return when (format) {
         OutputFormat.JSON -> toPrettyJson()
-        OutputFormat.HUMAN -> toHuman()
+        OutputFormat.JSON_EXT -> toJsonExt()
+        OutputFormat.YAML_EXT -> toYamlExt()
     }
 }
 
-fun Bundle.toHuman(): String {
-    val entries = this.entry.mapNotNull {
-        when (it.resource.resourceType) {
-            ResourceType.PractitionerRole -> {
-                val role = it.resource as PractitionerRole
-                ElaboratePractitionerRole(id = role.idElement.idPart).apply(role, this)
-            }
+fun Bundle.toYamlExt(): String {
+    val elaborateBundle = elaborateBundle()
+    return yamlOutputFormatter.encodeToString(elaborateBundle)
+}
 
-            else -> {
-                null
-            }
-        }
-
-
-    }
-
-    return yamlOutputFormatter.encodeToString(entries)
+fun Bundle.toJsonExt(): String {
+    val elaborateBundle = elaborateBundle()
+    return jsonOutputFormatter.encodeToString(elaborateBundle)
 }
