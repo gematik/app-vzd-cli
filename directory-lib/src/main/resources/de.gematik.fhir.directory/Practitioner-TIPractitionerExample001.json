@@ -2,6 +2,12 @@
   "resourceType": "Practitioner",
   "id": "TIPractitionerExample001",
   "meta": {
+    "tag": [
+      {
+        "system": "https://gematik.de/fhir/directory/CodeSystem/Origin",
+        "code": "ldap"
+      }
+    ],
     "profile": [
       "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
     ]
@@ -16,6 +22,7 @@
       "value": "123456789"
     }
   ],
+  "active": true,
   "qualification": [
     {
       "code": {
