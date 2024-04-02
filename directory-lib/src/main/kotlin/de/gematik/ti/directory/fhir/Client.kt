@@ -13,11 +13,15 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.OperationOutcome
+
+val FHIR_R4 = FhirContext.forR4()
 
 private val JSON =
     Json {
@@ -93,6 +97,13 @@ data class FdvConfig(
     val authorizationEndpoint: String,
 )
 
+enum class SearchResource {
+    PractitionerRole,
+    HealthcareService,
+}
+class SearchQuery(val params: MutableMap<String, List<String>> = mutableMapOf()) {
+}
+
 class Client(block: Configurator.() -> Unit = {}) {
     private val configurator: Configurator = Configurator()
     private val envConfig: EnvironmentConfig
@@ -164,22 +175,47 @@ class Client(block: Configurator.() -> Unit = {}) {
         this.envConfig = configurator.envConfig ?: throw ConfigException("No environment configured")
     }
 
-    suspend fun search(query: String): Bundle {
-        val response = httpClientSearch.get("/search/PractitionerRole") {
-            parameter("practitioner.active", true)
+    suspend fun search(resource: SearchResource, query: SearchQuery, active: Boolean = true): Bundle {
+        when (resource) {
+            SearchResource.PractitionerRole -> {
+                query.params.put("practitioner.active", listOf(active.toString()))
+            }
+            SearchResource.HealthcareService -> {
+                query.params.put("organization.active", listOf(active.toString()))
+            }
+        }
+        logger.debug { "Searching ${resource.name} with query: ${query.params}" }
+        val response = httpClientSearch.get("/search/${resource.name}") {
+            query.params.forEach { (key, values) ->
+                values.forEach { value ->
+                    parameter(key, value)
+                }
+            }
         }
 
         val body = response.body<String>()
+        val parser = FHIR_R4.newJsonParser()
 
-        val ctx = FhirContext.forR4()
-        val parser = ctx.newJsonParser()
+        if (response.status != HttpStatusCode.OK) {
+
+            var exc: DirectoryException? = null
+
+            try {
+                val outcome = parser.parseResource(OperationOutcome::class.java, body)
+                exc = DirectoryException(outcome.issue.joinToString { it.diagnostics })
+            } catch (e: Exception) {
+                exc =  DirectoryException("Search failed: ${response.status} $body")
+            }
+
+            throw exc!!
+        }
         val bundle = parser.parseResource(Bundle::class.java, body)
         return bundle
 
     }
     suspend fun fdvSearch(query: String) {
         val response = httpClientFdv.get("/fdv/search/PractitionerRole") {
-            parameter("practitioner.active", true)
+
         }
         logger.info { "FDV Search response: ${response.status}" }
     }

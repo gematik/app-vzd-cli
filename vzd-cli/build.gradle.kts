@@ -37,7 +37,7 @@ dependencies {
     // implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
     // YAML support for kotlinx serialisation
-    implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
+    implementation("net.mamoe.yamlkt:yamlkt:0.13.0")
 
     // CSV support
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.7.0")

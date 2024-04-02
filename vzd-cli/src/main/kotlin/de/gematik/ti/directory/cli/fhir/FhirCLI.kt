@@ -2,13 +2,22 @@ package de.gematik.ti.directory.cli.fhir
 
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.help
+import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.switch
+import com.github.ajalt.clikt.parameters.types.enum
 import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.cli.GlobalAPI
-import de.gematik.ti.directory.cli.VaultCommand
 import de.gematik.ti.directory.cli.catching
+import de.gematik.ti.directory.fhir.SearchQuery
+import de.gematik.ti.directory.fhir.SearchResource
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 
@@ -77,17 +86,55 @@ class SearchTokenCommand: CliktCommand(name = "token", help = "Set or get Access
         }
 }
 
+enum class ResourceName(val searchResource: SearchResource) {
+    PractitionerRole(SearchResource.PractitionerRole),
+    HealthcareService(SearchResource.HealthcareService),
+    PR(SearchResource.PractitionerRole),
+    HS(SearchResource.HealthcareService),
+}
+
 class SearchCommand: CliktCommand(name = "search", help = "Search FHIR Directory using SearchAPI") {
     private val logger = KotlinLogging.logger {}
+    private val outputFormat by option().switch(
+        "--json" to OutputFormat.JSON,
+        "--human" to OutputFormat.HUMAN,
+    ).default(OutputFormat.HUMAN)
+
+    private val include by option("--include", "-i", help = "Include referenced resources").multiple()
+
+    private val resource by argument(help = "Resource type to search for").enum<ResourceName>(ignoreCase = true)
+        .help(ResourceName.entries.joinToString(", ") { it.name })
+
+    private val params: List<String> by argument(help = "Query parameters").multiple().help("key=value")
 
     private val context by requireObject<FhirCliEnvironmentContext>()
+
+    fun parseParams(): SearchQuery {
+        val query = SearchQuery()
+        params.forEach {
+            if (!it.contains("=")) {
+                throw CliktError("Invalid parameter: $it")
+            }
+            val (key, value) = it.split("=")
+            if (query.params.containsKey(key)) {
+                query.params[key] = query.params[key]!!.plus(value)
+            } else {
+                query.params[key] = listOf(value)
+            }
+        }
+        include.forEach {
+            query.params["_include"] = query.params["_include"]?.plus(it) ?: listOf(it)
+        }
+        return query
+    }
 
     override fun run() =
         catching {
             logger.info { "Searching FHIR Directory ${context.env.name}" }
+            var query = parseParams()
             runBlocking {
-                val bundle = context.client.search("customParams, parameterOptions")
-                echo(bundle.toPrettyJson())
+                val bundle = context.client.search(resource.searchResource, query)
+                echo(bundle.toStringOutput(outputFormat))
             }
         }
 }

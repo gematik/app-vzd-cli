@@ -1,32 +1,26 @@
 package de.gematik.ti.directory.cli.fhir
 
 import ca.uhn.fhir.context.FhirContext
-import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
 import net.mamoe.yamlkt.Yaml
-import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.*
 
 
 val yamlOutputFormatter =
     Yaml {
         encodeDefaultValues = false
+        serializersModule = FHIRSerializerModule
     }
 
 val jsonOutputFormatter = Json {
     encodeDefaults = true
     prettyPrint = true
-    serializersModule =
-        SerializersModule {
-            contextual(ExtendedCertificateDataDERSerializer)
-        }
+    serializersModule = FHIRSerializerModule
 }
 
 enum class OutputFormat {
     JSON,
-    YAML,
+    HUMAN,
 }
 
 var ctx = FhirContext.forR4()
@@ -39,7 +33,26 @@ fun Bundle.toPrettyJson(): String {
 
 fun Bundle.toStringOutput(format: OutputFormat): String {
     return when (format) {
-        OutputFormat.JSON -> jsonOutputFormatter.encodeToString(this)
-        OutputFormat.YAML -> yamlOutputFormatter.encodeToString(this)
+        OutputFormat.JSON -> toPrettyJson()
+        OutputFormat.HUMAN -> toHuman()
     }
+}
+
+fun Bundle.toHuman(): String {
+    val entries = this.entry.mapNotNull {
+        when (it.resource.resourceType) {
+            ResourceType.PractitionerRole -> {
+                val role = it.resource as PractitionerRole
+                ElaboratePractitionerRole(id = role.idElement.idPart).apply(role, this)
+            }
+
+            else -> {
+                null
+            }
+        }
+
+
+    }
+
+    return yamlOutputFormatter.encodeToString(entries)
 }

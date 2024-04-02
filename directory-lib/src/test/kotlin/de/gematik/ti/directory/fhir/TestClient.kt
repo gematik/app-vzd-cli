@@ -3,24 +3,17 @@ package de.gematik.ti.directory.fhir
 import de.gematik.ti.directory.ClientCredentialsAuthenticator
 import de.gematik.ti.directory.DirectoryEnvironment
 import io.kotest.core.spec.style.FeatureSpec
+import io.kotest.matchers.shouldBe
+import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.Reference
 
 class TestClient : FeatureSpec({
-    feature("Authentication") {
-        scenario("Authenticate using secrets from environment") {
-            val client = Client()
-            val env = DirectoryEnvironment.valueOf(System.getenv("FHIR_DIRECTORY_ENV"))
-            val clientId = System.getenv("FHIR_DIRECTORY_CLIENT_ID")
-            val clientSecret = System.getenv("FHIR_DIRECTORY_CLIENT_SECRET")
-
-            val envConfig = DefaultConfig.environment(env)
-
-            val auth = ClientCredentialsAuthenticator(
-                envConfig.serviceAuthURL,
-                null
-            )
-
-            val token = auth.authenticate(clientId, clientSecret)
-            println(token)
+    feature("Bundle") {
+        scenario("References") {
+            val ref = Reference("Practitioner/123")
+            val id = IdType(ref.reference)
+            id.idPart shouldBe "123"
+            id.resourceType shouldBe "Practitioner"
         }
     }
 })
