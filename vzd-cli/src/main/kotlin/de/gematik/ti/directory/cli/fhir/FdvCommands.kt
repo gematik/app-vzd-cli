@@ -9,6 +9,7 @@ class FdvCommands : CliktCommand(name = "fdv", help = "Commands for FDVSearchAPI
             FdvLoginCommand(),
             FdvTokenCommand(),
             SearchCommand { context, query -> context.client.searchFdv(query) },
+            FdvShowCommand(),
         )
     }
 

@@ -21,6 +21,7 @@ import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.ResourceType
 
 val FHIR_R4 = FhirContext.forR4()
 
@@ -103,9 +104,9 @@ data class FdvConfig(
     val authorizationEndpoint: String,
 )
 
-enum class SearchResource {
-    PractitionerRole,
-    HealthcareService,
+enum class SearchResource(resourceType: ResourceType) {
+    PractitionerRole(ResourceType.PractitionerRole),
+    HealthcareService(ResourceType.HealthcareService),
 }
 
 class SearchQuery(val resource: SearchResource, val params: MutableMap<String, List<String>> = mutableMapOf()) {

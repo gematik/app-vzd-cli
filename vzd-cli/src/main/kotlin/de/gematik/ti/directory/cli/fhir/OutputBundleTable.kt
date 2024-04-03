@@ -1,17 +1,14 @@
 package de.gematik.ti.directory.cli.fhir
 
-import de.gematik.ti.directory.admin.DirectoryEntry
-import de.gematik.ti.directory.util.escape
+import de.gematik.ti.directory.fhir.toDirectoryEntries
 import hu.vissy.texttable.dsl.tableFormatter
 import org.hl7.fhir.r4.model.Bundle
 
 fun Bundle.toTable(): String {
     val formatter =
-        tableFormatter<Bundle> {
+        tableFormatter<de.gematik.ti.directory.fhir.DirectoryEntry> {
             labeled<String>("TelematikID", "Gesamt") {
-                extractor { directoryEntry ->
-                    "directoryEntry.directoryEntryBase.telematikID.escape()"
-                }
+                extractor { it.telematikID }
             }
 
             class State(var count: Int = 0)
@@ -19,7 +16,7 @@ fun Bundle.toTable(): String {
                 initState { State() }
                 extractor { directoryEntry, state ->
                     state.count += 1
-                    directoryEntry.directoryEntryBase.displayName
+                    directoryEntry.displayName ?: "N/A"
                 }
                 cellFormatter {
                     maxWidth = 24
@@ -32,11 +29,13 @@ fun Bundle.toTable(): String {
             stateless("Address") {
                 extractor { directoryEntry ->
                     buildString {
-                        append(directoryEntry.directoryEntryBase.streetAddress ?: "n/a")
-                        append(" ")
-                        append(directoryEntry.directoryEntryBase.postalCode ?: "n/a")
-                        append(" ")
-                        append(directoryEntry.directoryEntryBase.localityName ?: "n/a")
+                        directoryEntry.location?.firstOrNull()?.let {
+                                append(it.address?.line?.joinToString())
+                                append(", ")
+                                append(it.address?.postalCode)
+                                append(" ")
+                                append(it.address?.city)
+                        }
                     }
                 }
                 cellFormatter {
@@ -47,5 +46,5 @@ fun Bundle.toTable(): String {
             showAggregation = true
         }
 
-    return formatter.apply(this)
+    return formatter.apply(this.toDirectoryEntries())
 }

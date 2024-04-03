@@ -23,6 +23,7 @@ enum class OutputFormat {
     JSON,
     JSON_EXT,
     YAML_EXT,
+    TABLE,
 }
 
 var ctx = FhirContext.forR4()
@@ -38,6 +39,7 @@ fun Bundle.toStringOutput(format: OutputFormat): String {
         OutputFormat.JSON -> toPrettyJson()
         OutputFormat.JSON_EXT -> toJsonExt()
         OutputFormat.YAML_EXT -> toYamlExt()
+        OutputFormat.TABLE -> toTable()
     }
 }
 

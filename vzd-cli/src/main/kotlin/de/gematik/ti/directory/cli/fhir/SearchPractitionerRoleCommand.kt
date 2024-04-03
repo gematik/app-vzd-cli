@@ -16,13 +16,14 @@ import mu.KotlinLogging
 
 class SearchPractitionerRoleCommand : CliktCommand(name = "practitioner-role", help = "Search PractitionerRole resources (alias: pr)") {
     private val logger = KotlinLogging.logger {}
-    private val context by requireObject<FhirCliEnvironmentContext>()
+    private val context by requireObject<SearchCommand.SearchContext>()
 
     private val outputFormat by option().switch(
         "--json" to OutputFormat.JSON,
         "--json-ext" to OutputFormat.JSON_EXT,
         "--human" to OutputFormat.YAML_EXT,
-    ).default(OutputFormat.YAML_EXT)
+        "--table" to OutputFormat.TABLE,
+    ).default(OutputFormat.TABLE)
 
     private val active: Boolean by option("--active", "-a", help = "Filter by active status").flag(default = true)
 
@@ -47,7 +48,7 @@ class SearchPractitionerRoleCommand : CliktCommand(name = "practitioner-role", h
 
     override fun run() =
         catching {
-            logger.info { "Searching PractitionerRole resources in FHIR Directory ${context.env.name}" }
+            logger.info { "Searching PractitionerRole resources in FHIR Directory ${context.ctx.env.name}" }
             val query = SearchQuery(SearchResource.PractitionerRole)
 
             listOf(includePractitioner, includeLocation, includeEndpoint).forEach {
@@ -67,7 +68,7 @@ class SearchPractitionerRoleCommand : CliktCommand(name = "practitioner-role", h
             }
 
             runBlocking {
-                val bundle = context.client.search(query)
+                val bundle = context.search(context.ctx, query)
                 echo(bundle.toStringOutput(outputFormat))
             }
         }

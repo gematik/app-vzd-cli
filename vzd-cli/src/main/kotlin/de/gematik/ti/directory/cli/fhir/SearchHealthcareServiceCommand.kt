@@ -22,7 +22,8 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
         "--json" to OutputFormat.JSON,
         "--json-ext" to OutputFormat.JSON_EXT,
         "--human" to OutputFormat.YAML_EXT,
-    ).default(OutputFormat.YAML_EXT)
+        "--table" to OutputFormat.TABLE,
+    ).default(OutputFormat.TABLE)
 
     private val active: Boolean by option("--active", "-a", help = "Filter by active status").flag(default = true)
 

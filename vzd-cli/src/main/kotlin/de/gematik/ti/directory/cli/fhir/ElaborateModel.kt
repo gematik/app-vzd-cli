@@ -1,17 +1,11 @@
 package de.gematik.ti.directory.cli.fhir
 
+import de.gematik.ti.directory.fhir.findResource
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.hl7.fhir.r4.model.*
 
 typealias ElaborateBundle = List<Any>
-
-fun Bundle.findResource(reference: Reference): Bundle.BundleEntryComponent? {
-    val id = IdType(reference.reference)
-    return this.entry.find {
-        it.resource?.fhirType() == id.resourceType && it.resource?.idElement?.idPart == id.idPart
-    }
-}
 
 fun Bundle.elaborateBundle(): ElaborateBundle {
     val entries =
