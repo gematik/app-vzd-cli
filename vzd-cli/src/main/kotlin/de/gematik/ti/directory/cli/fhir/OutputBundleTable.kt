@@ -30,11 +30,11 @@ fun Bundle.toTable(): String {
                 extractor { directoryEntry ->
                     buildString {
                         directoryEntry.location?.firstOrNull()?.let {
-                                append(it.address?.line?.joinToString())
-                                append(", ")
-                                append(it.address?.postalCode)
-                                append(" ")
-                                append(it.address?.city)
+                            append(it.address?.line?.joinToString())
+                            append(", ")
+                            append(it.address?.postalCode)
+                            append(" ")
+                            append(it.address?.city)
                         }
                     }
                 }

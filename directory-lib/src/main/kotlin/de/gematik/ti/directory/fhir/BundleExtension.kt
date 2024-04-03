@@ -49,7 +49,6 @@ data class DirectoryEntry(
         }
 }
 
-
 fun Bundle.filterByType(resourceType: ResourceType): List<Resource> {
     return entry.filter { it.resource.resourceType == resourceType }.map { it.resource }
 }
@@ -61,7 +60,7 @@ fun Bundle.filterPractitionerRoles(): List<PractitionerRoleEntry> {
             practitionerRole = practitionerRole,
             practitioner = findResource(practitionerRole.practitioner)?.resource as Practitioner?,
             location = practitionerRole.location.map { findResource(it)?.resource as Location }.ifEmpty { null },
-            endpoint = practitionerRole.endpoint.map { findResource(it)?.resource as Endpoint }.ifEmpty { null }
+            endpoint = practitionerRole.endpoint.map { findResource(it)?.resource as Endpoint }.ifEmpty { null },
         )
     }
 }
@@ -73,14 +72,30 @@ fun Bundle.filterHealthcareServices(): List<HealthcareServiceEntry> {
             healthcareService = healthcareService,
             organization = findResource(healthcareService.providedBy)?.resource as Organization?,
             location = healthcareService.location.map { findResource(it)?.resource as Location }.ifEmpty { null },
-            endpoint = healthcareService.endpoint.map { findResource(it)?.resource as Endpoint }.ifEmpty { null }
+            endpoint = healthcareService.endpoint.map { findResource(it)?.resource as Endpoint }.ifEmpty { null },
         )
     }
 }
 
 fun Bundle.toDirectoryEntries(): List<DirectoryEntry> {
-    return filterPractitionerRoles().map { DirectoryEntry(resourceType = ResourceType.PractitionerRole, practitionerRole = it.practitionerRole, practitioner = it.practitioner, location = it.location, endpoint = it.endpoint) } +
-            filterHealthcareServices().map { DirectoryEntry(resourceType = ResourceType.HealthcareService, healthcareService = it.healthcareService, organization = it.organization, location = it.location, endpoint = it.endpoint) }
+    return filterPractitionerRoles().map {
+        DirectoryEntry(
+            resourceType = ResourceType.PractitionerRole,
+            practitionerRole = it.practitionerRole,
+            practitioner = it.practitioner,
+            location = it.location,
+            endpoint = it.endpoint,
+        )
+    } +
+        filterHealthcareServices().map {
+            DirectoryEntry(
+                resourceType = ResourceType.HealthcareService,
+                healthcareService = it.healthcareService,
+                organization = it.organization,
+                location = it.location,
+                endpoint = it.endpoint,
+            )
+        }
 }
 
 public fun Bundle.findResource(reference: Reference): Bundle.BundleEntryComponent? {
