@@ -220,7 +220,11 @@ class Client(block: Configurator.() -> Unit = {}) {
                 val outcome = parser.parseResource(OperationOutcome::class.java, body)
                 exc = DirectoryException(outcome.issue.joinToString { it.diagnostics })
             } catch (e: Exception) {
-                exc = DirectoryException("Search failed: ${response.status} $body")
+                if (response.status == HttpStatusCode.Unauthorized) {
+                    exc = DirectoryException("Unauthorized. Please use `vzd-cli login` first.")
+                } else {
+                    exc = DirectoryException("Search failed: ${response.status} $body")
+                }
             }
 
             throw exc!!
