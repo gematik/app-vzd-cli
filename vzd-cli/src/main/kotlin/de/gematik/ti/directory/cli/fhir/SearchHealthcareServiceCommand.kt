@@ -43,8 +43,9 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
     ).default("PractitionerRole:endpoint")
 
     private val textArguments by argument("SEARCH_TEXT").multiple(required = false)
-
     private val telematikID by option("--telematik-id", "-t", help = "Telematik-ID of the Organization")
+    private val professionOID by option("--professionOID", "-p", help = "OID of the profession")
+    private val summary by option("--summary", "-s", help = "Summary mode").flag()
 
     override fun run() =
         catching {
@@ -67,8 +68,22 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
                 query.addParam("organization.identifier", "https://gematik.de/fhir/sid/telematik-id|$telematikID")
             }
 
-            runBlocking {
-                val bundle = context.search(context.ctx, query)
+            if (professionOID != null) {
+                query.addParam("organization.type", "https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID|$professionOID")
+            }
+
+            if (summary) {
+                query.addParam("_summary", "count")
+            }
+
+            val bundle =
+                runBlocking {
+                    context.search(context.ctx, query)
+                }
+
+            if (summary) {
+                echo("Total: ${bundle.total}")
+            } else {
                 echo(bundle.toStringOutput(outputFormat))
             }
         }

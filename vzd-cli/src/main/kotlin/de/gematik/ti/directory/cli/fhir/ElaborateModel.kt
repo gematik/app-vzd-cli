@@ -133,6 +133,7 @@ data class ElaborateOrganization(
     val id: String,
     var identifier: List<@Contextual Identifier>? = null,
     var name: String? = null,
+    var type: List<@Contextual Coding>? = null,
 ) {
     fun apply(
         organization: Organization,
@@ -140,6 +141,8 @@ data class ElaborateOrganization(
     ): ElaborateOrganization {
         this.identifier = organization.identifier
         this.name = organization.name
+
+        this.type = organization.type?.map { it.coding }?.flatten()?.ifEmpty { null }
 
         return this
     }
