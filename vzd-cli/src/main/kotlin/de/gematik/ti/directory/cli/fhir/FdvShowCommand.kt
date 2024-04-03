@@ -1,7 +1,6 @@
 package de.gematik.ti.directory.cli.fhir
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
@@ -11,7 +10,6 @@ import com.github.ajalt.clikt.parameters.options.switch
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.fhir.SearchQuery
 import de.gematik.ti.directory.fhir.SearchResource
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -32,7 +30,6 @@ class FdvShowCommand : CliktCommand(name = "show", help = "Shows an entry") {
 
     override fun run() =
         catching {
-            val channel = Channel<Boolean>()
             runBlocking {
                 launch {
                     try {
@@ -48,13 +45,9 @@ class FdvShowCommand : CliktCommand(name = "show", help = "Shows an entry") {
                         val practitionerRoleBundle = context.client.searchFdv(practitionerRoleQuery)
                         if (practitionerRoleBundle.entry.isNotEmpty()) {
                             echo(practitionerRoleBundle.toStringOutput(outputFormat))
-                            channel.send(true)
-                        } else {
-                            channel.send(false)
                         }
                     } catch (e: Exception) {
                         logger.info(e) { "No PractitionerRole found for Telematik-ID $telematikID" }
-                        channel.send(false)
                     }
                 }
                 launch {
@@ -71,18 +64,10 @@ class FdvShowCommand : CliktCommand(name = "show", help = "Shows an entry") {
                         val healthcareServiceBundle = context.client.searchFdv(healthcareServiceQuery)
                         if (healthcareServiceBundle.entry.isNotEmpty()) {
                             echo(healthcareServiceBundle.toStringOutput(outputFormat))
-                            channel.send(true)
-                        } else {
-                            channel.send(false)
                         }
                     } catch (e: Exception) {
                         logger.info(e) { "No HealthcareService found for Telematik-ID $telematikID" }
-                        channel.send(false)
                     }
-                }
-
-                if (!channel.receive() && !channel.receive()) {
-                    throw CliktError("No entry found for Telematik-ID $telematikID")
                 }
             }
         }
