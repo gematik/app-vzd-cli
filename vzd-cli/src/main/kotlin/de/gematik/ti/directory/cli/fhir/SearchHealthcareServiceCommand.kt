@@ -4,10 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.switch
+import com.github.ajalt.clikt.parameters.options.*
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.fhir.SearchQuery
 import de.gematik.ti.directory.fhir.SearchResource
@@ -28,8 +25,8 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
     private val active: Boolean by option("--active", "-a", help = "Filter by active status").flag(default = true)
 
     private val includeOrganization by option().switch(
-        "--include-practitioner" to "HealthcareService:organization",
-        "--exclude-practitioner" to "",
+        "--include-organization" to "HealthcareService:organization",
+        "--exclude-organization" to "",
     ).default("HealthcareService:organization")
 
     private val includeLocation by option().switch(
@@ -44,8 +41,15 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
 
     private val textArguments by argument("SEARCH_TEXT").multiple(required = false)
     private val telematikID by option("--telematik-id", "-t", help = "Telematik-ID of the Organization")
-    private val professionOID by option("--professionOID", "-p", help = "OID of the profession")
+    private val professionOID by option("--professionOID", help = "OID of the profession")
     private val summary by option("--summary", "-s", help = "Summary mode").flag()
+
+    private val customParams: Map<String, String> by option(
+        "-p",
+        "--param",
+        help = "Specify query parameters to find matching entries",
+        metavar = "NAME=VALUE",
+    ).associate()
 
     override fun run() =
         catching {
@@ -74,6 +78,10 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
 
             if (summary) {
                 query.addParam("_summary", "count")
+            }
+
+            customParams.forEach {
+                query.addParam(it.key, it.value)
             }
 
             val bundle =

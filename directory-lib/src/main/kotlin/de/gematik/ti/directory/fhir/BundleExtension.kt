@@ -54,25 +54,45 @@ fun Bundle.filterByType(resourceType: ResourceType): List<Resource> {
 }
 
 fun Bundle.filterPractitionerRoles(): List<PractitionerRoleEntry> {
-    return filterByType(ResourceType.PractitionerRole).map {
-        val practitionerRole = it as PractitionerRole
+    return filterByType(ResourceType.PractitionerRole).map { resource ->
+        val practitionerRole = resource as PractitionerRole
         PractitionerRoleEntry(
             practitionerRole = practitionerRole,
-            practitioner = findResource(practitionerRole.practitioner)?.resource as Practitioner?,
-            location = practitionerRole.location.map { findResource(it)?.resource as Location }.ifEmpty { null },
-            endpoint = practitionerRole.endpoint.map { findResource(it)?.resource as Endpoint }.ifEmpty { null },
+            practitioner = findResource(practitionerRole.practitioner)?.resource?.let { it as Practitioner },
+            location =
+                practitionerRole.location?.mapNotNull {
+                    findResource(it)?.resource
+                }?.map {
+                    it as Location
+                }?.ifEmpty { null },
+            endpoint =
+                practitionerRole.endpoint?.mapNotNull {
+                    findResource(it)?.resource
+                }?.map {
+                    it as Endpoint
+                }?.ifEmpty { null },
         )
     }
 }
 
 fun Bundle.filterHealthcareServices(): List<HealthcareServiceEntry> {
-    return filterByType(ResourceType.HealthcareService).map {
-        val healthcareService = it as HealthcareService
+    return filterByType(ResourceType.HealthcareService).map { resource ->
+        val healthcareService = resource as HealthcareService
         HealthcareServiceEntry(
             healthcareService = healthcareService,
-            organization = findResource(healthcareService.providedBy)?.resource as Organization?,
-            location = healthcareService.location.map { findResource(it)?.resource as Location }.ifEmpty { null },
-            endpoint = healthcareService.endpoint.map { findResource(it)?.resource as Endpoint }.ifEmpty { null },
+            organization = findResource(healthcareService.providedBy)?.resource?.let { it as Organization },
+            location =
+                healthcareService.location?.mapNotNull {
+                    findResource(it)?.resource
+                }?.map {
+                    it as Location
+                }?.ifEmpty { null },
+            endpoint =
+                healthcareService.endpoint?.mapNotNull {
+                    findResource(it)?.resource
+                }?.map {
+                    it as Endpoint
+                }?.ifEmpty { null },
         )
     }
 }

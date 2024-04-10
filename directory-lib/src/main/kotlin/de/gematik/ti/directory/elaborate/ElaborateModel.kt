@@ -81,6 +81,7 @@ data class ElaborateKIMAddress(
     val mail: String,
     val version: String,
     val provider: ElaborateKIMProvider?,
+    val appTags: List<String>? = null,
 )
 
 @Serializable
