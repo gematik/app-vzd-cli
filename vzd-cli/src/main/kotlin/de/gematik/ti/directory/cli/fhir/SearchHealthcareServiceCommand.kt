@@ -35,9 +35,9 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
     ).default("HealthcareService:location")
 
     private val includeEndpoint by option().switch(
-        "--include-endpoint" to "PractitionerRole:endpoint",
+        "--include-endpoint" to "HealthcareService:endpoint",
         "--exclude-endpoint" to "",
-    ).default("PractitionerRole:endpoint")
+    ).default("HealthcareService:endpoint")
 
     private val textArguments by argument("SEARCH_TEXT").multiple(required = false)
     private val telematikID by option("--telematik-id", "-t", help = "Telematik-ID of the Organization")
