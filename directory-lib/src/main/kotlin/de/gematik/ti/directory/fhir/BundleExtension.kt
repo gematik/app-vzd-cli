@@ -1,15 +1,17 @@
 package de.gematik.ti.directory.fhir
 
+import kotlinx.serialization.Contextual
 import org.hl7.fhir.r4.model.*
 
 fun Bundle.filterByType(resourceType: ResourceType): List<Resource> {
     return entry.filter { it.resource.resourceType == resourceType }.map { it.resource }
 }
 
-fun Bundle.filterPractitionerRoles(): List<PractitionerRoleEntry> {
+fun Bundle.filterPractitionerRoles(): List<FHIRDirectoryEntry> {
     return filterByType(ResourceType.PractitionerRole).map { resource ->
         val practitionerRole = resource as PractitionerRole
-        PractitionerRoleEntry(
+        FHIRDirectoryEntry(
+            resourceType = ResourceType.PractitionerRole,
             practitionerRole = practitionerRole,
             practitioner = findResource(practitionerRole.practitioner)?.resource?.let { it as Practitioner },
             location =
@@ -28,10 +30,11 @@ fun Bundle.filterPractitionerRoles(): List<PractitionerRoleEntry> {
     }
 }
 
-fun Bundle.filterHealthcareServices(): List<HealthcareServiceEntry> {
+fun Bundle.filterHealthcareServices(): List<FHIRDirectoryEntry> {
     return filterByType(ResourceType.HealthcareService).map { resource ->
         val healthcareService = resource as HealthcareService
-        HealthcareServiceEntry(
+        FHIRDirectoryEntry(
+            resourceType = ResourceType.HealthcareService,
             healthcareService = healthcareService,
             organization = findResource(healthcareService.providedBy)?.resource?.let { it as Organization },
             location =

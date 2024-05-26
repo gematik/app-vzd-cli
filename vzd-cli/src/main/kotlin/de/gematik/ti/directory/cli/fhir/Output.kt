@@ -1,6 +1,10 @@
 package de.gematik.ti.directory.cli.fhir
 
 import ca.uhn.fhir.context.FhirContext
+import de.gematik.ti.directory.fhir.FHIRDirectoryEntry
+import de.gematik.ti.directory.fhir.toDirectoryEntries
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
@@ -44,11 +48,11 @@ fun Bundle.toStringOutput(format: OutputFormat): String {
 }
 
 fun Bundle.toYamlExt(): String {
-    val elaborateBundle = elaborateBundle()
-    return yamlOutputFormatter.encodeToString(elaborateBundle)
+    val entries = this.toDirectoryEntries()
+    return yamlOutputFormatter.encodeToString(ListSerializer(FHIRDirectoryEntrySerializer), entries)
 }
 
 fun Bundle.toJsonExt(): String {
-    val elaborateBundle = elaborateBundle()
-    return jsonOutputFormatter.encodeToString(elaborateBundle)
+    val entries = this.toDirectoryEntries()
+    return jsonOutputFormatter.encodeToString(ListSerializer(FHIRDirectoryEntrySerializer), entries)
 }
