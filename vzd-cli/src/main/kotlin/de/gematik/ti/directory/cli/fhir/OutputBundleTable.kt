@@ -6,7 +6,7 @@ import org.hl7.fhir.r4.model.Bundle
 
 fun Bundle.toTable(): String {
     val formatter =
-        tableFormatter<de.gematik.ti.directory.fhir.DirectoryEntry> {
+        tableFormatter<de.gematik.ti.directory.fhir.FHIRDirectoryEntry> {
             labeled<String>("TelematikID", "Gesamt") {
                 extractor { it.telematikID }
             }
