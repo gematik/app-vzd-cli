@@ -1,9 +1,7 @@
 package de.gematik.ti.directory.cli.fhir
 
 import ca.uhn.fhir.context.FhirContext
-import de.gematik.ti.directory.fhir.FHIRDirectoryEntry
 import de.gematik.ti.directory.fhir.toDirectoryEntries
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

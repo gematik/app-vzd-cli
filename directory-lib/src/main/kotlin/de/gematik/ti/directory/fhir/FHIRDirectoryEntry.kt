@@ -1,7 +1,6 @@
 package de.gematik.ti.directory.fhir
 
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.Polymorphic
 import org.hl7.fhir.r4.model.*
 
 /**

@@ -2,7 +2,6 @@ package de.gematik.ti.directory.cli.fhir
 
 import de.gematik.ti.directory.fhir.FHIRDirectoryEntry
 import kotlinx.serialization.*
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -144,7 +143,7 @@ object PractitionerRoleSerializer : KSerializer<PractitionerRole> {
         encoder.encodeSerializableValue(PractitionerRoleSurrogate.serializer(), surrogate)
     }
 
-    override fun deserialize(decoder: Decoder):PractitionerRole {
+    override fun deserialize(decoder: Decoder): PractitionerRole {
         throw NotImplementedError()
     }
 }

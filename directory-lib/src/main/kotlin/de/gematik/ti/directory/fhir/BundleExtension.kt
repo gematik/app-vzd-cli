@@ -1,6 +1,5 @@
 package de.gematik.ti.directory.fhir
 
-import kotlinx.serialization.Contextual
 import org.hl7.fhir.r4.model.*
 
 fun Bundle.filterByType(resourceType: ResourceType): List<Resource> {
