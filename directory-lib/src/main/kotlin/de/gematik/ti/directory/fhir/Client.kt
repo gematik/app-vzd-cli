@@ -104,7 +104,7 @@ data class FdvConfig(
     val authorizationEndpoint: String,
 )
 
-enum class SearchResource(resourceType: ResourceType) {
+enum class SearchResource(val resourceType: ResourceType) {
     PractitionerRole(ResourceType.PractitionerRole),
     HealthcareService(ResourceType.HealthcareService),
 }

@@ -79,6 +79,9 @@ dependencies {
     // Validation framework
     implementation("io.konform:konform-jvm:0.4.0")
 
+    // jackson yaml, the version must match the transitive dependency from hapi
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.2")
+
     // Bouncy castle fpr crypto and certificates processing
     shadow("org.bouncycastle:bcprov-jdk15on:$bcVersion")
     shadow("org.bouncycastle:bcpkix-jdk15on:$bcVersion")

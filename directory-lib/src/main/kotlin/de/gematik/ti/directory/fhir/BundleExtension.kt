@@ -9,10 +9,14 @@ fun Bundle.filterByType(resourceType: ResourceType): List<Resource> {
 fun Bundle.filterPractitionerRoles(): List<FHIRDirectoryEntry> {
     return filterByType(ResourceType.PractitionerRole).map { resource ->
         val practitionerRole = resource as PractitionerRole
+        val practitioner = findResource(practitionerRole.practitioner)?.resource?.let { it as Practitioner }
+
         FHIRDirectoryEntry(
+            telematikID = practitioner?.identifier?.firstOrNull { it.system == "https://gematik.de/fhir/sid/telematik-id" }?.value,
+            displayName = practitioner?.name?.firstOrNull()?.text,
             resourceType = ResourceType.PractitionerRole,
             practitionerRole = practitionerRole,
-            practitioner = findResource(practitionerRole.practitioner)?.resource?.let { it as Practitioner },
+            practitioner = practitioner,
             location =
                 practitionerRole.location?.mapNotNull {
                     findResource(it)?.resource
@@ -32,10 +36,13 @@ fun Bundle.filterPractitionerRoles(): List<FHIRDirectoryEntry> {
 fun Bundle.filterHealthcareServices(): List<FHIRDirectoryEntry> {
     return filterByType(ResourceType.HealthcareService).map { resource ->
         val healthcareService = resource as HealthcareService
+        val organization = findResource(healthcareService.providedBy)?.resource?.let { it as Organization }
         FHIRDirectoryEntry(
+            telematikID = organization?.identifier?.firstOrNull { it.system == "https://gematik.de/fhir/sid/telematik-id" }?.value,
+            displayName = organization?.name,
             resourceType = ResourceType.HealthcareService,
             healthcareService = healthcareService,
-            organization = findResource(healthcareService.providedBy)?.resource?.let { it as Organization },
+            organization = organization,
             location =
                 healthcareService.location?.mapNotNull {
                     findResource(it)?.resource
@@ -53,27 +60,10 @@ fun Bundle.filterHealthcareServices(): List<FHIRDirectoryEntry> {
 }
 
 fun Bundle.toDirectoryEntries(): List<FHIRDirectoryEntry> {
-    return filterPractitionerRoles().map {
-        FHIRDirectoryEntry(
-            resourceType = ResourceType.PractitionerRole,
-            practitionerRole = it.practitionerRole,
-            practitioner = it.practitioner,
-            location = it.location,
-            endpoint = it.endpoint,
-        )
-    } +
-        filterHealthcareServices().map {
-            FHIRDirectoryEntry(
-                resourceType = ResourceType.HealthcareService,
-                healthcareService = it.healthcareService,
-                organization = it.organization,
-                location = it.location,
-                endpoint = it.endpoint,
-            )
-        }
+    return filterPractitionerRoles() + filterHealthcareServices()
 }
 
-public fun Bundle.findResource(reference: Reference): Bundle.BundleEntryComponent? {
+fun Bundle.findResource(reference: Reference): Bundle.BundleEntryComponent? {
     val id = IdType(reference.reference)
     return this.entry.find {
         it.resource?.fhirType() == id.resourceType && it.resource?.idElement?.idPart == id.idPart

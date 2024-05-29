@@ -18,7 +18,8 @@ class SearchPractitionerRoleCommand : CliktCommand(name = "practitioner-role", h
     private val outputFormat by option().switch(
         "--json" to OutputFormat.JSON,
         "--json-ext" to OutputFormat.JSON_EXT,
-        "--human" to OutputFormat.YAML_EXT,
+        "--yaml" to OutputFormat.YAML,
+        "--human" to OutputFormat.HUMAN,
         "--table" to OutputFormat.TABLE,
     ).default(OutputFormat.TABLE)
 

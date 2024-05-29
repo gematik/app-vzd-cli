@@ -23,8 +23,9 @@ class FdvShowCommand : CliktCommand(name = "show", help = "Shows an entry") {
     private val outputFormat by option().switch(
         "--json" to OutputFormat.JSON,
         "--json-ext" to OutputFormat.JSON_EXT,
-        "--human" to OutputFormat.YAML_EXT,
-    ).default(OutputFormat.YAML_EXT)
+        "--yaml" to OutputFormat.YAML,
+        "--human" to OutputFormat.HUMAN,
+    ).default(OutputFormat.HUMAN)
 
     private val active: Boolean by option("--active", "-a", help = "Filter by active status").flag(default = true)
 
@@ -32,41 +33,33 @@ class FdvShowCommand : CliktCommand(name = "show", help = "Shows an entry") {
         catching {
             runBlocking {
                 launch {
-                    try {
-                        val practitionerRoleQuery = SearchQuery(SearchResource.PractitionerRole)
-                        practitionerRoleQuery.addParam("practitioner.active", active.toString())
-                        practitionerRoleQuery.addParam(
-                            "practitioner.identifier",
-                            "https://gematik.de/fhir/sid/telematik-id|$telematikID",
-                        )
-                        practitionerRoleQuery.addParam("_include", "PractitionerRole:practitioner")
-                        practitionerRoleQuery.addParam("_include", "PractitionerRole:location")
-                        practitionerRoleQuery.addParam("_include", "PractitionerRole:endpoint")
-                        val practitionerRoleBundle = context.client.searchFdv(practitionerRoleQuery)
-                        if (practitionerRoleBundle.entry.isNotEmpty()) {
-                            echo(practitionerRoleBundle.toStringOutput(outputFormat))
-                        }
-                    } catch (e: Exception) {
-                        logger.info(e) { "No PractitionerRole found for Telematik-ID $telematikID" }
+                    val practitionerRoleQuery = SearchQuery(SearchResource.PractitionerRole)
+                    practitionerRoleQuery.addParam("practitioner.active", active.toString())
+                    practitionerRoleQuery.addParam(
+                        "practitioner.identifier",
+                        "https://gematik.de/fhir/sid/telematik-id|$telematikID",
+                    )
+                    practitionerRoleQuery.addParam("_include", "PractitionerRole:practitioner")
+                    practitionerRoleQuery.addParam("_include", "PractitionerRole:location")
+                    practitionerRoleQuery.addParam("_include", "PractitionerRole:endpoint")
+                    val practitionerRoleBundle = context.client.searchFdv(practitionerRoleQuery)
+                    if (practitionerRoleBundle.entry?.isNotEmpty() == true) {
+                        echo(practitionerRoleBundle.toStringOutput(outputFormat))
                     }
                 }
                 launch {
-                    try {
-                        val healthcareServiceQuery = SearchQuery(SearchResource.HealthcareService)
-                        healthcareServiceQuery.addParam("organization.active", active.toString())
-                        healthcareServiceQuery.addParam(
-                            "organization.identifier",
-                            "https://gematik.de/fhir/sid/telematik-id|$telematikID",
-                        )
-                        healthcareServiceQuery.addParam("_include", "HealthcareService:organization")
-                        healthcareServiceQuery.addParam("_include", "HealthcareService:location")
-                        healthcareServiceQuery.addParam("_include", "HealthcareService:endpoint")
-                        val healthcareServiceBundle = context.client.searchFdv(healthcareServiceQuery)
-                        if (healthcareServiceBundle.entry.isNotEmpty()) {
-                            echo(healthcareServiceBundle.toStringOutput(outputFormat))
-                        }
-                    } catch (e: Exception) {
-                        logger.info(e) { "No HealthcareService found for Telematik-ID $telematikID" }
+                    val healthcareServiceQuery = SearchQuery(SearchResource.HealthcareService)
+                    healthcareServiceQuery.addParam("organization.active", active.toString())
+                    healthcareServiceQuery.addParam(
+                        "organization.identifier",
+                        "https://gematik.de/fhir/sid/telematik-id|$telematikID",
+                    )
+                    healthcareServiceQuery.addParam("_include", "HealthcareService:organization")
+                    healthcareServiceQuery.addParam("_include", "HealthcareService:location")
+                    healthcareServiceQuery.addParam("_include", "HealthcareService:endpoint")
+                    val healthcareServiceBundle = context.client.searchFdv(healthcareServiceQuery)
+                    if (healthcareServiceBundle.entry?.isNotEmpty() == true) {
+                        echo(healthcareServiceBundle.toStringOutput(outputFormat))
                     }
                 }
             }
