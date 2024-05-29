@@ -12,7 +12,6 @@ import org.hl7.fhir.r4.model.*
 
 val fhirExtFormatter =
     Json {
-        encodeDefaults = true
         prettyPrint = true
         serializersModule = FHIRSerializerModule
     }
@@ -46,8 +45,7 @@ fun Bundle.toJsonExt(): String {
     return fhirExtFormatter.encodeToString(entries)
 }
 
-fun Bundle.toYaml(): String {
-    val jsonString = toJson()
+private fun toYaml(jsonString: String): String {
     // parse json
     val jsonMapper = ObjectMapper(JsonFactory())
     val json = jsonMapper.readTree(jsonString)
@@ -56,12 +54,10 @@ fun Bundle.toYaml(): String {
     return yamlMapper.writeValueAsString(json)
 }
 
+fun Bundle.toYaml(): String {
+    return toYaml(toJson())
+}
+
 fun Bundle.toHuman(): String {
-    val jsonString = toJsonExt()
-    // parse json
-    val jsonMapper = ObjectMapper(JsonFactory())
-    val json = jsonMapper.readTree(jsonString)
-    // convert to yaml
-    val yamlMapper = ObjectMapper(YAMLFactory())
-    return yamlMapper.writeValueAsString(json)
+    return toYaml(toJsonExt())
 }
