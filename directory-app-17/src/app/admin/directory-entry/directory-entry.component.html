@@ -1,0 +1,272 @@
+<div ibmRow>
+    <div ibmCol [columnNumbers]="{'lg': 16}">
+        <cds-breadcrumb>
+            <cds-breadcrumb-item>
+                <a [routerLink]="['../../search']">Suche</a>
+            </cds-breadcrumb-item>
+            <cds-breadcrumb-item *ngIf="queryString">
+                <a [routerLink]="['../../search-results', {'q': queryString}]">Suchergebnise</a>
+            </cds-breadcrumb-item>
+        </cds-breadcrumb>   
+    </div>
+</div>
+<div ibmRow *ngIf="entry">
+    <div ibmCol [columnNumbers]="{'lg': 3}"></div>
+    <div ibmCol [columnNumbers]="{'lg': 10}">
+        <div ibmRow>
+            <div ibmCol>
+                <h1>{{entry.base.displayName}}</h1>
+            </div>
+        </div>
+        <cds-tabs [isNavigation]="true" [followFocus]="true">
+            <cds-tab heading="Allgemein">
+                <h2>{{entryKindTitle}}</h2>
+                
+                <cds-label
+                    [invalid]="validateBaseField('displayName')"
+                    [invalidText]="'Ungültiger Anzeigename'">
+                    Anzeigename
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.base.displayName"
+                        readonly="true"
+                        [invalid]="validateBaseField('displayName')"
+                        >
+                </cds-label>
+                
+                <div ibmRow *ngIf="entry.base.fhirResourceType == 'Practitioner'">
+                    <cds-label 
+                        ibmCol
+                        [columnNumbers]="{'lg': 8}"
+                        [invalid]="validateBaseField('sn')"
+                        [invalidText]="'Ungültiger Nachname'">
+
+                        Name
+                        <input
+                            ibmText
+                            [(ngModel)]="entry.base.sn"
+                            readonly="true"
+                            [invalid]="validateBaseField('sn')"
+                        >
+                    </cds-label>
+                    <cds-label 
+                        ibmCol
+                        [columnNumbers]="{'lg': 8}"
+                        [invalid]="validateBaseField('givenName')"
+                        [invalidText]="'Ungültiger Vorname'">
+                        Vorname(n)
+                        <input
+                            ibmText
+                            [(ngModel)]="entry.base.givenName"
+                            readonly="true"
+                            [invalid]="validateBaseField('givenName')"
+                        >
+                    </cds-label>
+                    </div>
+    
+
+                <cds-label>
+                    TelematikID
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.base.telematikID"
+                        readonly="true"
+                    >
+                </cds-label> 
+                <cds-label>
+                    DomainID
+                    <textarea
+                        ibmText
+                        readonly="true"
+                    >{{domainIDText}}</textarea>
+                </cds-label> 
+
+                <cds-label>
+                    Adresse
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.base.streetAddress"
+                        readonly="true"
+                    >
+                </cds-label> 
+
+                <div ibmRow>
+                <cds-label 
+                    ibmCol
+                    [columnNumbers]="{'lg': 11}"
+                >
+                    Ort
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.base.localityName"
+                        readonly="true"
+                    >
+                </cds-label>
+                <cds-label 
+                    ibmCol
+                    [columnNumbers]="{'lg': 5}"
+                >
+                    PLZ
+                    <input
+                        ibmText
+                        [(ngModel)]="entry.base.postalCode"
+                        readonly="true"
+                    >
+                </cds-label>
+                </div>
+                <div ibmRow>
+                    <cds-label 
+                        ibmCol
+                        [columnNumbers]="{'lg': 11}"
+                    >
+                        Bundesland
+                        <input
+                            ibmText
+                            [(ngModel)]="entry.base.stateOrProvinceName"
+                            readonly="true"
+                        >
+                    </cds-label>
+                    <cds-label 
+                        ibmCol
+                        [columnNumbers]="{'lg': 5}"
+                        [invalid]="validateBaseField('countryCode')"
+                        [invalidText]="'Ungültiger Landescode'"
+                    >
+                        Landescode
+                        <input
+                            ibmText
+                            [(ngModel)]="entry.base.countryCode"
+                            readonly="true"
+                            [invalid]="validateBaseField('countryCode')"
+                        >
+                    </cds-label>
+                    </div>
+    
+                <h2>&nbsp;</h2>
+
+                <cds-structured-list 
+                    [condensed]="true">
+                    <cds-list-header>
+                        <cds-list-column class="icon"></cds-list-column>
+                        <cds-list-column [nowrap]="true">Holder</cds-list-column>
+                        <cds-list-column class="right">Code</cds-list-column>
+                    </cds-list-header>
+                    <cds-list-row *ngFor="let code of entry.base.holder">
+                        <cds-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></cds-list-column>
+                        <cds-list-column>{{code?.display}}</cds-list-column>
+                        <cds-list-column class="right">{{code?.code}}</cds-list-column>
+                    </cds-list-row>
+                    <cds-list-row *ngIf="(entry.base.holder?.length ?? 0) == 0">
+                        <cds-list-column class="icon"><svg ibmIcon="warning--filled" class="warning"></svg></cds-list-column>
+                        <cds-list-column>Keine Holder</cds-list-column>
+                    </cds-list-row>
+                </cds-structured-list>
+
+                <cds-structured-list 
+                    [condensed]="true">
+                    <cds-list-header>
+                        <cds-list-column class="icon"></cds-list-column>
+                        <cds-list-column [nowrap]="true">ProfessionOID</cds-list-column>
+                        <cds-list-column class="right">Code</cds-list-column>
+                    </cds-list-header>
+                    <cds-list-row *ngFor="let code of entry.base.professionOID">
+                        <cds-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></cds-list-column>
+                        <cds-list-column>{{code?.display}}</cds-list-column>
+                        <cds-list-column class="right">{{code?.code}}</cds-list-column>
+                    </cds-list-row>
+                    <cds-list-row *ngIf="(entry.base.professionOID?.length ?? 0) == 0">
+                        <cds-list-column class="icon"><svg ibmIcon="error--filled" class="error"></svg></cds-list-column>
+                        <cds-list-column>Keine ProfessionOID</cds-list-column>
+                    </cds-list-row>
+                </cds-structured-list>
+
+                <cds-structured-list
+                    [condensed]="true">
+                    <cds-list-header>
+                        <cds-list-column class="icon"></cds-list-column>
+                        <cds-list-column [nowrap]="true">Spezialisierung</cds-list-column>
+                        <cds-list-column class="right">Code</cds-list-column>
+                    </cds-list-header>
+                    <cds-list-row *ngFor="let code of entry.base.specialization">
+                        <cds-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></cds-list-column>
+                        <cds-list-column>{{code?.display}}</cds-list-column>
+                        <cds-list-column class="right">{{code?.code}}</cds-list-column>
+                    </cds-list-row>
+                    <cds-list-row *ngIf="(entry.base.specialization?.length ?? 0) == 0">
+                        <cds-list-column><svg ibmIcon="warning--filled" class="warning"></svg></cds-list-column>
+                        <cds-list-column>Keine Spezialisierung</cds-list-column>
+                    </cds-list-row>
+                </cds-structured-list>
+
+                <cds-structured-list [condensed]="true">
+                    <cds-list-header>
+                        <cds-list-column></cds-list-column>
+                        <cds-list-column [nowrap]="true">KIM-Adresse</cds-list-column>
+                        <cds-list-column>Anbieter</cds-list-column>
+                        <cds-list-column class="right">Version</cds-list-column>
+                    </cds-list-header>
+                    <cds-list-row *ngFor="let kimAddress of entry.kimAddresses">
+                        <cds-list-column><svg ibmIcon="checkmark--filled" class="success"></svg></cds-list-column>
+                        <cds-list-column>{{kimAddress?.mail}}</cds-list-column>
+                        <cds-list-column>{{kimAddress?.provider?.display}}</cds-list-column>
+                        <cds-list-column class="right">{{kimAddress?.version}}</cds-list-column>
+                    </cds-list-row>
+                    <cds-list-row *ngIf="entry.kimAddresses === undefined">
+                        <cds-list-column><svg ibmIcon="warning--filled" class="warning"></svg></cds-list-column>
+                        <cds-list-column>Keine KIM-Adressen</cds-list-column>
+                    </cds-list-row>
+                </cds-structured-list>           
+            </cds-tab>
+            <cds-tab heading="Karten">
+                <h2>Karten</h2>
+                <app-admin-directory-entry-smartcard 
+                    *ngFor="let smartcard of entry.smartcards" 
+                    [entry]="entry"
+                    [smartcard]="smartcard">
+                </app-admin-directory-entry-smartcard>
+                <cds-structured-list [condensed]="true">
+                    <cds-list-row *ngIf="entry.smartcards === undefined || entry.smartcards.length == 0">
+                        <cds-list-column><svg ibmIcon="warning--filled" class="warning"></svg></cds-list-column>
+                        <cds-list-column>Keine Karten</cds-list-column>
+                    </cds-list-row>
+                </cds-structured-list>
+
+                <h2>Zertifikate</h2>
+
+                <div class="UserCertificateList">
+                    <cds-structured-list [condensed]="true">
+                        <cds-list-header>
+                            <cds-list-column [nowrap]="true"> </cds-list-column>
+                            <cds-list-column [nowrap]="true">Seriennummer</cds-list-column>
+                            <cds-list-column [nowrap]="true">Alg</cds-list-column>
+                            <cds-list-column [nowrap]="true">Herausgeber</cds-list-column>
+                            <cds-list-column [nowrap]="true">herausgegeben</cds-list-column>
+                            <cds-list-column [nowrap]="true">läuft ab</cds-list-column>
+                        </cds-list-header>
+                        <cds-list-row *ngFor="let cert of userCertificateList">
+                            <cds-list-column><svg [ibmIcon]="cert.iconName" [class]="cert.iconClass"></svg></cds-list-column>
+                            <cds-list-column>{{cert.serialNumber}}</cds-list-column>
+                            <cds-list-column>{{cert.algorithm}}</cds-list-column>
+                            <cds-list-column>{{cert.issuer}}</cds-list-column>
+                            <cds-list-column>{{cert.notBefore}}</cds-list-column>
+                            <cds-list-column>{{cert.notAfter}}</cds-list-column>
+                        </cds-list-row>
+                        <cds-list-row *ngIf="userCertificateList === undefined || userCertificateList.length === 0">
+                            <cds-list-column><svg ibmIcon="warning--filled" class="warning"></svg></cds-list-column>
+                            <cds-list-column>Keine Zertifikate</cds-list-column>
+                            <cds-list-column></cds-list-column>
+                            <cds-list-column></cds-list-column>
+                            <cds-list-column></cds-list-column>
+                            <cds-list-column></cds-list-column>
+                        </cds-list-row>
+                    </cds-structured-list>           
+                </div>
+            </cds-tab>
+            <cds-tab heading="Rohdaten">
+                <cds-code-snippet [display]="snippetDisplay">{{rawData}}</cds-code-snippet>
+            </cds-tab>
+        </cds-tabs>
+    </div>
+    <div ibmCol [columnNumbers]="{'lg': 3}"></div>
+</div>
+  

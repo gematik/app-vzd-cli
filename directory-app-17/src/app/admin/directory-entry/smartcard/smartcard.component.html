@@ -1,0 +1,28 @@
+<div class="wrapper">
+  <div>
+    <ibm-tag class="smartcardType" type="outline">{{smartcard.type}}</ibm-tag>
+    <div>
+      <span class="label">Ausgestellt</span>
+      <span class="value">{{smartcard.notBefore.substring(0, 10)}}</span>
+    </div>
+    <div>
+      <span class="label">Läuft ab</span>
+      <span class="value">{{smartcard.notAfter.substring(0, 10)}}</span>
+    </div>
+    <app-admin-directory-entry-validity-period
+      [notBefore]="smartcard.notBefore"
+      [notAfter]="smartcard.notAfter"
+    >
+    </app-admin-directory-entry-validity-period>
+  </div>
+  <div *ngFor="let cert of certificateInfoList">
+    <h2>{{cert.publicKeyAlgorithm}}-Zertifikat</h2>
+    <div *ngFor="let field of cert.subjectInfo | objectToMap | keyvalue">
+      <span class="label">{{field.key}}</span>
+      <span class="value">{{field.value}}</span>  
+    </div>
+    <div *ngFor="let field of cert.admissionStatement | objectToMap | keyvalue">
+      <span class="label">{{field.key}}</span>
+      <span class="value">{{field.value}}</span>  
+    </div>
+</div>
