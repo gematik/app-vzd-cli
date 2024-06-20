@@ -1,12 +1,11 @@
 {
   "resourceType": "CodeSystem",
-  "status": "draft",
+  "status": "active",
   "content": "complete",
   "name": "PractitionerProfessionOID",
   "id": "PractitionerProfessionOID",
-  "title": "CodeSystem for Practitioner's ProfessioiOID",
+  "title": "CodeSystem for Practitioner's ProfessionOID",
   "description": "The codes for Practitioners based on Profession OIDs defined in [gemSpec_OID](https://fachportal.gematik.de/fachportal-import/files/gemSpec_OID_V3.10.0.pdf)",
-  "version": "0.9.0",
   "url": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
   "concept": [
     {
@@ -149,9 +148,18 @@
     {
       "code": "1.2.276.0.76.4.277",
       "display": "Ernährungstherapeut/-in"
+    },
+    {
+      "code": "1.2.276.0.76.4.305",
+      "display": "Orthopädieschuhmacher/-in und Orthopädietechniker/-in"
+    },
+    {
+      "code": "1.2.276.0.76.4.308",
+      "display": "Augenoptiker/-in, Optometrist/-in und Hörakustiker/-in"
     }
   ],
   "publisher": "gematik GmbH",
+  "version": "0.11.2",
   "caseSensitive": false,
-  "count": 35
+  "count": 37
 }

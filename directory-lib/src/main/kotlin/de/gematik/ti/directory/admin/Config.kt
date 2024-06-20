@@ -1,5 +1,6 @@
 package de.gematik.ti.directory.admin
 
+import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.DirectoryException
 import kotlinx.serialization.Serializable
 
@@ -31,7 +32,7 @@ class ConfigException(message: String, cause: Throwable? = null) : DirectoryExce
 data class Config(
     val environments: Map<String, EnvironmentConfig>,
 ) {
-    fun environment(env: AdminEnvironment) = environments[env.name] ?: throw ConfigException("Unknown environment: ${env.name}")
+    fun environment(env: DirectoryEnvironment) = environments[env.name] ?: throw ConfigException("Unknown environment: ${env.name}")
 }
 
 @Serializable

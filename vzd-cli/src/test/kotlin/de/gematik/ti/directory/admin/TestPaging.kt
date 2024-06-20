@@ -19,13 +19,13 @@ class TestPaging : FeatureSpec({
                 val withOutPaging =
                     client?.readDirectoryEntryForSync(
                         mapOf(
-                            "telematikID" to "9-*",
+                            "telematikID" to "9-2*",
                         ),
                     )?.size
                 var withPaging = 0
                 client?.streamDirectoryEntriesPaging(
                     mapOf(
-                        "telematikID" to "9-*",
+                        "telematikID" to "9-2*",
                     ),
                     100,
                 ) {

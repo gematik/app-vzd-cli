@@ -1,5 +1,6 @@
 package de.gematik.ti.directory.cli.bff
 
+import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.elaborate.ElaborateDirectoryEntry
 import de.gematik.ti.directory.elaborate.elaborate
@@ -16,7 +17,7 @@ import java.io.IOException
 
 @Serializable
 data class LoginWithVaultRepresentation(
-    val env: AdminEnvironment,
+    val env: DirectoryEnvironment,
     val vaultPassword: String,
 )
 
@@ -34,7 +35,7 @@ class Admin {
     @Serializable
     @Resource("{envTitle}")
     class Env(val parent: Admin = Admin(), private val envTitle: String) {
-        val env get() = AdminEnvironment.valueOf(envTitle)
+        val env get() = DirectoryEnvironment.valueOf(envTitle)
 
         @Serializable
         @Resource("search")

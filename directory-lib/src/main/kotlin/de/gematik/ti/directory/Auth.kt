@@ -1,5 +1,6 @@
-package de.gematik.ti.directory.admin
+package de.gematik.ti.directory
 
+import de.gematik.ti.directory.admin.AdminResponseException
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*

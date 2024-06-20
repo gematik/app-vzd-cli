@@ -3,7 +3,7 @@ ktlint:
 
 dist: ktlint
 	./gradlew clean build -x test
-	java -jar ./vzd-cli/build/libs/vzd-cli-all.jar admin tu login
+	java -jar ./vzd-cli/build/libs/vzd-cli-all.jar login tu
 	./run_tests.sh
 
 release: 

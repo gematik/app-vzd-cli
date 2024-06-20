@@ -15,6 +15,7 @@ import de.gematik.ti.directory.DirectoryException
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.apo.ApoCli
 import de.gematik.ti.directory.cli.admin.AdminCli
+import de.gematik.ti.directory.cli.fhir.FhirCli
 import de.gematik.ti.directory.cli.gui.GuiCommand
 import de.gematik.ti.directory.cli.pers.PersCommand
 import de.gematik.ti.directory.cli.util.VaultException
@@ -108,7 +109,9 @@ class Cli : CliktCommand(name = "vzd-cli") {
         subcommands(
             ConfigCommand(),
             UpdateCommand(),
+            LoginCommand(),
             AdminCli(),
+            FhirCli(),
             ApoCli(),
             GuiCommand(),
             PersCommand(),
@@ -151,12 +154,14 @@ class Cli : CliktCommand(name = "vzd-cli") {
         currentContext.obj = CliContext(globalAPI)
 
         try {
-            val version = runBlocking { globalAPI.dailyUpdateCheck() }
-            if (version > BuildConfig.APP_VERSION) {
-                echo(
-                    "Update is available: $version (current: ${BuildConfig.APP_VERSION}). Please update using `vzd-cli update`",
-                    err = true,
-                )
+            if (globalAPI.config.updates.enabled) {
+                val version = runBlocking { globalAPI.dailyUpdateCheck() }
+                if (version > BuildConfig.APP_VERSION) {
+                    echo(
+                        "Update is available: $version (current: ${BuildConfig.APP_VERSION}). Please update using `vzd-cli update`",
+                        err = true,
+                    )
+                }
             }
         } catch (e: Exception) {
             // ignore error when checking for update

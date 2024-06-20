@@ -1,5 +1,6 @@
 package de.gematik.ti.directory.admin
 
+import de.gematik.ti.directory.DirectoryEnvironment
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
@@ -10,7 +11,7 @@ class TestAuth : FeatureSpec({
         scenario("Static token") {
             val adminClient =
                 Client {
-                    apiURL = DefaultConfig.environment(AdminEnvironment.tu).apiURL
+                    apiURL = DefaultConfig.environment(DirectoryEnvironment.tu).apiURL
                     auth {
                         accessToken {
                             System.getenv("TEST_ACCESS_TOKEN")
@@ -23,7 +24,7 @@ class TestAuth : FeatureSpec({
         scenario("Renew token") {
             val adminClient =
                 Client {
-                    apiURL = DefaultConfig.environment(AdminEnvironment.tu).apiURL
+                    apiURL = DefaultConfig.environment(DirectoryEnvironment.tu).apiURL
                     auth {
                         accessToken {
                             if (firstRun) {

@@ -1,11 +1,16 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+val ktorVersion: String by project
 val bcVersion: String by project
 
 plugins {
     id("de.gematik.directory.app-conventions")
-    kotlin("plugin.serialization") version "1.8.10"
+    kotlin("plugin.serialization") version "1.9.22"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
+kotlin {
+    jvmToolchain(11)
 }
 
 java {
@@ -36,7 +41,7 @@ dependencies {
     // implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
     // YAML support for kotlinx serialisation
-    implementation("net.mamoe.yamlkt:yamlkt:0.12.0")
+    implementation("net.mamoe.yamlkt:yamlkt:0.13.0")
 
     // CSV support
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.7.0")
@@ -60,7 +65,6 @@ dependencies {
     // implementation("org.apache.opennlp:opennlp-uima:2.0.0")
 
     // Ktor server (for GUI BFF)
-    val ktorVersion: String by project
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
@@ -74,6 +78,9 @@ dependencies {
 
     // Validation framework
     implementation("io.konform:konform-jvm:0.4.0")
+
+    // jackson yaml, the version must match the transitive dependency from hapi
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.2")
 
     // Bouncy castle fpr crypto and certificates processing
     shadow("org.bouncycastle:bcprov-jdk15on:$bcVersion")

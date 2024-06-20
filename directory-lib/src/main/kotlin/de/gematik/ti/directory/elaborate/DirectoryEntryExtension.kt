@@ -100,7 +100,7 @@ fun elaborateSpecialization(specialization: String): Coding {
             }
         } else if (OrganisationSpecializationRegex.matches(specialization)) {
             OrganisationSpecializationRegex.matchEntire(specialization)?.let {
-                HealthcareServiceSpecialtyVS.resolveCode("urn:oid:${it.groupValues[1]}", it.groupValues[2])
+                HealthcareServiceTypeVS.resolveCode("urn:oid:${it.groupValues[1]}", it.groupValues[2])
             }
         } else {
             null

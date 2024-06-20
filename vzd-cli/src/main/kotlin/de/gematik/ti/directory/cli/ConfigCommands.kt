@@ -8,7 +8,7 @@ import com.github.ajalt.clikt.parameters.types.choice
 import net.mamoe.yamlkt.Yaml
 import java.net.URL
 
-private val YAML = Yaml { encodeDefaultValues = false }
+private val YAML = Yaml { encodeDefaultValues = true }
 
 class ConfigCommand : CliktCommand(name = "config", help = "Manage configuration") {
     init {
@@ -34,6 +34,7 @@ val SET_PROPERTIES =
         },
         "httpProxy.enabled" to { config: GlobalConfig, value: String -> config.httpProxy.enabled = value.toBoolean() },
         "updates.preReleasesEnabled" to { config: GlobalConfig, value: String -> config.updates.preReleasesEnabled = value.toBoolean() },
+        "updates.enabled" to { config: GlobalConfig, value: String -> config.updates.enabled = value.toBoolean() },
     )
 
 class ConfigSetCommand : CliktCommand(

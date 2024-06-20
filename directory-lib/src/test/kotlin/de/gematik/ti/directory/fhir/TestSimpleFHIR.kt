@@ -16,7 +16,7 @@ class TestSimpleFHIR : FeatureSpec({
             val specialization = "urn:psc:1.3.6.1.4.1.19376.3.276.1.5.4:ALLG"
             val regex = Regex("^urn:psc:([0-9\\.]+):(.*)$")
             regex.matchEntire(specialization)?.let {
-                HealthcareServiceSpecialtyVS.resolveCode(
+                HealthcareServiceTypeVS.resolveCode(
                     "urn:oid:" + it.groupValues[1],
                     it.groupValues[2],
                 )?.display shouldBe "Allgemeinmedizin"

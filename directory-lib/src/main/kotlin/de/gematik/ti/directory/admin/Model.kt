@@ -132,6 +132,7 @@ data class FAD1(
     @SerialName("KOM-LE_Version")
     var komleVersion: String? = null,
     var komLeData: List<KomLeData>? = null,
+    var kimData: List<KIMData>? = null,
 )
 
 @Serializable
@@ -212,4 +213,33 @@ data class Error(
 data class InnerError(
     val attributeName: String,
     val attributeError: String,
+)
+
+/**
+ *  kimData:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               mail:
+ *                 type: string
+ *                 description: 'E-Mail-Adresse'
+ *               version:
+ *                 type: string
+ *                 example: 1.5+
+ *                 description: 'Die höchste Version der KIM Clientmodule für diese KIM-Mail-Adresse'
+ *               appTags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   example:
+ *                     - eEB;V1.0
+ *                     - DALE-UV;Einsendung;V1.0
+ *                   description: 'Anwendungskennzeichen, welche diese KIM-Mail-Adresse verarbeiten kann'
+ */
+@Serializable
+data class KIMData(
+    val mail: String,
+    val version: String,
+    val appTags: List<String>? = null,
 )
