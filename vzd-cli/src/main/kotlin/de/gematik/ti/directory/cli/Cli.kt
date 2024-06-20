@@ -154,12 +154,14 @@ class Cli : CliktCommand(name = "vzd-cli") {
         currentContext.obj = CliContext(globalAPI)
 
         try {
-            val version = runBlocking { globalAPI.dailyUpdateCheck() }
-            if (version > BuildConfig.APP_VERSION) {
-                echo(
-                    "Update is available: $version (current: ${BuildConfig.APP_VERSION}). Please update using `vzd-cli update`",
-                    err = true,
-                )
+            if (globalAPI.config.updates.enabled) {
+                val version = runBlocking { globalAPI.dailyUpdateCheck() }
+                if (version > BuildConfig.APP_VERSION) {
+                    echo(
+                        "Update is available: $version (current: ${BuildConfig.APP_VERSION}). Please update using `vzd-cli update`",
+                        err = true,
+                    )
+                }
             }
         } catch (e: Exception) {
             // ignore error when checking for update
