@@ -5,7 +5,7 @@
 - Unterstützung FHIR VZD FdV und Search Schnittstellen, s. `vzd-cli fhir`
 - Neues Befehl für übergreifenden login: `vzd-cli login`
 - Tägliche Überprüfung der Updates ist jetzt abschaltbar `vzd-cli config set updates.enabled true|false`
-- Diverse bugfixes
+- Diverse Bugfixes
 
 == Version 2.6.2
 - TelematikID ist jetzt optional in `vzd-cli admin <ru|tu|pu> log`
