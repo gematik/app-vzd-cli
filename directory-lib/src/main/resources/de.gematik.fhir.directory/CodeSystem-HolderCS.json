@@ -73,6 +73,10 @@
       "display": "Ärztekammer Sachsen-Anhalt"
     },
     {
+      "code": "aeksl",
+      "display": "Ärztekammer Saarland"
+    },    
+    {
       "code": "laekt",
       "display": "Landesärztekammer Thüringen"
     },
