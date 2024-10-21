@@ -2,15 +2,15 @@
   <div ibmCol [columnNumbers]="{'lg': 3}"></div>
   <div ibmCol [columnNumbers]="{'lg': 10}">
       <h1 class="Headline">Einstellungen</h1>
-        <ibm-tabs [followFocus]="true" [isNavigation]="true" [cacheActive]="false">
-          <ibm-tab heading="Administration">
+        <cds-tabs [followFocus]="true" [isNavigation]="true" [cacheActive]="false">
+          <cds-tab heading="Administration">
             <app-admin-settings></app-admin-settings>
-          </ibm-tab>
-          <ibm-tab i18n-heading heading="Einstellungen" *ngIf="config" (selected)="tabSelected()">
+          </cds-tab>
+          <cds-tab i18n-heading heading="Einstellungen" *ngIf="config" (selected)="tabSelected()">
             <div class="notification-container"></div>
             <div ibmRow class="row">
                 <div ibmCol>
-                    <ibm-inline-loading
+                    <cds-inline-loading
                         [state]="configState"
                         i18n-loadingText
                         loadingText="Updating configuration"
@@ -18,33 +18,32 @@
                         successText="Configuration updated"
                         i18n-errorText
                         errorText="Configuration update error">
-                    </ibm-inline-loading>
+                    </cds-inline-loading>
                 </div>
             </div>
             <div ibmRow class="row">
               <div ibmCol>
-                <ibm-checkbox
+                <cds-checkbox
                   [(ngModel)]="config.updates.preReleasesEnabled"
-                i18>Enable Pre-Releases</ibm-checkbox>
+                i18>Enable Pre-Releases</cds-checkbox>
               </div>
             </div>
             <div ibmRow class="row">
               <div ibmCol>
-                <ibm-checkbox
+                <cds-checkbox
                   [(ngModel)]="config.httpProxy.enabled"
-                i18>Enable Proxy</ibm-checkbox>
+                i18>Enable Proxy</cds-checkbox>
               </div>
             </div>
             <div ibmRow *ngIf="config.httpProxy.enabled" class="row">
               <div ibmCol>
-                <ibm-label>
+                <cds-label>
                   Proxy URL
                   <input
                       ibmText
                       [(ngModel)]="config.httpProxy.proxyURL"
-                      readonly="true"
                   >
-                </ibm-label>
+                </cds-label>
               </div>
               <div ibmCol>
                 </div>
@@ -53,10 +52,10 @@
               &nbsp;
             </div>
             <button ibmButton="primary" i18n (click)="updateConfig()">Update Config</button>
-          </ibm-tab>
-        </ibm-tabs>
+          </cds-tab>
+        </cds-tabs>
   </div>
   <div ibmCol [columnNumbers]="{'lg': 3}"></div>
 </div>
 
-<ibm-placeholder></ibm-placeholder>
+<cds-placeholder></cds-placeholder>

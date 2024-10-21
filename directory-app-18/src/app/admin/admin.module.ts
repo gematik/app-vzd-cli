@@ -2,7 +2,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 // carbon imports
 import { CarbonModule } from '../../carbon.module';
@@ -18,30 +18,25 @@ import { SmartcardComponent } from './directory-entry/smartcard/smartcard.compon
 import { ValidityPeriodComponent } from './directory-entry/validity-period/validity-period.component';
 import { ObjectToMapPipe } from '../object-to-map.pipe';
 
-@NgModule({
-  declarations: [
-    SearchResultsComponent,
-    SearchComponent,
-    DirectoryEntryComponent,
-    SettingsComponent,
-    AskPasswordComponent,
-    DirectoryEntrySummaryComponent,
-    SmartcardComponent,
-    ValidityPeriodComponent,
-    ObjectToMapPipe,
-  ],
-  imports: [
-    // angular imports
-    CommonModule,
-    FormsModule,
-    HttpClientModule,
-    // carbon imports
-    CarbonModule,
-    // local imports
-    AdminRoutingModule,
-  ],
-  exports: [
-    SettingsComponent
-  ]
-})
+@NgModule({ declarations: [
+        SearchResultsComponent,
+        SearchComponent,
+        DirectoryEntryComponent,
+        SettingsComponent,
+        AskPasswordComponent,
+        DirectoryEntrySummaryComponent,
+        SmartcardComponent,
+        ValidityPeriodComponent,
+        ObjectToMapPipe,
+    ],
+    exports: [
+        SettingsComponent
+    ], imports: [
+        // angular imports
+        CommonModule,
+        FormsModule,
+        // carbon imports
+        CarbonModule,
+        // local imports
+        AdminRoutingModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class AdminModule { }
