@@ -3,11 +3,11 @@ import { InlineLoadingState } from 'carbon-components-angular';
 import { BackendService } from 'src/services/backend.service';
 import { GlobalConfig } from 'src/services/global.model';
 import { NavigationService } from '../../services/navigation.service';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent implements OnInit {
   protected config!: GlobalConfig
@@ -15,7 +15,8 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     protected backendService: BackendService,
-    protected navigationService: NavigationService
+    protected navigationService: NavigationService,
+    protected router: Router,
     ) { }
 
   ngOnInit(): void {

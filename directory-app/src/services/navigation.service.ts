@@ -11,12 +11,13 @@ export interface NavigationLink {
   providedIn: 'root'
 })
 export class NavigationService {
-  public adminMenuLinks$: Observable<NavigationLink[]>
+  public adminMenuLinks$: Observable<NavigationLink[]> 
 
   constructor(
     private adminBackend: AdminBackendService
   ) { 
     const self = this
+
     this.adminMenuLinks$ = this.adminBackend.status$.pipe(
       map( adminStatus => {
         return adminStatus.environmentStatus.map((envStatus) => {

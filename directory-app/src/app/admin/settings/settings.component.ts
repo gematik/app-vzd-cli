@@ -15,7 +15,8 @@ interface EnvironmentStatusModel {
 @Component({
   selector: 'app-admin-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  styleUrls: ['./settings.component.scss'],
+  providers: [ModalService, NotificationService]
 })
 export class SettingsComponent implements OnInit {
   protected statusModel: EnvironmentStatusModel[] = []
@@ -35,7 +36,6 @@ export class SettingsComponent implements OnInit {
     this.adminBackend.status$.subscribe({
       next(adminStatus) {
         self.statusModel = adminStatus.environmentStatus
-          .filter ( envStatus => envStatus.env != "tu")
           .map( envStatus => {
           if (envStatus.accessTokenClaims != null) {
             return { 

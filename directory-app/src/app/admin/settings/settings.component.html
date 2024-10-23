@@ -31,7 +31,7 @@
             [routerLink]="['/admin', env.env]"
             >
             Suchen
-            <svg class="bx--btn__icon" ibmIcon="api" size="16"></svg>
+            <svg class="cds--btn__icon" ibmIcon="api" size="16"></svg>
             </button>    
             <button
             *ngIf="env.status === 'error'"
@@ -40,7 +40,7 @@
             (click)="onLogin(env.env)"
             >
             Login
-            <svg class="bx--btn__icon" ibmIcon="login" size="16"></svg>
+            <svg class="cds--btn__icon" ibmIcon="login" size="16"></svg>
             </button>    
         </ibm-list-column>
     </ibm-list-row>

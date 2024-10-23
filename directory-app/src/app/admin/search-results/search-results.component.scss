@@ -18,11 +18,11 @@
   background-color: #f4f4f4;
 }
 
-::ng-deep .bx--data-table thead {
+::ng-deep .cds--data-table thead {
   background-color: #ffffff !important;
 }
 
-::ng-deep .bx--data-table th {
+::ng-deep .cds--data-table th {
   padding: 1rem 0.5rem 0.5rem 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
@@ -38,7 +38,7 @@
   background-color: #ffffff !important;
 }
 
-::ng-deep .bx--data-table tbody tr {
+::ng-deep .cds--data-table tbody tr {
   cursor: pointer;
   background-color: #ffffff;
 }
@@ -47,16 +47,16 @@
   background-color: #ffffff;
 }
 
-::ng-deep .bx--data-table tbody {
+::ng-deep .cds--data-table tbody {
   background-color: #ffffff;
 }
 
-::ng-deep tr.bx--parent-row.bx--expandable-row td {
+::ng-deep tr.cds--parent-row.bx--expandable-row td {
   background-color: white;
   border-bottom: none;
 }
 
-::ng-deep tr.bx--parent-row.bx--expandable-row + tr[data-child-row] td {
+::ng-deep tr.cds--parent-row.bx--expandable-row + tr[data-child-row] td {
   background-color: white;
   border-top: none;
 }
@@ -65,4 +65,3 @@
   padding-top: 2em;
   margin: auto;
 }
-

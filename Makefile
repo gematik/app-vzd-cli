@@ -10,3 +10,6 @@ release:
 	$(eval VERSION := $(shell grep "^version=" gradle.properties | cut -d'=' -f2))
 	gh release create ${VERSION}
 	gh release upload ${VERSION} vzd-cli/build/distributions/vzd-cli-${VERSION}.zip
+
+gui:
+	cd directory-app && npm install && ng build
