@@ -13,3 +13,5 @@ release:
 
 gui:
 	cd directory-app && npm install && ng build
+	rm -rf vzd-cli/src/main/resources/directory-app
+	mv directory-app/dist/directory-app vzd-cli/src/main/resources

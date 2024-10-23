@@ -16,6 +16,9 @@ make dist
 
 [source,bash]
 ----
+# make sure you have correct java version
+sdk install java 17.0.13-tem
+sdk use java 17.0.13-tem
 make release
 ----
 

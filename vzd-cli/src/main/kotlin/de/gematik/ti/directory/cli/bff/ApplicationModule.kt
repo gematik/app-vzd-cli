@@ -62,7 +62,7 @@ fun Application.directoryModule() {
 
         singlePageApplication {
             useResources = true
-            filesPath = "directory-app"
+            filesPath = "directory-app/browser"
             defaultPage = "index.html"
         }
     }
