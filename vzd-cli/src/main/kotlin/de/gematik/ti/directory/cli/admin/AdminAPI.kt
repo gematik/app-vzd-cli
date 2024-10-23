@@ -1,5 +1,6 @@
 package de.gematik.ti.directory.cli.admin
 
+import de.gematik.ti.directory.ClientCredentialsAuthenticator
 import de.gematik.ti.directory.DirectoryAuthException
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.GlobalAPI
@@ -16,7 +17,9 @@ import java.nio.file.Path
 
 private val logger = KotlinLogging.logger {}
 
-typealias AdminEnvironment = de.gematik.ti.directory.admin.AdminEnvironment
+const val SERVICE_NAME = "urn:gematik:directory:admin"
+
+typealias AdminEnvironment = de.gematik.ti.directory.DirectoryEnvironment
 
 internal class AdminConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<Config>(
     "directory-admin.yaml",
@@ -43,6 +46,8 @@ data class AdminStatus(
 )
 
 class AdminAPI(val globalAPI: GlobalAPI) {
+    val config by lazy { loadConfig() }
+
     fun createClient(env: AdminEnvironment): Client {
         val tokenStore = TokenStore()
         val envConfig = config.environment(env)
@@ -77,10 +82,8 @@ class AdminAPI(val globalAPI: GlobalAPI) {
         return store.reset()
     }
 
-    val config by lazy { loadConfig() }
-
     fun openVault(vaultPassword: String): KeyStoreVault {
-        return KeyStoreVaultProvider().open(vaultPassword)
+        return KeyStoreVaultProvider().open(vaultPassword, SERVICE_NAME)
     }
 
     suspend fun status(includeBackendInfo: Boolean = false): AdminStatus {

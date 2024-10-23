@@ -12,10 +12,15 @@ fun DirectoryEntry.infereKIMAddresses(): List<ElaborateKIMAddress>? {
                             fad1.dn.ou?.first()?.let { fad ->
                                 ElaborateKIMProvider(fad, fad)
                             }
+                        val kimAddress =
+                            fad1.kimData?.firstOrNull { kimData ->
+                                kimData.mail == it.mail
+                            }
                         ElaborateKIMAddress(
                             it.mail,
                             it.version,
                             provider,
+                            kimAddress?.appTags,
                         )
                     } ?: emptyList()
                 }

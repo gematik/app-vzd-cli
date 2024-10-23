@@ -16,6 +16,7 @@ data class UpdatesConfig(
     var preReleasesEnabled: Boolean,
     var lastCheck: Long,
     var latestRelease: String,
+    var enabled: Boolean = true,
 )
 
 @Serializable
@@ -38,6 +39,7 @@ internal class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjec
                     preReleasesEnabled = false,
                     lastCheck = -1,
                     latestRelease = BuildConfig.APP_VERSION,
+                    enabled = true,
                 ),
         )
     },

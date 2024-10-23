@@ -1,36 +1,14 @@
 {
   "resourceType": "StructureDefinition",
   "id": "EndpointDirectory",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Base.Entities"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "business"
-    }
-  ],
   "url": "https://gematik.de/fhir/directory/StructureDefinition/EndpointDirectory",
-  "version": "0.9.0",
+  "version": "0.11.2",
   "name": "EndpointDirectory",
   "title": "Endpoint in gematik Directory",
-  "status": "draft",
+  "status": "active",
   "publisher": "gematik GmbH",
   "description": "Endpoints for applications in the gematik Directory",
   "fhirVersion": "4.0.1",
-  "mapping": [
-    {
-      "identity": "rim",
-      "uri": "http://hl7.org/v3",
-      "name": "RIM Mapping"
-    },
-    {
-      "identity": "w5",
-      "uri": "http://hl7.org/fhir/fivews",
-      "name": "FiveWs Pattern Mapping"
-    }
-  ],
   "kind": "resource",
   "abstract": false,
   "type": "Endpoint",
@@ -38,6 +16,60 @@
   "derivation": "constraint",
   "differential": {
     "element": [
+      {
+        "id": "Endpoint.id",
+        "path": "Endpoint.id",
+        "mustSupport": true
+      },
+      {
+        "id": "Endpoint.meta.tag",
+        "path": "Endpoint.meta.tag",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "system"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Endpoint.meta.tag:Origin",
+        "path": "Endpoint.meta.tag",
+        "sliceName": "Origin",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true,
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://gematik.de/fhir/directory/ValueSet/OriginVS"
+        }
+      },
+      {
+        "id": "Endpoint.meta.tag:Origin.system",
+        "path": "Endpoint.meta.tag.system",
+        "min": 1,
+        "patternUri": "https://gematik.de/fhir/directory/CodeSystem/Origin"
+      },
+      {
+        "id": "Endpoint.extension:endpointVisibility",
+        "path": "Endpoint.extension",
+        "sliceName": "endpointVisibility",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://gematik.de/fhir/directory/StructureDefinition/EndpointVisibility"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
       {
         "id": "Endpoint.status",
         "path": "Endpoint.status",
@@ -49,8 +81,14 @@
         "mustSupport": true
       },
       {
+        "id": "Endpoint.connectionType.system",
+        "path": "Endpoint.connectionType.system",
+        "mustSupport": true
+      },
+      {
         "id": "Endpoint.connectionType.code",
         "path": "Endpoint.connectionType.code",
+        "mustSupport": true,
         "binding": {
           "strength": "extensible",
           "valueSet": "https://gematik.de/fhir/directory/ValueSet/EndpointConnectionTypeVS"

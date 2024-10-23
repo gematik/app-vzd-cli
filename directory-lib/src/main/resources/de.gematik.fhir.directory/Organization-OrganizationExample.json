@@ -2,13 +2,19 @@
   "resourceType": "Organization",
   "id": "OrganizationExample",
   "meta": {
+    "tag": [
+      {
+        "system": "https://gematik.de/fhir/directory/CodeSystem/Origin",
+        "code": "ldap"
+      }
+    ],
     "profile": [
       "https://gematik.de/fhir/directory/StructureDefinition/OrganizationDirectory"
     ]
   },
   "identifier": [
     {
-      "system": "http://fhir.de/StructureDefinition/identifier-telematik-id",
+      "system": "https://gematik.de/fhir/sid/telematik-id",
       "value": "2-2.58.00000040"
     }
   ],

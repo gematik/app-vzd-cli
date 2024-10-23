@@ -1,7 +1,11 @@
 
 plugins {
     id("de.gematik.directory.library-conventions")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization") version "1.9.22"
+}
+
+kotlin {
+    jvmToolchain(11)
 }
 
 java {

@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
 import de.gematik.ti.directory.cli.GlobalAPI
+import de.gematik.ti.directory.cli.VaultCommand
 import de.gematik.ti.directory.cli.catching
 import mu.KotlinLogging
 
@@ -34,7 +35,7 @@ class AdminCli :
 
     init {
         subcommands(
-            VaultCommand(),
+            VaultCommand(SERVICE_NAME),
             ConfigCommand(),
             StatusCommand(),
             CertInfoCommand(),

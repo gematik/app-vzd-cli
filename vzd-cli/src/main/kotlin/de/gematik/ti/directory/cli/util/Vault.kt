@@ -12,8 +12,6 @@ private val logger = KotlinLogging.logger {}
 
 data class Secret(var variant: String, var name: String, var secret: String)
 
-private const val DEFAULT_SERVICE_NAME = "urn:gematik:directory:admin"
-
 class VaultException(message: String) : Exception(message)
 
 class KeyStoreVaultProvider(val customVaultPath: Path? = null) {
@@ -37,7 +35,7 @@ class KeyStoreVaultProvider(val customVaultPath: Path? = null) {
 
     fun open(
         password: String,
-        serviceName: String = DEFAULT_SERVICE_NAME,
+        serviceName: String,
     ): KeyStoreVault {
         return KeyStoreVault(password, vaultPath, serviceName)
     }

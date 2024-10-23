@@ -31,7 +31,9 @@ Options:
 Commands:
   config               Manage configuration
   update               Updates this software
+  login                Logins into all configured APIs
   admin                CLI for DirectoryAdministration API
+  fhir                 CLI for FHIR Directory
   apo                  CLI for ApoVZD API
   gui                  Starts HTTP Server with GUI
   pers                 Process gematik SMC-B/HBA Exports
@@ -68,6 +70,8 @@ vzd-cli config set httpProxy.enabled true
 
 * Directory Admin API
 * Apo API (ApoVZD)
+* FHIR FDV Search API
+* FHIR Search API (nur mit einem speziellen Token, s. https://directory-beta.ccs.gematik.solutions)
 
 Für die Nutzung dieser APIs sind jeweils entsprechende Geheimnisse bzw. Credentials erforderlich.
 Diese werden von der gematik *den bereichtigten Organistionen* bereitgestellt.
@@ -113,6 +117,22 @@ vzd-cli apo config set apiKeys.test <API_KEY_TEST>
 vzd-cli apo config set apiKeys.prod <API_KEY_PROD>
 ----
 
+
+=== (Neu) FHIR FDV Search API Credentials
+
+Zugriff auf FHIR FDV Search API wird mittels OAuth2 Client Credentials Flow geschützt. Die berechtige Dienstanbieter erhalten die Client ID und Client Secret von der gematik.
+
+[source,bash]
+----
+# Secret für die Referenzumgebung speichern
+# es folgt eine Vault Passwortabfrage für persönliche Vault
+vzd-cli fhir fdv-vault store -e ru -c <CLIEND_ID> -s <CLIENT_SECRET>
+
+# Secret für die Produktivumgebung speichern
+# es folgt eine Vault Passwortabfrage für persönliche Vault
+vzd-cli fhir fdv-vault store -e pu -c <CLIEND_ID> -s <CLIENT_SECRET>
+----
+
 == Erste Schritte
 
 Befor die Directory Admin API genutzt werden kann, muss eine Anmeldung erfolgen.
@@ -122,10 +142,10 @@ Die Anmeldung muss alle 6 Stunden wiederholt werden.
 ----
 # Anmelden in die Referenzumgebung (ru)
 # es folgt eine Vault-Passwortabfrage
-vzd-cli admin ru login
+vzd-cli login ru
 # Anmelden in die Referenzumgebung (pu)
 # es folgt eine Vault-Passwortabfrage
-vzd-cli admin pu login
+vzd-cli login pu
 ----
 
 Für vollautomatisierte Nutzung des `vzd-cli`, auch bei der Anmeldung, wird das setzten der Umgebungsvariable `VAULT_PASSWORD` empfohlen.
@@ -154,6 +174,16 @@ vzd-cli admin ru search Müller Berlin
 [source,bash]
 ----
 vzd-cli admin ru show 1-SMC-B-Testkarte-883110000117729
+----
+
+.*(Neu) Beispiel:* Suche nach einträgen in der FHIR FDV Search API in der Produktivumgebung (`pu`)
+[source,bash]
+----
+vzd-cli fhir pu fdv search healthcare-service -t <TelematikID>
+vzd-cli fhir pu fdv search practitioner-role -t <TelematikID>
+# oder in Kurzform
+vzd-cli fhir pu fdv search hs -t <TelematikID>
+vzd-cli fhir pu fdv search pr -t <TelematikID>
 ----
 
 == Übergreifende Befehle
@@ -575,3 +605,44 @@ vzd-cli apo prod show 3-1234567890
 == `vzd-cli gui`: Directory GUI
 
 Durch den Befehl `vzd-cli gui` wird ein HTTP Server gestartet und ein neuer Browser-Tab mit GUI geöffnet.
+
+== (Neu) `vzd-cli fhir`: FHIR Directory APIs
+
+=== `vzd-cli fhir <tu|ru|pu> fdv search`
+
+Suche nach Einträgen in der FHIR FDV Search API.
+
+.*Beispiel:* Suche nach Einträgen mit TelematikID
+[source,bash]
+----
+vzd-cli fhir pu fdv search hs -t 1-1234567890
+----
+
+=== `vzd-cli fhir fdv-vault`
+
+Befehle zur Verwaltung von OAuth2 Geheimnissen für die FHIR FDV Search API. Aufbau ist analog zu `vzd-cli admin vault`.
+
+=== `vzd-cli fhir <tu|ru|pu> token`
+
+Lesen und Setzen eines `ACCESS_TOKEN` für die FHIR Search API.
+
+[source,bash]
+----
+# Setzen des ACCESS_TOKEN für Referenzumgebung (ru)
+vzd-cli fhir ru token -s <ACCESS_TOKEN>
+# Lesen des ACCESS_TOKEN für Referenzumgebung (ru)
+vzd-cli fhir ru token
+----
+
+=== `vzd-cli fhir <tu|ru|pu> search`
+
+Suche nach Einträgen in der FHIR Search API.
+
+.*Beispiel:* Suche nach Einträgen mit TelematikID
+[source,bash]
+----
+# Suche nach HealthcareService Einträgen
+vzd-cli fhir ru search hs -t 1-2234567890
+# Suche nach PractitionerRole Einträgen
+vzd-cli fhir ru search pr -t 1-1234567890
+----
