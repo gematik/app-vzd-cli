@@ -1,5 +1,5 @@
-<div ibmRow>
-  <div ibmCol [columnNumbers]="{'lg': 16}">
+<div cdsRow>
+  <div cdsCol [columnNumbers]="{'lg': 16}">
     <ibm-breadcrumb [noTrailingSlash]="true">
       <ibm-breadcrumb-item>
         <a [routerLink]="['../search']">Suche</a>
@@ -11,17 +11,17 @@
   </div>
 </div>
 
-<div ibmRow>
-  <div ibmCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
-  <div ibmCol [columnNumbers]="{'lg': 8, 'md': 6}">
-    <div ibmRow>
+<div cdsRow>
+  <div cdsCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
+  <div cdsCol [columnNumbers]="{'lg': 8, 'md': 6}">
+    <div cdsRow>
     </div>
-    <div ibmRow>
+    <div cdsRow>
         <ibm-search 
           [(ngModel)]="queryString"
           class="SearchField" 
           [size]="'lg'" 
-          ibmCol 
+          cdsCol 
           [columnNumbers]="{'lg': 12, 'md': 6, 'sm': 4}"
           placeholder="Name, Ort, PLZ oder TelematikID"
           (search)="onSearch()"
@@ -30,14 +30,14 @@
         </ibm-search>
         <button
           (click)="onSearch()"
-          ibmCol 
+          cdsCol 
           [columnNumbers]="{'lg': 4, 'md': 2, 'sm': 4}" 
           [ibmButton]="'primary'"
           class="SearchButton"
         >Suchen</button>
     </div>
-    <div ibmRow *ngIf="errorMessage">
-      <div ibmCol>
+    <div cdsRow *ngIf="errorMessage">
+      <div cdsCol>
         <ibm-notification 
           [notificationObj]="{
           type: 'error',
@@ -50,12 +50,12 @@
       </div>
     </div>  
   </div>
-  <div ibmCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
+  <div cdsCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
 </div>
 
-<div ibmRow>
-  <div ibmCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
-  <div ibmCol [columnNumbers]="{'lg': 8, 'md': 6}">
+<div cdsRow>
+  <div cdsCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
+  <div cdsCol [columnNumbers]="{'lg': 8, 'md': 6}">
       <ibm-inline-loading
       class="LoadingState"
       [state]="loadingState"
@@ -80,9 +80,9 @@
   <app-admin-directory-entry-summary [model]="data"></app-admin-directory-entry-summary>
 </ng-template>
 
-<div ibmRow *ngIf="rows.length > 0">
-  <div ibmCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
-  <ibm-table-container class="SearchResultsContainer" ibmCol [columnNumbers]="{'lg': 12}">
+<div cdsRow *ngIf="rows.length > 0">
+  <div cdsCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
+  <ibm-table-container class="SearchResultsContainer" cdsCol [columnNumbers]="{'lg': 12}">
     <ibm-table
       [model]="model"
 			size="lg"
@@ -95,10 +95,10 @@
 		</ibm-table>
 
   </ibm-table-container>
-  <div ibmCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
+  <div cdsCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
 </div>
 
-<div ibmRow *ngIf="model.totalDataLength > 1">
+<div cdsRow *ngIf="model.totalDataLength > 1">
   <cds-pagination-nav class="Pagination" [model]="model" (selectPage)="selectPage($event)"></cds-pagination-nav>
 </div>
 

@@ -1,0 +1,348 @@
+@let marginCol = {sm: 0, md: 1, lg: 3};
+@let contentCol = {sm: 4, md: 6, lg: 10};
+<cds-placeholder></cds-placeholder>
+
+<ng-template #error>
+    <div cdsGrid [useCssGrid]="true">
+        <div cdsCol [columnNumbers]="marginCol"></div>
+        <div cdsCol [columnNumbers]="contentCol">
+            <cds-inline-notification [notificationObj]="globalError">
+            </cds-inline-notification>
+        </div>
+        <div cdsCol [columnNumbers]="marginCol"></div>
+    </div>
+</ng-template>
+
+<ng-template [ngIf]="baseEntry" [ngIfElse]="error">
+<cds-breadcrumb [noTrailingSlash]="true">
+    <cds-breadcrumb-item [route]="['admin', 'ru']">
+        <a [routerLink]="['../..', {'q': queryString}]">{{ adminBackend.getEnvLabel(env!) }}</a>        
+    </cds-breadcrumb-item>
+    <ibm-breadcrumb-item *ngIf="queryString">
+        <a [routerLink]="['../../../search-results', {'q': queryString}]">Suchergebnise</a>
+    </ibm-breadcrumb-item>
+    <cds-breadcrumb-item>
+        <a class="breadcrumb-short-text" [routerLink]="['..', {'q': queryString}]">{{ baseEntry.displayName }}</a>
+    </cds-breadcrumb-item>
+    <cds-breadcrumb-item>
+        Bearbeiten
+    </cds-breadcrumb-item>
+</cds-breadcrumb>
+
+<div cdsGrid [useCssGrid]="true" [condensed]="true">
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <h1>Eintrag bearbeiten</h1>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <!-- 
+        Names:
+        3.1. displayName
+        3.2. cn
+        3.3. otherName
+        3.4. organization
+        3.5. givenName
+        3.6. sn
+        3.7. title
+    -->
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <h2>Namen</h2>
+        <cds-label>
+            Anzeigename (displayName)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.displayName"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label>
+            Common Name (CN)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.cn"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label>
+            Andere Namen (otherName)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.otherName"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label>
+            Organisation (organization)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.organization"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label>
+            Vorname(n) (givenName)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.givenName"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label>
+            Nachname (sn)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.sn"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label>
+            Titel (title)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.title"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <!-- Identifiers -->
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <h2>Kennungen</h2>
+        <cds-label>
+            TelematikID
+            <input
+                cdsText
+                readonly="true"
+                [(ngModel)]="baseEntry!.telematikID"
+            >
+        </cds-label>    
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label helperText="Mehrere Werte sind erlaubt, getrennt durch Komma oder jeweils ein Wert pro Zeile.">
+            DomainID
+            <textarea
+                cdsText
+                [(ngModel)]="domainIDFlat"
+            ></textarea>
+        </cds-label>    
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    
+    <!-- Addresses:
+        4.1. streetAddress
+        4.2. postalCode
+        4.3. localityName
+        4.4. stateOrProvinceName
+        4.5. countryCode        
+    -->
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <h2>Adressen</h2>
+        <cds-label>
+            Straße (streetAddress)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.streetAddress"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="{sm: 3, md: 4, lg: 6}">
+        <cds-label>
+            Ort (localityName)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.localityName"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="{sm: 1, md: 2, lg: 4}">
+        <cds-label>
+            PLZ (postalCode)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.postalCode"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="{sm: 3, md: 4, lg: 6}">
+        <cds-label>
+            Bundesland (stateOrProvinceName)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.stateOrProvinceName"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="{sm: 1, md: 2, lg: 4}">
+        <cds-label>
+            Land (countryCode)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.countryCode"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <!-- Professional details:
+        5.1. professionOID
+        5.2. specialization
+        5.3. entryType
+    -->
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <h2>Berufliche Informationen</h2>
+        <cds-label>
+            Berufskennungen (professionOID)
+            <textarea
+                readonly="true"
+                cdsText
+                [(ngModel)]="baseEntry!.professionOID"
+            ></textarea>
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label helperText="Mehrere Werte sind erlaubt, getrennt durch Komma oder jeweils ein Wert pro Zeile.">
+            Spezialisierungen (specialization)
+            <textarea
+                cdsText
+                [(ngModel)]="baseEntry!.specialization"
+            ></textarea>
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label>
+            Eintragstyp (entryType)
+            <input
+                cdsText
+                [(ngModel)]="baseEntry!.entryType"
+            >
+        </cds-label>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <!-- System Details:
+        8.1. holder
+        8.2. dataFromAuthority
+        8.3. personalEntry
+        8.4. changeDateTime
+    -->
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <h2>System Details</h2>
+        <cds-label helperText="Mehrere Werte sind erlaubt, getrennt durch Komma oder jeweils ein Wert pro Zeile.">
+            Inhaber (holder)
+            <textarea
+                cdsText
+                [(ngModel)]="holderFlat"
+            ></textarea>
+        </cds-label>
+
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <!-- Buttons -->
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol" class="buttons-container">
+        <div class="notification-container-main"></div>
+        <button cdsButton="primary" (click)="onSave()">
+            Speichern
+            <svg class="cds--btn__icon" cdsIcon="save" size="16"></svg>
+        </button>
+        <button cdsButton="secondary" (click)="onCancel()">
+            Abbrechen
+            <svg class="cds--btn__icon" cdsIcon="close" size="16"></svg>
+        </button>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+ 
+    <!-- Danger Zone -->
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <h2 class="danger-text">Gefahrenzone</h2>
+        <div class="notification-container-danger"></div>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="{sm: 3, md: 5, lg: 8}" class="description">
+        Eintrag aktivieren oder deaktivieren. Deaktivierte Einträge werden den Endanwendern nicht angezeigt.
+    </div>
+    <div cdsCol [columnNumbers]="{sm: 1, md: 1, lg: 2}">
+        <button style="width:100%;" *ngIf="baseEntry.active" cdsButton="danger--tertiary" (click)="onDeactivate()" >
+            Deaktivieren
+            <svg class="cds--btn__icon" cdsIcon="fade" size="16"></svg>
+        </button>
+        <button style="width:100%;" *ngIf="!baseEntry.active" cdsButton="tertiary" (click)="onActivate()" >
+            Aktivieren
+            <svg class="cds--btn__icon" cdsIcon="checkmark--outline" size="16"></svg>
+        </button>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="{sm: 3, md: 5, lg: 8}" class="description">
+        Löschen des Eintrags. Der Eintrag wird unwiderruflich gelöscht. Zertifikate, KIM Adressen und andere Verknüpfungen werden ebenfalls gelöscht.
+    </div>
+    <div cdsCol [columnNumbers]="{sm: 1, md: 1, lg: 2}">
+        <button cdsButton="danger--tertiary" (click)="onDelete()" >
+            Löschen
+            <svg class="cds--btn__icon" cdsIcon="trash-can" size="16"></svg>
+        </button>
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
+</div>
+
+</ng-template>
+
+

@@ -11,14 +11,13 @@ export interface NavigationLink {
   providedIn: 'root'
 })
 export class NavigationService {
-  //public adminMenuLinks$: Observable<NavigationLink[]> = new Observable<NavigationLink[]>()
+  public adminMenuLinks$: Observable<NavigationLink[]> 
 
   constructor(
     private adminBackend: AdminBackendService
   ) { 
     const self = this
 
-    /*
     this.adminMenuLinks$ = this.adminBackend.status$.pipe(
       map( adminStatus => {
         return adminStatus.environmentStatus.map((envStatus) => {
@@ -29,13 +28,6 @@ export class NavigationService {
         }).filter( (x): x is NavigationLink => x != null ).reverse()
       })
     )
-      */
-  }
-
-  get adminMenuLinks$(): Observable<NavigationLink[]> {
-    return new Observable<NavigationLink[]>(subscriber => {
-        subscriber.next([])
-    })
   }
   
 }

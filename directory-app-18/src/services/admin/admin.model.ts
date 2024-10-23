@@ -195,3 +195,38 @@ export interface Smartcard {
     active: boolean,
     certificateSerialNumbers: [string],
 }
+
+export interface BaseDirectoryEntry {
+    // Identifier
+    telematikID: string,
+    domainID: Array<string> | undefined,
+    dn: DistinguishedName | undefined,
+    // Names
+    displayName: string | undefined,
+    cn: string | undefined,
+    otherName: string | undefined,
+    organization: string | undefined,
+    givenName: string | undefined,
+    sn: string | undefined,
+    title: string | undefined,
+    // Addresses
+    streetAddress: string | undefined,
+    postalCode: string | undefined,
+    localityName: string | undefined,
+    stateOrProvinceName: string | undefined,
+    countryCode: string | undefined,
+    // Professional
+    professionOID: Array<string> | undefined,
+    specialization: Array<string> | undefined,
+    entryType: Array<string> | undefined,
+    // System
+    holder: Array<string> | undefined,
+    dataFromAuthority: boolean | undefined,
+    personalEntry: boolean | undefined,
+    changeDateTime: string | undefined,
+    // Internal
+    maxKOMLEadr: number | undefined,
+    // Misc
+    active: boolean,
+    meta: Array<string> | undefined,  
+}

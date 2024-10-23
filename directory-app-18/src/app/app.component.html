@@ -1,4 +1,4 @@
-<cds-header brand="gematik" name="Directory" [route]="['']">
+<cds-header brand="gematik" name="Directory" [route]="['']" [useRouter]="true">
   <cds-header-navigation>
     <cds-header-item 
       *ngFor="let nav of adminMenuLinks"
@@ -8,12 +8,11 @@
     </cds-header-item>
   </cds-header-navigation>
   <cds-header-global>
-    <cds-header-action title="Settings" routerLink="/settings">
-      <svg cdsIcon="settings" size="24" class="icoon settings"></svg>
+    <cds-header-action description="Settings" (selected)="router.navigateByUrl('/settings')">
+      <svg cdsIcon="settings" size="24" class="icon settings"></svg>
     </cds-header-action>
   </cds-header-global>
 </cds-header>
-
 
 <main class="bx--content">
   <router-outlet></router-outlet>

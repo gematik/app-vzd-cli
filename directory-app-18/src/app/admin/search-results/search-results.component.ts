@@ -137,7 +137,7 @@ export class SearchResultsComponent implements OnInit {
 
   onRowClick(clickedRow: number) {
     const rowNum = (this.model.currentPage-1)*this.model.pageLength+clickedRow
-    const entry = this.rows[clickedRow][0].expandedData as ElaborateDirectoryEntry
+    const entry = this.rows[rowNum][0].expandedData as ElaborateDirectoryEntry
     this.router.navigate(
       ["entry", entry.base.telematikID, {"q": this.queryString}],
       { relativeTo: this.route.parent }

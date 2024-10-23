@@ -1,0 +1,47 @@
+::ng-deep .cds--inline-notification {
+  margin: 1rem;
+}
+
+::ng-deep label {
+    margin-bottom: 0.25em !important;    
+}
+
+h1 {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+h2 {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.danger-text {
+    color: var(--cds-support-error, #da1e28);
+}
+
+h2.danger-text {
+    margin-top: 1.5em;
+    padding-top: 0.5em;
+    border-top: 1px solid rgb(224, 224, 224);
+}
+
+.description {
+    padding-top: 0.5em;
+    height: 6em;
+    padding-bottom: 1.5em;
+    margin-right: 1em;
+}
+
+::ng-deep textarea {
+    height: 6em !important;
+}
+
+.buttons-container {
+    margin-top: 1.5em;
+}
+
+// readonly textareas mus have white background
+::ng-deep textarea[readonly] {
+    background-color: white !important;
+}

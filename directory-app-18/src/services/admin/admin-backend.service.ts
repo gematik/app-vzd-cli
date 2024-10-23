@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryFHIRResourceType, DirectoryEntryKind, Outcome, ElaborateSearchResults } from './admin.model';
+import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryFHIRResourceType, DirectoryEntryKind, Outcome, ElaborateSearchResults, BaseDirectoryEntry } from './admin.model';
 
 // TODO: how does one provide labels in Angular?
 const labels: Record<string, string> = {
@@ -14,47 +14,38 @@ const labels: Record<string, string> = {
   providedIn: 'root'
 })
 export class AdminBackendService {
-  private adminStatus: AdminStatus | undefined
+  public adminStatus: AdminStatus | undefined
 
   constructor(
     private http: HttpClient,
   ) { 
     const self = this
+  }
 
-    this.getStatus().then( adminStatus => {
+  updateStatus() {
+    firstValueFrom(
+      this.http.get<AdminStatus>('/api/admin/status')
+    ).then( adminStatus => {
       this.adminStatus = adminStatus
-      setInterval( () => {
-        this.getStatus().then( adminStatus => this.adminStatus = adminStatus)
-      }, 1000)
     })
   }
 
-  get status$() : Observable<AdminStatus> {
-    const self = this
-    return new Observable(function subscribe(subscriber) {
-      var lastValue = JSON.stringify(self.adminStatus)
-      if (self.adminStatus != undefined) {
-        lastValue = lastValue
-        subscriber.next(self.adminStatus)
+  get status$(): Observable<AdminStatus> {
+    return new Observable<AdminStatus>(subscriber => {
+      if (this.adminStatus == undefined) {
+        this.updateStatus()
       }
-
-
-      const id = setInterval(() => {
-        if (self.adminStatus != undefined) {
-          const json = JSON.stringify(self.adminStatus) 
-          if (json != lastValue) {
-            lastValue = json
-            subscriber.next(self.adminStatus)
-          }
+      var lastStatus = this.adminStatus
+      if (lastStatus != undefined) {
+        subscriber.next(lastStatus)
+      }
+      setInterval(() => {
+        if (lastStatus !== this.adminStatus) {
+          lastStatus = this.adminStatus
+          subscriber.next(this.adminStatus!)
         }
-      }, 500);
-    });
-  }
-
-  getStatus() {
-    return firstValueFrom(
-      this.http.get<AdminStatus>('/api/admin/status')
-    )
+      }, 500)
+    })
   }
 
   getEnvLabel(env: string) {
@@ -125,5 +116,78 @@ export class AdminBackendService {
     } else {
       return "hospital"
     }
+  }
+
+  loadBaseEntry(env: string, telematikID: string) : Promise<BaseDirectoryEntry> {
+    return new Promise<BaseDirectoryEntry>((resolve, reject) => {
+      resolve({
+        telematikID: telematikID,
+        domainID: ["domainID #1", "domainID #2"],
+        dn: {
+          cn: "cn",
+          ou: ["ou"],
+          dc: ["dc"],
+          uid: "uid",
+        },
+        displayName: "SMB Test Betriebsstätte gematik "+telematikID,
+        cn: "cn",
+        otherName: "otherName",
+        organization: "organization",
+        givenName: "givenName",
+        sn: "sn",
+        title: "title",
+        streetAddress: "streetAddress",
+        postalCode: "postalCode",
+        localityName: "localityName",
+        stateOrProvinceName: "stateOrProvinceName",
+        countryCode: "countryCode",
+        professionOID: ["professionOID"],
+        specialization: ["specialization"],
+        entryType: ["1"],
+        holder: ["holder"],
+        dataFromAuthority: true,
+        personalEntry: true,
+        changeDateTime: "changeDateTime",
+        maxKOMLEadr: 1,
+        active: true,
+        meta: ["meta"],
+      })
+    })
+  }
+
+  modifyBaseEntry(env: string, baseEntry: BaseDirectoryEntry): Promise<BaseDirectoryEntry> {
+    return new Promise<BaseDirectoryEntry>((resolve, reject) => {
+      // clone the object
+      var modifiedEntry = JSON.parse(JSON.stringify(baseEntry))
+      modifiedEntry.cn = "cn"
+      resolve(modifiedEntry)
+    })
+  }
+
+  deleteEntry(env: string, telematikID: string): Promise<Outcome> {
+    return new Promise<Outcome>((resolve, reject) => {
+      resolve({
+        code: "true",
+        message: "Entry deleted"
+      })
+    })
+  }
+
+  deactivateEntry(env: string, telematikID: string): Promise<Outcome> {
+    return new Promise<Outcome>((resolve, reject) => {
+      resolve({
+        code: "true",
+        message: "Entry deactivated"
+      })
+    })
+  }
+
+  activateEntry(env: string, telematikID: string): Promise<Outcome> {
+    return new Promise<Outcome>((resolve, reject) => {
+      resolve({
+        code: "true",
+        message: "Entry activated"
+      })
+    })
   }
 }

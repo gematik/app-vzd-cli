@@ -2,11 +2,6 @@ h2 {
     margin-bottom: 1.5em;
 }
 
-ibm-label {
-    margin-bottom: 1em;
-    width: unset;
-}
-
 .right {
     text-align: right;
 }
@@ -19,9 +14,24 @@ ibm-label {
     margin-bottom: 2rem !important;
 }
 
+::ng-deep label {
+    margin-bottom: 0.25em !important;    
+}
+
+::ng-deep input {
+    background-color: rgb(244,244,244) !important;
+}
+
 ::ng-deep textarea {
-    padding-top: 0.5em !important;
-    padding-bottom: 0.5em !important;
     line-height: 1.25em !important;
     height: 4.5em !important;
+    background-color: rgb(244,244,244);
+}
+
+::ng-deep .cds--form-item {
+    margin-top: 1rem !important;
+}
+
+::ng-deep .cds--structured-list {
+    margin-top: 2em;
 }

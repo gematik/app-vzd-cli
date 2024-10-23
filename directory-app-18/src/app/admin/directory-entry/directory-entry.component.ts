@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnippetType } from 'carbon-components-angular/code-snippet/code-snippet.component';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
 import { Coding, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
+import { IconService } from 'carbon-components-angular';
+import { Edit16 } from "@carbon/icons";
 
 interface KIMAddressInfo {
   mail: string
@@ -38,6 +40,7 @@ export class DirectoryEntryComponent implements OnInit {
     private route: ActivatedRoute,
     private adminBackend: AdminBackendService,
     private changeDetector: ChangeDetectorRef,
+    private iconService: IconService,
   ) { }
 
   ngOnInit(): void {
@@ -53,6 +56,7 @@ export class DirectoryEntryComponent implements OnInit {
         }
       )
     })
+    this.iconService.register(Edit16)
   }
 
   validateBaseField(field: string): boolean {
@@ -115,4 +119,11 @@ export class DirectoryEntryComponent implements OnInit {
       }
     }).filter( x => x !== undefined) as UserCertificateInfo[] || []
   }
+
+  onEdit() {
+    this.router.navigate(
+      ["entry", this.entry?.base.telematikID, "edit", {"q": this.queryString}],
+      { relativeTo: this.route.parent }
+    )
+ }
 }

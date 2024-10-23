@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { InlineLoadingState, GridModule } from 'carbon-components-angular';
+import { InlineLoadingState } from 'carbon-components-angular';
 import { BackendService } from 'src/services/backend.service';
 import { GlobalConfig } from 'src/services/global.model';
 import { NavigationService } from '../../services/navigation.service';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
@@ -14,7 +15,8 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     protected backendService: BackendService,
-    protected navigationService: NavigationService
+    protected navigationService: NavigationService,
+    protected router: Router,
     ) { }
 
   ngOnInit(): void {

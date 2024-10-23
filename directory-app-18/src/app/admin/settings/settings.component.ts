@@ -36,7 +36,6 @@ export class SettingsComponent implements OnInit {
     this.adminBackend.status$.subscribe({
       next(adminStatus) {
         self.statusModel = adminStatus.environmentStatus
-          .filter ( envStatus => envStatus.env != "tu")
           .map( envStatus => {
           if (envStatus.accessTokenClaims != null) {
             return { 
@@ -66,14 +65,12 @@ export class SettingsComponent implements OnInit {
   }
 
   showError(err: any) {
-    /*
     this.notificationService.showNotification({
       type: "error",
       title: "Error",
       message: err.error?.message || err.message,
       target: ".notification-container",
     })  
-      */
   }
 
   onLogin(env: string) {

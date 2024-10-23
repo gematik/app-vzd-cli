@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewContainerRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Title } from "@angular/platform-browser";
 import { Router } from '@angular/router';
 import { NavigationLink, NavigationService } from "../services/navigation.service";
@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
   constructor(
     private iconsService: IconService,
     private titleService: Title,
-    private router: Router,
+    public router: Router,
     public navigationService: NavigationService
   ) {
 
@@ -30,12 +30,10 @@ export class AppComponent implements OnInit {
   public ngOnInit(): void {
     this.titleService.setTitle("gematik Directory")
     this.iconsService.register(Settings24)
-    /*
     this.navigationService.adminMenuLinks$
       .subscribe(links => {
         this.adminMenuLinks = links
       });
-      */
   }
-
+  
 }
