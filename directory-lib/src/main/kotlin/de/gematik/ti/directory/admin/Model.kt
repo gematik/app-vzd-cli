@@ -177,6 +177,7 @@ enum class Operation {
     add_Directory_Entry,
     modify_Directory_Entry,
     delete_Directory_Entry,
+    stateSwitch_Directory_Entry,
     add_Directory_Entry_Certificate,
     delete_Directory_Entry_Certificate,
 
@@ -188,9 +189,6 @@ enum class Operation {
 
     @SerialName("delete_Directory_FA-Attributes")
     delete_Directory_FA_Attributes,
-
-    // TODO: not in OpenAPI
-    stateSwitch_Directory_Entry,
 }
 
 @Serializable

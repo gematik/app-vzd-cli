@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom, Observable } from 'rxjs';
+import { catchError, firstValueFrom, Observable } from 'rxjs';
 import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryFHIRResourceType, DirectoryEntryKind, Outcome, ElaborateSearchResults, BaseDirectoryEntry } from './admin.model';
 
 // TODO: how does one provide labels in Angular?
@@ -19,7 +19,13 @@ export class AdminBackendService {
   constructor(
     private http: HttpClient,
   ) { 
-    const self = this
+  }
+
+  parseError(error: any): Error {
+    if (error instanceof HttpErrorResponse && error.error != undefined && error.error.message != undefined) {
+      return new Error(error.error.message)
+    }
+    return new Error(error.message)
   }
 
   updateStatus() {
@@ -119,75 +125,81 @@ export class AdminBackendService {
   }
 
   loadBaseEntry(env: string, telematikID: string) : Promise<BaseDirectoryEntry> {
-    return new Promise<BaseDirectoryEntry>((resolve, reject) => {
-      resolve({
-        telematikID: telematikID,
-        domainID: ["domainID #1", "domainID #2"],
-        dn: {
-          cn: "cn",
-          ou: ["ou"],
-          dc: ["dc"],
-          uid: "uid",
-        },
-        displayName: "SMB Test Betriebsstätte gematik "+telematikID,
-        cn: "cn",
-        otherName: "otherName",
-        organization: "organization",
-        givenName: "givenName",
-        sn: "sn",
-        title: "title",
-        streetAddress: "streetAddress",
-        postalCode: "postalCode",
-        localityName: "localityName",
-        stateOrProvinceName: "stateOrProvinceName",
-        countryCode: "countryCode",
-        professionOID: ["professionOID"],
-        specialization: ["specialization"],
-        entryType: ["1"],
-        holder: ["holder"],
-        dataFromAuthority: true,
-        personalEntry: true,
-        changeDateTime: "changeDateTime",
-        maxKOMLEadr: 1,
-        active: true,
-        meta: ["meta"],
-      })
-    })
+    return firstValueFrom(
+      this.http.get<BaseDirectoryEntry>(
+        `/api/admin/${env}/base-entry/${telematikID}`
+      )
+    )
   }
 
   modifyBaseEntry(env: string, baseEntry: BaseDirectoryEntry): Promise<BaseDirectoryEntry> {
-    return new Promise<BaseDirectoryEntry>((resolve, reject) => {
-      // clone the object
-      var modifiedEntry = JSON.parse(JSON.stringify(baseEntry))
-      modifiedEntry.cn = "cn"
-      resolve(modifiedEntry)
-    })
+    return firstValueFrom(
+      this.http.put<BaseDirectoryEntry>(
+        `/api/admin/${env}/base-entry/${baseEntry.telematikID}`,
+        baseEntry
+      ).pipe(catchError((error) => {
+        throw this.parseError(error)
+      })
+      )
+    )
   }
 
   deleteEntry(env: string, telematikID: string): Promise<Outcome> {
     return new Promise<Outcome>((resolve, reject) => {
-      resolve({
-        code: "true",
-        message: "Entry deleted"
+      reject({
+        code: "error",
+        message: "Löschen der Einträge über GUI ist derzeit nicht möglich"
       })
     })
   }
 
   deactivateEntry(env: string, telematikID: string): Promise<Outcome> {
-    return new Promise<Outcome>((resolve, reject) => {
-      resolve({
-        code: "true",
-        message: "Entry deactivated"
+    return firstValueFrom(
+      this.http.put<Outcome>(
+        `/api/admin/${env}/entry/${telematikID}/activation`,
+        {active: false}
+      ).pipe(catchError((error) => {
+        throw this.parseError(error)
       })
-    })
+      )
+    )
   }
 
   activateEntry(env: string, telematikID: string): Promise<Outcome> {
-    return new Promise<Outcome>((resolve, reject) => {
-      resolve({
-        code: "true",
-        message: "Entry activated"
+    return firstValueFrom(
+      this.http.put<Outcome>(
+        `/api/admin/${env}/entry/${telematikID}/activation`,
+        {active: true}
+      ).pipe(catchError((error) => {
+        throw this.parseError(error)
       })
-    })
+      )
+    )
   }
+
+  getOperationLabel(operation: string) {
+    switch(operation) {
+      case "add_Directory_Entry":
+        return "Eintrag hinzufügt"
+      case "modify_Directory_Entry":
+        return "Eintrag geändert"
+      case "delete_Directory_Entry":
+        return "Eintrag gelöscht"
+      case "stateSwitch_Directory_Entry":
+        return "Eintrag aktiviert/deaktiviert"
+      case "add_Directory_Entry_Certificate":
+        return "Zertifikat hinzugefügt"
+      case "delete_Directory_Entry_Certificate":
+        return "Zertifikat gelöscht"
+      case "add_Directory_FA-Attributes":
+        return "Anwendungsdaten hinzugefügt"
+      case "modify_Directory_FA-Attributes":
+        return "Anwendungsdaten geändert"
+      case "delete_Directory_FA-Attribute":
+        return "Anwendungsdaten gelöscht"
+      default:
+        return operation
+    }
+  }
+
 }

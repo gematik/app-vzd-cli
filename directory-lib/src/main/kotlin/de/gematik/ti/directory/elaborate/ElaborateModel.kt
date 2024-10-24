@@ -1,6 +1,8 @@
 package de.gematik.ti.directory.elaborate
 
 import de.gematik.ti.directory.admin.DistinguishedName
+import de.gematik.ti.directory.admin.LogEntry
+import de.gematik.ti.directory.admin.Operation
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.fhir.Coding
 import de.gematik.ti.directory.validation.Finding
@@ -15,6 +17,7 @@ data class ElaborateDirectoryEntry(
     val kimAddresses: List<ElaborateKIMAddress>? = null,
     val smartcards: List<Smartcard>? = null,
     var validationResult: ValidationResult? = null,
+    var logs: List<ElaborateLogEntry>? = null,
 )
 
 @Serializable
@@ -88,4 +91,12 @@ data class ElaborateKIMAddress(
 data class ElaborateKIMProvider(
     val code: String,
     val display: String,
+)
+
+@Serializable
+data class ElaborateLogEntry(
+    val clientID: String?,
+    val logTime: Instant,
+    val operation: Operation,
+    val noDataChanged: Boolean,
 )

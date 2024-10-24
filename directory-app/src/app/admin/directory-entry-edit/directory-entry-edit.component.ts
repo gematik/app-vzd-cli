@@ -2,7 +2,6 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import {
   BreadcrumbModule,
-  NotificationService,
   GridModule,
   TabsModule,
   ButtonModule,
@@ -39,13 +38,12 @@ import { FormsModule } from '@angular/forms';
   ],
   templateUrl: './directory-entry-edit.component.html',
   styleUrl: './directory-entry-edit.component.scss',
-  providers: [NotificationService, ModalService],
+  providers: [ModalService],
 })
 export class DirectoryEntryEditComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private notificationService: NotificationService,
     protected adminBackend: AdminBackendService,
     protected modalService: ModalService,
   ) { }
@@ -53,17 +51,14 @@ export class DirectoryEntryEditComponent implements OnInit {
   env: string | undefined
   baseEntry: BaseDirectoryEntry | undefined
   queryString: string | null = null
-  notificationRef: any | null = null
   toggleActive: boolean = true
   domainIDFlat: string | undefined
   holderFlat: string | undefined
+  metaFlat: string | undefined
 
-  globalError: NotificationContent = {
-    lowContrast: true,
-    type: "error",
-    title: "Fehler",
-    message: "Ein Fehler ist aufgetreten",
-  }
+  globalNotification: NotificationContent | null = null
+  modifyNotification: NotificationContent | null = null
+  dangerNotification: NotificationContent | null = null
 
   ngOnInit(): void {
     this.route.params.subscribe(param => {
@@ -76,51 +71,43 @@ export class DirectoryEntryEditComponent implements OnInit {
         value => {
           this.baseEntry = value
           this.domainIDFlat = this.baseEntry?.domainID?.join("\n")
-          this.holderFlat = this.baseEntry?.holder?.join("\n")              
+          this.holderFlat = this.baseEntry?.holder?.join("\n")
+          this.metaFlat = this.baseEntry?.meta?.join("\n")
         }
       ).catch(
         error => {
-          this.globalError = {
+          this.globalNotification = {
             lowContrast: true,
             type: "error",
             title: "Fehler",
-            message: error,
+            message: error.message,
           }
         }
       )
     })
   }
 
-  notify(content: NotificationContent) {
-    if (this.notificationRef != null) {
-      this.notificationService.close(this.notificationRef)
-    }
-
-    content.lowContrast = true
-
-    this.notificationRef = this.notificationService.showNotification(content)
-  }
-
   onSave(): void {
     // split textareay to arrays by comma or new line, trimming the whitespaces
     this.baseEntry!.domainID = this.domainIDFlat?.split(/,|\n/).map((item) => item.trim())
     this.baseEntry!.holder = this.holderFlat?.split(/,|\n/).map((item) => item.trim())
+    this.baseEntry!.meta =this.metaFlat?.split(/,|\n/).map((item) => item.trim())
 
     this.adminBackend.modifyBaseEntry(this.env!, this.baseEntry!).then(
       value => {
         this.router.navigate(
           ['entry', this.baseEntry?.telematikID, {"q": this.queryString}],
-          { relativeTo: this.route.parent }
+          { relativeTo: this.route.parent, queryParams: {modified: 'true'} }
         )    
       }
     ).catch(
       error => {
-        this.notify({
+        this.modifyNotification = {
+          lowContrast: true,
           type: "error",
           title: "Fehler",
-          message: error,
-          target: ".notification-container-main",
-        })
+          message: error.message,
+        }
       }
     )
     
@@ -160,12 +147,12 @@ export class DirectoryEntryEditComponent implements OnInit {
       }
     ).catch(
       error => {
-        this.notify({
+        this.dangerNotification = {
+          lowContrast: true,
           type: "error",
           title: "Fehler",
-          message: error,
-          target: ".notification-container-danger",
-        })
+          message: error.message,
+        }
       }
     )
   }
@@ -191,34 +178,70 @@ export class DirectoryEntryEditComponent implements OnInit {
     this.adminBackend.deactivateEntry(this.env!, this.baseEntry!.telematikID).then(
       value => {
         this.baseEntry!.active = false
+        this.dangerNotification = {
+          lowContrast: true,
+          type: "success",
+          title: "Erfolg",
+          message: "Der Eintrag wurde erfolgreich deaktiviert.",
+        }
       }
     ).catch(
       error => {
-        this.notify({
+        this.dangerNotification = {
+          lowContrast: true,
           type: "error",
           title: "Fehler",
-          message: error,
-          target: ".notification-container-danger",
-        })
+          message: error.message,
+        }
       }
     )
   }
 
   onActivate(): void {
+    const ref = this.modalService.show({
+      type: AlertModalType.danger,
+      title: "Aktivieren bestätigen",
+      content: `<p>${this.baseEntry?.telematikID}</p><p>${this.baseEntry?.displayName}</p>`,      
+      size: "md",
+      buttons: [{
+        text: "Nein, abbrechen",
+        type: ModalButtonType.secondary
+      }, {
+        text: "Ja, aktivieren",
+        type: ModalButtonType.danger,
+        click: () => this.doActivate()
+      }]
+    })
+  }
+
+  doActivate(): void {
     this.adminBackend.activateEntry(this.env!, this.baseEntry!.telematikID).then(
       value => {
         this.baseEntry!.active = true
+        this.dangerNotification = {
+          lowContrast: true,
+          type: "success",
+          title: "Erfolg",
+          message: "Der Eintrag wurde erfolgreich aktiviert.",
+        }
       }
     ).catch(
       error => {
-        this.notify({
+        this.dangerNotification = {
           type: "error",
           title: "Fehler",
-          message: error,
+          message: error.message,
           target: ".notification-container-danger",
-        })
+        }
       }
     )
   }
 
+  get entryType(): string {
+    return this.baseEntry?.entryType?.join(",") ?? ""
+  }
+
+  set entryType(value: string) {
+    this.baseEntry!.entryType = value.split(",").map((item) => item.trim())
+  }
 }

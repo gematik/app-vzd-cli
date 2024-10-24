@@ -13,6 +13,14 @@
         </ibm-breadcrumb>   
     </div>
 </div>
+<div ibmRow *ngIf="globalNotification">
+    <div ibmCol [columnNumbers]="{'lg': 3}"></div>
+    <div style="padding:1em" ibmCol [columnNumbers]="{'lg': 10}">
+        <cds-inline-notification *ngIf="globalNotification" [notificationObj]="globalNotification" (close)="globalNotification = null">
+        </cds-inline-notification>
+    </div>
+    <div ibmCol [columnNumbers]="{'lg': 3}"></div>
+</div>
 <div ibmRow *ngIf="entry">
     <div ibmCol [columnNumbers]="{'lg': 3}"></div>
     <div ibmCol [columnNumbers]="{'lg': 10}">
@@ -29,6 +37,7 @@
         </div>
         <ibm-tabs [isNavigation]="true" [followFocus]="true">
             <ibm-tab heading="Allgemein">
+
                 <h2>{{entryKindTitle}}</h2>
                 
                 <ibm-label
@@ -268,6 +277,24 @@
                         </ibm-list-row>
                     </ibm-structured-list>           
                 </div>
+            </ibm-tab>
+            <ibm-tab heading="Protokoll">
+                <h2>Änderungsprotokoll</h2>
+                <ibm-structured-list 
+                    [condensed]="true">
+                    <ibm-list-header>
+                        <ibm-list-column class="icon"></ibm-list-column>
+                        <ibm-list-column [nowrap]="true">Zeitstempel</ibm-list-column>
+                        <ibm-list-column [nowrap]="true">Bearbeiter</ibm-list-column>
+                        <ibm-list-column>Operation</ibm-list-column>
+                    </ibm-list-header>
+                    <ibm-list-row *ngFor="let log of entry.logs">
+                        <ibm-list-column class="icon"><svg ibmIcon="checkmark--filled" class="success"></svg></ibm-list-column>
+                        <ibm-list-column>{{formatDate(log.logTime)}}</ibm-list-column>
+                        <ibm-list-column>{{log.clientID}}</ibm-list-column>
+                        <ibm-list-column>{{operationLabel(log.operation)}}</ibm-list-column>
+                    </ibm-list-row>
+                </ibm-structured-list>
             </ibm-tab>
             <ibm-tab heading="Rohdaten">
                 <ibm-code-snippet

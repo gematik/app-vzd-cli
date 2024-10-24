@@ -61,7 +61,7 @@ class LogCommand : CliktCommand(name = "log", help = "Show logs") {
                     logTimeTo?.let { put("logTimeTo", it.toString()) }
                 }
 
-            val logEntries = runBlocking { context.client.readLog(params) }.sortedBy { it.logTime }
+            val logEntries = runBlocking { context.client.readLog(params) }
 
             val stdout = System.`out`
             try {

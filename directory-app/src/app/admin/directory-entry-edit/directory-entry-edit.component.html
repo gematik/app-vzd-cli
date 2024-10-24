@@ -6,7 +6,7 @@
     <div cdsGrid [useCssGrid]="true">
         <div cdsCol [columnNumbers]="marginCol"></div>
         <div cdsCol [columnNumbers]="contentCol">
-            <cds-inline-notification [notificationObj]="globalError">
+            <cds-inline-notification *ngIf="globalNotification" [notificationObj]="globalNotification" (close)="globalNotification = null">
             </cds-inline-notification>
         </div>
         <div cdsCol [columnNumbers]="marginCol"></div>
@@ -142,7 +142,7 @@
             <input
                 cdsText
                 readonly="true"
-                [(ngModel)]="baseEntry!.telematikID"
+                [(ngModel)]="baseEntry.telematikID"
             >
         </cds-label>    
     </div>
@@ -175,7 +175,7 @@
             Straße (streetAddress)
             <input
                 cdsText
-                [(ngModel)]="baseEntry!.streetAddress"
+                [(ngModel)]="baseEntry.streetAddress"
             >
         </cds-label>
     </div>
@@ -187,7 +187,7 @@
             Ort (localityName)
             <input
                 cdsText
-                [(ngModel)]="baseEntry!.localityName"
+                [(ngModel)]="baseEntry.localityName"
             >
         </cds-label>
     </div>
@@ -196,7 +196,7 @@
             PLZ (postalCode)
             <input
                 cdsText
-                [(ngModel)]="baseEntry!.postalCode"
+                [(ngModel)]="baseEntry.postalCode"
             >
         </cds-label>
     </div>
@@ -208,7 +208,7 @@
             Bundesland (stateOrProvinceName)
             <input
                 cdsText
-                [(ngModel)]="baseEntry!.stateOrProvinceName"
+                [(ngModel)]="baseEntry.stateOrProvinceName"
             >
         </cds-label>
     </div>
@@ -217,7 +217,7 @@
             Land (countryCode)
             <input
                 cdsText
-                [(ngModel)]="baseEntry!.countryCode"
+                [(ngModel)]="baseEntry.countryCode"
             >
         </cds-label>
     </div>
@@ -237,7 +237,7 @@
             <textarea
                 readonly="true"
                 cdsText
-                [(ngModel)]="baseEntry!.professionOID"
+                [(ngModel)]="baseEntry.professionOID"
             ></textarea>
         </cds-label>
     </div>
@@ -249,7 +249,7 @@
             Spezialisierungen (specialization)
             <textarea
                 cdsText
-                [(ngModel)]="baseEntry!.specialization"
+                [(ngModel)]="baseEntry.specialization"
             ></textarea>
         </cds-label>
     </div>
@@ -261,7 +261,7 @@
             Eintragstyp (entryType)
             <input
                 cdsText
-                [(ngModel)]="baseEntry!.entryType"
+                [(ngModel)]="entryType"
             >
         </cds-label>
     </div>
@@ -288,11 +288,25 @@
     </div>
     <div cdsCol [columnNumbers]="marginCol"></div>
 
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label helperText="Mehrere Werte sind erlaubt, getrennt durch Komma oder jeweils ein Wert pro Zeile.">
+            Metadaten (meta)
+            <textarea
+                cdsText
+                [(ngModel)]="metaFlat"
+            ></textarea>
+        </cds-label>
+
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
     <!-- Buttons -->
 
     <div cdsCol [columnNumbers]="marginCol"></div>
     <div cdsCol [columnNumbers]="contentCol" class="buttons-container">
-        <div class="notification-container-main"></div>
+        <cds-inline-notification *ngIf="modifyNotification" [notificationObj]="modifyNotification" (close)="modifyNotification = null">
+        </cds-inline-notification>
         <button cdsButton="primary" (click)="onSave()">
             Speichern
             <svg class="cds--btn__icon" cdsIcon="save" size="16"></svg>
@@ -309,7 +323,8 @@
     <div cdsCol [columnNumbers]="marginCol"></div>
     <div cdsCol [columnNumbers]="contentCol">
         <h2 class="danger-text">Gefahrenzone</h2>
-        <div class="notification-container-danger"></div>
+        <cds-inline-notification *ngIf="dangerNotification" [notificationObj]="dangerNotification" (close)="dangerNotification = null">
+        </cds-inline-notification>
     </div>
     <div cdsCol [columnNumbers]="marginCol"></div>
 
@@ -329,6 +344,7 @@
     </div>
     <div cdsCol [columnNumbers]="marginCol"></div>
 
+    <!--
     <div cdsCol [columnNumbers]="marginCol"></div>
     <div cdsCol [columnNumbers]="{sm: 3, md: 5, lg: 8}" class="description">
         Löschen des Eintrags. Der Eintrag wird unwiderruflich gelöscht. Zertifikate, KIM Adressen und andere Verknüpfungen werden ebenfalls gelöscht.
@@ -340,6 +356,7 @@
         </button>
     </div>
     <div cdsCol [columnNumbers]="marginCol"></div>
+    -->
 
 </div>
 

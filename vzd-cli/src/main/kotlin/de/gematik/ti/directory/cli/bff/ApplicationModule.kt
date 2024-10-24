@@ -1,6 +1,8 @@
 package de.gematik.ti.directory.cli.bff
 
 import de.gematik.ti.directory.DirectoryAuthException
+import de.gematik.ti.directory.DirectoryException
+import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.admin.AdminAPI
 import de.gematik.ti.directory.cli.util.VaultException
@@ -33,6 +35,7 @@ fun Application.directoryModule() {
             Json {
                 prettyPrint = true
                 isLenient = true
+                encodeDefaults = true
                 serializersModule =
                     SerializersModule {
                         contextual(ExtendedCertificateDataDERSerializer)
@@ -76,6 +79,9 @@ fun Application.directoryModule() {
         }
         exception<DirectoryAuthException> { call, _ ->
             call.respondText(text = "401: Unauthorized", status = HttpStatusCode.Unauthorized)
+        }
+        exception<AdminResponseException> { call, cause ->
+            call.respond(cause.response.status, Outcome("admin_error", cause.details))
         }
     }
 }

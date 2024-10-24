@@ -1,5 +1,11 @@
 = Changelog `vzd-cli`
 
+== Version 3.1.0
+
+- Editieren der Einträge in der GUI
+- Upgrade der GUI auf Angular 18 und neuesten Carbon Design System
+- Bugfixes
+
 == Version 3.0.0
 
 - Unterstützung FHIR VZD FdV und Search Schnittstellen, s. `vzd-cli fhir`

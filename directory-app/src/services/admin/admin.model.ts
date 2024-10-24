@@ -142,6 +142,7 @@ export interface ElaborateBaseDirectoryEntry {
 
   // Internal
   maxKOMLEadr?: number
+
 }
 
 export interface UserCertificate {
@@ -163,6 +164,7 @@ export interface ElaborateDirectoryEntry {
   kimAddresses?: ElaborateKIMAddress[]
   smartcards?: Smartcard[]
   validationResult?: any
+  logs: Array<ElaborateLogEntry> | undefined
 }
 
 export interface ElaborateKIMAddress {
@@ -229,4 +231,11 @@ export interface BaseDirectoryEntry {
     // Misc
     active: boolean,
     meta: Array<string> | undefined,  
+}
+
+export interface ElaborateLogEntry {
+  clientID: string
+  logTime: string
+  operation: string
+  noDataChange: boolean
 }

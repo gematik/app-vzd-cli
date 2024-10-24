@@ -26,8 +26,20 @@ private val JSON =
     }
 
 class AdminResponseException(response: HttpResponse, message: String) : ResponseException(response, message) {
+    val directoryError: Error?
+        get() {
+            return runBlocking {
+                runCatching {  response.body<Error>() }.getOrNull()
+            }
+        }
     val details: String
         get() {
+
+            val error = directoryError
+            if (error != null) {
+                return error.message
+            }
+
             var details = "Bad response: $response"
 
             val reason = response.headers["RS-DIRECTORY-ADMIN-ERROR"]
@@ -336,7 +348,7 @@ class Client(block: Configuration.() -> Unit = {}) {
             throw AdminResponseException(response, "Unable to get log $parameters")
         }
 
-        return response.body()
+        return response.body<List<LogEntry>>().sortedBy { it.logTime }
     }
 
     /**
