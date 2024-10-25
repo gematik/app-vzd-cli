@@ -108,6 +108,4 @@ fun elaborateSpecialization(specialization: String): Coding {
     return coding ?: Coding(specialization, specialization)
 }
 
-fun elaborateHolder(holder: String): Coding {
-    return Holder.resolveCode(holder) ?: Coding(holder, holder)
-}
+fun elaborateHolder(holder: String): Coding = Holder.resolveCode(holder) ?: Coding(holder, holder)

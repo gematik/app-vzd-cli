@@ -22,10 +22,11 @@ class LoadBaseCommand : CliktCommand(name = "load-base", help = "Load the base e
     ).associate()
     private val parameterOptions by ParameterOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()
-    private val format by option().switch(
-        "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML,
-    ).default(RepresentationFormat.YAML)
+    private val format by option()
+        .switch(
+            "--json" to RepresentationFormat.JSON,
+            "--yaml" to RepresentationFormat.YAML,
+        ).default(RepresentationFormat.YAML)
 
     private val json =
         Json {

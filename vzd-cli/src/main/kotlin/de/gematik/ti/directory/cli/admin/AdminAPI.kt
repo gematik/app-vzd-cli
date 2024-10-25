@@ -21,12 +21,14 @@ const val SERVICE_NAME = "urn:gematik:directory:admin"
 
 typealias AdminEnvironment = de.gematik.ti.directory.DirectoryEnvironment
 
-internal class AdminConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<Config>(
-    "directory-admin.yaml",
-    { DefaultConfig },
-    { yaml, stringValue -> yaml.decodeFromString(stringValue) },
-    customConfigPath,
-) {
+internal class AdminConfigFileStore(
+    customConfigPath: Path? = null
+) : FileObjectStore<Config>(
+        "directory-admin.yaml",
+        { DefaultConfig },
+        { yaml, stringValue -> yaml.decodeFromString(stringValue) },
+        customConfigPath,
+    ) {
     var config: Config get() = value
         set(newValue) {
             value = newValue
@@ -45,7 +47,9 @@ data class AdminStatus(
     val environmentStatus: List<AdminEnvironmentStatus>,
 )
 
-class AdminAPI(val globalAPI: GlobalAPI) {
+class AdminAPI(
+    val globalAPI: GlobalAPI
+) {
     val config by lazy { loadConfig() }
 
     fun createClient(env: AdminEnvironment): Client {
@@ -56,9 +60,10 @@ class AdminAPI(val globalAPI: GlobalAPI) {
                 apiURL = envConfig.apiURL
                 auth {
                     accessToken {
-                        tokenStore.accessTokenFor(
-                            envConfig.apiURL,
-                        )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
+                        tokenStore
+                            .accessTokenFor(
+                                envConfig.apiURL,
+                            )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
                     }
                 }
                 if (globalAPI.config.httpProxy.enabled) {
@@ -82,9 +87,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
         return store.reset()
     }
 
-    fun openVault(vaultPassword: String): KeyStoreVault {
-        return KeyStoreVaultProvider().open(vaultPassword, SERVICE_NAME)
-    }
+    fun openVault(vaultPassword: String): KeyStoreVault = KeyStoreVaultProvider().open(vaultPassword, SERVICE_NAME)
 
     suspend fun status(includeBackendInfo: Boolean = false): AdminStatus {
         // force reload from file in case smth changed in between the requests
@@ -114,9 +117,7 @@ class AdminAPI(val globalAPI: GlobalAPI) {
         )
     }
 
-    fun environmentConfig(env: AdminEnvironment): EnvironmentConfig {
-        return config.environment(env)
-    }
+    fun environmentConfig(env: AdminEnvironment): EnvironmentConfig = config.environment(env)
 
     fun login(
         env: AdminEnvironment,
@@ -140,7 +141,8 @@ class AdminAPI(val globalAPI: GlobalAPI) {
     }
 
     suspend fun expandOCSPStatus(entries: List<DirectoryEntry>?) {
-        entries?.mapNotNull { it.userCertificates }
+        entries
+            ?.mapNotNull { it.userCertificates }
             ?.flatten()
             ?.mapNotNull { it.userCertificate }
             ?.forEach {
@@ -148,7 +150,5 @@ class AdminAPI(val globalAPI: GlobalAPI) {
             }
     }
 
-    suspend fun verifyCertificate(cert: CertificateDataDER): OCSPResponse {
-        return globalAPI.pkiClient.ocsp(cert)
-    }
+    suspend fun verifyCertificate(cert: CertificateDataDER): OCSPResponse = globalAPI.pkiClient.ocsp(cert)
 }

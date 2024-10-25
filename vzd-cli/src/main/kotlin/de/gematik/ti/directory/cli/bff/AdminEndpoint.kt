@@ -25,7 +25,7 @@ data class LoginWithVaultRepresentation(
 )
 
 @Serializable
-data class Activation (
+data class Activation(
     val active: Boolean,
 )
 
@@ -34,32 +34,51 @@ data class Activation (
 class Admin {
     @Serializable
     @Resource("status")
-    class Status(val parent: Admin = Admin())
+    class Status(
+        val parent: Admin = Admin()
+    )
 
     @Serializable
     @Resource("login")
-    class Login(val parent: Admin = Admin())
+    class Login(
+        val parent: Admin = Admin()
+    )
 
     @Serializable
     @Resource("{envTitle}")
-    class Env(val parent: Admin = Admin(), private val envTitle: String) {
+    class Env(
+        val parent: Admin = Admin(),
+        private val envTitle: String
+    ) {
         val env get() = DirectoryEnvironment.valueOf(envTitle)
 
         @Serializable
         @Resource("search")
-        class Search(val parent: Env, val q: String)
+        class Search(
+            val parent: Env,
+            val q: String
+        )
 
         @Resource("entry/{telematikID}")
         @Serializable
-        data class Entry(val parent: Env, val telematikID: String)
+        data class Entry(
+            val parent: Env,
+            val telematikID: String
+        )
 
         @Resource("entry/{telematikID}/activation")
         @Serializable
-        data class EntryActivation(val parent: Env, val telematikID: String)
+        data class EntryActivation(
+            val parent: Env,
+            val telematikID: String
+        )
 
         @Resource("base-entry/{telematikID}")
         @Serializable
-        data class BaseEntry(val parent: Env, val telematikID: String)
+        data class BaseEntry(
+            val parent: Env,
+            val telematikID: String
+        )
     }
 }
 
@@ -127,8 +146,8 @@ fun Route.adminRoutes() {
             return@get
         }
         call.respondText(
-            status=HttpStatusCode.NotFound,
-            text="Entry with telematikID '${resource.telematikID}' not found in env '${resource.parent.env}'"
+            status = HttpStatusCode.NotFound,
+            text = "Entry with telematikID '${resource.telematikID}' not found in env '${resource.parent.env}'",
         )
     }
 
@@ -176,6 +195,5 @@ fun Route.adminRoutes() {
             client.stateSwitch(entry.directoryEntryBase.dn!!.uid, activation.active)
             call.respond(Outcome("success", "Activation state changed."))
         }
-
     }
 }

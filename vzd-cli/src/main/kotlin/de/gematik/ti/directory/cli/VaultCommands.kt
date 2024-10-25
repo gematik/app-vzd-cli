@@ -15,10 +15,14 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-class VaultCommand(serviceName: String, commandName: String = "vault", commandHelp: String = "Manage OAuth credentials in the Vault") : CliktCommand(
-    name = commandName,
-    help = commandHelp,
-) {
+class VaultCommand(
+    serviceName: String,
+    commandName: String = "vault",
+    commandHelp: String = "Manage OAuth credentials in the Vault"
+) : CliktCommand(
+        name = commandName,
+        help = commandHelp,
+    ) {
     init {
         subcommands(
             VaultListCommand(serviceName),
@@ -32,7 +36,11 @@ class VaultCommand(serviceName: String, commandName: String = "vault", commandHe
     override fun run() = Unit
 }
 
-abstract class AbstractVaultCommand(val serviceName: String, name: String, help: String) : CliktCommand(name = name, help = help) {
+abstract class AbstractVaultCommand(
+    val serviceName: String,
+    name: String,
+    help: String
+) : CliktCommand(name = name, help = help) {
     protected val password by option(
         "--password",
         "-p",
@@ -42,8 +50,8 @@ abstract class AbstractVaultCommand(val serviceName: String, name: String, help:
 
     protected val vaultProvider = KeyStoreVaultProvider()
 
-    fun openOrCreateVault(): KeyStoreVault {
-        return password?.let {
+    fun openOrCreateVault(): KeyStoreVault =
+        password?.let {
             vaultProvider.open(it, serviceName)
         } ?: run {
             if (vaultProvider.exists()) {
@@ -60,14 +68,15 @@ abstract class AbstractVaultCommand(val serviceName: String, name: String, help:
                 vaultProvider.open(newPassword, serviceName)
             }
         }
-    }
 }
 
-class VaultListCommand(serviceName: String) : AbstractVaultCommand(
-    serviceName = serviceName,
-    name = "list",
-    help = "List configured OAuth2 credentials",
-) {
+class VaultListCommand(
+    serviceName: String
+) : AbstractVaultCommand(
+        serviceName = serviceName,
+        name = "list",
+        help = "List configured OAuth2 credentials",
+    ) {
     override fun run() =
         catching {
             if (!vaultProvider.exists()) {
@@ -82,11 +91,13 @@ class VaultListCommand(serviceName: String) : AbstractVaultCommand(
         }
 }
 
-class VaultClearCommand(serviceName: String) : AbstractVaultCommand(
-    serviceName = serviceName,
-    name = "clear",
-    help = "Clears the credentials of this service",
-) {
+class VaultClearCommand(
+    serviceName: String
+) : AbstractVaultCommand(
+        serviceName = serviceName,
+        name = "clear",
+        help = "Clears the credentials of this service",
+    ) {
     override fun run() =
         catching {
             if (!vaultProvider.exists()) {
@@ -97,11 +108,13 @@ class VaultClearCommand(serviceName: String) : AbstractVaultCommand(
         }
 }
 
-class VaultStoreCommand(serviceName: String) : AbstractVaultCommand(
-    serviceName = serviceName,
-    name = "store",
-    help = "Store OAuth2 client credentials",
-) {
+class VaultStoreCommand(
+    serviceName: String
+) : AbstractVaultCommand(
+        serviceName = serviceName,
+        name = "store",
+        help = "Store OAuth2 client credentials",
+    ) {
     private val env by option(
         "-e",
         "--env",
@@ -121,11 +134,13 @@ class VaultStoreCommand(serviceName: String) : AbstractVaultCommand(
         }
 }
 
-class VaultExportCommand(serviceName: String) : AbstractVaultCommand(
-    serviceName = serviceName,
-    name = "export",
-    help = "Export Vault to a file for backup or transfer.",
-) {
+class VaultExportCommand(
+    serviceName: String
+) : AbstractVaultCommand(
+        serviceName = serviceName,
+        name = "export",
+        help = "Export Vault to a file for backup or transfer.",
+    ) {
     private val output by option("-o", "--output").path(canBeDir = false).required()
     private val transferPassword by option("-t", "--transfer-password")
         .prompt("Enter Vault transfer password", hideInput = true)
@@ -144,11 +159,13 @@ class VaultExportCommand(serviceName: String) : AbstractVaultCommand(
         }
 }
 
-class VaultImportCommand(serviceName: String) : AbstractVaultCommand(
-    serviceName = serviceName,
-    name = "import",
-    help = "Import credentials from another Vault",
-) {
+class VaultImportCommand(
+    serviceName: String
+) : AbstractVaultCommand(
+        serviceName = serviceName,
+        name = "import",
+        help = "Import credentials from another Vault",
+    ) {
     private val input by option("-i", "--input").path(canBeDir = false, mustBeReadable = true).required()
     private val transferPassword by option("-t", "--transfer-password")
         .prompt("Enter TRANSFER Vault password", hideInput = true)
@@ -166,7 +183,7 @@ class VaultImportCommand(serviceName: String) : AbstractVaultCommand(
         }
 }
 
-class VaultPurgeCommand() : CliktCommand(name = "purge", help = "Remove Vault") {
+class VaultPurgeCommand : CliktCommand(name = "purge", help = "Remove Vault") {
     protected val vaultProvider = KeyStoreVaultProvider()
 
     override fun run() =

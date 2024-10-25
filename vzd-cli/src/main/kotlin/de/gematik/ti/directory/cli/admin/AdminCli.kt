@@ -25,8 +25,7 @@ class AdminCliEnvironmentContext(
     val pkiClient get() = adminAPI.globalAPI.pkiClient
 }
 
-class AdminCli :
-    CliktCommand(name = "admin", help = """CLI for DirectoryAdministration API""".trimMargin()) {
+class AdminCli : CliktCommand(name = "admin", help = """CLI for DirectoryAdministration API""".trimMargin()) {
     override fun run() =
         catching {
             val adminAPI = AdminAPI(GlobalAPI())
@@ -46,7 +45,9 @@ class AdminCli :
     }
 }
 
-class EnvironmentCommands(env: AdminEnvironment) : CliktCommand(name = env.name, help = """Commands for $env instance""".trimMargin()) {
+class EnvironmentCommands(
+    env: AdminEnvironment
+) : CliktCommand(name = env.name, help = """Commands for $env instance""".trimMargin()) {
     private val context by requireObject<AdminCliContext>()
 
     init {

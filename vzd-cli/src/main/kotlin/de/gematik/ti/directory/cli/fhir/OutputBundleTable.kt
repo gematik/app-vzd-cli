@@ -11,7 +11,9 @@ fun Bundle.toTable(): String {
                 extractor { it.telematikID }
             }
 
-            class State(var count: Int = 0)
+            class State(
+                var count: Int = 0
+            )
             stateful<String, State>("Name") {
                 initState { State() }
                 extractor { directoryEntry, state ->

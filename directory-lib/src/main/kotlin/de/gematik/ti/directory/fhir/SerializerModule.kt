@@ -41,7 +41,5 @@ class ResourceSerializer<R> : KSerializer<R> where R : BaseResource {
         encoder.encodeSerializableValue(JsonObject.serializer(), surrogate)
     }
 
-    override fun deserialize(decoder: Decoder): R {
-        throw NotImplementedError()
-    }
+    override fun deserialize(decoder: Decoder): R = throw NotImplementedError()
 }

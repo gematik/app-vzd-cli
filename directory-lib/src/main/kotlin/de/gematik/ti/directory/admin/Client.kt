@@ -25,11 +25,14 @@ private val JSON =
         prettyPrint = true
     }
 
-class AdminResponseException(response: HttpResponse, message: String) : ResponseException(response, message) {
+class AdminResponseException(
+    response: HttpResponse,
+    message: String
+) : ResponseException(response, message) {
     val directoryError: Error?
         get() {
             return runBlocking {
-                runCatching {  response.body<Error>() }.getOrNull()
+                runCatching { response.body<Error>() }.getOrNull()
             }
         }
     val details: String
@@ -60,7 +63,9 @@ class AdminResponseException(response: HttpResponse, message: String) : Response
  * Directory Administration API Client
  * @see <a href="https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml">Directory Administration Open API</a>
  */
-class Client(block: Configuration.() -> Unit = {}) {
+class Client(
+    block: Configuration.() -> Unit = {}
+) {
     val logger = KotlinLogging.logger {}
 
     class Configuration {
@@ -160,17 +165,14 @@ class Client(block: Configuration.() -> Unit = {}) {
         parameters: Map<String, String>,
         cursorSize: Int = 100,
         cookie: String? = null,
-    ): ReadDirectoryEntryForSyncResponse? {
-        return fetchNextEntries(parameters, cursorSize, cookie)
-    }
+    ): ReadDirectoryEntryForSyncResponse? = fetchNextEntries(parameters, cursorSize, cookie)
 
     /**
      * Implements GET /DirectoryEntriesSync (read_Directory_Entry_for_Sync)
      */
     @Deprecated("Use streamDirectoryEntriesPaging instaed")
-    suspend fun readDirectoryEntryForSync(parameters: Map<String, String>): List<DirectoryEntry>? {
-        return readDirectoryEntry(parameters, "/DirectoryEntriesSync")
-    }
+    suspend fun readDirectoryEntryForSync(parameters: Map<String, String>): List<DirectoryEntry>? =
+        readDirectoryEntry(parameters, "/DirectoryEntriesSync")
 
     /**
      * Implements GET /DirectoryEntries (read_Directory_Entry)

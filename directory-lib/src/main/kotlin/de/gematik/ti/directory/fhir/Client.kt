@@ -77,7 +77,10 @@ val DefaultConfig =
             ),
     )
 
-class ConfigException(message: String, cause: Throwable? = null) : DirectoryException(message, cause)
+class ConfigException(
+    message: String,
+    cause: Throwable? = null
+) : DirectoryException(message, cause)
 
 @Serializable
 data class Config(
@@ -104,12 +107,17 @@ data class FdvConfig(
     val authorizationEndpoint: String,
 )
 
-enum class SearchResource(val resourceType: ResourceType) {
+enum class SearchResource(
+    val resourceType: ResourceType
+) {
     PractitionerRole(ResourceType.PractitionerRole),
     HealthcareService(ResourceType.HealthcareService),
 }
 
-class SearchQuery(val resource: SearchResource, val params: MutableMap<String, List<String>> = mutableMapOf()) {
+class SearchQuery(
+    val resource: SearchResource,
+    val params: MutableMap<String, List<String>> = mutableMapOf()
+) {
     fun addParam(
         key: String,
         value: String
@@ -122,7 +130,9 @@ class SearchQuery(val resource: SearchResource, val params: MutableMap<String, L
     }
 }
 
-class Client(block: Configurator.() -> Unit = {}) {
+class Client(
+    block: Configurator.() -> Unit = {}
+) {
     private val configurator: Configurator = Configurator()
     private val envConfig: EnvironmentConfig
     private val httpClientFdv: HttpClient get() {
@@ -153,8 +163,8 @@ class Client(block: Configurator.() -> Unit = {}) {
     fun createHttpClient(
         defaultURL: String,
         authBlock: DirectoryAuthPluginConfig.() -> Unit
-    ): HttpClient {
-        return HttpClient(CIO) {
+    ): HttpClient =
+        HttpClient(CIO) {
             engine {
                 configurator.httpProxyURL?.let {
                     logger.debug { "Using proxy: $it" }
@@ -190,7 +200,6 @@ class Client(block: Configurator.() -> Unit = {}) {
                 url(defaultURL)
             }
         }
-    }
 
     init {
         block(configurator)

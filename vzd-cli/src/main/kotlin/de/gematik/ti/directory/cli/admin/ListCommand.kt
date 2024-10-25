@@ -18,15 +18,16 @@ import kotlin.io.path.useLines
 
 class ListCommand : CliktCommand(name = "list", help = "List directory entries") {
     private val context by requireObject<AdminCliEnvironmentContext>()
-    private val outputFormat by option().switch(
-        "--human" to RepresentationFormat.HUMAN,
-        "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML,
-        "--csv" to RepresentationFormat.CSV,
-        "--table" to RepresentationFormat.TABLE,
-        "--yaml-ext" to RepresentationFormat.YAML_EXT,
-        "--json-ext" to RepresentationFormat.JSON_EXT,
-    ).default(RepresentationFormat.HUMAN)
+    private val outputFormat by option()
+        .switch(
+            "--human" to RepresentationFormat.HUMAN,
+            "--json" to RepresentationFormat.JSON,
+            "--yaml" to RepresentationFormat.YAML,
+            "--csv" to RepresentationFormat.CSV,
+            "--table" to RepresentationFormat.TABLE,
+            "--yaml-ext" to RepresentationFormat.YAML_EXT,
+            "--json-ext" to RepresentationFormat.JSON_EXT,
+        ).default(RepresentationFormat.HUMAN)
 
     private val paramFile: Pair<String, String>? by option(
         "-f",

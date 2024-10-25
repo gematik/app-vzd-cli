@@ -1,7 +1,6 @@
 package de.gematik.ti.directory.cli.bff
 
 import de.gematik.ti.directory.DirectoryAuthException
-import de.gematik.ti.directory.DirectoryException
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.admin.AdminAPI
@@ -87,7 +86,10 @@ fun Application.directoryModule() {
 }
 
 @Serializable
-data class Outcome(val code: String, val message: String)
+data class Outcome(
+    val code: String,
+    val message: String
+)
 
 val ApplicationCall.adminAPI: AdminAPI
     get() {

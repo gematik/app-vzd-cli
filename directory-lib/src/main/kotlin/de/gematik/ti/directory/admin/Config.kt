@@ -26,7 +26,10 @@ val DefaultConfig =
             ),
     )
 
-class ConfigException(message: String, cause: Throwable? = null) : DirectoryException(message, cause)
+class ConfigException(
+    message: String,
+    cause: Throwable? = null
+) : DirectoryException(message, cause)
 
 @Serializable
 data class Config(

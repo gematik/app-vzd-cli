@@ -20,12 +20,13 @@ class FdvShowCommand : CliktCommand(name = "show", help = "Shows an entry") {
 
     private val telematikID by argument("TELEMATIK_ID", help = "Telematik-ID of the entry")
 
-    private val outputFormat by option().switch(
-        "--json" to OutputFormat.JSON,
-        "--json-ext" to OutputFormat.JSON_EXT,
-        "--yaml" to OutputFormat.YAML,
-        "--human" to OutputFormat.HUMAN,
-    ).default(OutputFormat.HUMAN)
+    private val outputFormat by option()
+        .switch(
+            "--json" to OutputFormat.JSON,
+            "--json-ext" to OutputFormat.JSON_EXT,
+            "--yaml" to OutputFormat.YAML,
+            "--human" to OutputFormat.HUMAN,
+        ).default(OutputFormat.HUMAN)
 
     private val active: Boolean by option("--active", "-a", help = "Filter by active status").flag(default = true)
 

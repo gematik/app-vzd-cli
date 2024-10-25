@@ -90,12 +90,29 @@ fun List<DirectoryEntry>.toCsv(): String {
                         it.directoryEntryBase.active,
                         it.directoryEntryBase.meta?.joinToString("|"),
                         it.userCertificates?.count { it.userCertificate != null } ?: 0,
-                        it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()?.flatten()?.count() ?: 0,
-                        it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }?.flatten()
-                            ?.flatten()?.joinToString("|"),
-                        it.fachdaten?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.komLeData } } }?.flatten()
-                            ?.flatten()?.joinToString("|") { "${it.version},${it.mail}" },
-                        it.fachdaten?.let { it.mapNotNull { it.fad1 }.flatten().mapNotNull { it.dn.ou?.firstOrNull() }.joinToString("|") },
+                        it.fachdaten
+                            ?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }
+                            ?.flatten()
+                            ?.flatten()
+                            ?.count()
+                            ?: 0,
+                        it.fachdaten
+                            ?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.mail } } }
+                            ?.flatten()
+                            ?.flatten()
+                            ?.joinToString("|"),
+                        it.fachdaten
+                            ?.let { it.mapNotNull { it.fad1 }.map { it.mapNotNull { it.komLeData } } }
+                            ?.flatten()
+                            ?.flatten()
+                            ?.joinToString("|") { "${it.version},${it.mail}" },
+                        it.fachdaten?.let {
+                            it
+                                .mapNotNull { it.fad1 }
+                                .flatten()
+                                .mapNotNull { it.dn.ou?.firstOrNull() }
+                                .joinToString("|")
+                        },
                     ),
                 ),
             )

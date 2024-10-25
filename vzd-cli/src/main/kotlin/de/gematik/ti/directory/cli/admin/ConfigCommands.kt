@@ -61,14 +61,15 @@ val GET_PROPERTIES =
         "environments.tu" to { config: Config -> config.environments["tu"] },
     )
 
-class ConfigGetCommand : CliktCommand(
-    name = "get",
-    help = """Get configuration properties:
+class ConfigGetCommand :
+    CliktCommand(
+        name = "get",
+        help = """Get configuration properties:
         
             ```${GET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
             """,
-) {
+    ) {
     private val context by requireObject<AdminCliContext>()
     private val property by argument().choice(GET_PROPERTIES).optional()
 

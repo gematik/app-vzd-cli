@@ -41,14 +41,15 @@ val SET_PROPERTIES =
         },
     )
 
-class ConfigSetCommand : CliktCommand(
-    name = "set",
-    help = """Set configuration properties:
+class ConfigSetCommand :
+    CliktCommand(
+        name = "set",
+        help = """Set configuration properties:
         
             ```${SET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
             """,
-) {
+    ) {
     private val context by requireObject<ApoCliContext>()
     private val property by argument().choice(SET_PROPERTIES)
     private val value by argument()
@@ -71,14 +72,15 @@ val GET_PROPERTIES =
         "apiKeys.prod" to { config: ApoConfig -> config.apiKeys[ApoInstance.test] },
     )
 
-class ConfigGetCommand : CliktCommand(
-    name = "get",
-    help = """Get configuration properties:
+class ConfigGetCommand :
+    CliktCommand(
+        name = "get",
+        help = """Get configuration properties:
         
             ```${GET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
             """,
-) {
+    ) {
     private val context by requireObject<ApoCliContext>()
     private val property by argument().choice(GET_PROPERTIES).optional()
 

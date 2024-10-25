@@ -25,24 +25,26 @@ data class GlobalConfig(
     var updates: UpdatesConfig,
 )
 
-internal class GlobalConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<GlobalConfig>(
-    "directory-global.yaml",
-    {
-        GlobalConfig(
-            httpProxy =
-                HttpProxyConfig(
-                    proxyURL = "http://192.168.110.10:3128/",
-                    enabled = false,
-                ),
-            updates =
-                UpdatesConfig(
-                    preReleasesEnabled = false,
-                    lastCheck = -1,
-                    latestRelease = BuildConfig.APP_VERSION,
-                    enabled = true,
-                ),
-        )
-    },
-    { yaml, stringValue -> yaml.decodeFromString(stringValue) },
-    customConfigPath,
-)
+internal class GlobalConfigFileStore(
+    customConfigPath: Path? = null
+) : FileObjectStore<GlobalConfig>(
+        "directory-global.yaml",
+        {
+            GlobalConfig(
+                httpProxy =
+                    HttpProxyConfig(
+                        proxyURL = "http://192.168.110.10:3128/",
+                        enabled = false,
+                    ),
+                updates =
+                    UpdatesConfig(
+                        preReleasesEnabled = false,
+                        lastCheck = -1,
+                        latestRelease = BuildConfig.APP_VERSION,
+                        enabled = true,
+                    ),
+            )
+        },
+        { yaml, stringValue -> yaml.decodeFromString(stringValue) },
+        customConfigPath,
+    )

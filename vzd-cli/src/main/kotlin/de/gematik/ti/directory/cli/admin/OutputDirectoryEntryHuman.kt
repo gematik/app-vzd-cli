@@ -148,9 +148,7 @@ object DirectoryEntryHumanSerializer : KSerializer<DirectoryEntry> {
         encoder.encodeSerializableValue(HumanDirectoryEntry.serializer(), surrogate)
     }
 
-    override fun deserialize(decoder: Decoder): DirectoryEntry {
-        throw NotImplementedError()
-    }
+    override fun deserialize(decoder: Decoder): DirectoryEntry = throw NotImplementedError()
 }
 
 fun DirectoryEntry.toHuman() = humanDirectoryEntryYaml.encodeToString(DirectoryEntryHumanSerializer, this)

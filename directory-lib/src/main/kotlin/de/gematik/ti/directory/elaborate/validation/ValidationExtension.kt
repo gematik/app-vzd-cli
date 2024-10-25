@@ -4,8 +4,8 @@ import de.gematik.ti.directory.elaborate.ElaborateBaseDirectoryEntry
 import de.gematik.ti.directory.validation.Finding
 import de.gematik.ti.directory.validation.Validation
 
-fun ElaborateBaseDirectoryEntry.validate(): Map<String, List<Finding>>? {
-    return Validation(
+fun ElaborateBaseDirectoryEntry.validate(): Map<String, List<Finding>>? =
+    Validation(
         listOf(
             InvalidDisplayName,
             InvalidSpecialization,
@@ -18,4 +18,3 @@ fun ElaborateBaseDirectoryEntry.validate(): Map<String, List<Finding>>? {
         ),
         this,
     ).validate()
-}

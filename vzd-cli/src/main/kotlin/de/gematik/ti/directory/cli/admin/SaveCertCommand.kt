@@ -41,8 +41,7 @@ class SaveCertCommand : CliktCommand(name = "save-cert", help = "Saves certifica
         "--output-dir",
         metavar = "OUTPUT_DIR",
         help = "Output directory for certificate files. Default ist current directory.",
-    )
-        .path(mustExist = true, canBeFile = false)
+    ).path(mustExist = true, canBeFile = false)
         .default(Paths.get(""))
     private val context by requireObject<AdminCliEnvironmentContext>()
 

@@ -26,8 +26,7 @@ class FhirCliEnvironmentContext(
     }
 }
 
-class FhirCli :
-    CliktCommand(name = "fhir", help = """CLI for FHIR Directory""".trimMargin()) {
+class FhirCli : CliktCommand(name = "fhir", help = """CLI for FHIR Directory""".trimMargin()) {
     override fun run() =
         catching {
             val adminAPI = FhirAPI(GlobalAPI())
@@ -44,7 +43,9 @@ class FhirCli :
     }
 }
 
-class EnvironmentCommands(env: DirectoryEnvironment) : CliktCommand(name = env.name, help = """Commands for $env instance""".trimMargin()) {
+class EnvironmentCommands(
+    env: DirectoryEnvironment
+) : CliktCommand(name = env.name, help = """Commands for $env instance""".trimMargin()) {
     private val context by requireObject<FhirCliContext>()
 
     init {

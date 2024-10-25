@@ -16,18 +16,20 @@ import de.gematik.ti.directory.cli.toJsonPretty
 import de.gematik.ti.directory.cli.toYaml
 import de.gematik.ti.directory.pki.CertificateDataDER
 
-class TemplateCommand : CliktCommand(
-    name = "template",
-    help = """Create template for a resource
+class TemplateCommand :
+    CliktCommand(
+        name = "template",
+        help = """Create template for a resource
      
      Supported types: base, entry, cert
 """,
-) {
+    ) {
     private val context by requireObject<AdminCliEnvironmentContext>()
-    private val outputFormat by option().switch(
-        "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML,
-    ).default(RepresentationFormat.YAML)
+    private val outputFormat by option()
+        .switch(
+            "--json" to RepresentationFormat.JSON,
+            "--yaml" to RepresentationFormat.YAML,
+        ).default(RepresentationFormat.YAML)
     private val resourceType by argument(help = "Specify type of a resource").choice("base", "entry", "cert")
 
     override fun run() =

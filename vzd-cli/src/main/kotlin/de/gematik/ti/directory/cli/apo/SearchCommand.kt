@@ -29,13 +29,16 @@ class SearchCommand : CliktCommand(name = "search", help = "Search for pharmacie
                 tableFormatter<Location> {
                     labeled("TelematikID", "Gesamt") {
                         extractor { location ->
-                            location.identifier.firstOrNull {
-                                it.system == "https://gematik.de/fhir/NamingSystem/TelematikID"
-                            }?.value
+                            location.identifier
+                                .firstOrNull {
+                                    it.system == "https://gematik.de/fhir/NamingSystem/TelematikID"
+                                }?.value
                         }
                     }
 
-                    class State(var count: Int = 0)
+                    class State(
+                        var count: Int = 0
+                    )
                     stateful<String, State>("Name") {
                         initState { State() }
                         extractor { location, state ->

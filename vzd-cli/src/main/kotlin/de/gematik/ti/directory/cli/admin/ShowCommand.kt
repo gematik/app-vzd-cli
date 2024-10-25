@@ -14,13 +14,14 @@ import de.gematik.ti.directory.cli.catching
 import kotlinx.coroutines.runBlocking
 
 class ShowCommand : CliktCommand(name = "show", help = "Show all information about an entry") {
-    private val outputFormat by option().switch(
-        "--human" to RepresentationFormat.HUMAN,
-        "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML,
-        "--yaml-ext" to RepresentationFormat.YAML_EXT,
-        "--json-ext" to RepresentationFormat.JSON_EXT,
-    ).default(RepresentationFormat.HUMAN)
+    private val outputFormat by option()
+        .switch(
+            "--human" to RepresentationFormat.HUMAN,
+            "--json" to RepresentationFormat.JSON,
+            "--yaml" to RepresentationFormat.YAML,
+            "--yaml-ext" to RepresentationFormat.YAML_EXT,
+            "--json-ext" to RepresentationFormat.JSON_EXT,
+        ).default(RepresentationFormat.HUMAN)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val id by argument()

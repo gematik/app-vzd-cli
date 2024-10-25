@@ -1,7 +1,6 @@
 package de.gematik.ti.directory.elaborate
 
 import de.gematik.ti.directory.admin.DistinguishedName
-import de.gematik.ti.directory.admin.LogEntry
 import de.gematik.ti.directory.admin.Operation
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.fhir.Coding

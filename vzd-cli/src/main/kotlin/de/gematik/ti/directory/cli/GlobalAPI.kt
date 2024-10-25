@@ -47,9 +47,7 @@ private val JSON =
 class GlobalAPI {
     val config by lazy { loadConfig() }
 
-    fun loadConfig(): GlobalConfig {
-        return GlobalConfigFileStore().value
-    }
+    fun loadConfig(): GlobalConfig = GlobalConfigFileStore().value
 
     fun updateConfig() {
         val store = GlobalConfigFileStore()
@@ -117,7 +115,10 @@ class GlobalAPI {
             runCatching {
                 Path(Cli::class.java.protectionDomain.codeSource.location.file).parent.parent
             }.recover {
-                Path(Cli::class.java.protectionDomain.codeSource.location.file.substring(1)).parent.parent
+                Path(
+                    Cli::class.java.protectionDomain.codeSource.location.file
+                        .substring(1),
+                ).parent.parent
             }.getOrThrow()
 
         logger.info { "Updating app in $appHome" }
@@ -197,8 +198,8 @@ class GlobalAPI {
 
     val cachePath = Path(System.getProperty("user.home"), ".telematik", "tsl-cache.yaml")
 
-    private fun loadCache(): ListOfTrustedServiceLists? {
-        return if (!cachePath.toFile().exists()) {
+    private fun loadCache(): ListOfTrustedServiceLists? =
+        if (!cachePath.toFile().exists()) {
             null
         } else {
             val cache: ListOfTrustedServiceLists = yaml.decodeFromString(cachePath.readText())
@@ -210,7 +211,6 @@ class GlobalAPI {
                 cache
             }
         }
-    }
 
     fun saveCache(tslCache: ListOfTrustedServiceLists) {
         cachePath.writeText(yaml.encodeToString(tslCache))

@@ -42,7 +42,14 @@ class TestClient {
         val loadedDirectoryEntry =
             runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID")) }
         assertEquals(1, loadedDirectoryEntry?.size)
-        assertEquals(dn.uid, loadedDirectoryEntry?.first()?.directoryEntryBase?.dn?.uid)
+        assertEquals(
+            dn.uid,
+            loadedDirectoryEntry
+                ?.first()
+                ?.directoryEntryBase
+                ?.dn
+                ?.uid,
+        )
     }
 
     @Test

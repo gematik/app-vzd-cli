@@ -12,7 +12,9 @@ class ApoInstanceCliContext(
     val client: ApoClient,
 )
 
-class InstanceCommands(inst: ApoInstance) : CliktCommand(name = inst.toString(), help = """Commands for $inst instance""".trimMargin()) {
+class InstanceCommands(
+    inst: ApoInstance
+) : CliktCommand(name = inst.toString(), help = """Commands for $inst instance""".trimMargin()) {
     private val context by requireObject<ApoCliContext>()
 
     init {

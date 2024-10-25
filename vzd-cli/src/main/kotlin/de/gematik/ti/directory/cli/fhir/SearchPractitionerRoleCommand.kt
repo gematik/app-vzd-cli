@@ -15,30 +15,34 @@ class SearchPractitionerRoleCommand : CliktCommand(name = "practitioner-role", h
     private val logger = KotlinLogging.logger {}
     private val context by requireObject<SearchCommand.SearchContext>()
 
-    private val outputFormat by option().switch(
-        "--json" to OutputFormat.JSON,
-        "--json-ext" to OutputFormat.JSON_EXT,
-        "--yaml" to OutputFormat.YAML,
-        "--human" to OutputFormat.HUMAN,
-        "--table" to OutputFormat.TABLE,
-    ).default(OutputFormat.TABLE)
+    private val outputFormat by option()
+        .switch(
+            "--json" to OutputFormat.JSON,
+            "--json-ext" to OutputFormat.JSON_EXT,
+            "--yaml" to OutputFormat.YAML,
+            "--human" to OutputFormat.HUMAN,
+            "--table" to OutputFormat.TABLE,
+        ).default(OutputFormat.TABLE)
 
     private val active: Boolean by option("--active", "-a", help = "Filter by active status").flag(default = true)
 
-    private val includePractitioner by option().switch(
-        "--include-practitioner" to "PractitionerRole:practitioner",
-        "--exclude-practitioner" to "",
-    ).default("PractitionerRole:practitioner")
+    private val includePractitioner by option()
+        .switch(
+            "--include-practitioner" to "PractitionerRole:practitioner",
+            "--exclude-practitioner" to "",
+        ).default("PractitionerRole:practitioner")
 
-    private val includeLocation by option().switch(
-        "--include-location" to "PractitionerRole:location",
-        "--exclude-location" to "",
-    ).default("PractitionerRole:location")
+    private val includeLocation by option()
+        .switch(
+            "--include-location" to "PractitionerRole:location",
+            "--exclude-location" to "",
+        ).default("PractitionerRole:location")
 
-    private val includeEndpoint by option().switch(
-        "--include-endpoint" to "PractitionerRole:endpoint",
-        "--exclude-endpoint" to "",
-    ).default("PractitionerRole:endpoint")
+    private val includeEndpoint by option()
+        .switch(
+            "--include-endpoint" to "PractitionerRole:endpoint",
+            "--exclude-endpoint" to "",
+        ).default("PractitionerRole:endpoint")
 
     private val textArguments by argument("SEARCH_TEXT").multiple(required = false)
     private val telematikID by option("--telematik-id", "-t", help = "Telematik-ID of the Practitioner")

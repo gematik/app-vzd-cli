@@ -38,8 +38,8 @@ fun DirectoryEntry.toJsonExt(): String = jsonDirectoryEntryExt.encodeToString(th
 
 fun List<DirectoryEntry>.toJsonExt(): String = jsonDirectoryEntryExt.encodeToString(this.map { it.elaborate() })
 
-fun DirectoryEntry.toStringRepresentation(format: RepresentationFormat): String {
-    return when (format) {
+fun DirectoryEntry.toStringRepresentation(format: RepresentationFormat): String =
+    when (format) {
         RepresentationFormat.HUMAN -> this.toHuman()
         RepresentationFormat.YAML -> this.toYamlNoDefaults()
         RepresentationFormat.YAML_EXT -> this.toYamlExt()
@@ -47,10 +47,9 @@ fun DirectoryEntry.toStringRepresentation(format: RepresentationFormat): String 
         RepresentationFormat.JSON_EXT -> this.toJsonExt()
         else -> ""
     }
-}
 
-fun List<DirectoryEntry>.toStringRepresentation(format: RepresentationFormat): String {
-    return when (format) {
+fun List<DirectoryEntry>.toStringRepresentation(format: RepresentationFormat): String =
+    when (format) {
         RepresentationFormat.HUMAN -> this.toHuman()
         RepresentationFormat.YAML -> this.toYamlNoDefaults()
         RepresentationFormat.YAML_EXT -> this.toYamlExt()
@@ -59,4 +58,3 @@ fun List<DirectoryEntry>.toStringRepresentation(format: RepresentationFormat): S
         RepresentationFormat.TABLE -> this.toTable()
         RepresentationFormat.CSV -> this.toCsv()
     }
-}

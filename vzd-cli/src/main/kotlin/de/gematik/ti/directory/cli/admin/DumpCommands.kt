@@ -94,7 +94,8 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         help = "Specify query parameters to find matching entries",
     ).associate()
     private val cursorSize by option("-c", "--cursor-size", help = "Size of the cursor per HTTP Request")
-        .int().default(500)
+        .int()
+        .default(500)
     private val expectedTotal by option(
         "-e",
         "--expected-count",
@@ -144,7 +145,9 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
                             launch {
                                 semaphore.withPermit {
                                     expandOcspStatus(entry)
-                                    logger.debug { "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})" }
+                                    logger.debug {
+                                        "Dumping ${entry.directoryEntryBase.telematikID} (${entry.directoryEntryBase.displayName})"
+                                    }
                                     val elaboratedDumpDirectoryEntry = entry.elaborate()
                                     val elaboratedEntry =
                                         ElaboratedDumpDirectoryEntry(
@@ -207,10 +210,11 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
         }
 }
 
-class DumpSaveCert : CliktCommand(
-    name = "save-cert",
-    help = "Reads dump from STDIN and saves all X509 certificate to specified directory",
-) {
+class DumpSaveCert :
+    CliktCommand(
+        name = "save-cert",
+        help = "Reads dump from STDIN and saves all X509 certificate to specified directory",
+    ) {
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val destination by argument().path(mustExist = true, mustBeWritable = true, canBeFile = false)
 

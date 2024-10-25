@@ -34,7 +34,10 @@ data class TokenResponse(
     val refresh_token: String? = null,
 )
 
-class ClientCredentialsAuthenticator(private val authURL: String, private val httpProxyUrl: String?) {
+class ClientCredentialsAuthenticator(
+    private val authURL: String,
+    private val httpProxyUrl: String?
+) {
     suspend fun authenticate(
         clientId: String,
         clientSecret: String,

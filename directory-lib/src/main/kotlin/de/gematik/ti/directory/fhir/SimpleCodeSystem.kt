@@ -22,16 +22,14 @@ class SimpleCodeSystem(
     val url: String,
     val concept: List<SimpleConcept>,
 ) {
-    fun resolveCode(code: String): Coding? {
-        return concept.firstOrNull { it.code == code }?.let {
+    fun resolveCode(code: String): Coding? =
+        concept.firstOrNull { it.code == code }?.let {
             Coding(code, it.display, url)
         }
-    }
 }
 
-private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem {
-    return json.decodeFromString(SimpleCodeSystem::class.java.getResource("/de.gematik.fhir.directory/CodeSystem-$name.json")!!.readText())
-}
+private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem =
+    json.decodeFromString(SimpleCodeSystem::class.java.getResource("/de.gematik.fhir.directory/CodeSystem-$name.json")!!.readText())
 
 val OrganizationProfessionOID = loadSimpleCodeSystem("OrganizationProfessionOID")
 val PractitionerProfessionOID = loadSimpleCodeSystem("PractitionerProfessionOID")

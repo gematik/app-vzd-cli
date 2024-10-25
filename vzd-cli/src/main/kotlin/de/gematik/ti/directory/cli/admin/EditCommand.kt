@@ -23,10 +23,11 @@ private val JsonPretty = Json { prettyPrint = true }
 class EditCommand : CliktCommand(name = "edit", help = "Edit base entry using text editor") {
     private val telematikID by argument()
     private val context by requireObject<AdminCliEnvironmentContext>()
-    private val format by option().switch(
-        "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML,
-    ).default(RepresentationFormat.YAML)
+    private val format by option()
+        .switch(
+            "--json" to RepresentationFormat.JSON,
+            "--yaml" to RepresentationFormat.YAML,
+        ).default(RepresentationFormat.YAML)
 
     private val json = Json { ignoreUnknownKeys = true }
 
