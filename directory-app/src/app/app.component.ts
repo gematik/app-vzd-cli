@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
   }
 
   public ngOnInit(): void {
+    this.navigationService.update()
     this.titleService.setTitle("gematik Directory")
     this.iconsService.register(Settings24)
     this.navigationService.adminMenuLinks$

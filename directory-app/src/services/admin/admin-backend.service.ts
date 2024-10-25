@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, firstValueFrom, Observable } from 'rxjs';
+import { ReplaySubject, catchError, firstValueFrom } from 'rxjs';
 import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryFHIRResourceType, DirectoryEntryKind, Outcome, ElaborateSearchResults, BaseDirectoryEntry } from './admin.model';
 
 // TODO: how does one provide labels in Angular?
@@ -14,7 +14,7 @@ const labels: Record<string, string> = {
   providedIn: 'root'
 })
 export class AdminBackendService {
-  public adminStatus: AdminStatus | undefined
+  public status$: ReplaySubject<AdminStatus> = new ReplaySubject<AdminStatus>(1)
 
   constructor(
     private http: HttpClient,
@@ -32,25 +32,7 @@ export class AdminBackendService {
     firstValueFrom(
       this.http.get<AdminStatus>('/api/admin/status')
     ).then( adminStatus => {
-      this.adminStatus = adminStatus
-    })
-  }
-
-  get status$(): Observable<AdminStatus> {
-    return new Observable<AdminStatus>(subscriber => {
-      if (this.adminStatus == undefined) {
-        this.updateStatus()
-      }
-      var lastStatus = this.adminStatus
-      if (lastStatus != undefined) {
-        subscriber.next(lastStatus)
-      }
-      setInterval(() => {
-        if (lastStatus !== this.adminStatus) {
-          lastStatus = this.adminStatus
-          subscriber.next(this.adminStatus!)
-        }
-      }, 500)
+      this.status$.next(adminStatus)
     })
   }
 

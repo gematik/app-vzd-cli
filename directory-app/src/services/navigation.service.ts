@@ -26,8 +26,12 @@ export class NavigationService {
           } 
           return null
         }).filter( (x): x is NavigationLink => x != null ).reverse()
-      })
-    )
+      }) 
+    ) 
+  }
+
+  update() {
+    this.adminBackend.updateStatus()
   }
   
 }
