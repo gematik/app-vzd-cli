@@ -2,11 +2,12 @@
   "resourceType": "CodeSystem",
   "status": "active",
   "content": "complete",
-  "name": "PharmacyHealthcareSpecialityCS",
-  "id": "PharmacyHealthcareSpecialityCS",
-  "title": "HealthcareService Speciality",
-  "description": "Speciality codes of HealthcareServices",
-  "url": "https://gematik.de/fhir/directory/CodeSystem/PharmacyHealthcareSpecialityCS",
+  "name": "PharmacyHealthcareSpecialtyCS",
+  "id": "PharmacyHealthcareSpecialtyCS",
+  "title": "Pharmacy HealthcareService Specialty",
+  "description": "Specialty codes of pharmacy HealthcareServices",
+  "version": "0.11.18",
+  "url": "https://gematik.de/fhir/directory/CodeSystem/PharmacyHealthcareSpecialtyCS",
   "concept": [
     {
       "code": "10",
@@ -26,11 +27,12 @@
     },
     {
       "code": "50",
-      "display": "Zytostatikaherstellung"
+      "display": "Sterilherstellung"
     }
   ],
+  "experimental": false,
   "publisher": "gematik GmbH",
-  "version": "0.11.2",
+  "date": "2024-10-11",
   "caseSensitive": false,
   "count": 5
 }

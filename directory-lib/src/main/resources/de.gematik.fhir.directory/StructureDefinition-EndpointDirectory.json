@@ -2,10 +2,12 @@
   "resourceType": "StructureDefinition",
   "id": "EndpointDirectory",
   "url": "https://gematik.de/fhir/directory/StructureDefinition/EndpointDirectory",
-  "version": "0.11.2",
+  "version": "0.11.18",
   "name": "EndpointDirectory",
   "title": "Endpoint in gematik Directory",
   "status": "active",
+  "experimental": false,
+  "date": "2024-10-11",
   "publisher": "gematik GmbH",
   "description": "Endpoints for applications in the gematik Directory",
   "fhirVersion": "4.0.1",
@@ -27,7 +29,7 @@
         "slicing": {
           "discriminator": [
             {
-              "type": "value",
+              "type": "pattern",
               "path": "system"
             }
           ],
@@ -98,11 +100,6 @@
         "id": "Endpoint.name",
         "path": "Endpoint.name",
         "min": 1,
-        "mustSupport": true
-      },
-      {
-        "id": "Endpoint.managingOrganization",
-        "path": "Endpoint.managingOrganization",
         "mustSupport": true
       },
       {

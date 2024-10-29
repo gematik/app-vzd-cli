@@ -6,14 +6,16 @@
   "id": "EndpointVisibilityCS",
   "title": "EndpointVisibilityCS",
   "description": "EndpointVisibilityCS",
+  "version": "0.11.18",
   "url": "https://gematik.de/fhir/directory/CodeSystem/EndpointVisibilityCS",
   "concept": [
     {
       "code": "hide-versicherte",
-      "display": "Eintrag nicht Versicherten anzeigen"
+      "display": "Eintrag für Versicherte verbergen"
     }
   ],
+  "experimental": false,
   "publisher": "gematik GmbH",
-  "version": "0.11.2",
+  "date": "2024-10-11",
   "count": 1
 }
