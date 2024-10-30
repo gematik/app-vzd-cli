@@ -60,6 +60,7 @@ data class ElaborateBaseDirectoryEntry(
     // Misc
     var active: Boolean,
     var meta: List<String>? = null,
+    var providedBy: String? = null,
 )
 
 enum class SmartcardType {

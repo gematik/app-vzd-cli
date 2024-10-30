@@ -28,8 +28,7 @@ data class SimpleCodesystemReference(
     val concept: List<SimpleConcept>? = null,
 )
 
-private fun loadSimpleValueSet(name: String): SimpleValueSet =
-    json.decodeFromString(SimpleValueSet::class.java.getResource("/de.gematik.fhir.directory/ValueSet-$name.json")!!.readText())
+private fun loadSimpleValueSet(name: String): SimpleValueSet = json.decodeFromString(SimpleValueSet::class.java.getResource("/de.gematik.fhir.directory/ValueSet-$name.json")!!.readText())
 
 val HealthcareServiceTypeVS = loadSimpleValueSet("HealthcareServiceTypeVS")
 val PractitionerQualificationVS = loadSimpleValueSet("PractitionerQualificationVS")

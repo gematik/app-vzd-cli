@@ -73,6 +73,7 @@ fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
         maxKOMLEadr = base.maxKOMLEadr,
         active = base.active,
         meta = base.meta,
+        providedBy = base.providedBy,
     )
 }
 

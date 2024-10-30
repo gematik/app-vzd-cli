@@ -12,10 +12,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
-import de.gematik.ti.directory.admin.BaseDirectoryEntry
-import de.gematik.ti.directory.admin.DirectoryEntry
-import de.gematik.ti.directory.admin.Fachdaten
-import de.gematik.ti.directory.admin.UserCertificate
+import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.OcspOptions
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.elaborate.DirectoryEntryResourceType
@@ -103,27 +100,38 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
     ).int().default(-1)
     private val parameterOptions by ParameterOptions()
     private val ocspOptions by OcspOptions()
+    private val kimParameterOptions by KimParameterOptions()
 
     override fun run() =
         catching {
-            val params = parameterOptions.toMap() + customParams
-            logger.info { "Requesting entries for dump: $params" }
+            val plainParams = parameterOptions.toMap() + customParams
+            val kimParams = kimParameterOptions.toMap()
+
+            // cant use both KIM and Query parameters
+            if (kimParams.isNotEmpty() && plainParams.isNotEmpty()) {
+                throw CliktError("Cannot use both plain and KIM query parameters")
+            }
+
+            val query: Pair<Map<String, String>, String> =
+                if (kimParams.isNotEmpty()) {
+                    Pair(kimParams, ResourceDirectoryEntriesSyncByKim)
+                } else {
+                    Pair(plainParams, ResourceDirectoryEntriesSync)
+                }
+
+            logger.info { "Requesting entries for dump: $query" }
             paramFile?.let { paramFile ->
                 val file = Path(paramFile.second)
                 if (!file.exists()) throw CliktError("File not found: ${paramFile.second}")
                 file.useLines { line ->
                     line.forEach {
-                        runQuery(params + Pair(paramFile.first, it))
+                        runQuery(query.first + Pair(paramFile.first, it), query.second)
                     }
                 }
             } ?: run {
-                runQuery(params)
+                runQuery(query.first, query.second)
             }
         }
-
-    fun runQuery(params: Map<String, String>) {
-        runQueryWithPaging(params)
-    }
 
     private fun expandOcspStatus(entry: DirectoryEntry) {
         if (ocspOptions.enableOcsp) {
@@ -133,7 +141,10 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
         }
     }
 
-    private fun runQueryWithPaging(params: Map<String, String>) {
+    private fun runQuery(
+        params: Map<String, String>,
+        resource: String
+    ) {
         var entries = 0
         val semaphore = Semaphore(20)
         val elapsed =
@@ -141,7 +152,7 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
                 val progressBar = ProgressBar("Query $params", expectedTotal.toLong())
                 try {
                     runBlocking {
-                        context.client.streamDirectoryEntriesPaging(params, cursorSize) { entry ->
+                        context.client.streamDirectoryEntriesPaging(params, cursorSize, resource) { entry ->
                             launch {
                                 semaphore.withPermit {
                                     expandOcspStatus(entry)

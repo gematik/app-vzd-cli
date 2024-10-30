@@ -2,6 +2,9 @@
 
 == Version 3.1.0
 
+- `providedBy` in den Basisdaten und bei der Abfrage werden jetzt unterstützt
+- `vzd-cli admin <ru|tu|pu> list` und `vzd-cli admin <ru|tu|pu> dump` unterstützen jetzt `--kim-mail` und `--kim-data` Optionen (neue Schnittstelle für die Suche über Fachanwendungsattribute)
+- Aktualisierung der FHIR-Profile und Mappings auf die neueste Spezifikation
 - Editieren der Einträge in der GUI
 - Upgrade der GUI auf Angular 18 und neuesten Carbon Design System
 - Bugfixes

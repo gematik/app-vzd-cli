@@ -28,10 +28,9 @@ class SimpleCodeSystem(
         }
 }
 
-private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem =
-    json.decodeFromString(SimpleCodeSystem::class.java.getResource("/de.gematik.fhir.directory/CodeSystem-$name.json")!!.readText())
+private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem = json.decodeFromString(SimpleCodeSystem::class.java.getResource("/de.gematik.fhir.directory/CodeSystem-$name.json")!!.readText())
 
 val OrganizationProfessionOID = loadSimpleCodeSystem("OrganizationProfessionOID")
 val PractitionerProfessionOID = loadSimpleCodeSystem("PractitionerProfessionOID")
-val PharmacyTypeCS = loadSimpleCodeSystem("PharmacyTypeCS")
+val PharmacyHealthcareSpecialtyCS = loadSimpleCodeSystem("PharmacyHealthcareSpecialtyCS")
 val Holder = loadSimpleCodeSystem("HolderCS")
