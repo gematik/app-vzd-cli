@@ -227,7 +227,7 @@ export interface BaseDirectoryEntry {
     personalEntry: boolean | undefined,
     changeDateTime: string | undefined,
     // Internal
-    maxKOMLEadr: number | undefined,
+    maxKOMLEadr: number | null,
     // Misc
     active: boolean,
     meta: Array<string> | undefined,  

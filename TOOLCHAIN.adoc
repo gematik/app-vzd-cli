@@ -10,6 +10,22 @@ Die gewünschte Versionsnummer in `vzd-cli/build.gradle.kts` setzen, z.B. 2.2.0
 make dist
 ----
 
+=== GUI app entwickeln und bauen
+
+[source,bash]
+----
+# install angular 18
+npm install -g @angular/cli@18
+
+# start GUI server
+cd vzd-cli
+./vzd-cli-dev gui
+
+# start dev APP
+cd directory-app
+ng serve
+----
+
 === Release im github veröffentlichen 
 
 Änderungen zur Vorversion in link:CHANGELOG.adoc[CHANGELOG] dokumentieren.

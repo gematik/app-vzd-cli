@@ -168,8 +168,12 @@ fun Route.adminRoutes() {
         val adminAPI = application.attributes[AdminAPIKey]
         val client = adminAPI.createClient(entry.parent.env)
         val baseFromClient = call.receive<BaseDirectoryEntry>()
+
         val jsonData = Json.encodeToString(baseFromClient)
         val updateBaseDirectoryEntry = JsonIgnoreUnknownKeys.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
+
+        logger.debug { "Updating base entry: $jsonData" }
+
         val dn = client.modifyDirectoryEntry(baseFromClient.dn?.uid!!, updateBaseDirectoryEntry)
 
         val updateDirectoryEntry = client.readDirectoryEntry(mapOf("uid" to dn.uid))

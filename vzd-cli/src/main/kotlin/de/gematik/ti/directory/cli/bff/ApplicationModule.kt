@@ -21,9 +21,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
+import mu.KotlinLogging
 
 val AdminAPIKey = AttributeKey<AdminAPI>("AdminAPI")
 val GlobalAPIKey = AttributeKey<GlobalAPI>("GlobalAPI")
+
+val logger = KotlinLogging.logger {}
 
 /**
  * Backend for Frontend module for Directory BFF (Backend for Frontend)

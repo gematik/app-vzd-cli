@@ -2,6 +2,7 @@ package de.gematik.ti.directory.admin
 
 import de.gematik.ti.directory.DirectoryAuthPlugin
 import de.gematik.ti.directory.DirectoryAuthPluginConfig
+import de.gematik.ti.directory.fhir.json
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -23,6 +24,7 @@ private val JSON =
     Json {
         ignoreUnknownKeys = true
         prettyPrint = true
+        encodeDefaults = true
     }
 
 val ResourceDirectoryEntries = "/DirectoryEntries"
@@ -266,6 +268,7 @@ class Client(
             http.put("/DirectoryEntries/$uid/baseDirectoryEntries") {
                 contentType(ContentType.Application.Json)
                 setBody(baseDirectoryEntry)
+
             }
 
         if (response.status != HttpStatusCode.OK) {

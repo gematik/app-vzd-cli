@@ -88,10 +88,10 @@ export class DirectoryEntryEditComponent implements OnInit {
   }
 
   onSave(): void {
-    // split textareay to arrays by comma or new line, trimming the whitespaces
-    this.baseEntry!.domainID = this.domainIDFlat?.split(/,|\n/).map((item) => item.trim())
-    this.baseEntry!.holder = this.holderFlat?.split(/,|\n/).map((item) => item.trim())
-    this.baseEntry!.meta =this.metaFlat?.split(/,|\n/).map((item) => item.trim())
+    // split textareay to arrays by comma or new line, trimming the whitespaces, removing empty strings and assigning to null if empty
+    this.baseEntry!.domainID = this.domainIDFlat?.split(/,|\n/).map((item) => item.trim()).filter((item) => item !== "")
+    this.baseEntry!.holder = this.holderFlat?.split(/,|\n/).map((item) => item.trim()).filter((item) => item !== "")
+    this.baseEntry!.meta = this.metaFlat?.split(/,|\n/).map((item) => item.trim()).filter((item) => item !== "")
 
     this.adminBackend.modifyBaseEntry(this.env!, this.baseEntry!).then(
       value => {
@@ -243,5 +243,17 @@ export class DirectoryEntryEditComponent implements OnInit {
 
   set entryType(value: string) {
     this.baseEntry!.entryType = value.split(",").map((item) => item.trim())
+  }
+
+  get maxKOMLEadr(): string {
+    return this.baseEntry?.maxKOMLEadr?.toString() ?? ""
+  }
+
+  set maxKOMLEadr(value: string) {
+    if (value === "") {
+      this.baseEntry!.maxKOMLEadr = null
+      return
+    }
+    this.baseEntry!.maxKOMLEadr = parseInt(value)
   }
 }

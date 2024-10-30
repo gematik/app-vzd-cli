@@ -301,6 +301,19 @@
     </div>
     <div cdsCol [columnNumbers]="marginCol"></div>
 
+    <div cdsCol [columnNumbers]="marginCol"></div>
+    <div cdsCol [columnNumbers]="contentCol">
+        <cds-label>
+            Maximale erlaubte Anzahl von KIM-Adressen (maxKOMLEadr)
+            <input
+                cdsText
+                [(ngModel)]="maxKOMLEadr"
+            >
+        </cds-label>
+
+    </div>
+    <div cdsCol [columnNumbers]="marginCol"></div>
+
     <!-- Buttons -->
 
     <div cdsCol [columnNumbers]="marginCol"></div>
