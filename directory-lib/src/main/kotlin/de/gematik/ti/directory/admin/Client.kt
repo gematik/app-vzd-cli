@@ -268,7 +268,6 @@ class Client(
             http.put("/DirectoryEntries/$uid/baseDirectoryEntries") {
                 contentType(ContentType.Application.Json)
                 setBody(baseDirectoryEntry)
-
             }
 
         if (response.status != HttpStatusCode.OK) {
