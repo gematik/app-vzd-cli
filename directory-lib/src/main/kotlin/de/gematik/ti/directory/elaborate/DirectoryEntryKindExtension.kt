@@ -7,11 +7,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
 
-fun BaseDirectoryEntry.infereKind(): TelematikIDMapping {
-    return TelematikIDMappings.instance.mapping.firstOrNull {
+fun BaseDirectoryEntry.infereKind(): TelematikIDMapping =
+    TelematikIDMappings.instance.mapping.firstOrNull {
         it.matches(this)
     } ?: TelematikIDMappings.instance.mapping.last()
-}
 
 enum class DirectoryEntryResourceType {
     Organization,
@@ -30,9 +29,7 @@ data class TelematikIDMapping(
     @Transient
     val regex = Regex(pattern, setOf(RegexOption.DOT_MATCHES_ALL))
 
-    fun matches(baseDirectoryEntry: BaseDirectoryEntry): Boolean {
-        return baseDirectoryEntry.telematikID.matches(regex)
-    }
+    fun matches(baseDirectoryEntry: BaseDirectoryEntry): Boolean = baseDirectoryEntry.telematikID.matches(regex)
 }
 
 @Serializable

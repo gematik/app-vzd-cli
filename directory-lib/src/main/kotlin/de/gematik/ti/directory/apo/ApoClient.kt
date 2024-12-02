@@ -24,7 +24,9 @@ import java.net.http.HttpResponse.BodyHandlers
 private val logger = KotlinLogging.logger {}
 private val prettyJson = Json { prettyPrint = true }
 
-class ApoClient(block: Configuration.() -> Unit = {}) {
+class ApoClient(
+    block: Configuration.() -> Unit = {}
+) {
     private val httpClient: HttpClient
     private val config: Configuration = Configuration()
 
@@ -59,11 +61,11 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
 
     fun search(queryString: String): Pair<String, Bundle> {
         val request =
-            HttpRequest.newBuilder()
+            HttpRequest
+                .newBuilder()
                 .uri(
                     URL(URL(config.apiURL), "Location?name=${queryString.encodeURLParameter()}").toURI(),
-                )
-                .header("X-API-KEY", config.apiKey)
+                ).header("X-API-KEY", config.apiKey)
                 .GET()
                 .build()
 
@@ -97,11 +99,11 @@ class ApoClient(block: Configuration.() -> Unit = {}) {
 
     fun getLocationByTelematikID(telematikID: String): Pair<String, Location> {
         val request =
-            HttpRequest.newBuilder()
+            HttpRequest
+                .newBuilder()
                 .uri(
                     URL(URL(config.apiURL), "Location?identifier=${telematikID.encodeURLParameter()}").toURI(),
-                )
-                .header("X-API-KEY", config.apiKey)
+                ).header("X-API-KEY", config.apiKey)
                 .GET()
                 .build()
 

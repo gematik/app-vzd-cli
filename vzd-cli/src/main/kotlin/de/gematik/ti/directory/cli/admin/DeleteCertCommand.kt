@@ -31,8 +31,7 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
         "--backup-dir",
         metavar = "OUTPUT_DIR",
         help = "Backup directory to store deleted certificates.",
-    )
-        .path(mustExist = true, canBeFile = false, mustBeWritable = true)
+    ).path(mustExist = true, canBeFile = false, mustBeWritable = true)
         .default(Paths.get(""))
 
     private val match by option("-m", "--match", help = "Pattern to match the to be deleted certificates.").multiple(required = true)
@@ -105,7 +104,9 @@ class DeleteCertCommand : CliktCommand(name = "delete-cert", help = "Delete cert
 
             if (dryRun) {
                 echo(
-                    "Would have deleted $deletedCount of ${entry.userCertificates?.count { it.userCertificate != null }} certificates (dry run)",
+                    "Would have deleted $deletedCount of ${entry.userCertificates?.count {
+                        it.userCertificate != null
+                    }} certificates (dry run)",
                 )
             } else {
                 echo("Deleted $deletedCount of ${entry.userCertificates?.count { it.userCertificate != null }} certificates")

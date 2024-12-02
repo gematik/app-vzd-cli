@@ -30,15 +30,14 @@ fun Bundle.toJson(): String {
     return parser.encodeResourceToString(this)
 }
 
-fun Bundle.toStringOutput(format: OutputFormat): String {
-    return when (format) {
+fun Bundle.toStringOutput(format: OutputFormat): String =
+    when (format) {
         OutputFormat.JSON -> toJson()
         OutputFormat.JSON_EXT -> toJsonExt()
         OutputFormat.YAML -> toYaml()
         OutputFormat.HUMAN -> toHuman()
         OutputFormat.TABLE -> toTable()
     }
-}
 
 fun Bundle.toJsonExt(): String {
     val entries = this.toDirectoryEntries()
@@ -54,10 +53,6 @@ private fun toYaml(jsonString: String): String {
     return yamlMapper.writeValueAsString(json)
 }
 
-fun Bundle.toYaml(): String {
-    return toYaml(toJson())
-}
+fun Bundle.toYaml(): String = toYaml(toJson())
 
-fun Bundle.toHuman(): String {
-    return toYaml(toJsonExt())
-}
+fun Bundle.toHuman(): String = toYaml(toJsonExt())

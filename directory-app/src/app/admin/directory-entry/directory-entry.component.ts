@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SnippetType } from 'carbon-components-angular/code-snippet/code-snippet.component';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
 import { Coding, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
+import { IconService, NotificationContent } from 'carbon-components-angular';
+import { Edit16 } from "@carbon/icons";
 
 interface KIMAddressInfo {
   mail: string
@@ -32,15 +34,36 @@ export class DirectoryEntryComponent implements OnInit {
   kimAddressList: KIMAddressInfo[] = []
   userCertificateList: UserCertificateInfo[] = []
   snippetDisplay = "multi" as SnippetType
+  globalNotification: NotificationContent | null = null
+  dateFormat = Intl.DateTimeFormat('de-DE', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,  // 24-Stunden-Format
+  })
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private adminBackend: AdminBackendService,
     private changeDetector: ChangeDetectorRef,
+    private iconService: IconService,
   ) { }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['modified'] == 'true') {
+        this.globalNotification = {
+          lowContrast: true,
+          type: "success",
+          title: "Erfolg",
+          message: "Der Eintrag wurde erfolgreich geändert.",
+        }
+      }
+    })
     this.route.params.subscribe(param => {
       this.queryString = param['q']
       const telematikID = param['id']
@@ -53,6 +76,7 @@ export class DirectoryEntryComponent implements OnInit {
         }
       )
     })
+    this.iconService.register(Edit16)
   }
 
   validateBaseField(field: string): boolean {
@@ -114,5 +138,20 @@ export class DirectoryEntryComponent implements OnInit {
         algorithm: cert.publicKeyAlgorithm
       }
     }).filter( x => x !== undefined) as UserCertificateInfo[] || []
+  }
+
+  onEdit() {
+    this.router.navigate(
+      ["entry", this.entry?.base.telematikID, "edit", {"q": this.queryString}],
+      { relativeTo: this.route.parent }
+    )
+  }
+
+  operationLabel(operation: string): string {
+    return this.adminBackend.getOperationLabel(operation)
+  }
+
+  formatDate(dateStr: string) {
+    return this.dateFormat.format(new Date(dateStr))
   }
 }

@@ -3,12 +3,13 @@ package de.gematik.ti.directory.admin
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.shouldBe
 
-class TestList : FeatureSpec({
-    feature("admin list") {
-        scenario("Befehl 'admin list' ohne parameter liefert beliebige Liste von 100 Einträgen") {
-            val output = runCLI(listOf("admin", "tu", "list", "--table"))
-            output.trim().split("\n").size shouldBe 106
-        }
+class TestList :
+    FeatureSpec({
+        feature("admin list") {
+            scenario("Befehl 'admin list' ohne parameter liefert beliebige Liste von 100 Einträgen") {
+                val output = runCLI(listOf("admin", "tu", "list", "--table"))
+                output.trim().split("\n").size shouldBe 106
+            }
         /*
         scenario("Befehl 'admin list -p telematikID=5-SMC-B-Testkarte-883110000092568' liefert Bonifatiuskrankenhaus als JSON") {
             val output =
@@ -24,5 +25,5 @@ class TestList : FeatureSpec({
             output shouldContain "5-SMC-B-Testkarte-883110000092568"
         }
          */
-    }
-})
+        }
+    })

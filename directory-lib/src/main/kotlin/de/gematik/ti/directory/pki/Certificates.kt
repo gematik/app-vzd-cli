@@ -52,7 +52,10 @@ data class CertificateInfo(
  * Simple datatype for base64 encoded certificates to differentiate them from plain strings
  */
 @Serializable(with = CertificateDataDERSerializer::class)
-data class CertificateDataDER(val base64String: String, val _certInfo: CertificateInfo? = null) {
+data class CertificateDataDER(
+    val base64String: String,
+    val _certInfo: CertificateInfo? = null
+) {
     val certificateInfo by lazy {
         _certInfo ?: run {
 
@@ -116,10 +119,13 @@ data class CertificateDataDER(val base64String: String, val _certInfo: Certifica
             val aiaExtension = AuthorityInformationAccess.fromExtensions(certHolder.extensions)
 
             if (aiaExtension != null && aiaExtension.accessDescriptions != null) {
-                aiaExtension.accessDescriptions.asSequence()
+                aiaExtension.accessDescriptions
+                    .asSequence()
                     .filter { ad -> ad.accessMethod == X509ObjectIdentifiers.id_ad_ocsp }
                     .map { ad -> ad.accessLocation.name }
-                    .first().toASN1Primitive().toString()
+                    .first()
+                    .toASN1Primitive()
+                    .toString()
             } else {
                 null
             }
@@ -142,9 +148,7 @@ object CertificateDataDERSerializer : KSerializer<CertificateDataDER> {
         encoder.encodeString(value.base64String)
     }
 
-    override fun deserialize(decoder: Decoder): CertificateDataDER {
-        return CertificateDataDER(decoder.decodeString())
-    }
+    override fun deserialize(decoder: Decoder): CertificateDataDER = CertificateDataDER(decoder.decodeString())
 }
 
 /**
@@ -184,7 +188,11 @@ data class NameInfo(
     var countryCode: String? = null,
 ) {
     constructor(x500Name: X500Name) : this() {
-        val rdns = x500Name.rdNs.map { it.typesAndValues.toList() }.flatten().toTypedArray()
+        val rdns =
+            x500Name.rdNs
+                .map { it.typesAndValues.toList() }
+                .flatten()
+                .toTypedArray()
         this.cn = valueOf(rdns, BCStyle.CN)
         this.sn = valueOf(rdns, BCStyle.SURNAME)
         this.givenName = valueOf(rdns, BCStyle.GIVENNAME)
@@ -224,7 +232,9 @@ data class AdmissionStatementInfo(
 /**
  * Port of gematik Java class to Kotlin.
  */
-class Admission(x509EeCert: X509Certificate) {
+class Admission(
+    x509EeCert: X509Certificate
+) {
     private val admissionSyntax: AdmissionSyntax
 
     init {
@@ -256,11 +266,13 @@ class Admission(x509EeCert: X509Certificate) {
      */
     val professionItems: List<String>
         get() {
-            return admissionSyntax.contentsOfAdmissions[0].professionInfos.map { professionInfo ->
-                professionInfo.professionItems.map { value ->
-                    value.string
-                }
-            }.flatten()
+            return admissionSyntax.contentsOfAdmissions[0]
+                .professionInfos
+                .map { professionInfo ->
+                    professionInfo.professionItems.map { value ->
+                        value.string
+                    }
+                }.flatten()
         }
 
     /**
@@ -271,11 +283,13 @@ class Admission(x509EeCert: X509Certificate) {
     val professionOids: List<String>
         get() {
 
-            return admissionSyntax.contentsOfAdmissions[0].professionInfos.map { professionInfo ->
-                professionInfo.professionOIDs.map { oid ->
-                    oid.id
-                }
-            }.flatten()
+            return admissionSyntax.contentsOfAdmissions[0]
+                .professionInfos
+                .map { professionInfo ->
+                    professionInfo.professionOIDs.map { oid ->
+                        oid.id
+                    }
+                }.flatten()
         }
 
     /**

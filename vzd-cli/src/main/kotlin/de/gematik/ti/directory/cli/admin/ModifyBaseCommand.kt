@@ -29,26 +29,28 @@ class ModifyBaseCommand : CliktCommand(name = "modify-base", help = "Modify sing
         "FILENAME",
         help = "Read the directory BaseDirectoryEntry from specified file, use - to read data from STDIN",
     )
-    private val format by option().switch(
-        "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML,
-    ).default(RepresentationFormat.YAML)
+    private val format by option()
+        .switch(
+            "--json" to RepresentationFormat.JSON,
+            "--yaml" to RepresentationFormat.YAML,
+        ).default(RepresentationFormat.YAML)
 
     override fun run() =
         catching {
             val baseFromFile: BaseDirectoryEntry =
-                file?.let {
-                    when (it) {
-                        "-" -> generateSequence(::readLine).joinToString("\n")
-                        else -> File(file.toString()).readText(Charsets.UTF_8)
-                    }
-                }?.let {
-                    when (format) {
-                        RepresentationFormat.HUMAN, RepresentationFormat.YAML -> Yaml.decodeFromString(it)
-                        RepresentationFormat.JSON -> Json.decodeFromString(it)
-                        else -> throw CliktError("Unsupported format: $format")
-                    }
-                } ?: run { throw CliktError("Unable to load base entry") }
+                file
+                    ?.let {
+                        when (it) {
+                            "-" -> generateSequence(::readLine).joinToString("\n")
+                            else -> File(file.toString()).readText(Charsets.UTF_8)
+                        }
+                    }?.let {
+                        when (format) {
+                            RepresentationFormat.HUMAN, RepresentationFormat.YAML -> Yaml.decodeFromString(it)
+                            RepresentationFormat.JSON -> Json.decodeFromString(it)
+                            else -> throw CliktError("Unsupported format: $format")
+                        }
+                    } ?: run { throw CliktError("Unable to load base entry") }
 
             val dn =
                 baseFromFile.dn ?: run {

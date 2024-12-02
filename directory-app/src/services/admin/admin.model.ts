@@ -142,6 +142,7 @@ export interface ElaborateBaseDirectoryEntry {
 
   // Internal
   maxKOMLEadr?: number
+
 }
 
 export interface UserCertificate {
@@ -163,6 +164,7 @@ export interface ElaborateDirectoryEntry {
   kimAddresses?: ElaborateKIMAddress[]
   smartcards?: Smartcard[]
   validationResult?: any
+  logs: Array<ElaborateLogEntry> | undefined
 }
 
 export interface ElaborateKIMAddress {
@@ -194,4 +196,46 @@ export interface Smartcard {
     notAfter: string,
     active: boolean,
     certificateSerialNumbers: [string],
+}
+
+export interface BaseDirectoryEntry {
+    // Identifier
+    telematikID: string,
+    domainID: Array<string> | undefined,
+    dn: DistinguishedName | undefined,
+    // Names
+    displayName: string | undefined,
+    cn: string | undefined,
+    otherName: string | undefined,
+    organization: string | undefined,
+    givenName: string | undefined,
+    sn: string | undefined,
+    title: string | undefined,
+    // Addresses
+    streetAddress: string | undefined,
+    postalCode: string | undefined,
+    localityName: string | undefined,
+    stateOrProvinceName: string | undefined,
+    countryCode: string | undefined,
+    // Professional
+    professionOID: Array<string> | undefined,
+    specialization: Array<string> | undefined,
+    entryType: Array<string> | undefined,
+    // System
+    holder: Array<string> | undefined,
+    dataFromAuthority: boolean | undefined,
+    personalEntry: boolean | undefined,
+    changeDateTime: string | undefined,
+    // Internal
+    maxKOMLEadr: number | null,
+    // Misc
+    active: boolean,
+    meta: Array<string> | undefined,  
+}
+
+export interface ElaborateLogEntry {
+  clientID: string
+  logTime: string
+  operation: string
+  noDataChange: boolean
 }

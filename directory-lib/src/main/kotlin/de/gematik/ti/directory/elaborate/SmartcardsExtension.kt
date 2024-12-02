@@ -59,15 +59,19 @@ fun DirectoryEntry.infereSmartcards(): List<Smartcard>? {
  */
 fun identifyCertificatePairs(certs: List<CertificateInfo>): List<Pair<CertificateInfo, CertificateInfo?>> {
     val pairs =
-        certs.filter {
-            it.publicKeyAlgorithm == "RSA"
-        }.sortedBy { it.notBefore }.map { Pair<CertificateInfo, CertificateInfo?>(it, null) }.toTypedArray()
+        certs
+            .filter {
+                it.publicKeyAlgorithm == "RSA"
+            }.sortedBy { it.notBefore }
+            .map { Pair<CertificateInfo, CertificateInfo?>(it, null) }
+            .toTypedArray()
     // iterate all EC certificates and try to find the closest RSA cert to form a pair
     certs.filter { it.publicKeyAlgorithm == "EC" }.sortedBy { it.notBefore }.forEach { eccert ->
         var closestIndex = -1
         var closestPair: Pair<CertificateInfo, CertificateInfo?>? = null
         pairs.forEachIndexed { index, pair ->
-            if (closestPair == null || abs(
+            if (closestPair == null ||
+                abs(
                     closestPair!!.first.notBefore.epochSeconds - eccert.notBefore.epochSeconds,
                 ) > abs(pair.first.notBefore.epochSeconds - eccert.notBefore.epochSeconds)
             ) {

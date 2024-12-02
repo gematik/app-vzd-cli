@@ -16,17 +16,20 @@ private val logger = KotlinLogging.logger {}
 private const val GRACE_PERIOD_MILLIS = -300000
 
 @Serializable
-class TokenStoreItem(var url: String, var accessToken: String)
+class TokenStoreItem(
+    var url: String,
+    var accessToken: String
+)
 
-class TokenStore(customConfigPath: Path? = null) : FileObjectStore<List<TokenStoreItem>>(
-    "directory-tokens.yaml",
-    { emptyList() },
-    { yaml, stringValue -> yaml.decodeFromString(stringValue) },
-    customConfigPath,
-) {
-    fun accessTokenFor(url: String): TokenStoreItem? {
-        return value.firstOrNull { it.url == url }
-    }
+class TokenStore(
+    customConfigPath: Path? = null
+) : FileObjectStore<List<TokenStoreItem>>(
+        "directory-tokens.yaml",
+        { emptyList() },
+        { yaml, stringValue -> yaml.decodeFromString(stringValue) },
+        customConfigPath,
+    ) {
+    fun accessTokenFor(url: String): TokenStoreItem? = value.firstOrNull { it.url == url }
 
     fun addAccessToken(
         url: String,
@@ -48,13 +51,14 @@ class TokenStore(customConfigPath: Path? = null) : FileObjectStore<List<TokenSto
         val tokenParts = token.split(".")
         val tokenBody = String(Base64.getUrlDecoder().decode(tokenParts[1]), Charsets.UTF_8)
         val jsonObject = Json.decodeFromString<JsonObject>(tokenBody)
-        return jsonObject.map { entry ->
-            if (entry.value is JsonPrimitive) {
-                Pair(entry.key, entry.value.jsonPrimitive.content)
-            } else {
-                Pair(entry.key, entry.value.toString())
-            }
-        }.toMap()
+        return jsonObject
+            .map { entry ->
+                if (entry.value is JsonPrimitive) {
+                    Pair(entry.key, entry.value.jsonPrimitive.content)
+                } else {
+                    Pair(entry.key, entry.value.toString())
+                }
+            }.toMap()
     }
 
     fun removeExpired() {

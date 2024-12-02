@@ -21,10 +21,11 @@ import kotlin.io.path.name
 class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of a certificate") {
     private val logger = KotlinLogging.logger {}
     private val files by argument().path(mustBeReadable = true, canBeDir = false).multiple()
-    private val outputFormat by option().switch(
-        "--yaml" to RepresentationFormat.YAML,
-        "--json" to RepresentationFormat.JSON,
-    ).default(RepresentationFormat.YAML)
+    private val outputFormat by option()
+        .switch(
+            "--yaml" to RepresentationFormat.YAML,
+            "--json" to RepresentationFormat.JSON,
+        ).default(RepresentationFormat.YAML)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliContext>()
 
@@ -38,7 +39,10 @@ class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of
 
                 if (ocspOptions.enableOcsp) {
                     certificateInfo.ocspResponse =
-                        runBlocking { context.adminAPI.globalAPI.pkiClient.ocsp(userCertificate) }
+                        runBlocking {
+                            context.adminAPI.globalAPI.pkiClient
+                                .ocsp(userCertificate)
+                        }
                 }
 
                 when (outputFormat) {

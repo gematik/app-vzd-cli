@@ -22,13 +22,14 @@ private val logger = KotlinLogging.logger {}
 
 class ListCertCommand : CliktCommand(name = "list-cert", help = "List certificates") {
     private val context by requireObject<AdminCliEnvironmentContext>()
-    private val outputFormat by option().switch(
-        "--human" to RepresentationFormat.HUMAN,
-        "--json" to RepresentationFormat.JSON,
-        "--yaml" to RepresentationFormat.YAML,
-        "--csv" to RepresentationFormat.CSV,
-        "--table" to RepresentationFormat.TABLE,
-    ).default(RepresentationFormat.TABLE)
+    private val outputFormat by option()
+        .switch(
+            "--human" to RepresentationFormat.HUMAN,
+            "--json" to RepresentationFormat.JSON,
+            "--yaml" to RepresentationFormat.YAML,
+            "--csv" to RepresentationFormat.CSV,
+            "--table" to RepresentationFormat.TABLE,
+        ).default(RepresentationFormat.TABLE)
     private val paramFile: Pair<String, String>? by option(
         "-f",
         "--param-file",

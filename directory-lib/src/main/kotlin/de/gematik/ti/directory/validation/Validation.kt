@@ -2,9 +2,14 @@ package de.gematik.ti.directory.validation
 
 import kotlin.reflect.KProperty1
 
-open class ValidationRule<T>(val logic: ValidationRuleContext<T>.(value: T) -> Unit)
+open class ValidationRule<T>(
+    val logic: ValidationRuleContext<T>.(value: T) -> Unit
+)
 
-class ValidationRuleContext<T>(val validation: Validation<T>, val validationRule: ValidationRule<T>) {
+class ValidationRuleContext<T>(
+    val validation: Validation<T>,
+    val validationRule: ValidationRule<T>
+) {
     fun addFinding(
         property: KProperty1<T, *>,
         severity: FindingSeverity,
@@ -19,7 +24,10 @@ class ValidationRuleContext<T>(val validation: Validation<T>, val validationRule
     }
 }
 
-class Validation<T>(val rules: List<ValidationRule<T>>, val value: T) {
+class Validation<T>(
+    val rules: List<ValidationRule<T>>,
+    val value: T
+) {
     private val findings = mutableMapOf<String, MutableList<Finding>>()
 
     fun validate(): Map<String, List<Finding>>? {

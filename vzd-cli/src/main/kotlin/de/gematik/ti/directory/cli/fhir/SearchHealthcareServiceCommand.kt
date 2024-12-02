@@ -15,30 +15,34 @@ class SearchHealthcareServiceCommand : CliktCommand(name = "healthcare-service",
     private val logger = KotlinLogging.logger {}
     private val context by requireObject<SearchCommand.SearchContext>()
 
-    private val outputFormat by option().switch(
-        "--json" to OutputFormat.JSON,
-        "--json-ext" to OutputFormat.JSON_EXT,
-        "--yaml" to OutputFormat.YAML,
-        "--human" to OutputFormat.HUMAN,
-        "--table" to OutputFormat.TABLE,
-    ).default(OutputFormat.TABLE)
+    private val outputFormat by option()
+        .switch(
+            "--json" to OutputFormat.JSON,
+            "--json-ext" to OutputFormat.JSON_EXT,
+            "--yaml" to OutputFormat.YAML,
+            "--human" to OutputFormat.HUMAN,
+            "--table" to OutputFormat.TABLE,
+        ).default(OutputFormat.TABLE)
 
     private val active: Boolean by option("--active", "-a", help = "Filter by active status").flag(default = true)
 
-    private val includeOrganization by option().switch(
-        "--include-organization" to "HealthcareService:organization",
-        "--exclude-organization" to "",
-    ).default("HealthcareService:organization")
+    private val includeOrganization by option()
+        .switch(
+            "--include-organization" to "HealthcareService:organization",
+            "--exclude-organization" to "",
+        ).default("HealthcareService:organization")
 
-    private val includeLocation by option().switch(
-        "--include-location" to "HealthcareService:location",
-        "--exclude-location" to "",
-    ).default("HealthcareService:location")
+    private val includeLocation by option()
+        .switch(
+            "--include-location" to "HealthcareService:location",
+            "--exclude-location" to "",
+        ).default("HealthcareService:location")
 
-    private val includeEndpoint by option().switch(
-        "--include-endpoint" to "HealthcareService:endpoint",
-        "--exclude-endpoint" to "",
-    ).default("HealthcareService:endpoint")
+    private val includeEndpoint by option()
+        .switch(
+            "--include-endpoint" to "HealthcareService:endpoint",
+            "--exclude-endpoint" to "",
+        ).default("HealthcareService:endpoint")
 
     private val textArguments by argument("SEARCH_TEXT").multiple(required = false)
     private val telematikID by option("--telematik-id", "-t", help = "Telematik-ID of the Organization")

@@ -66,10 +66,11 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
     ).path(mustExist = true, canBeDir = false, mustBeReadable = true).optional()
     private val context by requireObject<AdminCliEnvironmentContext>()
     private val ignore by option("--ignore", "-i", help = "Ignore Error 409 (entry exists).").flag()
-    private val format by option().switch(
-        "--yaml" to RepresentationFormat.YAML,
-        "--json" to RepresentationFormat.JSON,
-    ).default(RepresentationFormat.YAML)
+    private val format by option()
+        .switch(
+            "--yaml" to RepresentationFormat.YAML,
+            "--json" to RepresentationFormat.JSON,
+        ).default(RepresentationFormat.YAML)
 
     override fun run() =
         catching {

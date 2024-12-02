@@ -73,6 +73,7 @@ fun BaseDirectoryEntry.elaborate(): ElaborateBaseDirectoryEntry {
         maxKOMLEadr = base.maxKOMLEadr,
         active = base.active,
         meta = base.meta,
+        providedBy = base.providedBy,
     )
 }
 
@@ -108,6 +109,4 @@ fun elaborateSpecialization(specialization: String): Coding {
     return coding ?: Coding(specialization, specialization)
 }
 
-fun elaborateHolder(holder: String): Coding {
-    return Holder.resolveCode(holder) ?: Coding(holder, holder)
-}
+fun elaborateHolder(holder: String): Coding = Holder.resolveCode(holder) ?: Coding(holder, holder)

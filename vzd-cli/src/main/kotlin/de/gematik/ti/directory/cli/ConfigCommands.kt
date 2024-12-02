@@ -37,14 +37,15 @@ val SET_PROPERTIES =
         "updates.enabled" to { config: GlobalConfig, value: String -> config.updates.enabled = value.toBoolean() },
     )
 
-class ConfigSetCommand : CliktCommand(
-    name = "set",
-    help = """Set configuration properties:
+class ConfigSetCommand :
+    CliktCommand(
+        name = "set",
+        help = """Set configuration properties:
         
             ```${SET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
             """,
-) {
+    ) {
     private val property by argument().choice(SET_PROPERTIES)
     private val value by argument()
 
@@ -65,14 +66,15 @@ val GET_PROPERTIES =
         "updates" to { config: GlobalConfig -> config.updates },
     )
 
-class ConfigGetCommand : CliktCommand(
-    name = "get",
-    help = """Get configuration properties:
+class ConfigGetCommand :
+    CliktCommand(
+        name = "get",
+        help = """Get configuration properties:
         
             ```${GET_PROPERTIES.keys.sorted().joinToString("\n")}
             ```
             """,
-) {
+    ) {
     private val property by argument().choice(GET_PROPERTIES).optional()
 
     override fun run() {

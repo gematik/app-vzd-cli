@@ -12,10 +12,15 @@ import de.gematik.ti.directory.util.escape
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 
-abstract class AbstractSwitchStateCommand(val active: Boolean, val activeLabel: String, name: String, help: String) : CliktCommand(
-    name = name,
-    help = help,
-) {
+abstract class AbstractSwitchStateCommand(
+    val active: Boolean,
+    val activeLabel: String,
+    name: String,
+    help: String
+) : CliktCommand(
+        name = name,
+        help = help,
+    ) {
     private val logger = KotlinLogging.logger {}
     private val customParams: Map<String, String> by option(
         "-p",

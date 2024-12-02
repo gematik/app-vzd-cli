@@ -25,12 +25,13 @@ private val operations = Operation.values().joinToString("\n") { it.toString() }
 
 class LogCommand : CliktCommand(name = "log", help = "Show logs") {
     private val context by requireObject<AdminCliEnvironmentContext>()
-    private val outputFormat by option().switch(
-        "--table" to RepresentationFormat.TABLE,
-        "--yaml" to RepresentationFormat.YAML,
-        "--json" to RepresentationFormat.JSON,
-        "--csv" to RepresentationFormat.CSV,
-    ).default(RepresentationFormat.TABLE)
+    private val outputFormat by option()
+        .switch(
+            "--table" to RepresentationFormat.TABLE,
+            "--yaml" to RepresentationFormat.YAML,
+            "--json" to RepresentationFormat.JSON,
+            "--csv" to RepresentationFormat.CSV,
+        ).default(RepresentationFormat.TABLE)
     private val outfile by option(
         "-o",
         "--outfile",
@@ -44,8 +45,8 @@ class LogCommand : CliktCommand(name = "log", help = "Show logs") {
         option(
             "--operation",
             help = "Name of an operation performed on an entry. Possible values: $operations",
-        )
-            .choice(*Operation.values().map { it.toString() }.toTypedArray()).convert { Pair("operation", it.toString()) },
+        ).choice(*Operation.values().map { it.toString() }.toTypedArray())
+            .convert { Pair("operation", it.toString()) },
         option("--noDataChanged").convert { Pair("noDataChanged", it) },
     ).required()
 
@@ -61,7 +62,7 @@ class LogCommand : CliktCommand(name = "log", help = "Show logs") {
                     logTimeTo?.let { put("logTimeTo", it.toString()) }
                 }
 
-            val logEntries = runBlocking { context.client.readLog(params) }.sortedBy { it.logTime }
+            val logEntries = runBlocking { context.client.readLog(params) }
 
             val stdout = System.`out`
             try {
@@ -73,14 +74,13 @@ class LogCommand : CliktCommand(name = "log", help = "Show logs") {
         }
 }
 
-fun List<LogEntry>.toStringRepresentation(format: RepresentationFormat): String {
-    return when (format) {
+fun List<LogEntry>.toStringRepresentation(format: RepresentationFormat): String =
+    when (format) {
         RepresentationFormat.YAML -> this.toYamlNoDefaults()
         RepresentationFormat.JSON -> this.toJsonPretty()
         RepresentationFormat.CSV -> this.toCsv()
         else -> this.toTable()
     }
-}
 
 fun List<LogEntry>.toTable(): String {
     val formatter =
@@ -91,7 +91,9 @@ fun List<LogEntry>.toTable(): String {
                 }
             }
 
-            class State(var count: Int = 0)
+            class State(
+                var count: Int = 0
+            )
             stateful<String, State>("ClientID") {
                 initState { State() }
                 extractor { logEntry, state ->

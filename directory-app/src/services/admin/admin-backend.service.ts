@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom, Observable } from 'rxjs';
-import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryFHIRResourceType, DirectoryEntryKind, Outcome, ElaborateSearchResults } from './admin.model';
+import { ReplaySubject, catchError, firstValueFrom } from 'rxjs';
+import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryFHIRResourceType, DirectoryEntryKind, Outcome, ElaborateSearchResults, BaseDirectoryEntry } from './admin.model';
 
 // TODO: how does one provide labels in Angular?
 const labels: Record<string, string> = {
@@ -14,45 +14,26 @@ const labels: Record<string, string> = {
   providedIn: 'root'
 })
 export class AdminBackendService {
-  private adminStatus: AdminStatus | undefined
+  public status$: ReplaySubject<AdminStatus> = new ReplaySubject<AdminStatus>(1)
 
   constructor(
     private http: HttpClient,
   ) { 
-    const self = this
-
-    this.getStatus().then( adminStatus => {
-      this.adminStatus = adminStatus
-      setInterval( () => {
-        this.getStatus().then( adminStatus => this.adminStatus = adminStatus)
-      }, 1000)
-    })
   }
 
-  get status$() : Observable<AdminStatus> {
-    const self = this
-    return new Observable(function subscribe(subscriber) {
-      var lastValue = JSON.stringify(self.adminStatus)
-      if (self.adminStatus != undefined) {
-        lastValue = lastValue
-        subscriber.next(self.adminStatus)
-      }
-      const id = setInterval(() => {
-        if (self.adminStatus != undefined) {
-          const json = JSON.stringify(self.adminStatus) 
-          if (json != lastValue) {
-            lastValue = json
-            subscriber.next(self.adminStatus)
-          }
-        }
-      }, 500);
-    });
+  parseError(error: any): Error {
+    if (error instanceof HttpErrorResponse && error.error != undefined && error.error.message != undefined) {
+      return new Error(error.error.message)
+    }
+    return new Error(error.message)
   }
 
-  getStatus() {
-    return firstValueFrom(
+  updateStatus() {
+    firstValueFrom(
       this.http.get<AdminStatus>('/api/admin/status')
-    )
+    ).then( adminStatus => {
+      this.status$.next(adminStatus)
+    })
   }
 
   getEnvLabel(env: string) {
@@ -124,4 +105,83 @@ export class AdminBackendService {
       return "hospital"
     }
   }
+
+  loadBaseEntry(env: string, telematikID: string) : Promise<BaseDirectoryEntry> {
+    return firstValueFrom(
+      this.http.get<BaseDirectoryEntry>(
+        `/api/admin/${env}/base-entry/${telematikID}`
+      )
+    )
+  }
+
+  modifyBaseEntry(env: string, baseEntry: BaseDirectoryEntry): Promise<BaseDirectoryEntry> {
+    return firstValueFrom(
+      this.http.put<BaseDirectoryEntry>(
+        `/api/admin/${env}/base-entry/${baseEntry.telematikID}`,
+        baseEntry
+      ).pipe(catchError((error) => {
+        throw this.parseError(error)
+      })
+      )
+    )
+  }
+
+  deleteEntry(env: string, telematikID: string): Promise<Outcome> {
+    return new Promise<Outcome>((resolve, reject) => {
+      reject({
+        code: "error",
+        message: "Löschen der Einträge über GUI ist derzeit nicht möglich"
+      })
+    })
+  }
+
+  deactivateEntry(env: string, telematikID: string): Promise<Outcome> {
+    return firstValueFrom(
+      this.http.put<Outcome>(
+        `/api/admin/${env}/entry/${telematikID}/activation`,
+        {active: false}
+      ).pipe(catchError((error) => {
+        throw this.parseError(error)
+      })
+      )
+    )
+  }
+
+  activateEntry(env: string, telematikID: string): Promise<Outcome> {
+    return firstValueFrom(
+      this.http.put<Outcome>(
+        `/api/admin/${env}/entry/${telematikID}/activation`,
+        {active: true}
+      ).pipe(catchError((error) => {
+        throw this.parseError(error)
+      })
+      )
+    )
+  }
+
+  getOperationLabel(operation: string) {
+    switch(operation) {
+      case "add_Directory_Entry":
+        return "Eintrag hinzufügt"
+      case "modify_Directory_Entry":
+        return "Eintrag geändert"
+      case "delete_Directory_Entry":
+        return "Eintrag gelöscht"
+      case "stateSwitch_Directory_Entry":
+        return "Eintrag aktiviert/deaktiviert"
+      case "add_Directory_Entry_Certificate":
+        return "Zertifikat hinzugefügt"
+      case "delete_Directory_Entry_Certificate":
+        return "Zertifikat gelöscht"
+      case "add_Directory_FA-Attributes":
+        return "Anwendungsdaten hinzugefügt"
+      case "modify_Directory_FA-Attributes":
+        return "Anwendungsdaten geändert"
+      case "delete_Directory_FA-Attribute":
+        return "Anwendungsdaten gelöscht"
+      default:
+        return operation
+    }
+  }
+
 }

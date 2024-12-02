@@ -16,20 +16,22 @@ class ApoConfig(
     var apiKeys: Map<ApoInstance, String>,
 )
 
-internal class ApoConfigFileStore(customConfigPath: Path? = null) : FileObjectStore<ApoConfig>(
-    "directory-apo.yaml",
-    {
-        ApoConfig(
-            mapOf(
-                ApoInstance.test to ApoEnvironmentConfig("https://apovzd-test.app.ti-dienste.de/api/"),
-                ApoInstance.prod to ApoEnvironmentConfig("https://apovzd.app.ti-dienste.de/api/"),
-            ),
-            mapOf(
-                ApoInstance.test to "unknown",
-                ApoInstance.prod to "unknown",
-            ),
-        )
-    },
-    { yaml, stringValue -> yaml.decodeFromString(stringValue) },
-    customConfigPath,
-)
+internal class ApoConfigFileStore(
+    customConfigPath: Path? = null
+) : FileObjectStore<ApoConfig>(
+        "directory-apo.yaml",
+        {
+            ApoConfig(
+                mapOf(
+                    ApoInstance.test to ApoEnvironmentConfig("https://apovzd-test.app.ti-dienste.de/api/"),
+                    ApoInstance.prod to ApoEnvironmentConfig("https://apovzd.app.ti-dienste.de/api/"),
+                ),
+                mapOf(
+                    ApoInstance.test to "unknown",
+                    ApoInstance.prod to "unknown",
+                ),
+            )
+        },
+        { yaml, stringValue -> yaml.decodeFromString(stringValue) },
+        customConfigPath,
+    )

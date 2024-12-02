@@ -25,10 +25,11 @@ class ModifyBaseAttrCommand : CliktCommand(name = "modify-base-attr", help = "Mo
     private val logger = KotlinLogging.logger {}
     private val context by requireObject<AdminCliEnvironmentContext>()
 
-    private val format by option().switch(
-        "--yaml" to RepresentationFormat.YAML,
-        "--json" to RepresentationFormat.JSON,
-    ).default(RepresentationFormat.YAML)
+    private val format by option()
+        .switch(
+            "--yaml" to RepresentationFormat.YAML,
+            "--json" to RepresentationFormat.JSON,
+        ).default(RepresentationFormat.YAML)
     private val customParams: Map<String, String> by option(
         "-p",
         "--param",

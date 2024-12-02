@@ -6,6 +6,7 @@
   "id": "OrganizationProfessionOID",
   "title": "CodeSystem for ProfessionOID of Institutions",
   "description": "The codes for Organizations based on Profession OIDs defined in [gemSpec_OID](https://fachportal.gematik.de/fachportal-import/files/gemSpec_OID_V3.10.0.pdf)",
+  "version": "0.11.18",
   "url": "https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID",
   "concept": [
     {
@@ -257,8 +258,9 @@
       "display": "Betriebsstätte Orthopädieschuhmacher und Orthopädietechniker"
     }
   ],
+  "experimental": false,
   "publisher": "gematik GmbH",
-  "version": "0.11.2",
+  "date": "2024-10-11",
   "caseSensitive": false,
   "count": 62
 }

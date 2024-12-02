@@ -23,7 +23,9 @@ import kotlinx.serialization.json.jsonPrimitive
 
 const val FDV_SEARCH_SERVICE_NAME = "urn:gematik:directory:fhir:fdv-search"
 
-class FhirAPI(val globalAPI: GlobalAPI) {
+class FhirAPI(
+    val globalAPI: GlobalAPI
+) {
     val config = DefaultConfig
 
     fun createClient(env: DirectoryEnvironment): Client {
@@ -48,9 +50,7 @@ class FhirAPI(val globalAPI: GlobalAPI) {
         return client
     }
 
-    fun openVaultFdv(vaultPassword: String): KeyStoreVault {
-        return KeyStoreVaultProvider().open(vaultPassword, FDV_SEARCH_SERVICE_NAME)
-    }
+    fun openVaultFdv(vaultPassword: String): KeyStoreVault = KeyStoreVaultProvider().open(vaultPassword, FDV_SEARCH_SERVICE_NAME)
 
     fun storeAccessTokenSearch(
         env: DirectoryEnvironment,
@@ -64,9 +64,10 @@ class FhirAPI(val globalAPI: GlobalAPI) {
     fun retrieveAccessTokenSearch(env: DirectoryEnvironment): String {
         val tokenStore = TokenStore()
         val envConfig = config.environment(env)
-        return tokenStore.accessTokenFor(
-            envConfig.search.apiURL,
-        )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment (SearchAPI): $env")
+        return tokenStore
+            .accessTokenFor(
+                envConfig.search.apiURL,
+            )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment (SearchAPI): $env")
     }
 
     fun storeAccessTokenFdv(
@@ -81,9 +82,10 @@ class FhirAPI(val globalAPI: GlobalAPI) {
     fun retrieveAccessTokenFdv(env: DirectoryEnvironment): String {
         val tokenStore = TokenStore()
         val envConfig = config.environment(env)
-        return tokenStore.accessTokenFor(
-            envConfig.fdv.apiURL,
-        )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment (FDVSearchAPI): $env")
+        return tokenStore
+            .accessTokenFor(
+                envConfig.fdv.apiURL,
+            )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment (FDVSearchAPI): $env")
     }
 
     fun loginFdv(

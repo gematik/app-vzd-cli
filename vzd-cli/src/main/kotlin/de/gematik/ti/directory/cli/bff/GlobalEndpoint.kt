@@ -15,7 +15,9 @@ import kotlinx.serialization.Serializable
 class Global {
     @Serializable
     @Resource("config")
-    class Config(val parent: Global = Global())
+    class Config(
+        val parent: Global = Global()
+    )
 }
 
 fun Route.globalRoutes() {

@@ -2,6 +2,7 @@ package de.gematik.ti.directory.admin
 
 import de.gematik.ti.directory.DirectoryAuthPlugin
 import de.gematik.ti.directory.DirectoryAuthPluginConfig
+import de.gematik.ti.directory.fhir.json
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -23,11 +24,32 @@ private val JSON =
     Json {
         ignoreUnknownKeys = true
         prettyPrint = true
+        encodeDefaults = true
     }
 
-class AdminResponseException(response: HttpResponse, message: String) : ResponseException(response, message) {
+val ResourceDirectoryEntries = "/DirectoryEntries"
+val ResourceDirectoryEntriesSync = "/v2/DirectoryEntriesSync"
+val ResourceDirectoryEntriesByKim = "/DirectoryEntries/KOM-LE_Fachdaten"
+val ResourceDirectoryEntriesSyncByKim = "/v2/DirectoryEntriesSync/KOM-LE_Fachdaten"
+
+class AdminResponseException(
+    response: HttpResponse,
+    message: String
+) : ResponseException(response, message) {
+    val directoryError: Error?
+        get() {
+            return runBlocking {
+                runCatching { response.body<Error>() }.getOrNull()
+            }
+        }
     val details: String
         get() {
+
+            val error = directoryError
+            if (error != null) {
+                return error.message
+            }
+
             var details = "Bad response: $response"
 
             val reason = response.headers["RS-DIRECTORY-ADMIN-ERROR"]
@@ -48,7 +70,9 @@ class AdminResponseException(response: HttpResponse, message: String) : Response
  * Directory Administration API Client
  * @see <a href="https://github.com/gematik/api-vzd/blob/master/src/openapi/DirectoryAdministration.yaml">Directory Administration Open API</a>
  */
-class Client(block: Configuration.() -> Unit = {}) {
+class Client(
+    block: Configuration.() -> Unit = {}
+) {
     val logger = KotlinLogging.logger {}
 
     class Configuration {
@@ -142,34 +166,16 @@ class Client(block: Configuration.() -> Unit = {}) {
     }
 
     /**
-     * Implements GET /DirectoryEntriesSync (read_Directory_Entry_for_Sync_paging)
-     */
-    suspend fun readDirectoryEntryV2(
-        parameters: Map<String, String>,
-        cursorSize: Int = 100,
-        cookie: String? = null,
-    ): ReadDirectoryEntryForSyncResponse? {
-        return fetchNextEntries(parameters, cursorSize, cookie)
-    }
-
-    /**
-     * Implements GET /DirectoryEntriesSync (read_Directory_Entry_for_Sync)
-     */
-    @Deprecated("Use streamDirectoryEntriesPaging instaed")
-    suspend fun readDirectoryEntryForSync(parameters: Map<String, String>): List<DirectoryEntry>? {
-        return readDirectoryEntry(parameters, "/DirectoryEntriesSync")
-    }
-
-    /**
      * Implements GET /DirectoryEntries (read_Directory_Entry)
+     * and GET /DirectoryEntries/KOM-LE_Fachdaten (search_Directory_FA_Attributes)
      */
     suspend fun readDirectoryEntry(
         parameters: Map<String, String>,
-        path: String = "/DirectoryEntries",
+        resource: String = ResourceDirectoryEntries,
     ): List<DirectoryEntry>? {
         logger.info { "readDirectoryEntry $parameters" }
         val response =
-            http.get(path) {
+            http.get(resource) {
                 for (param in parameters.entries) {
                     parameter(param.key, param.value)
                 }
@@ -189,17 +195,19 @@ class Client(block: Configuration.() -> Unit = {}) {
 
     /**
      * Implements GET /v2/DirectoryEntriesSync (read_Directory_Entry_for_Sync_paging)
+     * and GET /v2/DirectoryEntriesSync/KOM-LE_Fachdaten (read_Directory_FA_Attributes_for_Sync_paging)
      */
     suspend fun streamDirectoryEntriesPaging(
         parameters: Map<String, String>,
         cursorSize: Int = 500,
+        resource: String = ResourceDirectoryEntriesSync,
         sink: (entry: DirectoryEntry) -> Unit,
     ) {
         var cookie: String? = null
         coroutineScope {
             do {
                 logger.info { "Requesting $cursorSize entries, cookie: '$cookie'" }
-                val syncResponse = fetchNextEntries(parameters, cursorSize, cookie)
+                val syncResponse = fetchNextEntries(resource, parameters, cursorSize, cookie)
                 logger.info {
                     "Got ${syncResponse?.directoryEntries?.size ?: 0} entries, new cookie: '${syncResponse?.searchControlValue?.cookie ?: "none"}'"
                 }
@@ -212,12 +220,13 @@ class Client(block: Configuration.() -> Unit = {}) {
     }
 
     private suspend fun fetchNextEntries(
+        resource: String,
         parameters: Map<String, String>,
         cursorSize: Int,
         cookie: String?,
     ): ReadDirectoryEntryForSyncResponse? {
         val response =
-            http.get("/v2/DirectoryEntriesSync") {
+            http.get(resource) {
                 expectSuccess = false
                 for (param in parameters.entries) {
                     parameter(param.key, param.value)
@@ -336,7 +345,7 @@ class Client(block: Configuration.() -> Unit = {}) {
             throw AdminResponseException(response, "Unable to get log $parameters")
         }
 
-        return response.body()
+        return response.body<List<LogEntry>>().sortedBy { it.logTime }
     }
 
     /**

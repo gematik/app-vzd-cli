@@ -10,23 +10,33 @@ import kotlin.io.path.*
 
 private val logger = KotlinLogging.logger {}
 
-data class Secret(var variant: String, var name: String, var secret: String)
+data class Secret(
+    var variant: String,
+    var name: String,
+    var secret: String
+)
 
-class VaultException(message: String) : Exception(message)
+class VaultException(
+    message: String
+) : Exception(message)
 
-class KeyStoreVaultProvider(val customVaultPath: Path? = null) {
+class KeyStoreVaultProvider(
+    val customVaultPath: Path? = null
+) {
     private val defaultVaultPath = Path(System.getProperty("user.home"), ".telematik", "directory-vault.keystore")
     private val vaultPath get() = customVaultPath ?: defaultVaultPath
 
     init {
         if (!vaultPath.toFile().exists()) {
-            vaultPath.absolute().parent.toFile().mkdirs()
+            vaultPath
+                .absolute()
+                .parent
+                .toFile()
+                .mkdirs()
         }
     }
 
-    fun exists(): Boolean {
-        return vaultPath.exists()
-    }
+    fun exists(): Boolean = vaultPath.exists()
 
     fun purge() {
         logger.debug { "Purging the Vault at $vaultPath" }
@@ -36,28 +46,33 @@ class KeyStoreVaultProvider(val customVaultPath: Path? = null) {
     fun open(
         password: String,
         serviceName: String,
-    ): KeyStoreVault {
-        return KeyStoreVault(password, vaultPath, serviceName)
-    }
+    ): KeyStoreVault = KeyStoreVault(password, vaultPath, serviceName)
 }
 
-class KeyStoreVault(private val password: String, private val keystorePath: Path, private val serviceName: String) {
+class KeyStoreVault(
+    private val password: String,
+    private val keystorePath: Path,
+    private val serviceName: String
+) {
     private val pattern = "^$serviceName:([\\w\\p{L}\\-_]+):([\\w\\p{L}\\-_]+)".toRegex()
 
     fun clear() {
-        keyStore.aliases().asSequence().filter {
-            pattern.matches(it)
-        }.forEach {
-            keyStore.deleteEntry(it)
-        }
+        keyStore
+            .aliases()
+            .asSequence()
+            .filter {
+                pattern.matches(it)
+            }.forEach {
+                keyStore.deleteEntry(it)
+            }
         saveKeystore()
     }
 
     private val keystorePassword: CharArray
         get() = this.password.toCharArray()
 
-    fun list(): Sequence<Secret> {
-        return keyStore.aliases().asSequence().mapNotNull { alias ->
+    fun list(): Sequence<Secret> =
+        keyStore.aliases().asSequence().mapNotNull { alias ->
             pattern.matchEntire(alias)?.let {
                 Secret(
                     it.groups[1]!!.value,
@@ -66,7 +81,6 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
                 )
             }
         }
-    }
 
     fun store(
         environment: String,
@@ -75,11 +89,14 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
     ) {
         val protection = KeyStore.PasswordProtection(keystorePassword)
         val secretSpec = SecretKeySpec(secret.toByteArray(Charsets.UTF_8), "AES")
-        keyStore.aliases().asSequence().filter {
-            it.startsWith("$serviceName:$environment:")
-        }.forEach {
-            keyStore.deleteEntry(it)
-        }
+        keyStore
+            .aliases()
+            .asSequence()
+            .filter {
+                it.startsWith("$serviceName:$environment:")
+            }.forEach {
+                keyStore.deleteEntry(it)
+            }
         keyStore.setEntry("$serviceName:$environment:$name", KeyStore.SecretKeyEntry(secretSpec), protection)
         saveKeystore()
     }
@@ -112,11 +129,14 @@ class KeyStoreVault(private val password: String, private val keystorePath: Path
     }
 
     fun delete(environment: String) {
-        keyStore.aliases().asSequence().filter {
-            it.startsWith("$serviceName:$environment")
-        }.forEach {
-            keyStore.deleteEntry(it)
-        }
+        keyStore
+            .aliases()
+            .asSequence()
+            .filter {
+                it.startsWith("$serviceName:$environment")
+            }.forEach {
+                keyStore.deleteEntry(it)
+            }
         saveKeystore()
     }
 

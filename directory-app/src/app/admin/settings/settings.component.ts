@@ -15,7 +15,8 @@ interface EnvironmentStatusModel {
 @Component({
   selector: 'app-admin-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  styleUrls: ['./settings.component.scss'],
+  providers: [ModalService, NotificationService]
 })
 export class SettingsComponent implements OnInit {
   protected statusModel: EnvironmentStatusModel[] = []
@@ -32,10 +33,10 @@ export class SettingsComponent implements OnInit {
     this.iconService.register(Login16)
     this.iconService.register(Api16)
     const self = this
+    this.adminBackend.updateStatus()
     this.adminBackend.status$.subscribe({
       next(adminStatus) {
         self.statusModel = adminStatus.environmentStatus
-          .filter ( envStatus => envStatus.env != "tu")
           .map( envStatus => {
           if (envStatus.accessTokenClaims != null) {
             return { 
@@ -82,6 +83,7 @@ export class SettingsComponent implements OnInit {
           this.loadingState = InlineLoadingState.Active
           this.adminBackend.loginUsingVault(env, password)
             .then( () => {
+              this.adminBackend.updateStatus()
               this.loadingState = InlineLoadingState.Finished
               const model = this.statusModel.find( (e) => e.env == env)
               model!.iconName = "checkmark--filled"

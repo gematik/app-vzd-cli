@@ -29,16 +29,16 @@ fun NodeList.forEach(action: (Node) -> Unit) {
         .forEach { action(it) }
 }
 
-fun NodeList.asSequence(): Sequence<Node> {
-    return (0 until this.length)
+fun NodeList.asSequence(): Sequence<Node> =
+    (0 until this.length)
         .asSequence()
         .map { this.item(it) }
-}
 
-class ExtractCommand : CliktCommand(
-    name = "extract",
-    help = """Extract data from SMC-B/HBA Exports and ObjectSystem files""".trimMargin(),
-) {
+class ExtractCommand :
+    CliktCommand(
+        name = "extract",
+        help = """Extract data from SMC-B/HBA Exports and ObjectSystem files""".trimMargin(),
+    ) {
     private val logger = KotlinLogging.logger {}
     private val sourceFiles by argument().path(mustBeReadable = true).multiple(required = true)
     private val outputDir by option("-o", "--output-dir", metavar = "OUTPUT_DIR", help = "Output directory for files")
@@ -151,9 +151,7 @@ class ExtractCommand : CliktCommand(
     private fun evalString(
         xpathExpr: String,
         node: Node,
-    ): String {
-        return xpath.evaluate(xpathExpr, node).trim()
-    }
+    ): String = xpath.evaluate(xpathExpr, node).trim()
 }
 
 private val HEX_CHARS = "0123456789ABCDEF"

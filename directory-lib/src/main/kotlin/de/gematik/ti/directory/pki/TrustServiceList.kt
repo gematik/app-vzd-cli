@@ -22,16 +22,17 @@ enum class TrustEnvironment {
 }
 
 object TrustServiceListAddresses {
-    fun url(env: TrustEnvironment): String {
-        return when (env) {
+    fun url(env: TrustEnvironment): String =
+        when (env) {
             TrustEnvironment.TU -> "https://download-test.tsl.ti-dienste.de/ECC/ECC-RSA_TSL-test.xml"
             TrustEnvironment.RU -> "https://download-ref.tsl.ti-dienste.de/ECC/ECC-RSA_TSL-ref.xml"
             TrustEnvironment.PU -> "https://download.tsl.ti-dienste.de/ECC/ECC-RSA_TSL.xml"
         }
-    }
 }
 
-enum class TrustServiceType(val uri: String) {
+enum class TrustServiceType(
+    val uri: String
+) {
     CA_NON_QES("http://uri.etsi.org/TrstSvc/Svctype/CA/PKC"),
 }
 

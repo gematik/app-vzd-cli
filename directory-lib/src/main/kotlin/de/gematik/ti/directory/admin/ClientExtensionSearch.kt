@@ -26,13 +26,12 @@ enum class TokenType {
     DomainID,
 }
 
-fun String.trailingAsterisk(): String {
-    return if (!this.contains("*")) {
+fun String.trailingAsterisk(): String =
+    if (!this.contains("*")) {
         "$this*"
     } else {
         this
     }
-}
 
 fun String.leadindAndTrailingAsterisks(): String {
     if (!this.contains("*")) {
@@ -42,26 +41,28 @@ fun String.leadindAndTrailingAsterisks(): String {
     }
 }
 
-data class TokenPosition(val type: TokenType, val range: IntRange)
+data class TokenPosition(
+    val type: TokenType,
+    val range: IntRange
+)
 
-data class TokenizerResult(val tokens: List<String>, val positions: List<TokenPosition>) {
-    fun joinAll(): String {
-        return positions.joinToString(" ") { join(it) }
-    }
+data class TokenizerResult(
+    val tokens: List<String>,
+    val positions: List<TokenPosition>
+) {
+    fun joinAll(): String = positions.joinToString(" ") { join(it) }
 
-    fun join(tokenPosition: TokenPosition): String {
-        return tokens.slice(tokenPosition.range).joinToString(" ")
-    }
+    fun join(tokenPosition: TokenPosition): String = tokens.slice(tokenPosition.range).joinToString(" ")
 
-    fun joinAllExcept(tokenPosition: TokenPosition): String {
-        return positions.filter { it != tokenPosition }.joinToString(" ") { join(it) }
-    }
+    fun joinAllExcept(tokenPosition: TokenPosition): String = positions.filter { it != tokenPosition }.joinToString(" ") { join(it) }
 }
 
 object POSTokenizer {
     private val LOCALITY_NAMES =
         lazy {
-            object {}.javaClass.getResourceAsStream("/PLZ_2021.csv")
+            object {}
+                .javaClass
+                .getResourceAsStream("/PLZ_2021.csv")
                 ?.bufferedReader()
                 ?.readLines()
                 ?.map { it.split(",")[1].lowercase() }
@@ -87,7 +88,7 @@ object POSTokenizer {
                         val startPos = (index) + offset
                         val endPos = startPos + localityLength
                         // only add if we dont have already position in the same range
-                        if (!positions.any { startPos >= it.range.first && endPos-1 <= it.range.last }) {
+                        if (!positions.any { startPos >= it.range.first && endPos - 1 <= it.range.last }) {
                             positions.add(
                                 TokenPosition(
                                     TokenType.LocalityName,
@@ -163,14 +164,15 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
             withContext(Dispatchers.IO) {
                 if (!namesAndLocalities.positions.any { it.type == TokenType.LocalityName }) {
                     // no localities in search query
-                    self.readDirectoryEntry(
-                        buildMap {
-                            putAll(fixedParams)
-                            if (namesAndLocalities.positions.isNotEmpty()) {
-                                put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
-                            }
-                        },
-                    )?.apply { addAll(this) }
+                    self
+                        .readDirectoryEntry(
+                            buildMap {
+                                putAll(fixedParams)
+                                if (namesAndLocalities.positions.isNotEmpty()) {
+                                    put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
+                                }
+                            },
+                        )?.apply { addAll(this) }
                 } else {
                     // for each locality token query the API
                     // queries are fired in parallel using co-routines
@@ -178,34 +180,36 @@ suspend fun Client.quickSearch(searchQuery: String): SearchResults {
                         namesAndLocalities.positions.filter { it.type == TokenType.LocalityName }.forEach { localityPos ->
                             add(
                                 launch {
-                                    self.readDirectoryEntry(
-                                        buildMap {
-                                            putAll(fixedParams)
-                                            put("localityName", namesAndLocalities.join(localityPos).trailingAsterisk())
-                                            if (namesAndLocalities.positions.size > 1) {
-                                                put(
-                                                    "displayName",
-                                                    namesAndLocalities.joinAllExcept(localityPos).leadindAndTrailingAsterisks(),
-                                                )
-                                            }
-                                        },
-                                    )?.apply {
-                                        entriesList.addAll(this)
-                                    }
+                                    self
+                                        .readDirectoryEntry(
+                                            buildMap {
+                                                putAll(fixedParams)
+                                                put("localityName", namesAndLocalities.join(localityPos).trailingAsterisk())
+                                                if (namesAndLocalities.positions.size > 1) {
+                                                    put(
+                                                        "displayName",
+                                                        namesAndLocalities.joinAllExcept(localityPos).leadindAndTrailingAsterisks(),
+                                                    )
+                                                }
+                                            },
+                                        )?.apply {
+                                            entriesList.addAll(this)
+                                        }
                                 },
                             )
                             // finish with query without localityName
                             if (tokenizerResult.positions.size > 0) {
                                 add(
                                     launch {
-                                        self.readDirectoryEntry(
-                                            buildMap {
-                                                putAll(fixedParams)
-                                                put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
-                                            },
-                                        )?.apply {
-                                            entriesList.addAll(this)
-                                        }
+                                        self
+                                            .readDirectoryEntry(
+                                                buildMap {
+                                                    putAll(fixedParams)
+                                                    put("displayName", namesAndLocalities.joinAll().leadindAndTrailingAsterisks())
+                                                },
+                                            )?.apply {
+                                                entriesList.addAll(this)
+                                            }
                                     },
                                 )
                             }

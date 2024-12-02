@@ -11,8 +11,11 @@ import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.resources.post
 import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.server.routing.Route
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.IOException
 
 @Serializable
@@ -22,28 +25,60 @@ data class LoginWithVaultRepresentation(
 )
 
 @Serializable
+data class Activation(
+    val active: Boolean,
+)
+
+@Serializable
 @Resource("admin")
 class Admin {
     @Serializable
     @Resource("status")
-    class Status(val parent: Admin = Admin())
+    class Status(
+        val parent: Admin = Admin()
+    )
 
     @Serializable
     @Resource("login")
-    class Login(val parent: Admin = Admin())
+    class Login(
+        val parent: Admin = Admin()
+    )
 
     @Serializable
     @Resource("{envTitle}")
-    class Env(val parent: Admin = Admin(), private val envTitle: String) {
+    class Env(
+        val parent: Admin = Admin(),
+        private val envTitle: String
+    ) {
         val env get() = DirectoryEnvironment.valueOf(envTitle)
 
         @Serializable
         @Resource("search")
-        class Search(val parent: Env, val q: String)
+        class Search(
+            val parent: Env,
+            val q: String
+        )
 
         @Resource("entry/{telematikID}")
         @Serializable
-        data class Entry(val parent: Env, val telematikID: String)
+        data class Entry(
+            val parent: Env,
+            val telematikID: String
+        )
+
+        @Resource("entry/{telematikID}/activation")
+        @Serializable
+        data class EntryActivation(
+            val parent: Env,
+            val telematikID: String
+        )
+
+        @Resource("base-entry/{telematikID}")
+        @Serializable
+        data class BaseEntry(
+            val parent: Env,
+            val telematikID: String
+        )
     }
 }
 
@@ -52,6 +87,8 @@ data class ElaboratedSearchResults(
     val searchQuery: String,
     val directoryEntries: List<ElaborateDirectoryEntry>,
 )
+
+private val JsonIgnoreUnknownKeys = Json { ignoreUnknownKeys = true }
 
 fun Route.adminRoutes() {
     get<Admin.Status> {
@@ -94,15 +131,73 @@ fun Route.adminRoutes() {
         )
     }
 
-    get<Admin.Env.Entry> { entry ->
+    get<Admin.Env.Entry> { resource ->
+        val adminAPI = application.attributes[AdminAPIKey]
+
+        val cliant = adminAPI.createClient(resource.parent.env)
+        // launch two coroutines in parallel and wait for both to finish
+        val entry = cliant.readDirectoryEntryByTelematikID(resource.telematikID)
+        val logs = cliant.readLog(mapOf("telematikID" to resource.telematikID))
+
+        if (entry != null) {
+            val elaborated = entry.elaborate()
+            elaborated.logs = logs.map { it.elaborate() }
+            call.respond(elaborated)
+            return@get
+        }
+        call.respondText(
+            status = HttpStatusCode.NotFound,
+            text = "Entry with telematikID '${resource.telematikID}' not found in env '${resource.parent.env}'",
+        )
+    }
+
+    get<Admin.Env.BaseEntry> { entry ->
         val adminAPI = application.attributes[AdminAPIKey]
         val result = adminAPI.createClient(entry.parent.env).readDirectoryEntryByTelematikID(entry.telematikID)
         if (result != null) {
-            call.respond(result.elaborate())
+            call.respond(result.directoryEntryBase)
+            return@get
         }
-        call.respond(
-            HttpStatusCode.NotFound,
-            Outcome("NOT_FOUND", "Entry with telematikID '${entry.telematikID}' not found in env '${entry.parent.env}'"),
+        call.respondText(
+            status = HttpStatusCode.NotFound,
+            text = "Base entry with telematikID '${entry.telematikID}' not found in env '${entry.parent.env}'",
         )
+    }
+
+    put<Admin.Env.BaseEntry> { entry ->
+        val adminAPI = application.attributes[AdminAPIKey]
+        val client = adminAPI.createClient(entry.parent.env)
+        val baseFromClient = call.receive<BaseDirectoryEntry>()
+
+        val jsonData = Json.encodeToString(baseFromClient)
+        val updateBaseDirectoryEntry = JsonIgnoreUnknownKeys.decodeFromString<UpdateBaseDirectoryEntry>(jsonData)
+
+        logger.debug { "Updating base entry: $jsonData" }
+
+        val dn = client.modifyDirectoryEntry(baseFromClient.dn?.uid!!, updateBaseDirectoryEntry)
+
+        val updateDirectoryEntry = client.readDirectoryEntry(mapOf("uid" to dn.uid))
+        if (updateDirectoryEntry?.first() != null) {
+            call.respond(updateDirectoryEntry.first().directoryEntryBase)
+            return@put
+        }
+
+        call.respondText(
+            status = HttpStatusCode.NotFound,
+            text = "Base entry with telematikID '${entry.telematikID}' not found in env '${entry.parent.env}'",
+        )
+    }
+
+    put<Admin.Env.EntryActivation> { resource ->
+        val adminAPI = application.attributes[AdminAPIKey]
+        val client = adminAPI.createClient(resource.parent.env)
+        val activation = call.receive<Activation>()
+
+        val entry = client.readDirectoryEntryByTelematikID(resource.telematikID)
+
+        if (entry != null) {
+            client.stateSwitch(entry.directoryEntryBase.dn!!.uid, activation.active)
+            call.respond(Outcome("success", "Activation state changed."))
+        }
     }
 }

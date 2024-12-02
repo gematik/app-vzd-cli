@@ -1,6 +1,15 @@
-.icon.settings {
-  transition: transform .3s ease-in-out;
+::ng-deep .cds--breadcrumb {
+  padding-top: 1em;
+  padding-left: 1rem !important;
 }
-.icon.settings:hover {
-  transform: rotate(120deg);
+
+::ng-deep .cds--form-item {
+  margin-bottom: 1rem !important;
+}
+
+::ng-deep .breadcrumb-short-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap; 
+  max-width: 16em;
 }

@@ -15,10 +15,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @Resource("vault")
-class VaultResource()
+class VaultResource
 
 @Serializable
-data class OpenVaultRequest(val vaultPassword: String)
+data class OpenVaultRequest(
+    val vaultPassword: String
+)
 
 fun Route.vaultRoute() {
     post<VaultResource> {

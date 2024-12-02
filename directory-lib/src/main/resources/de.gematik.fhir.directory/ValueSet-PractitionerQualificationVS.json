@@ -4,16 +4,18 @@
   "name": "PractitionerQualificationVS",
   "id": "PractitionerQualificationVS",
   "description": "ValueSet for `Practitoner.qualification`",
+  "version": "0.11.18",
   "url": "https://gematik.de/fhir/directory/ValueSet/PractitionerQualificationVS",
+  "experimental": false,
   "publisher": "gematik GmbH",
-  "version": "0.11.2",
+  "date": "2024-10-11",
   "compose": {
     "include": [
       {
         "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID"
       },
       {
-        "system": "urn:as:1.2.276.0.76.5.114",
+        "system": "urn:oid:1.2.276.0.76.5.114",
         "concept": [
           {
             "code": "010",
@@ -274,7 +276,7 @@
         ]
       },
       {
-        "system": "urn:as:1.2.276.0.76.5.514",
+        "system": "urn:oid:1.2.276.0.76.5.514",
         "concept": [
           {
             "code": "011001",
@@ -1067,7 +1069,7 @@
         ]
       },
       {
-        "system": "urn:as:1.2.276.0.76.5.492",
+        "system": "urn:oid:1.2.276.0.76.5.492",
         "concept": [
           {
             "code": "1",
@@ -1096,7 +1098,7 @@
         ]
       },
       {
-        "system": "urn:as:1.3.6.1.4.1.19376.3.276.1.5.11",
+        "system": "urn:oid:1.3.6.1.4.1.19376.3.276.1.5.11",
         "concept": [
           {
             "code": "1",
@@ -1813,7 +1815,7 @@
         ]
       },
       {
-        "system": "urn:as:1.2.276.0.76.5.493",
+        "system": "urn:oid:1.2.276.0.76.5.493",
         "concept": [
           {
             "code": "1",

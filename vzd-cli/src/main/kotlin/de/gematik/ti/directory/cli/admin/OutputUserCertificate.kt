@@ -80,7 +80,9 @@ fun List<UserCertificate>.toTable(): String {
                 }
             }
 
-            class State(var count: Int = 0)
+            class State(
+                var count: Int = 0
+            )
             stateful<String, State>("Alg") {
                 initState { State() }
                 extractor { cert, state ->
@@ -143,8 +145,8 @@ fun UserCertificate.toStringRepresentation(
     }
 }
 
-fun List<UserCertificate>.toStringRepresentation(format: RepresentationFormat): String {
-    return when (format) {
+fun List<UserCertificate>.toStringRepresentation(format: RepresentationFormat): String =
+    when (format) {
         RepresentationFormat.HUMAN -> this.toHuman()
         RepresentationFormat.YAML -> this.toYamlNoDefaults()
         RepresentationFormat.JSON -> this.toJsonPretty()
@@ -152,4 +154,3 @@ fun List<UserCertificate>.toStringRepresentation(format: RepresentationFormat): 
         RepresentationFormat.CSV -> this.toCsv()
         else -> ""
     }
-}

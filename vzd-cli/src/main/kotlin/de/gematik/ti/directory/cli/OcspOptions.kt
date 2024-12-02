@@ -8,6 +8,5 @@ class OcspOptions : OptionGroup("OCSP options") {
     val enableOcsp: Boolean by option(
         "--ocsp",
         help = "Validate certificates using OCSP",
-    )
-        .flag()
+    ).flag()
 }

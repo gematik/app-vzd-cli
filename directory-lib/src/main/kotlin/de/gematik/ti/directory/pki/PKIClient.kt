@@ -29,18 +29,22 @@ enum class OCSPResponseCertificateStatus {
     ERROR,
 }
 
-fun loadAllEnvironments(httpClient: HttpClient): ListOfTrustedServiceLists {
-    return ListOfTrustedServiceLists(
+fun loadAllEnvironments(httpClient: HttpClient): ListOfTrustedServiceLists =
+    ListOfTrustedServiceLists(
         tu = ListOfTrustedServiceLists.loadFromServer(httpClient, TrustEnvironment.TU),
         ru = ListOfTrustedServiceLists.loadFromServer(httpClient, TrustEnvironment.RU),
         pu = ListOfTrustedServiceLists.loadFromServer(httpClient, TrustEnvironment.PU),
     )
-}
 
 @Serializable
-data class OCSPResponse(var status: OCSPResponseCertificateStatus, var message: String? = null)
+data class OCSPResponse(
+    var status: OCSPResponseCertificateStatus,
+    var message: String? = null
+)
 
-class PKIClient(block: Configuration.() -> Unit = {}) {
+class PKIClient(
+    block: Configuration.() -> Unit = {}
+) {
     class Configuration {
         var httpProxyURL: String? = null
         var loader: ((HttpClient) -> ListOfTrustedServiceLists) = { ListOfTrustedServiceLists() }
@@ -94,7 +98,9 @@ class PKIClient(block: Configuration.() -> Unit = {}) {
             val eeCert = eeCertDER.certificate
             logger.debug { "Looking for CA Certificate for ${eeCert.issuerX500Principal}" }
             val issuerCert =
-                tsl.caServices.first { it.caCertificate.certificate.subjectX500Principal == eeCert.issuerX500Principal }.caCertificate.certificate
+                tsl.caServices
+                    .first { it.caCertificate.certificate.subjectX500Principal == eeCert.issuerX500Principal }
+                    .caCertificate.certificate
 
             logger.info {
                 "Verifying '${eeCert.subjectX500Principal}' from '${issuerCert.subjectX500Principal}' using OCSP Responder: '$ocspResponderURL'"

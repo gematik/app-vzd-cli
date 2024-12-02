@@ -1,6 +1,7 @@
 package de.gematik.ti.directory.cli.bff
 
 import de.gematik.ti.directory.DirectoryAuthException
+import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.admin.AdminAPI
 import de.gematik.ti.directory.cli.util.VaultException
@@ -20,9 +21,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
+import mu.KotlinLogging
 
 val AdminAPIKey = AttributeKey<AdminAPI>("AdminAPI")
 val GlobalAPIKey = AttributeKey<GlobalAPI>("GlobalAPI")
+
+val logger = KotlinLogging.logger {}
 
 /**
  * Backend for Frontend module for Directory BFF (Backend for Frontend)
@@ -33,6 +37,7 @@ fun Application.directoryModule() {
             Json {
                 prettyPrint = true
                 isLenient = true
+                encodeDefaults = true
                 serializersModule =
                     SerializersModule {
                         contextual(ExtendedCertificateDataDERSerializer)
@@ -62,7 +67,7 @@ fun Application.directoryModule() {
 
         singlePageApplication {
             useResources = true
-            filesPath = "directory-app"
+            filesPath = "directory-app/browser"
             defaultPage = "index.html"
         }
     }
@@ -77,11 +82,17 @@ fun Application.directoryModule() {
         exception<DirectoryAuthException> { call, _ ->
             call.respondText(text = "401: Unauthorized", status = HttpStatusCode.Unauthorized)
         }
+        exception<AdminResponseException> { call, cause ->
+            call.respond(cause.response.status, Outcome("admin_error", cause.details))
+        }
     }
 }
 
 @Serializable
-data class Outcome(val code: String, val message: String)
+data class Outcome(
+    val code: String,
+    val message: String
+)
 
 val ApplicationCall.adminAPI: AdminAPI
     get() {
