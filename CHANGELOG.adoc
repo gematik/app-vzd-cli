@@ -7,6 +7,7 @@
 - Aktualisierung der FHIR-Profile und Mappings auf die neueste Spezifikation
 - Editieren der Einträge in der GUI
 - Upgrade der GUI auf Angular 18 und neuesten Carbon Design System
+- FHIR Umgebung wurde von `test` auf `tu` umgestellt.
 - Bugfixes
 
 == Version 3.0.0

@@ -39,13 +39,13 @@ val DefaultConfig =
                     EnvironmentConfig(
                         search =
                             SearchConfig(
-                                apiURL = "https://fhir-directory-test.vzd.ti-dienste.de/search",
+                                apiURL = "https://fhir-directory-tu.vzd.ti-dienste.de/search",
                             ),
                         fdv =
                             FdvConfig(
-                                apiURL = "https://fhir-directory-test.vzd.ti-dienste.de/fdv/search",
+                                apiURL = "https://fhir-directory-tu.vzd.ti-dienste.de/fdv/search",
                                 authenticationEndpoint = "https://auth-test.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
-                                authorizationEndpoint = "https://fhir-directory-test.vzd.ti-dienste.de/service-authenticate",
+                                authorizationEndpoint = "https://fhir-directory-tu.vzd.ti-dienste.de/service-authenticate",
                             ),
                     ),
                 "ru" to
