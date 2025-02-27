@@ -1,12 +1,12 @@
-ARG VERSION=3.2.0a1
 
 FROM eclipse-temurin:21 AS builder
-ARG VERSION
+
+RUN apt-get update && apt-get install -y wget unzip
 
 WORKDIR /app
+ARG VERSION=3.2.0a1
 
 # download release from github
-RUN apt-get update && apt-get install -y wget unzip
 RUN wget https://github.com/gematik/app-vzd-cli/releases/download/${VERSION}/vzd-cli-${VERSION}.zip
 RUN unzip vzd-cli-${VERSION}.zip
 RUN mv vzd-cli-${VERSION} vzd-cli
