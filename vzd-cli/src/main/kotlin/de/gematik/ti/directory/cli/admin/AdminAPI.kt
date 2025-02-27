@@ -2,6 +2,7 @@ package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.ClientCredentialsAuthenticator
 import de.gematik.ti.directory.DirectoryAuthException
+import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.util.FileObjectStore
@@ -38,7 +39,7 @@ internal class AdminConfigFileStore(
 @Serializable
 data class AdminEnvironmentStatus(
     val env: String,
-    val accessTokenClaims: Map<String, String>?,
+    val accessible: Boolean,
     val backendInfo: InfoObject?,
 )
 
@@ -52,18 +53,19 @@ class AdminAPI(
 ) {
     val config by lazy { loadConfig() }
 
-    fun createClient(env: AdminEnvironment): Client {
+    var tokenProvider: (apiURL: String) -> String? = { apiURL ->
         val tokenStore = TokenStore()
+        tokenStore.accessTokenFor(apiURL)?.accessToken
+    }
+
+    fun createClient(env: AdminEnvironment): Client {
         val envConfig = config.environment(env)
         val client =
             Client {
                 apiURL = envConfig.apiURL
                 auth {
                     accessToken {
-                        tokenStore
-                            .accessTokenFor(
-                                envConfig.apiURL,
-                            )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
+                        tokenProvider(envConfig.apiURL) ?: throw DirectoryAuthException("You are not logged in to environment: $env")
                     }
                 }
                 if (globalAPI.config.httpProxy.enabled) {
@@ -91,9 +93,7 @@ class AdminAPI(
 
     suspend fun status(includeBackendInfo: Boolean = false): AdminStatus {
         // force reload from file in case smth changed in between the requests
-        val tokenStore = TokenStore()
         val config = loadConfig()
-        tokenStore.removeExpired()
         val envInfoList =
             config.environments.map {
                 val backendInfo =
@@ -108,7 +108,7 @@ class AdminAPI(
                     }
                 AdminEnvironmentStatus(
                     it.key,
-                    tokenStore.claimsFor(it.value.apiURL),
+                    tokenProvider(it.value.apiURL) != null,
                     backendInfo,
                 )
             }

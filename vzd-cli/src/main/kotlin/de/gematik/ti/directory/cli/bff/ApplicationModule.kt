@@ -28,10 +28,24 @@ val GlobalAPIKey = AttributeKey<GlobalAPI>("GlobalAPI")
 
 val logger = KotlinLogging.logger {}
 
+class Configuration(
+    val globalAPI: GlobalAPI,
+    val adminAPI: AdminAPI,
+    var routing: (Routing.() -> Unit)? = null,
+)
+
 /**
  * Backend for Frontend module for Directory BFF (Backend for Frontend)
  */
-fun Application.directoryModule() {
+fun Application.directoryModule(configure: Configuration.() -> Unit = {}) {
+    val globalAPI = GlobalAPI()
+    val adminAPI = AdminAPI(globalAPI)
+    val cfg = Configuration(globalAPI, adminAPI)
+    // allow external code to customize the configuration
+    configure(cfg)
+    attributes.put(GlobalAPIKey, globalAPI)
+    attributes.put(AdminAPIKey, adminAPI)
+
     install(ContentNegotiation) {
         json(
             Json {
@@ -47,40 +61,40 @@ fun Application.directoryModule() {
     }
     install(Resources)
 
-    val globalAPI = GlobalAPI()
-    val adminAPI = AdminAPI(globalAPI)
-    attributes.put(GlobalAPIKey, globalAPI)
-    attributes.put(AdminAPIKey, adminAPI)
-
-    routing {
-        route("api") {
-            globalRoutes()
-            vaultRoute()
-            adminRoutes()
-        }
-
-        route("api/{...}") {
-            handle {
-                call.respond(HttpStatusCode.NotFound)
+    if (cfg.routing != null) {
+        // allow overriding the routing
+        routing(cfg.routing!!)
+    } else {
+        routing {
+            route("api") {
+                globalRoutes()
+                vaultRoute()
+                adminRoutes()
             }
-        }
 
-        singlePageApplication {
-            useResources = true
-            filesPath = "directory-app/browser"
-            defaultPage = "index.html"
+            route("api/{...}") {
+                handle {
+                    call.respond(HttpStatusCode.NotFound)
+                }
+            }
+
+            singlePageApplication {
+                useResources = true
+                filesPath = "directory-app/browser"
+                defaultPage = "index.html"
+            }
         }
     }
 
     install(StatusPages) {
-        exception<ParseException> { call, _ ->
-            call.respondText(text = "401: Unauthorized", status = HttpStatusCode.Unauthorized)
+        exception<ParseException> { call, cause ->
+            call.respond(HttpStatusCode.BadRequest, Outcome("bad_request", cause.message))
         }
         exception<VaultException> { call, _ ->
-            call.respondText(text = "401: Unauthorized", status = HttpStatusCode.Unauthorized)
+            call.respond(HttpStatusCode.Unauthorized, Outcome("unauthorized", "Vault error"))
         }
-        exception<DirectoryAuthException> { call, _ ->
-            call.respondText(text = "401: Unauthorized", status = HttpStatusCode.Unauthorized)
+        exception<DirectoryAuthException> { call, cause ->
+            call.respond(HttpStatusCode.Unauthorized, Outcome("unauthorized", cause.message ?: "Auth error"))
         }
         exception<AdminResponseException> { call, cause ->
             call.respond(cause.response.status, Outcome("admin_error", cause.details))

@@ -38,7 +38,7 @@ export class SettingsComponent implements OnInit {
       next(adminStatus) {
         self.statusModel = adminStatus.environmentStatus
           .map( envStatus => {
-          if (envStatus.accessTokenClaims != null) {
+          if (envStatus.accessible) {
             return { 
               env: envStatus.env,
               status: "success",
