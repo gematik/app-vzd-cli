@@ -1,4 +1,4 @@
-ARG VERSION=3.1.0
+ARG VERSION=3.2.0a1
 
 FROM eclipse-temurin:21 AS builder
 ARG VERSION
