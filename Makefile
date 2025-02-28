@@ -16,6 +16,6 @@ gui:
 	rm -rf vzd-cli/src/main/resources/directory-app
 	mv directory-app/dist/directory-app vzd-cli/src/main/resources
 
-dockerfile: vzd-cli/Dockerfile.tmpl
+dockerfile: vzd-cli/Dockerfile.tmpl gradle.properties
 	$(eval VERSION := $(shell grep "^version=" gradle.properties | cut -d'=' -f2))
 	sed 's/ARG VERSION=.*/ARG VERSION=${VERSION}/' vzd-cli/Dockerfile.tmpl > Dockerfile
