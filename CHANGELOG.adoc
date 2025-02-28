@@ -1,5 +1,10 @@
 = Changelog `vzd-cli`
 
+== Version 3.2.0
+
+- Client kann jetzt als Backend for Frontend (BFF) für die Web-GUI verwendet werden `vzd-cli bff start`
+- Client kann jetzt im Docker ausgeführt werden
+
 == Version 3.1.0
 
 - `providedBy` in den Basisdaten und bei der Abfrage werden jetzt unterstützt
