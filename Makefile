@@ -8,7 +8,7 @@ dist: ktlint dockerfile
 
 release: dockerfile
 	$(eval VERSION := $(shell grep "^version=" gradle.properties | cut -d'=' -f2))
-	gh release create ${VERSION}
+	gh release create ${VERSION} --target $(shell git rev-parse --abbrev-ref HEAD)
 	gh release upload ${VERSION} vzd-cli/build/distributions/vzd-cli-${VERSION}.zip
 
 gui:
