@@ -1,4 +1,4 @@
-package de.gematik.ti.directory.cli.service
+package de.gematik.ti.directory.cli.bff
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
@@ -10,9 +10,6 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
 import de.gematik.ti.directory.DirectoryEnvironment
-import de.gematik.ti.directory.cli.bff.TokenManager
-import de.gematik.ti.directory.cli.bff.adminRoutes
-import de.gematik.ti.directory.cli.bff.directoryModule
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -20,15 +17,12 @@ import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import mu.KotlinLogging
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.seconds
 
-private val logger = KotlinLogging.logger {}
-
 enum class LogLevelOption { ERROR, WARN, INFO, DEBUG }
 
-class ServiceRunCommand : CliktCommand(name = "run", help = "Run the client as microservice") {
+class BffStartCommand : CliktCommand(name = "start", help = "Start the client as backend for frontend") {
     init {
         context { autoEnvvarPrefix = "DIRECTORY" }
     }

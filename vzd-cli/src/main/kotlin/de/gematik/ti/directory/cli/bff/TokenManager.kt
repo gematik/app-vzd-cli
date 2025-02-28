@@ -22,6 +22,7 @@ class TokenManager(
         clientId: String,
         clientSecret: String
     ) {
+        logger.info { "Registering admin credentials for $env" }
         val cfg = DefaultConfig.environment(env)
         val authenticator = ClientCredentialsAuthenticator(cfg.authURL, httpProxyUrl)
         tokenProviders[cfg.apiURL] = TokenProvider(authenticator, clientId, clientSecret, defaultExpiresIn)
