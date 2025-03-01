@@ -91,7 +91,7 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                 }
             }
         // TODO proxy
-        tokenManager.httpProxyUrl = null
+        tokenManager.httpProxyUrl = httpProxyUrl
 
         if (adminTuClientId != "") {
             tokenManager.registerAdminCredentials(DirectoryEnvironment.tu, adminTuClientId, adminTuClientSecret)
