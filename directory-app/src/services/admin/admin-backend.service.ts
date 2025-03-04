@@ -1,7 +1,8 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { ReplaySubject, catchError, firstValueFrom } from 'rxjs';
 import { AdminStatus, ElaborateDirectoryEntry, DirectoryEntryFHIRResourceType, DirectoryEntryKind, Outcome, ElaborateSearchResults, BaseDirectoryEntry } from './admin.model';
+import { APP_BASE_HREF } from '@angular/common';
 
 // TODO: how does one provide labels in Angular?
 const labels: Record<string, string> = {
@@ -18,6 +19,7 @@ export class AdminBackendService {
 
   constructor(
     private http: HttpClient,
+    @Inject(APP_BASE_HREF) private baseHref: string
   ) { 
   }
 
@@ -30,7 +32,7 @@ export class AdminBackendService {
 
   updateStatus() {
     firstValueFrom(
-      this.http.get<AdminStatus>('/api/admin/status')
+      this.http.get<AdminStatus>(`${this.baseHref}api/admin/status`)
     ).then( adminStatus => {
       this.status$.next(adminStatus)
     })
@@ -43,7 +45,7 @@ export class AdminBackendService {
   search(env: string, queryString: string) {
     return firstValueFrom(
       this.http.get<ElaborateSearchResults> (
-        `/api/admin/${env}/search`, 
+        `${this.baseHref}api/admin/${env}/search`, 
         { params: {"q": queryString} }
       )
     )
@@ -52,7 +54,7 @@ export class AdminBackendService {
   loginUsingVault(env: string, vaultPassword: string) {
     return firstValueFrom(
       this.http.post<Outcome>(
-        `/api/admin/login`,
+        `${this.baseHref}api/admin/login`,
         {
           env: env,
           vaultPassword: vaultPassword
@@ -64,7 +66,7 @@ export class AdminBackendService {
   loadEntry(env: string, telematikID: string) : Promise<ElaborateDirectoryEntry> {
     return firstValueFrom(
       this.http.get<ElaborateDirectoryEntry>(
-        `/api/admin/${env}/entry/${telematikID}`
+        `${this.baseHref}api/admin/${env}/entry/${telematikID}`
       )
     )
   }
@@ -109,7 +111,7 @@ export class AdminBackendService {
   loadBaseEntry(env: string, telematikID: string) : Promise<BaseDirectoryEntry> {
     return firstValueFrom(
       this.http.get<BaseDirectoryEntry>(
-        `/api/admin/${env}/base-entry/${telematikID}`
+        `${this.baseHref}api/admin/${env}/base-entry/${telematikID}`
       )
     )
   }
@@ -117,7 +119,7 @@ export class AdminBackendService {
   modifyBaseEntry(env: string, baseEntry: BaseDirectoryEntry): Promise<BaseDirectoryEntry> {
     return firstValueFrom(
       this.http.put<BaseDirectoryEntry>(
-        `/api/admin/${env}/base-entry/${baseEntry.telematikID}`,
+        `${this.baseHref}api/admin/${env}/base-entry/${baseEntry.telematikID}`,
         baseEntry
       ).pipe(catchError((error) => {
         throw this.parseError(error)
@@ -138,7 +140,7 @@ export class AdminBackendService {
   deactivateEntry(env: string, telematikID: string): Promise<Outcome> {
     return firstValueFrom(
       this.http.put<Outcome>(
-        `/api/admin/${env}/entry/${telematikID}/activation`,
+        `${this.baseHref}api/admin/${env}/entry/${telematikID}/activation`,
         {active: false}
       ).pipe(catchError((error) => {
         throw this.parseError(error)
@@ -150,7 +152,7 @@ export class AdminBackendService {
   activateEntry(env: string, telematikID: string): Promise<Outcome> {
     return firstValueFrom(
       this.http.put<Outcome>(
-        `/api/admin/${env}/entry/${telematikID}/activation`,
+        `${this.baseHref}api/admin/${env}/entry/${telematikID}/activation`,
         {active: true}
       ).pipe(catchError((error) => {
         throw this.parseError(error)

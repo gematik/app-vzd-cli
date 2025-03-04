@@ -29,7 +29,7 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
     }
 
     val port by option().int().default(57036)
-    val pathPrefix by option().default("")
+    val baseHref by option().default("")
     val logLevel by option().enum<LogLevelOption>().default(LogLevelOption.INFO)
     val expiresIn by option().int().default(60 * 60 * 4).help("Duration in seconds when the access token is considered expired and must be refreshed. Default 4 Hours (14400 seconds)")
     val adminRuClientId by option().default("")
@@ -54,9 +54,16 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                 defaultExpiresIn = expiresIn.seconds,
             )
 
-        if (pathPrefix != "" && !pathPrefix.matches(Regex("^/[^/]+$"))) {
-            throw UsageError("Invalid path prefix: $pathPrefix. Prefix must start with / and contain only one slash.")
+        if (baseHref != "" && !baseHref.matches(Regex("^/[^/]+$"))) {
+            throw UsageError("Invalid path prefix: $baseHref. Prefix must start with / and contain only one slash.")
         }
+
+        var indexHtml =
+            BffStartCommand::class.java.getResource("/directory-app/browser/index.html")?.readText()
+                ?: throw IllegalStateException("Could not find index.html in resources")
+
+        indexHtml = indexHtml.replace("<base href=\"/\">", "<base href=\"$baseHref/\">")
+        indexHtml = indexHtml.replace("window.__baseHref = '/'", "window.__baseHref = '$baseHref/'")
 
         val server =
             embeddedServer(Netty, port = port) {
@@ -68,8 +75,8 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                     }
                     adminAPI.tokenProvider = tokenProvider
                     routing = {
-                        route("$pathPrefix/api") {
-                            logger.info { "Configuring API routes: $pathPrefix/api" }
+                        route("$baseHref/api") {
+                            logger.info { "Configuring API routes: $baseHref/api" }
                             adminRoutes()
                             route("{...}") {
                                 handle {
@@ -77,12 +84,22 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                                 }
                             }
                         }
-                        logger.info { "Configuring SPA frontend: $pathPrefix/index.html" }
-                        singlePageApplication {
-                            //applicationRoute = "$pathPrefix/"
-                            useResources = true
-                            filesPath = "directory-app/browser"
-                            defaultPage = "index.html"
+                        logger.info { "Configuring SPA frontend: $baseHref/index.html" }
+                        route("$baseHref/{path...}") {
+                            handle {
+                                val paths = call.parameters.getAll("path").orEmpty()
+                                val content = call.resolveResource(paths.joinToString("/"), "directory-app/browser")
+                                if (content != null) {
+                                    call.respond(content)
+                                } else {
+                                    call.respondText(indexHtml, ContentType.Text.Html)
+                                }
+                            }
+                        }
+                        route("$baseHref/") {
+                            handle {
+                                call.respondText(indexHtml, ContentType.Text.Html)
+                            }
                         }
                     }
                 }

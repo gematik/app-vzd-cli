@@ -4,5 +4,11 @@
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true
+  },
+  "/my-dynamic-base/api": {
+    "target": "http://127.0.0.1:57036",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true
   }
 }
