@@ -4,7 +4,7 @@ FROM eclipse-temurin:21 AS builder
 RUN apt-get update && apt-get install -y wget unzip
 
 WORKDIR /app
-ARG VERSION=3.2.0a6
+ARG VERSION=3.2.0a7
 
 # download release from github
 RUN wget https://github.com/gematik/app-vzd-cli/releases/download/${VERSION}/vzd-cli-${VERSION}.zip

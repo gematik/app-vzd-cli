@@ -3,6 +3,7 @@ package de.gematik.ti.directory.cli.bff
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.UsageError
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.help
@@ -28,7 +29,7 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
     }
 
     val port by option().int().default(57036)
-    val urlPath by option().default("")
+    val pathPrefix by option().default("")
     val logLevel by option().enum<LogLevelOption>().default(LogLevelOption.INFO)
     val expiresIn by option().int().default(60 * 60 * 4).help("Duration in seconds when the access token is considered expired and must be refreshed. Default 4 Hours (14400 seconds)")
     val adminRuClientId by option().default("")
@@ -53,11 +54,9 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                 defaultExpiresIn = expiresIn.seconds,
             )
 
-        if (urlPath != "") {
-            throw IllegalArgumentException("URL path is not supported yet")
+        if (pathPrefix != "" && !pathPrefix.matches(Regex("^/[^/]+$"))) {
+            throw UsageError("Invalid path prefix: $pathPrefix. Prefix must start with / and contain only one slash.")
         }
-
-        val prefix = urlPath.removeSuffix("/") + "/"
 
         val server =
             embeddedServer(Netty, port = port) {
@@ -69,8 +68,8 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                     }
                     adminAPI.tokenProvider = tokenProvider
                     routing = {
-                        route("${prefix}api") {
-                            logger.info { "Configuring API routes: ${prefix}api" }
+                        route("$pathPrefix/api") {
+                            logger.info { "Configuring API routes: $pathPrefix/api" }
                             adminRoutes()
                             route("{...}") {
                                 handle {
@@ -78,9 +77,9 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                                 }
                             }
                         }
-                        logger.info { "Configuring SPA frontend: ${prefix}index.html" }
+                        logger.info { "Configuring SPA frontend: $pathPrefix/index.html" }
                         singlePageApplication {
-                            applicationRoute = prefix
+                            //applicationRoute = "$pathPrefix/"
                             useResources = true
                             filesPath = "directory-app/browser"
                             defaultPage = "index.html"
@@ -88,7 +87,9 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                     }
                 }
             }
-        tokenProvider.httpProxyUrl = httpProxyUrl
+        if (httpProxyUrl != "") {
+            tokenProvider.httpProxyUrl = httpProxyUrl
+        }
 
         if (adminTuClientId != "") {
             tokenProvider.registerAdminCredentials(DirectoryEnvironment.tu, adminTuClientId, adminTuClientSecret)

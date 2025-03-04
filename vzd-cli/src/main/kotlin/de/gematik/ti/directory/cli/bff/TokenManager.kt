@@ -13,8 +13,14 @@ import kotlin.time.Duration
  * Interface token manager
  */
 interface TokenProvider {
+    /**
+     * Get the access token for the given API URL
+     */
     fun accessTokenFor(apiURL: String): String?
 
+    /**
+     * Update the tokens, e.g. by removing or refreshing the expired ones
+     */
     fun updateTokens()
 }
 
@@ -47,9 +53,9 @@ class ClientCredentialsTokenProvider(
         clientId: String,
         clientSecret: String
     ) {
-        logger.info { "Registering admin credentials for environment '$env', client_id: '$clientId'" }
         val cfg = DefaultConfig.environment(env)
         authenticators[cfg.apiURL] = Authenticator(cfg.authURL, httpProxyUrl, clientId, clientSecret, defaultExpiresIn)
+        logger.info { "Registered admin credentials for environment '$env', client_id: '$clientId', proxy: '${httpProxyUrl ?: "none"}'" }
     }
 
     override fun accessTokenFor(apiURL: String): String? = authenticators.get(apiURL)?.accessToken()

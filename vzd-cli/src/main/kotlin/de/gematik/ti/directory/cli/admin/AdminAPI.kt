@@ -106,12 +106,13 @@ class AdminAPI(
                     } else {
                         null
                     }
-                val accessible = try {
-                    tokenProvider.accessTokenFor(it.value.apiURL) != null
-                } catch (e: Exception) {
-                    logger.error(e) { "Error while checking environment status: ${it.key}" }
-                    false
-                }
+                val accessible =
+                    try {
+                        tokenProvider.accessTokenFor(it.value.apiURL) != null
+                    } catch (e: Exception) {
+                        logger.error(e) { "Error while checking environment status: ${it.key}" }
+                        false
+                    }
                 AdminEnvironmentStatus(
                     it.key,
                     accessible,
