@@ -48,8 +48,8 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
             LogLevelOption.DEBUG -> root.level = Level.DEBUG
         }
 
-        val tokenManager =
-            TokenManager(
+        val tokenProvider =
+            ClientCredentialsTokenProvider(
                 defaultExpiresIn = expiresIn.seconds,
             )
 
@@ -65,11 +65,9 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                     if (httpProxyUrl != "") {
                         globalAPI.config.httpProxy.enabled = true
                         globalAPI.config.httpProxy.proxyURL = httpProxyUrl
-                        tokenManager.httpProxyUrl = httpProxyUrl
+                        tokenProvider.httpProxyUrl = httpProxyUrl
                     }
-                    adminAPI.tokenProvider = { apiURL ->
-                        tokenManager.accessTokenFor(apiURL)
-                    }
+                    adminAPI.tokenProvider = tokenProvider
                     routing = {
                         route("${prefix}api") {
                             logger.info { "Configuring API routes: ${prefix}api" }
@@ -90,19 +88,18 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                     }
                 }
             }
-        // TODO proxy
-        tokenManager.httpProxyUrl = httpProxyUrl
+        tokenProvider.httpProxyUrl = httpProxyUrl
 
         if (adminTuClientId != "") {
-            tokenManager.registerAdminCredentials(DirectoryEnvironment.tu, adminTuClientId, adminTuClientSecret)
+            tokenProvider.registerAdminCredentials(DirectoryEnvironment.tu, adminTuClientId, adminTuClientSecret)
         }
 
         if (adminRuClientId != "") {
-            tokenManager.registerAdminCredentials(DirectoryEnvironment.ru, adminRuClientId, adminRuClientSecret)
+            tokenProvider.registerAdminCredentials(DirectoryEnvironment.ru, adminRuClientId, adminRuClientSecret)
         }
 
         if (adminPuClientId != "") {
-            tokenManager.registerAdminCredentials(DirectoryEnvironment.pu, adminPuClientId, adminPuClientSecret)
+            tokenProvider.registerAdminCredentials(DirectoryEnvironment.pu, adminPuClientId, adminPuClientSecret)
         }
 
         server.start(wait = true)

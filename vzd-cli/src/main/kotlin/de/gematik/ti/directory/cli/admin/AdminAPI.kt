@@ -5,6 +5,8 @@ import de.gematik.ti.directory.DirectoryAuthException
 import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.GlobalAPI
+import de.gematik.ti.directory.cli.bff.TokenProvider
+import de.gematik.ti.directory.cli.bff.TokenStoreTokenProvider
 import de.gematik.ti.directory.cli.util.FileObjectStore
 import de.gematik.ti.directory.cli.util.KeyStoreVault
 import de.gematik.ti.directory.cli.util.KeyStoreVaultProvider
@@ -53,10 +55,7 @@ class AdminAPI(
 ) {
     val config by lazy { loadConfig() }
 
-    var tokenProvider: (apiURL: String) -> String? = { apiURL ->
-        val tokenStore = TokenStore()
-        tokenStore.accessTokenFor(apiURL)?.accessToken
-    }
+    var tokenProvider: TokenProvider = TokenStoreTokenProvider()
 
     fun createClient(env: AdminEnvironment): Client {
         val envConfig = config.environment(env)
@@ -65,7 +64,7 @@ class AdminAPI(
                 apiURL = envConfig.apiURL
                 auth {
                     accessToken {
-                        tokenProvider(envConfig.apiURL) ?: throw DirectoryAuthException("You are not logged in to environment: $env")
+                        tokenProvider.accessTokenFor(envConfig.apiURL) ?: throw DirectoryAuthException("You are not logged in to environment: $env")
                     }
                 }
                 if (globalAPI.config.httpProxy.enabled) {
@@ -92,6 +91,7 @@ class AdminAPI(
     fun openVault(vaultPassword: String): KeyStoreVault = KeyStoreVaultProvider().open(vaultPassword, SERVICE_NAME)
 
     suspend fun status(includeBackendInfo: Boolean = false): AdminStatus {
+        tokenProvider.updateTokens()
         // force reload from file in case smth changed in between the requests
         val config = loadConfig()
         val envInfoList =
@@ -106,9 +106,15 @@ class AdminAPI(
                     } else {
                         null
                     }
+                val accessible = try {
+                    tokenProvider.accessTokenFor(it.value.apiURL) != null
+                } catch (e: Exception) {
+                    logger.error(e) { "Error while checking environment status: ${it.key}" }
+                    false
+                }
                 AdminEnvironmentStatus(
                     it.key,
-                    tokenProvider(it.value.apiURL) != null,
+                    accessible,
                     backendInfo,
                 )
             }
