@@ -27,6 +27,10 @@ export class AppComponent implements OnInit {
     return this.router.url.startsWith(link)
   }
 
+  public isSettingsAvailable() {
+    return this.navigationService.settingsAvailable
+  }
+
   public ngOnInit(): void {
     this.navigationService.update()
     this.titleService.setTitle("gematik Directory")

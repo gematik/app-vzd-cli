@@ -22,7 +22,7 @@ class TestLog :
                         runCLI(listOf("admin", "tu", "log", "--json", "-t", telematikID)),
                     )
                 try {
-                    runCLI(listOf("admin", "tu", "add-base", "-s", "telematikID=$telematikID", "-s", "entryType=1"))
+                    runCLI(listOf("admin", "tu", "add-base", "-s", "telematikID=$telematikID", "-s", "entryType=1", "-s", "postalCode=12345", "-s", "displayName=Test-vzd-cli", "-s", "specialization=urn:as:1.2.276.0.76.5.514:141002"))
                 } catch (e: Exception) {
                     // OK to ignore this error
                 }

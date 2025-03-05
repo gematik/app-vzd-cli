@@ -36,16 +36,14 @@ class AdminResponseException(
     response: HttpResponse,
     message: String
 ) : ResponseException(response, message) {
-    val directoryError: Error?
-        get() {
-            return runBlocking {
+    companion object {
+        private fun parseDirectoryError(response: HttpResponse): Error? =
+            runBlocking {
                 runCatching { response.body<Error>() }.getOrNull()
             }
-        }
-    val details: String
-        get() {
 
-            val error = directoryError
+        fun detailsFromResponse(response: HttpResponse): String {
+            val error = parseDirectoryError(response)
             if (error != null) {
                 return error.message
             }
@@ -63,6 +61,12 @@ class AdminResponseException(
             }
 
             return details
+        }
+    }
+
+    val details: String
+        get() {
+            return detailsFromResponse(response)
         }
 }
 
@@ -145,7 +149,7 @@ class Client(
         if (response.status != HttpStatusCode.Created) {
             throw AdminResponseException(
                 response,
-                "Unable to create directory entry: ${response.status.description} ${response.status.description}",
+                AdminResponseException.detailsFromResponse(response),
             )
         }
 

@@ -2,8 +2,11 @@ package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.ClientCredentialsAuthenticator
 import de.gematik.ti.directory.DirectoryAuthException
+import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.GlobalAPI
+import de.gematik.ti.directory.cli.bff.TokenProvider
+import de.gematik.ti.directory.cli.bff.TokenStoreTokenProvider
 import de.gematik.ti.directory.cli.util.FileObjectStore
 import de.gematik.ti.directory.cli.util.KeyStoreVault
 import de.gematik.ti.directory.cli.util.KeyStoreVaultProvider
@@ -38,7 +41,7 @@ internal class AdminConfigFileStore(
 @Serializable
 data class AdminEnvironmentStatus(
     val env: String,
-    val accessTokenClaims: Map<String, String>?,
+    val accessible: Boolean,
     val backendInfo: InfoObject?,
 )
 
@@ -52,18 +55,16 @@ class AdminAPI(
 ) {
     val config by lazy { loadConfig() }
 
+    var tokenProvider: TokenProvider = TokenStoreTokenProvider()
+
     fun createClient(env: AdminEnvironment): Client {
-        val tokenStore = TokenStore()
         val envConfig = config.environment(env)
         val client =
             Client {
                 apiURL = envConfig.apiURL
                 auth {
                     accessToken {
-                        tokenStore
-                            .accessTokenFor(
-                                envConfig.apiURL,
-                            )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment: $env")
+                        tokenProvider.accessTokenFor(envConfig.apiURL) ?: throw DirectoryAuthException("You are not logged in to environment: $env")
                     }
                 }
                 if (globalAPI.config.httpProxy.enabled) {
@@ -90,10 +91,9 @@ class AdminAPI(
     fun openVault(vaultPassword: String): KeyStoreVault = KeyStoreVaultProvider().open(vaultPassword, SERVICE_NAME)
 
     suspend fun status(includeBackendInfo: Boolean = false): AdminStatus {
+        tokenProvider.updateTokens()
         // force reload from file in case smth changed in between the requests
-        val tokenStore = TokenStore()
         val config = loadConfig()
-        tokenStore.removeExpired()
         val envInfoList =
             config.environments.map {
                 val backendInfo =
@@ -106,9 +106,16 @@ class AdminAPI(
                     } else {
                         null
                     }
+                val accessible =
+                    try {
+                        tokenProvider.accessTokenFor(it.value.apiURL) != null
+                    } catch (e: Exception) {
+                        logger.error(e) { "Error while checking environment status: ${it.key}" }
+                        false
+                    }
                 AdminEnvironmentStatus(
                     it.key,
-                    tokenStore.claimsFor(it.value.apiURL),
+                    accessible,
                     backendInfo,
                 )
             }

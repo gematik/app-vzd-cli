@@ -5,7 +5,6 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 private val logger = KotlinLogging.logger {}
@@ -24,32 +23,6 @@ class TestClient {
                 runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }
             }
         }
-    }
-
-    @Test
-    fun testCreateWithOnlyTelematikID() {
-        val entries = runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID")) }
-        entries?.forEach {
-            runBlocking { client?.deleteDirectoryEntry(it.directoryEntryBase.dn!!.uid) }
-            return
-        }
-
-        val baseDirectoryEntry = BaseDirectoryEntry(telematikID = "vzd-cli-only-telematikID", entryType = listOf("1"))
-        val directoryEntry = CreateDirectoryEntry(baseDirectoryEntry)
-        val dn = runBlocking { client?.addDirectoryEntry(directoryEntry) }
-        assertNotNull(dn)
-
-        val loadedDirectoryEntry =
-            runBlocking { client?.readDirectoryEntry(mapOf("telematikID" to "vzd-cli-only-telematikID")) }
-        assertEquals(1, loadedDirectoryEntry?.size)
-        assertEquals(
-            dn.uid,
-            loadedDirectoryEntry
-                ?.first()
-                ?.directoryEntryBase
-                ?.dn
-                ?.uid,
-        )
     }
 
     @Test

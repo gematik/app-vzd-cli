@@ -10,7 +10,7 @@ export interface InfoObject {
 
 export interface AdminEnvironmentStatus {
   env: string
-  accessTokenClaims?: Map<String, any>,
+  accessible: boolean,
   backendInfo?: InfoObject | null
 }
 
