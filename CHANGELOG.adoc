@@ -1,5 +1,9 @@
 = Changelog `vzd-cli`
 
+== Version 3.2.1
+
+- `dump ocsp` hat nun die beiden Parameter `--delay INT` und `--concurrency INT`
+
 == Version 3.2.0
 
 - Client kann jetzt als Backend for Frontend (BFF) für die Web-GUI verwendet werden `vzd-cli bff start`. Konfiguration erfolgt über die Umgebungsvariablen.
