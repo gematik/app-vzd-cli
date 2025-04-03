@@ -2,7 +2,7 @@
 
 == Version 3.2.1
 
-- `dump ocsp` hat nun die beiden Parameter `--delay INT` und `--concurrency INT`
+- `vzd-cli admin <ru|tu|pu> dump ocsp` hat nun die neue Parameter `--delay INT` und `--concurrency INT`
 
 == Version 3.2.0
 
