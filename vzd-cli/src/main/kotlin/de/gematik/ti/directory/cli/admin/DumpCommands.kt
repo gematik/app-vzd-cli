@@ -21,6 +21,7 @@ import de.gematik.ti.directory.elaborate.elaborate
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import de.gematik.ti.directory.pki.OCSPResponseCertificateStatus
 import de.gematik.ti.directory.util.escape
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -188,9 +189,19 @@ class DumpCreateCommand : CliktCommand(name = "create", help = "Create dump fetc
 class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests for each entry in the dump") {
     private val context by requireObject<AdminCliEnvironmentContext>()
 
+    private val requestDelay by option(
+        "--delay",
+        help = "Delay between processing entries in milliseconds",
+    ).int().default(0)
+
+    private val concurrency by option(
+        "--concurrency",
+        help = "Maximum number of concurrent OCSP requests",
+    ).int().default(20)
+
     override fun run() =
         catching {
-            val semaphore = Semaphore(20)
+            val semaphore = Semaphore(concurrency)
 
             var entries = 0
             // initialize lazy variable before coroutines
@@ -212,12 +223,15 @@ class DumpOcspCommand : CliktCommand(name = "ocsp", help = "Make OCSP-Requests f
                                         }
                                     }
                                     println(ndjson.encodeToString(entry))
+                                    if (requestDelay > 0) {
+                                        delay(requestDelay.toLong())
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            logger.info { "Processed $entries entries in ${elapsed / 1000} seconds" }
+            logger.info { "Processed $entries entries in ${elapsed / 1000} seconds with concurrency=$concurrency and delay=$requestDelay ms" }
         }
 }
 
