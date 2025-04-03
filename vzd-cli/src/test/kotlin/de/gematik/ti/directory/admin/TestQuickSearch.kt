@@ -23,8 +23,8 @@ class TestQuickSearch :
             }
             scenario("Search by displayName and locationName") {
                 runBlocking {
-                    val result = client?.quickSearch("Siegfried Klön Berlin")?.directoryEntries ?: emptyList()
-                    result.first().directoryEntryBase.telematikID shouldBe "1-SMC-B-Testkarte-883110000100535"
+                    val result = client?.quickSearch("Siegfried Graf Otís Hamburg")?.directoryEntries ?: emptyList()
+                    result.first().directoryEntryBase.telematikID shouldBe "1-SMC-B-Testkarte--883110000162002"
                 }
             }
             scenario("Search by postalCode") {
