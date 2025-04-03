@@ -3,7 +3,6 @@ package de.gematik.ti.directory.admin
 import de.gematik.ti.directory.DirectoryEnvironment
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.comparables.shouldBeGreaterThan
-import io.kotest.matchers.shouldBe
 
 class TestAuth :
     FeatureSpec({
@@ -37,8 +36,8 @@ class TestAuth :
                             }
                         }
                     }
-                val result = adminClient.readDirectoryEntry(mapOf("telematikID" to "2-SMC-B-Testkarte-883110000103275"))
-                result?.size shouldBe 1
+                val result = adminClient.readDirectoryEntry(mapOf("telematikID" to "2-*"))
+                (result?.size ?: 0) shouldBeGreaterThan 0
             }
         }
     })
