@@ -28,7 +28,7 @@ ng serve
 
 === Release im github veröffentlichen 
 
-Änderungen zur Vorversion in link:CHANGELOG.adoc[CHANGELOG] dokumentieren.
+Änderungen zur Vorversion in link:ReleaseNotes.adoc[ReleaseNotes] dokumentieren.
 
 [source,bash]
 ----
