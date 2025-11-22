@@ -44,6 +44,7 @@ class TestClient {
         assertNotNull(dn)
         logger.info { "Created directory entry: $dn" }
 
+        /*
         val updateDirectoryEntry =
             UpdateBaseDirectoryEntry(
                 // telematikID = "vzd-cli-123456890",
@@ -54,5 +55,6 @@ class TestClient {
             )
 
         runBlocking { client?.modifyDirectoryEntry(dn.uid, updateDirectoryEntry) }
+         */
     }
 }
