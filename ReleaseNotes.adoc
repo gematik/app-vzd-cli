@@ -4,6 +4,7 @@
 
 - Bugfix: Editieren des Attributs `specialization` in der GUI funktionierte nicht korrekt.
 - Aktualisiere der dependencies in GUI Projekt
+- Neue `holder`
 
 == Version 3.2.1
 
