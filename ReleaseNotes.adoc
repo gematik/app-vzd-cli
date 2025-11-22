@@ -1,5 +1,10 @@
 = Changelog `vzd-cli`
 
+== Version 3.2.2
+
+- Bugfix: Editieren des Attributs `specialization` in der GUI funktionierte nicht korrekt.
+- Aktualisiere der dependencies in GUI Projekt
+
 == Version 3.2.1
 
 - `vzd-cli admin <ru|tu|pu> dump ocsp` hat nun die neue Parameter `--delay INT` und `--concurrency INT`
