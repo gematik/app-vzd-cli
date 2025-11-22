@@ -54,6 +54,7 @@ class TemplateCommand :
                 "base" -> {
                     printTemplate(base, outputFormat)
                 }
+
                 "entry" -> {
                     printTemplate(
                         DirectoryEntry(
@@ -69,6 +70,7 @@ class TemplateCommand :
                         outputFormat,
                     )
                 }
+
                 "cert" -> {
                     printTemplate(
                         UserCertificate(
@@ -78,7 +80,10 @@ class TemplateCommand :
                         outputFormat,
                     )
                 }
-                else -> throw UsageError("Undefinded resource type: $resourceType")
+
+                else -> {
+                    throw UsageError("Undefinded resource type: $resourceType")
+                }
             }
         }
 
@@ -87,14 +92,21 @@ class TemplateCommand :
         outputFormat: RepresentationFormat,
     ) {
         when (outputFormat) {
-            RepresentationFormat.JSON ->
+            RepresentationFormat.JSON -> {
                 when (template) {
                     is BaseDirectoryEntry -> echo(template.toJsonPretty())
                     is DirectoryEntry -> echo(template.toJsonPretty())
                     is UserCertificate -> echo(template.toJsonPretty())
                 }
-            RepresentationFormat.YAML -> echo(template.toYaml())
-            else -> throw UsageError("Templates are not available for format: $outputFormat")
+            }
+
+            RepresentationFormat.YAML -> {
+                echo(template.toYaml())
+            }
+
+            else -> {
+                throw UsageError("Templates are not available for format: $outputFormat")
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ class TestModifyBaseAttr :
             entry.directoryEntryBase?.displayName = "Test vzd-cli"
             entry.directoryEntryBase?.postalCode = "12345"
             entry.directoryEntryBase?.specialization = listOf("urn:as:1.2.276.0.76.5.514:141002")
+            entry.directoryEntryBase?.countryCode = "DE"
             val uid = client.addDirectoryEntry(entry).uid
             state = TestState(client, telematikID, uid)
         }
