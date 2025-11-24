@@ -160,6 +160,7 @@ class PKIClient(
                         }
                         return OCSPResponse(OCSPResponseCertificateStatus.GOOD)
                     }
+
                     is UnknownStatus -> {
                         logger.info {
                             "Certificate is unknown by the OCSP server subject='${eeCert.subjectX500Principal}', serialNumber='${ocspReq.requestList[0].certID.serialNumber}', issuer='${issuerCert.subjectX500Principal}'"
@@ -169,6 +170,7 @@ class PKIClient(
                             "Certificate is unknown by the OCSP server",
                         )
                     }
+
                     is RevokedStatus -> {
                         val reason = if (certStatus.hasRevocationReason()) certStatus.revocationReason else "none"
                         OCSPResponse(
@@ -176,11 +178,13 @@ class PKIClient(
                             "Revocation reason: '$reason' at ${certStatus.revocationTime}",
                         )
                     }
-                    else ->
+
+                    else -> {
                         OCSPResponse(
                             OCSPResponseCertificateStatus.ERROR,
                             "Unknown status: $certStatus",
                         )
+                    }
                 }
 
             return result

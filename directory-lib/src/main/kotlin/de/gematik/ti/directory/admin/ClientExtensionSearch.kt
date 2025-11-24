@@ -127,12 +127,15 @@ private fun extractFixedParams(tokenizerResult: TokenizerResult): Pair<Map<Strin
                     TokenType.TelematikID -> {
                         put("telematikID", tokenizerResult.tokens[position.range.first].trailingAsterisk())
                     }
+
                     TokenType.PostalCode -> {
                         put("postalCode", tokenizerResult.tokens[position.range.first])
                     }
+
                     TokenType.DomainID -> {
                         put("domainID", tokenizerResult.tokens[position.range.first].trailingAsterisk())
                     }
+
                     else -> {
                         namesAndLocalities.add(position)
                     }

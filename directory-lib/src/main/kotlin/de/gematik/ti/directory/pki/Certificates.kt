@@ -62,14 +62,30 @@ data class CertificateDataDER(
             val keyUsage = mutableListOf<String>()
             certificate.keyUsage?.forEachIndexed { index, element ->
                 when (index) {
-                    0 -> if (element) keyUsage.add("digitalSignature") // digitalSignature        (0)
-                    1 -> if (element) keyUsage.add("nonRepudiation") // nonRepudiation          (1)
-                    2 -> if (element) keyUsage.add("keyEncipherment") // keyEncipherment         (2)
-                    3 -> if (element) keyUsage.add("dataEncipherment") // dataEncipherment        (3)
-                    4 -> if (element) keyUsage.add("keyAgreement") // keyAgreement            (4)
-                    5 -> if (element) keyUsage.add("keyCertSign") // keyCertSign             (5)
-                    6 -> if (element) keyUsage.add("cRLSign") // cRLSign                 (6)
-                    7 -> if (element) keyUsage.add("encipherOnly") // encipherOnly            (7)
+                    0 -> if (element) keyUsage.add("digitalSignature")
+
+                    // digitalSignature        (0)
+                    1 -> if (element) keyUsage.add("nonRepudiation")
+
+                    // nonRepudiation          (1)
+                    2 -> if (element) keyUsage.add("keyEncipherment")
+
+                    // keyEncipherment         (2)
+                    3 -> if (element) keyUsage.add("dataEncipherment")
+
+                    // dataEncipherment        (3)
+                    4 -> if (element) keyUsage.add("keyAgreement")
+
+                    // keyAgreement            (4)
+                    5 -> if (element) keyUsage.add("keyCertSign")
+
+                    // keyCertSign             (5)
+                    6 -> if (element) keyUsage.add("cRLSign")
+
+                    // cRLSign                 (6)
+                    7 -> if (element) keyUsage.add("encipherOnly")
+
+                    // encipherOnly            (7)
                     8 -> if (element) keyUsage.add("decipherOnly") // decipherOnly            (8)
                 }
             }
