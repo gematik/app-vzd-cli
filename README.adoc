@@ -662,9 +662,13 @@ vzd-cli fhir ru search pr -t 1-1234567890
 
 == License
 
-Copyright 2022-2025 gematik GmbH; created by gematik GmbH employees.
+Copyright 2022-2025 gematik GmbH
 
-link:LICENSE[MIT License]
+EUROPEAN UNION PUBLIC LICENCE v. 1.2
+
+EUPL © the European Union 2007, 2016
+
+See the `link:./LICENSE[LICENSE]` for the specific language governing permissions and limitations under the License
 
 == Additional Notes and Disclaimer from gematik GmbH
 
