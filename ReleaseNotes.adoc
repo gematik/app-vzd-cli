@@ -7,6 +7,7 @@
   - `vzd-cli fhir download <telematikID> <filename>`: lädt den FHIR Eintrag mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
   - `vzd-cli fhir upload <filename>`: lädt den FHIR Eintrag aus der angegebenen Datei in das Verzeichnis hoch (erstellt oder aktualisiert den Eintrag)
 - ApoVZD Unterstützung wurde entfernt
+- `vzd-cli admin <ru|tu|pu> log <TELEMATIK_ID>` - TelematikID kann jetzt auch ohne option `-t` angegeben werden
 - Bugfixes
 
 == Version 3.2.2

@@ -24,14 +24,14 @@ class ShowCommand : CliktCommand(name = "show", help = "Show all information abo
         ).default(RepresentationFormat.HUMAN)
     private val ocspOptions by OcspOptions()
     private val context by requireObject<AdminCliEnvironmentContext>()
-    private val id by argument()
+    private val telematikID by argument("TELEMATIK_ID", help = "Telematik-ID of an entry to show")
 
     override fun run() =
         catching {
             val client = context.client
             val entry =
-                runBlocking { client.readDirectoryEntryByTelematikID(id) }
-                    ?: throw CliktError("Entry with TelematikID '$id' not found")
+                runBlocking { client.readDirectoryEntryByTelematikID(telematikID) }
+                    ?: throw CliktError("Entry with TelematikID '$telematikID' not found")
 
             if (ocspOptions.enableOcsp) {
                 runBlocking { context.adminAPI.expandOCSPStatus(listOf(entry)) }

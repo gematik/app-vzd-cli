@@ -20,7 +20,7 @@ class ShowCommand : CliktCommand(name = "show", help = "SHows all Data of a sing
             "--human" to OutputFormat.HUMAN,
         ).default(OutputFormat.HUMAN)
 
-    private val telematikID by argument("TELEMATIK_ID", help = "Telematik-ID of the entry")
+    private val telematikID by argument("TELEMATIK_ID", help = "Telematik-ID of an entry to show")
 
     override fun run() =
         catching {
