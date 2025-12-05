@@ -1,9 +1,9 @@
 package de.gematik.ti.directory.fhir
 
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.parser.IParser
 import de.gematik.ti.directory.DirectoryAuthPlugin
 import de.gematik.ti.directory.DirectoryAuthPluginConfig
-import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.DirectoryException
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -16,11 +16,12 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 val FHIR_R4 = FhirContext.forR4()
@@ -30,82 +31,6 @@ private val JSON =
         ignoreUnknownKeys = true
         prettyPrint = true
     }
-
-val DefaultConfig =
-    Config(
-        environments =
-            mapOf(
-                "tu" to
-                    EnvironmentConfig(
-                        search =
-                            SearchConfig(
-                                apiURL = "https://fhir-directory-tu.vzd.ti-dienste.de/search",
-                            ),
-                        fdv =
-                            FdvConfig(
-                                apiURL = "https://fhir-directory-tu.vzd.ti-dienste.de/fdv/search",
-                                authenticationEndpoint = "https://auth-test.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
-                                authorizationEndpoint = "https://fhir-directory-tu.vzd.ti-dienste.de/service-authenticate",
-                            ),
-                    ),
-                "ru" to
-                    EnvironmentConfig(
-                        search =
-                            SearchConfig(
-                                apiURL = "https://fhir-directory-ref.vzd.ti-dienste.de/search",
-                            ),
-                        fdv =
-                            FdvConfig(
-                                apiURL = "https://fhir-directory-ref.vzd.ti-dienste.de/fdv/search",
-                                authenticationEndpoint = "https://auth-ref.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
-                                authorizationEndpoint = "https://fhir-directory-ref.vzd.ti-dienste.de/service-authenticate",
-                            ),
-                    ),
-                "pu" to
-                    EnvironmentConfig(
-                        search =
-                            SearchConfig(
-                                apiURL = "https://fhir-directory.vzd.ti-dienste.de/search",
-                            ),
-                        fdv =
-                            FdvConfig(
-                                apiURL = "https://fhir-directory.vzd.ti-dienste.de/fdv/search",
-                                authenticationEndpoint = "https://auth.vzd.ti-dienste.de:9443/auth/realms/Service-Authenticate/protocol/openid-connect/token",
-                                authorizationEndpoint = "https://fhir-directory.vzd.ti-dienste.de/service-authenticate",
-                            ),
-                    ),
-            ),
-    )
-
-class ConfigException(
-    message: String,
-    cause: Throwable? = null
-) : DirectoryException(message, cause)
-
-@Serializable
-data class Config(
-    val environments: Map<String, EnvironmentConfig>,
-) {
-    fun environment(env: DirectoryEnvironment) = environments[env.name] ?: throw ConfigException("Unknown environment: ${env.name}")
-}
-
-@Serializable
-data class EnvironmentConfig(
-    val search: SearchConfig,
-    val fdv: FdvConfig,
-)
-
-@Serializable
-data class SearchConfig(
-    val apiURL: String,
-)
-
-@Serializable
-data class FdvConfig(
-    val apiURL: String,
-    val authenticationEndpoint: String,
-    val authorizationEndpoint: String,
-)
 
 enum class SearchResource(
     val resourceType: ResourceType
@@ -133,30 +58,20 @@ class SearchQuery(
 class Client(
     block: Configurator.() -> Unit = {}
 ) {
+    private val logger = KotlinLogging.logger {}
     private val configurator: Configurator = Configurator()
     private val envConfig: EnvironmentConfig
-    private val httpClientFdv: HttpClient get() {
-        val httpClient by lazy { createHttpClient(envConfig.fdv.apiURL, configurator.authFdvBlock) }
-        return httpClient
-    }
-    private val httpClientSearch: HttpClient get() {
-        val httpClient by lazy { createHttpClient(envConfig.search.apiURL, configurator.authSearchBlock) }
-        return httpClient
-    }
-    val logger = KotlinLogging.logger {}
+
+    private val httpClient: HttpClient
 
     class Configurator {
         var envConfig: EnvironmentConfig? = null
         var httpProxyURL: String? = null
         internal var authFdvBlock: DirectoryAuthPluginConfig.() -> Unit = {}
-        internal var authSearchBlock: DirectoryAuthPluginConfig.() -> Unit = {}
+        internal var auth: DirectoryAuthPluginConfig.() -> Unit = {}
 
-        fun authFdv(block: DirectoryAuthPluginConfig.() -> Unit) {
-            authFdvBlock = block
-        }
-
-        fun authSearch(block: DirectoryAuthPluginConfig.() -> Unit) {
-            authSearchBlock = block
+        fun auth(block: DirectoryAuthPluginConfig.() -> Unit) {
+            auth = block
         }
     }
 
@@ -204,12 +119,26 @@ class Client(
     init {
         block(configurator)
         this.envConfig = configurator.envConfig ?: throw ConfigException("No environment configured")
+        httpClient =
+            createHttpClient(
+                envConfig.search.apiURL,
+                configurator.auth,
+            )
     }
 
-    suspend fun search(query: SearchQuery): Bundle {
+    suspend fun searchFdv(query: SearchQuery,) = doSearch("/fdv/search", query)
+
+    suspend fun search(query: SearchQuery,) = doSearch("/search", query)
+
+    suspend fun searchOwner(query: SearchQuery,) = doSearch("/owner", query)
+
+    suspend fun doSearch(
+        searchBasePath: String,
+        query: SearchQuery,
+    ): Bundle {
         logger.debug { "Searching ${query.resource.name} with query: ${query.params}" }
         val response =
-            httpClientSearch.get("/search/${query.resource.name}") {
+            httpClient.get("$searchBasePath/${query.resource.name}") {
                 query.params.forEach { (key, values) ->
                     values.forEach { value ->
                         parameter(key, value)
@@ -220,40 +149,51 @@ class Client(
     }
 
     private suspend fun handleSearchResponse(response: HttpResponse): Bundle {
-        val body = response.body<String>()
         val parser = FHIR_R4.newJsonParser()
 
         if (response.status != HttpStatusCode.OK) {
-            var exc: DirectoryException?
-
-            try {
-                val outcome = parser.parseResource(OperationOutcome::class.java, body)
-                exc = DirectoryException(outcome.issue.joinToString { it.diagnostics })
-            } catch (e: Exception) {
-                if (response.status == HttpStatusCode.Unauthorized) {
-                    exc = DirectoryException("Unauthorized. Please use `vzd-cli login` first.")
-                } else {
-                    exc = DirectoryException("Search failed: ${response.status} $body")
-                }
-            }
-
-            throw exc!!
+            throw parseError(parser, response)
         }
+
+        val body = response.body<String>()
         val bundle = parser.parseResource(Bundle::class.java, body)
         logger.debug { "Got search response bundle with ${bundle.total} resources." }
         return bundle
     }
 
-    suspend fun searchFdv(query: SearchQuery): Bundle {
-        logger.debug { "Searching ${query.resource.name} with query: ${query.params}" }
-        val response =
-            httpClientFdv.get("/fdv/search/${query.resource.name}") {
-                query.params.forEach { (key, values) ->
-                    values.forEach { value ->
-                        parameter(key, value)
-                    }
-                }
+    private fun parseError(
+        parser: IParser,
+        response: HttpResponse
+    ): DirectoryException {
+        var exc: DirectoryException? = null
+
+        val body = runBlocking { response.body<String>() }
+
+        try {
+            val outcome = parser.parseResource(OperationOutcome::class.java, body)
+            exc = DirectoryException(outcome.issue.joinToString { it.diagnostics })
+        } catch (e: Exception) {
+            if (response.status == HttpStatusCode.Unauthorized) {
+                exc = DirectoryException("Unauthorized. Please use `vzd-cli login` first.")
+            } else {
+                exc = DirectoryException("Search failed: ${response.status} $body")
             }
-        return handleSearchResponse(response)
+        }
+        return exc!!
+    }
+
+    suspend fun put(resource: Resource) {
+        val body = FHIR_R4.newJsonParser().encodeResourceToString(resource)
+
+        val response =
+            httpClient.put("/owner/${resource.resourceType.name}/${resource.idElement.idPart}") {
+                contentType(ContentType.parse("application/fhir+json"))
+                setBody(body)
+            }
+
+        val parser = FHIR_R4.newJsonParser()
+        if (response.status != HttpStatusCode.OK) {
+            throw parseError(parser, response)
+        }
     }
 }

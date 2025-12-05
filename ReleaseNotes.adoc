@@ -1,5 +1,14 @@
 = Changelog `vzd-cli`
 
+== Version 3.3.0
+
+- Ergänzt um holder login (`vzd-cli fhir login`)
+- Neue FHIR Befehle:
+  - `vzd-cli fhir download <telematikID> <filename>`: lädt den FHIR Eintrag mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
+  - `vzd-cli fhir upload <filename>`: lädt den FHIR Eintrag aus der angegebenen Datei in das Verzeichnis hoch (erstellt oder aktualisiert den Eintrag)
+- ApoVZD Unterstützung wurde entfernt
+- Bugfixes
+
 == Version 3.2.2
 
 - Bugfix: Editieren des Attributs `specialization` in der GUI funktionierte nicht korrekt.

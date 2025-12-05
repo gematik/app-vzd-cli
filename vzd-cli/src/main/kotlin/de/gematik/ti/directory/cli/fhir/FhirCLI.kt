@@ -3,9 +3,9 @@ package de.gematik.ti.directory.cli.fhir
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.subcommands
-import com.github.ajalt.clikt.parameters.arguments.help
 import com.github.ajalt.clikt.parameters.options.option
 import de.gematik.ti.directory.DirectoryEnvironment
+import de.gematik.ti.directory.cli.EditCommand
 import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.VaultCommand
 import de.gematik.ti.directory.cli.catching
@@ -50,11 +50,16 @@ class EnvironmentCommands(
 
     init {
         subcommands(
-            FdvCommands(),
+            LoginHolderCommand(),
             SearchTokenCommand(),
+            FdvCommands(),
             SearchCommand { ctx, query ->
                 ctx.client.search(query)
             },
+            ShowCommand(),
+            EditCommand(),
+            DownloadCommand(),
+            UploadCommand(),
         )
     }
 

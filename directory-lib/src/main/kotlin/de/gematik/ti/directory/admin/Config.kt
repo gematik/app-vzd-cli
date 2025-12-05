@@ -26,16 +26,11 @@ val DefaultConfig =
             ),
     )
 
-class ConfigException(
-    message: String,
-    cause: Throwable? = null
-) : DirectoryException(message, cause)
-
 @Serializable
 data class Config(
     val environments: Map<String, EnvironmentConfig>,
 ) {
-    fun environment(env: DirectoryEnvironment) = environments[env.name] ?: throw ConfigException("Unknown environment: ${env.name}")
+    fun environment(env: DirectoryEnvironment) = environments[env.name] ?: throw DirectoryException("Unknown environment: ${env.name}")
 }
 
 @Serializable

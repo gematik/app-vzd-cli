@@ -215,4 +215,12 @@ class GlobalAPI {
     fun saveCache(tslCache: ListOfTrustedServiceLists) {
         cachePath.writeText(yaml.encodeToString(tslCache))
     }
+
+    val httpProxyOrNull: String? get() {
+        if (config.httpProxy.enabled) {
+            return config.httpProxy.proxyURL
+        } else {
+            return null
+        }
+    }
 }
