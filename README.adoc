@@ -704,7 +704,7 @@ Editieren des FHIR Eintrags mit der angegebenen TelematikID in einem Text-Editor
 vzd-cli fhir ru edit 1-1234567890
 ----
 
-`=== `vzd-cli fhir <tu|ru|pu> download`
+=== `vzd-cli fhir <tu|ru|pu> download`
 
 Lädt den FHIR Eintrag mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
 .*Beispiel*
