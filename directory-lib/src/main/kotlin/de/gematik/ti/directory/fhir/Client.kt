@@ -24,7 +24,7 @@ import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-val FHIR_R4 = FhirContext.forR4()
+val FHIR_R4: FhirContext = FhirContext.forR4()
 
 private val JSON =
     Json {
@@ -67,7 +67,6 @@ class Client(
     class Configurator {
         var envConfig: EnvironmentConfig? = null
         var httpProxyURL: String? = null
-        internal var authFdvBlock: DirectoryAuthPluginConfig.() -> Unit = {}
         internal var auth: DirectoryAuthPluginConfig.() -> Unit = {}
 
         fun auth(block: DirectoryAuthPluginConfig.() -> Unit) {
@@ -126,11 +125,11 @@ class Client(
             )
     }
 
-    suspend fun searchFdv(query: SearchQuery,) = doSearch("/fdv/search", query)
+    suspend fun searchFdv(query: SearchQuery) = doSearch("/fdv/search", query)
 
-    suspend fun search(query: SearchQuery,) = doSearch("/search", query)
+    suspend fun search(query: SearchQuery) = doSearch("/search", query)
 
-    suspend fun searchOwner(query: SearchQuery,) = doSearch("/owner", query)
+    suspend fun searchOwner(query: SearchQuery) = doSearch("/owner", query)
 
     suspend fun doSearch(
         searchBasePath: String,
@@ -165,19 +164,20 @@ class Client(
         parser: IParser,
         response: HttpResponse
     ): DirectoryException {
-        var exc: DirectoryException? = null
+        var exc: DirectoryException?
 
         val body = runBlocking { response.body<String>() }
 
         try {
             val outcome = parser.parseResource(OperationOutcome::class.java, body)
             exc = DirectoryException(outcome.issue.joinToString { it.diagnostics })
-        } catch (e: Exception) {
-            if (response.status == HttpStatusCode.Unauthorized) {
-                exc = DirectoryException("Unauthorized. Please use `vzd-cli login` first.")
-            } else {
-                exc = DirectoryException("Search failed: ${response.status} $body")
-            }
+        } catch (_: Exception) {
+            exc =
+                if (response.status == HttpStatusCode.Unauthorized) {
+                    DirectoryException("Unauthorized. Please use `vzd-cli login` first.")
+                } else {
+                    DirectoryException("Search failed: ${response.status} $body")
+                }
         }
         return exc!!
     }

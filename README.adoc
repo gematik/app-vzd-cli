@@ -34,9 +34,9 @@ Commands:
   login                Logins into all configured APIs
   admin                CLI for DirectoryAdministration API
   fhir                 CLI for FHIR Directory
-  apo                  CLI for ApoVZD API
   gui                  Starts HTTP Server with GUI
   pers                 Process gematik SMC-B/HBA Exports
+  bff                  CLI to run client as microservice backend for frontend
   generate-completion  Generate a tab-complete script for the given shell
 ----
 
@@ -140,6 +140,8 @@ Die Anmeldung muss alle 6 Stunden wiederholt werden.
 
 [source,bash]
 ----
+# In alle Umgebungen / alle konfigurierte APIs anmelden
+vzd-cli login
 # Anmelden in die Referenzumgebung (ru)
 # es folgt eine Vault-Passwortabfrage
 vzd-cli login ru
@@ -176,15 +178,41 @@ vzd-cli admin ru search Müller Berlin
 vzd-cli admin ru show 1-SMC-B-Testkarte-883110000117729
 ----
 
-.*(Neu) Beispiel:* Suche nach einträgen in der FHIR FDV Search API in der Produktivumgebung (`pu`)
+.*(Neu) Beispiel:* Suche nach Einträgen in der FHIR FDV Search API in der Produktivumgebung (`ru`)
 [source,bash]
 ----
-vzd-cli fhir pu fdv search healthcare-service -t <TelematikID>
-vzd-cli fhir pu fdv search practitioner-role -t <TelematikID>
+vzd-cli fhir ru search healthcare-service -t <TelematikID>
+vzd-cli fhir ru earch practitioner-role -t <TelematikID>
 # oder in Kurzform
-vzd-cli fhir pu fdv search hs -t <TelematikID>
-vzd-cli fhir pu fdv search pr -t <TelematikID>
+vzd-cli fhir ru search hs -t <TelematikID>
+vzd-cli fhir ru search pr -t <TelematikID>
 ----
+
+.*(Neu) Beispiel:* Zeigen der Detailinformationen für die angegebene telematikID in der FHIR FDV Search API in der Referenzumgebung (`ru`)
+[source,bash]
+----
+vzd-cli fhir ru show <TelematikID>
+----
+
+.*(Neu) Beispiel:* Editieren des Eintrags mit der angegebenen TelematikID in der Referenzumgebung (`ru`)
+[source,bash]
+----
+vzd-cli fhir ru edit <TelematikID>
+----
+
+.*(Neu) Beispiel:* Download des FHIR Eintrags mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
+[source,bash]
+----
+vzd-cli fhir download <TelematikID> <filename>
+----
+
+.*(Neu) Beispiel:* Upload des FHIR Eintrags aus der angegebenen Datei in das Verzeichnis (erstellt oder aktualisiert den Eintrag)
+[source,bash]
+----
+vzd-cli fhir upload <filename>
+----
+
+
 
 == Übergreifende Befehle
 
