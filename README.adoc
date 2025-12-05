@@ -654,7 +654,7 @@ Durch den Befehl `vzd-cli gui` wird ein HTTP Server gestartet und ein neuer Brow
 Anmelden beim FHIR Directory als Holder mit den für admin konfigurierten OAuth2 Client-Credentials aus dem Vault.
 Damit die Anmeldung funktioniert muus man sich als admin angemeldet haben (s. `vzd-cli admin <tu|ru|pu> login` oder `vzd-cli login`).
 
-.*Beispiel:* In alle drei Umgebungen einloggen (vorausgesetzt alle drei ClientIDs sind über `vzd-cli fhir fdv-vault` hinterlegt)
+.*Beispiel:* In alle drei Umgebungen einloggen
 [source,bash]
 ----
 vzd-cli fhir tu login
