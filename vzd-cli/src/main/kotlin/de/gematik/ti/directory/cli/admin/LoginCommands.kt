@@ -15,7 +15,7 @@ private fun doLogin(
     clientID: String,
     clientSecret: String,
 ) {
-    val claims = context.adminAPI.login(env, clientID, clientSecret)
+    val claims = context.adminAPI.login(env, clientID, clientSecret, true)
 
     println("Login to `$env` successful")
 

@@ -16,6 +16,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
@@ -31,6 +32,14 @@ private val JSON =
         ignoreUnknownKeys = true
         prettyPrint = true
     }
+
+enum class Scope(
+    val searchBasePath: String
+) {
+    Search("/search"),
+    Owner("/owner"),
+    Fdv("/fdv/search"),
+}
 
 enum class SearchResource(
     val resourceType: ResourceType
@@ -125,19 +134,19 @@ class Client(
             )
     }
 
-    suspend fun searchFdv(query: SearchQuery) = doSearch("/fdv/search", query)
+    suspend fun searchFdv(query: SearchQuery) = doSearch(Scope.Fdv, query)
 
-    suspend fun search(query: SearchQuery) = doSearch("/search", query)
+    suspend fun search(query: SearchQuery) = doSearch(Scope.Search, query)
 
-    suspend fun searchOwner(query: SearchQuery) = doSearch("/owner", query)
+    suspend fun searchOwner(query: SearchQuery) = doSearch(Scope.Owner, query)
 
-    suspend fun doSearch(
-        searchBasePath: String,
+    private suspend fun doSearch(
+        scope: Scope,
         query: SearchQuery,
     ): Bundle {
-        logger.debug { "Searching ${query.resource.name} with query: ${query.params}" }
+        logger.debug { "Searching ${scope.searchBasePath}/${query.resource.name} with query: ${query.params}" }
         val response =
-            httpClient.get("$searchBasePath/${query.resource.name}") {
+            httpClient.get("${scope.searchBasePath}/${query.resource.name}") {
                 query.params.forEach { (key, values) ->
                     values.forEach { value ->
                         parameter(key, value)
@@ -195,5 +204,61 @@ class Client(
         if (response.status != HttpStatusCode.OK) {
             throw parseError(parser, response)
         }
+    }
+
+    fun findEntry(
+        scope: Scope,
+        telematikID: String,
+        resource: SearchResource? = null,
+    ): Bundle {
+        var practitionerBundle: Bundle? = null
+        var healthcareServiceBundle: Bundle? = null
+
+        runBlocking {
+            val practitionerJob =
+                launch {
+                    if (resource != null && resource != SearchResource.PractitionerRole) {
+                        return@launch
+                    }
+                    val practitionerRoleQuery = SearchQuery(SearchResource.PractitionerRole)
+                    practitionerRoleQuery.addParam(
+                        "practitioner.identifier",
+                        "https://gematik.de/fhir/sid/telematik-id|$telematikID",
+                    )
+                    if (scope != Scope.Owner) {
+                        practitionerRoleQuery.addParam("practitioner.active", "true")
+                    }
+                    practitionerRoleQuery.addParam("_include", "PractitionerRole:practitioner")
+                    practitionerRoleQuery.addParam("_include", "PractitionerRole:location")
+                    practitionerRoleQuery.addParam("_include", "PractitionerRole:endpoint")
+                    practitionerBundle = doSearch(scope, practitionerRoleQuery)
+                }
+            val healthcareServiceJob =
+                launch {
+                    if (resource != null && resource != SearchResource.HealthcareService) {
+                        return@launch
+                    }
+                    val healthcareServiceQuery = SearchQuery(SearchResource.HealthcareService)
+                    healthcareServiceQuery.addParam(
+                        "organization.identifier",
+                        "https://gematik.de/fhir/sid/telematik-id|$telematikID",
+                    )
+                    if (scope != Scope.Owner) {
+                        healthcareServiceQuery.addParam("organization.active", "true")
+                    }
+                    healthcareServiceQuery.addParam("_include", "HealthcareService:organization")
+                    healthcareServiceQuery.addParam("_include", "HealthcareService:location")
+                    healthcareServiceQuery.addParam("_include", "HealthcareService:endpoint")
+                    healthcareServiceBundle = doSearch(scope, healthcareServiceQuery)
+                }
+
+            practitionerJob.join()
+            healthcareServiceJob.join()
+        }
+        val bundle =
+            practitionerBundle?.takeIf { it.total > 0 }
+                ?: healthcareServiceBundle?.takeIf { it.total > 0 }
+                ?: throw DirectoryException("Entry with TelematikID `$telematikID` not found or cannot be edited.")
+        return bundle
     }
 }

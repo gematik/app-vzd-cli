@@ -50,7 +50,6 @@ class EnvironmentCommands(
 
     init {
         subcommands(
-            LoginHolderCommand(),
             SearchTokenCommand(),
             FdvCommands(),
             SearchCommand { ctx, query ->
