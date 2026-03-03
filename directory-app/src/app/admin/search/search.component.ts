@@ -3,9 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Search } from 'carbon-components-angular';
 
 @Component({
-  selector: 'app-admin-search',
-  templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+    selector: 'app-admin-search',
+    templateUrl: './search.component.html',
+    styleUrls: ['./search.component.scss'],
+    standalone: false
 })
 export class SearchComponent implements OnInit, AfterViewInit {
   queryString = ""

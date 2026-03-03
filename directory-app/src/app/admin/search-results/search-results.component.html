@@ -17,38 +17,40 @@
     <div cdsRow>
     </div>
     <div cdsRow>
-        <ibm-search 
-          [(ngModel)]="queryString"
-          class="SearchField" 
-          [size]="'lg'" 
-          cdsCol 
-          [columnNumbers]="{'lg': 12, 'md': 6, 'sm': 4}"
-          placeholder="Name, Ort, PLZ oder TelematikID"
-          (search)="onSearch()"
-          (clear)="onClear()"
-        >  
-        </ibm-search>
-        <button
-          (click)="onSearch()"
-          cdsCol 
-          [columnNumbers]="{'lg': 4, 'md': 2, 'sm': 4}" 
-          [ibmButton]="'primary'"
-          class="SearchButton"
-        >Suchen</button>
+      <ibm-search
+        [(ngModel)]="queryString"
+        class="SearchField"
+        [size]="'lg'"
+        cdsCol
+        [columnNumbers]="{'lg': 12, 'md': 6, 'sm': 4}"
+        placeholder="Name, Ort, PLZ oder TelematikID"
+        (search)="onSearch()"
+        (clear)="onClear()"
+        >
+      </ibm-search>
+      <button
+        (click)="onSearch()"
+        cdsCol
+        [columnNumbers]="{'lg': 4, 'md': 2, 'sm': 4}"
+        [ibmButton]="'primary'"
+        class="SearchButton"
+      >Suchen</button>
     </div>
-    <div cdsRow *ngIf="errorMessage">
-      <div cdsCol>
-        <ibm-notification 
+    @if (errorMessage) {
+      <div cdsRow>
+        <div cdsCol>
+          <ibm-notification
           [notificationObj]="{
           type: 'error',
           title: 'Fehler',
           message: errorMessage,
           showClose: true,
           lowContrast: true}"
-          (close)="onErrorClose()">
-        </ibm-notification>
+            (close)="onErrorClose()">
+          </ibm-notification>
+        </div>
       </div>
-    </div>  
+    }
   </div>
   <div cdsCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
 </div>
@@ -56,13 +58,13 @@
 <div cdsRow>
   <div cdsCol [columnNumbers]="{'lg': 4, 'md': 1}"></div>
   <div cdsCol [columnNumbers]="{'lg': 8, 'md': 6}">
-      <ibm-inline-loading
+    <ibm-inline-loading
       class="LoadingState"
       [state]="loadingState"
       loadingText="Durchsuchen des Verzeichnisses"
       [successText]="searchReport"
       errorText="Es wurden keine Einträge gefunden, die den Suchkriterien entsprechen">
-      </ibm-inline-loading>  
+    </ibm-inline-loading>
   </div>
 </div>
 
@@ -80,25 +82,28 @@
   <app-admin-directory-entry-summary [model]="data"></app-admin-directory-entry-summary>
 </ng-template>
 
-<div cdsRow *ngIf="rows.length > 0">
-  <div cdsCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
-  <ibm-table-container class="SearchResultsContainer" cdsCol [columnNumbers]="{'lg': 12}">
-    <ibm-table
-      [model]="model"
-			size="lg"
-			[sortable]="false"
-			[showSelectionColumn]="false"
-			[stickyHeader]="false"
-			[striped]="false"
-      (rowClick)="onRowClick($event)"
-			[isDataGrid]="false">
-		</ibm-table>
+@if (rows.length > 0) {
+  <div cdsRow>
+    <div cdsCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
+    <ibm-table-container class="SearchResultsContainer" cdsCol [columnNumbers]="{'lg': 12}">
+      <ibm-table
+        [model]="model"
+        size="lg"
+        [sortable]="false"
+        [showSelectionColumn]="false"
+        [stickyHeader]="false"
+        [striped]="false"
+        (rowClick)="onRowClick($event)"
+        [isDataGrid]="false">
+      </ibm-table>
+    </ibm-table-container>
+    <div cdsCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
+  </div>
+}
 
-  </ibm-table-container>
-  <div cdsCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
-</div>
-
-<div cdsRow *ngIf="model.totalDataLength > 1">
-  <cds-pagination-nav class="Pagination" [model]="model" (selectPage)="selectPage($event)"></cds-pagination-nav>
-</div>
+@if (model.totalDataLength > 1) {
+  <div cdsRow>
+    <cds-pagination-nav class="Pagination" [model]="model" (selectPage)="selectPage($event)"></cds-pagination-nav>
+  </div>
+}
 

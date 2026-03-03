@@ -1,6 +1,9 @@
 import { Pipe, PipeTransform } from "@angular/core";
 
-@Pipe({name: 'objectToMap'})
+@Pipe({
+    name: 'objectToMap',
+    standalone: false
+})
 export class ObjectToMapPipe implements PipeTransform {
   transform(obj: any): object {
     const keys = Object.keys(obj)

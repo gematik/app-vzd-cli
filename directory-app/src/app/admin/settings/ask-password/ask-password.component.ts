@@ -2,9 +2,10 @@ import { AfterViewInit, Component, ElementRef, Inject, Input, OnInit, ViewChild 
 import { BaseModal, Label, ModalService } from 'carbon-components-angular';
 
 @Component({
-  selector: 'app-admin-settings-ask-password',
-  templateUrl: './ask-password.component.html',
-  styleUrls: ['./ask-password.component.scss']
+    selector: 'app-admin-settings-ask-password',
+    templateUrl: './ask-password.component.html',
+    styleUrls: ['./ask-password.component.scss'],
+    standalone: false
 })
 export class AskPasswordComponent extends BaseModal {
   protected password: string = ""

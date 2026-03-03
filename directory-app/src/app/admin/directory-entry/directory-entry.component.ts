@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SnippetType } from 'carbon-components-angular/code-snippet/code-snippet.component';
+import { SnippetType } from 'carbon-components-angular/code-snippet';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
 import { Coding, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 import { IconService, NotificationContent } from 'carbon-components-angular';
@@ -22,9 +22,10 @@ interface UserCertificateInfo {
 }
 
 @Component({
-  selector: 'app-admin-directory-entry',
-  templateUrl: './directory-entry.component.html',
-  styleUrls: ['./directory-entry.component.scss']
+    selector: 'app-admin-directory-entry',
+    templateUrl: './directory-entry.component.html',
+    styleUrls: ['./directory-entry.component.scss'],
+    standalone: false
 })
 export class DirectoryEntryComponent implements OnInit {
   env!: string

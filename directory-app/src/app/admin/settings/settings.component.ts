@@ -13,10 +13,11 @@ interface EnvironmentStatusModel {
 }
 
 @Component({
-  selector: 'app-admin-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss'],
-  providers: [ModalService, NotificationService]
+    selector: 'app-admin-settings',
+    templateUrl: './settings.component.html',
+    styleUrls: ['./settings.component.scss'],
+    providers: [ModalService, NotificationService],
+    standalone: false
 })
 export class SettingsComponent implements OnInit {
   protected statusModel: EnvironmentStatusModel[] = []

@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Coding, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 
 @Component({
-  selector: 'app-admin-directory-entry-summary',
-  templateUrl: './directory-entry-summary.component.html',
-  styleUrls: ['./directory-entry-summary.component.scss']
+    selector: 'app-admin-directory-entry-summary',
+    templateUrl: './directory-entry-summary.component.html',
+    styleUrls: ['./directory-entry-summary.component.scss'],
+    standalone: false
 })
 export class DirectoryEntrySummaryComponent implements OnInit {
   @Input() model!: ElaborateDirectoryEntry

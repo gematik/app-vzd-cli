@@ -8,9 +8,10 @@ import { IconService } from 'carbon-components-angular';
 import { Hospital16, User16 } from "@carbon/icons";
 
 @Component({
-  selector: 'app-admin-search-results',
-  templateUrl: './search-results.component.html',
-  styleUrls: ['./search-results.component.scss']
+    selector: 'app-admin-search-results',
+    templateUrl: './search-results.component.html',
+    styleUrls: ['./search-results.component.scss'],
+    standalone: false
 })
 export class SearchResultsComponent implements OnInit {
   env!: string

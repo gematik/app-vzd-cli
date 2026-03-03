@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   BreadcrumbModule,
   GridModule,
@@ -20,10 +20,8 @@ import { AdminBackendService } from 'src/services/admin/admin-backend.service';
 import { BaseDirectoryEntry } from 'src/services/admin/admin.model';
 import { FormsModule } from '@angular/forms';
 @Component({
-  selector: 'app-directory-entry-edit',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-directory-entry-edit',
+    imports: [
     RouterModule,
     GridModule,
     BreadcrumbModule,
@@ -34,11 +32,11 @@ import { FormsModule } from '@angular/forms';
     IconModule,
     NotificationModule,
     ModalModule,
-    PlaceholderModule,
-  ],
-  templateUrl: './directory-entry-edit.component.html',
-  styleUrl: './directory-entry-edit.component.scss',
-  providers: [ModalService],
+    PlaceholderModule
+],
+    templateUrl: './directory-entry-edit.component.html',
+    styleUrl: './directory-entry-edit.component.scss',
+    providers: [ModalService]
 })
 export class DirectoryEntryEditComponent implements OnInit {
   constructor(

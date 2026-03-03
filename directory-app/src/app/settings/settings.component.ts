@@ -5,9 +5,10 @@ import { GlobalConfig } from 'src/services/global.model';
 import { NavigationService } from '../../services/navigation.service';
 import { Router } from '@angular/router';
 @Component({
-  selector: 'app-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss'],
+    selector: 'app-settings',
+    templateUrl: './settings.component.html',
+    styleUrls: ['./settings.component.scss'],
+    standalone: false
 })
 export class SettingsComponent implements OnInit {
   protected config!: GlobalConfig
