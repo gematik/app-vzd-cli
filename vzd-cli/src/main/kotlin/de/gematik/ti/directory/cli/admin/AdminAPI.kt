@@ -2,16 +2,17 @@ package de.gematik.ti.directory.cli.admin
 
 import de.gematik.ti.directory.ClientCredentialsAuthenticator
 import de.gematik.ti.directory.DirectoryAuthException
-import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.admin.*
 import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.bff.TokenProvider
 import de.gematik.ti.directory.cli.bff.TokenStoreTokenProvider
+import de.gematik.ti.directory.cli.fhir.FhirAPI
 import de.gematik.ti.directory.cli.util.FileObjectStore
 import de.gematik.ti.directory.cli.util.KeyStoreVault
 import de.gematik.ti.directory.cli.util.KeyStoreVaultProvider
 import de.gematik.ti.directory.cli.util.TokenStore
-import de.gematik.ti.directory.pki.*
+import de.gematik.ti.directory.pki.CertificateDataDER
+import de.gematik.ti.directory.pki.OCSPResponse
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -130,6 +131,7 @@ class AdminAPI(
         env: AdminEnvironment,
         clientID: String,
         clientSecret: String,
+        fhirHolderLogin: Boolean = false,
     ): Map<String, String> {
         val tokenStore = TokenStore()
         val envConfig = environmentConfig(env)
@@ -142,6 +144,11 @@ class AdminAPI(
         val authResponse = runBlocking { auth.authenticate(clientID, clientSecret) }
 
         tokenStore.addAccessToken(envConfig.apiURL, authResponse.accessToken)
+
+        if (fhirHolderLogin) {
+            logger.info { "FHIR holder login" }
+            FhirAPI(globalAPI).loginHolder(env, authResponse.accessToken)
+        }
 
         logger.info { "Login successful: env:$env , clientID:$clientID" }
         return tokenStore.claimsFor(envConfig.apiURL)!!

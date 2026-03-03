@@ -2,13 +2,17 @@ package de.gematik.ti.directory.cli.admin
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.groups.mutuallyExclusiveOptions
-import com.github.ajalt.clikt.parameters.groups.provideDelegate
-import com.github.ajalt.clikt.parameters.groups.required
-import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.path
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
+import de.gematik.ti.directory.DirectoryException
 import de.gematik.ti.directory.admin.LogEntry
 import de.gematik.ti.directory.admin.Operation
 import de.gematik.ti.directory.cli.catching
@@ -38,6 +42,8 @@ class LogCommand : CliktCommand(name = "log", help = "Show logs") {
         help = "Write output to file",
     ).path(mustExist = false, canBeDir = false, canBeFile = true)
 
+    private val telematikID by argument("TELEMATIK_ID", help = "Telematik-ID of an entry to show").optional()
+
     private val primaryParam by mutuallyExclusiveOptions<Pair<String, String>>(
         option("-u", "--uid", help = "UID of an entry").convert { Pair("uid", it) },
         option("-t", "--telematikID", help = "TelematikID of an entry").convert { Pair("telematikID", it) },
@@ -48,18 +54,26 @@ class LogCommand : CliktCommand(name = "log", help = "Show logs") {
         ).choice(*Operation.values().map { it.toString() }.toTypedArray())
             .convert { Pair("operation", it.toString()) },
         option("--noDataChanged").convert { Pair("noDataChanged", it) },
-    ).required()
+    )
 
     private val logTimeFrom by option("--logTimeFrom").convert { Instant.parse(it) }
     private val logTimeTo by option("--logTimeTo").convert { Instant.parse(it) }
 
     override fun run() =
         catching {
+            if (primaryParam == null && telematikID == null) {
+                throw DirectoryException("Specify TelematikID or other options, see --help")
+            }
             val params =
                 buildMap {
-                    put(primaryParam.first, primaryParam.second)
+                    primaryParam?.let {
+                        put(it.first, it.second)
+                    }
                     logTimeFrom?.let { put("logTimeFrom", it.toString()) }
                     logTimeTo?.let { put("logTimeTo", it.toString()) }
+                    telematikID?.let {
+                        put("telematikID", it)
+                    }
                 }
 
             val logEntries = runBlocking { context.client.readLog(params) }

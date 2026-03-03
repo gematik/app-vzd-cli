@@ -1,6 +1,5 @@
 package de.gematik.ti.directory.admin
 
-import de.gematik.ti.directory.elaborate.*
 import de.gematik.ti.directory.pki.CertificateDataDER
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
@@ -190,6 +189,9 @@ enum class Operation {
 
     @SerialName("delete_Directory_FA-Attributes")
     delete_Directory_FA_Attributes,
+
+    mark_Directory_Entry_Certless,
+    unmark_Directory_Entry_Certless,
 }
 
 @Serializable

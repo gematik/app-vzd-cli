@@ -5,9 +5,11 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
+import de.gematik.ti.directory.DirectoryAuthException
 import de.gematik.ti.directory.DirectoryEnvironment
 import de.gematik.ti.directory.cli.admin.AdminAPI
 import de.gematik.ti.directory.cli.fhir.FhirAPI
+import de.gematik.ti.directory.cli.util.TokenStore
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -25,20 +27,33 @@ class LoginCommand : CliktCommand(name = "login", help = "Logins into all config
         catching {
             val globalAPI = GlobalAPI()
             val adminAPI = AdminAPI(globalAPI)
+            val fhirAPI = FhirAPI(globalAPI)
+
             val adminVault = adminAPI.openVault(password)
             adminVault.list().forEach {
                 if (environments.contains(it.variant)) {
+                    val env = DirectoryEnvironment.valueOf(it.variant)
                     try {
-                        adminAPI.login(DirectoryEnvironment.valueOf(it.variant), it.name, it.secret)
+                        adminAPI.login(env, it.name, it.secret)
                         echo("Logged in as ${it.name} to Admin API (${it.variant})")
                     } catch (e: Exception) {
                         echo("Failed to login as ${it.name} to Admin API (${it.variant})")
                         logger.debug(e) { "Stacktrace of previous error" }
                     }
+                    try {
+                        val envConfig = adminAPI.config.environment(env)
+                        val tokenStore = TokenStore()
+                        val tokenEntry =
+                            tokenStore.accessTokenFor(envConfig.apiURL) ?: throw DirectoryAuthException("Fatal error")
+                        fhirAPI.loginHolder(env, tokenEntry.accessToken)
+                        echo("Logged in as ${it.name} to FHIR Holder API (${it.variant})")
+                    } catch (e: Exception) {
+                        echo("Failed to login as ${it.name} to FHIR Holder API (${it.variant})")
+                        logger.debug(e) { "Stacktrace of previous error" }
+                    }
                 }
             }
 
-            val fhirAPI = FhirAPI(globalAPI)
             val fhirVault = fhirAPI.openVaultFdv(password)
 
             fhirVault.list().forEach {
