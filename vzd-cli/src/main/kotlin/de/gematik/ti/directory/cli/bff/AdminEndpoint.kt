@@ -1,7 +1,10 @@
 package de.gematik.ti.directory.cli.bff
 
 import de.gematik.ti.directory.DirectoryEnvironment
-import de.gematik.ti.directory.admin.*
+import de.gematik.ti.directory.admin.BaseDirectoryEntry
+import de.gematik.ti.directory.admin.UpdateBaseDirectoryEntry
+import de.gematik.ti.directory.admin.quickSearch
+import de.gematik.ti.directory.admin.readDirectoryEntryByTelematikID
 import de.gematik.ti.directory.elaborate.ElaborateDirectoryEntry
 import de.gematik.ti.directory.elaborate.elaborate
 import io.ktor.http.*
@@ -9,20 +12,12 @@ import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
-import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.Route
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.IOException
-
-@Serializable
-data class LoginWithVaultRepresentation(
-    val env: DirectoryEnvironment,
-    val vaultPassword: String,
-)
 
 @Serializable
 data class Activation(
@@ -35,12 +30,6 @@ class Admin {
     @Serializable
     @Resource("status")
     class Status(
-        val parent: Admin = Admin()
-    )
-
-    @Serializable
-    @Resource("login")
-    class Login(
         val parent: Admin = Admin()
     )
 
@@ -95,33 +84,8 @@ fun Route.adminRoutes() {
         call.respond(call.adminAPI.status())
     }
 
-    post<Admin.Login> {
-        val body = call.receive<LoginWithVaultRepresentation>()
-
-        val vault = call.adminAPI.openVault(body.vaultPassword)
-        val credential = vault.get(body.env.toString().lowercase())
-
-        if (credential == null) {
-            call.respond(
-                HttpStatusCode.BadRequest,
-                Outcome("VAULT_CREDENTIALS_MISSING", "Credentials für '${body.env}' are not configured in vault."),
-            )
-            return@post
-        }
-
-        try {
-            call.adminAPI.login(body.env, credential.name, credential.secret)
-            call.respond(HttpStatusCode.OK, Outcome("VAULT_LOGIN_OK", "Logged in to '${body.env}'"))
-        } catch (e: IOException) {
-            call.respond(
-                HttpStatusCode.BadGateway,
-                Outcome("DOWNSTREAM_CONNECTION_ERROR", "Unable to connect to backend. Check proxy settings."),
-            )
-        }
-    }
-
     get<Admin.Env.Search> { search ->
-        val adminAPI = application.attributes[AdminAPIKey]
+        val adminAPI = application.attributes[AdminAPIAttributeName]
         val searchResults = adminAPI.createClient(search.parent.env).quickSearch(search.q)
         call.respond(
             ElaboratedSearchResults(
@@ -132,12 +96,12 @@ fun Route.adminRoutes() {
     }
 
     get<Admin.Env.Entry> { resource ->
-        val adminAPI = application.attributes[AdminAPIKey]
+        val adminAPI = application.attributes[AdminAPIAttributeName]
 
-        val cliant = adminAPI.createClient(resource.parent.env)
+        val client = adminAPI.createClient(resource.parent.env)
         // launch two coroutines in parallel and wait for both to finish
-        val entry = cliant.readDirectoryEntryByTelematikID(resource.telematikID)
-        val logs = cliant.readLog(mapOf("telematikID" to resource.telematikID))
+        val entry = client.readDirectoryEntryByTelematikID(resource.telematikID)
+        val logs = client.readLog(mapOf("telematikID" to resource.telematikID))
 
         if (entry != null) {
             val elaborated = entry.elaborate()
@@ -152,7 +116,7 @@ fun Route.adminRoutes() {
     }
 
     get<Admin.Env.BaseEntry> { entry ->
-        val adminAPI = application.attributes[AdminAPIKey]
+        val adminAPI = application.attributes[AdminAPIAttributeName]
         val result = adminAPI.createClient(entry.parent.env).readDirectoryEntryByTelematikID(entry.telematikID)
         if (result != null) {
             call.respond(result.directoryEntryBase)
@@ -165,7 +129,7 @@ fun Route.adminRoutes() {
     }
 
     put<Admin.Env.BaseEntry> { entry ->
-        val adminAPI = application.attributes[AdminAPIKey]
+        val adminAPI = application.attributes[AdminAPIAttributeName]
         val client = adminAPI.createClient(entry.parent.env)
         val baseFromClient = call.receive<BaseDirectoryEntry>()
 
@@ -189,7 +153,7 @@ fun Route.adminRoutes() {
     }
 
     put<Admin.Env.EntryActivation> { resource ->
-        val adminAPI = application.attributes[AdminAPIKey]
+        val adminAPI = application.attributes[AdminAPIAttributeName]
         val client = adminAPI.createClient(resource.parent.env)
         val activation = call.receive<Activation>()
 

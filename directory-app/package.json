@@ -9,6 +9,9 @@
     "test": "ng test"
   },
   "private": true,
+  "overrides": {
+    "serialize-javascript": "^7.0.4"
+  },
   "dependencies": {
     "@angular/animations": "^21.2.0",
     "@angular/common": "^21.2.0",

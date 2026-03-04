@@ -4,11 +4,13 @@
 
 - Ergänzt um holder login (`vzd-cli fhir login`)
 - Neue FHIR Befehle:
-  - `vzd-cli fhir download <telematikID> <filename>`: lädt den FHIR Eintrag mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
-  - `vzd-cli fhir upload <filename>`: lädt den FHIR Eintrag aus der angegebenen Datei in das Verzeichnis hoch (erstellt oder aktualisiert den Eintrag)
+    - `vzd-cli fhir <tu|ru|pu> edit <telematikID>`: ermöglicht das Editieren eines FHIR Eintrags in einem Text-Editor, die Änderungen werden nach dem Speichern automatisch hochgeladen
+    - `vzd-cli fhir <tu|ru|pu> download <telematikID> <filename>`: lädt den FHIR Eintrag mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
+    - `vzd-cli fhir <tu|ru|pu> upload <filename>`: lädt den FHIR Eintrag aus der angegebenen Datei in das Verzeichnis hoch (erstellt oder aktualisiert den Eintrag)
 - ApoVZD Unterstützung wurde entfernt
 - `vzd-cli admin <ru|tu|pu> log <TELEMATIK_ID>` - TelematikID kann jetzt auch ohne option `-t` angegeben werden
 - Bugfixes
+- Angular GUI wurde auf die neueste Version aktualisiert (21)
 
 == Version 3.2.2
 

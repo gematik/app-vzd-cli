@@ -41,11 +41,7 @@ class LoginCommand : CliktCommand(name = "login", help = "Logins into all config
                         logger.debug(e) { "Stacktrace of previous error" }
                     }
                     try {
-                        val envConfig = adminAPI.config.environment(env)
-                        val tokenStore = TokenStore()
-                        val tokenEntry =
-                            tokenStore.accessTokenFor(envConfig.apiURL) ?: throw DirectoryAuthException("Fatal error")
-                        fhirAPI.loginHolder(env, tokenEntry.accessToken)
+                        doLoginFhirHolder(adminAPI, fhirAPI, env)
                         echo("Logged in as ${it.name} to FHIR Holder API (${it.variant})")
                     } catch (e: Exception) {
                         echo("Failed to login as ${it.name} to FHIR Holder API (${it.variant})")
@@ -69,4 +65,16 @@ class LoginCommand : CliktCommand(name = "login", help = "Logins into all config
             }
         }
     }
+}
+
+fun doLoginFhirHolder(
+    adminAPI: AdminAPI,
+    fhirAPI: FhirAPI,
+    env: DirectoryEnvironment
+) {
+    val envConfig = adminAPI.config.environment(env)
+    val tokenStore = TokenStore()
+    val tokenEntry =
+        tokenStore.accessTokenFor(envConfig.apiURL) ?: throw DirectoryAuthException("Fatal error")
+    fhirAPI.loginHolder(env, tokenEntry.accessToken)
 }

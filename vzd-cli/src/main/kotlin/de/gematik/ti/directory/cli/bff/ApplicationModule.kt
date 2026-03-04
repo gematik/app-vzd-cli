@@ -4,6 +4,7 @@ import de.gematik.ti.directory.DirectoryAuthException
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.cli.GlobalAPI
 import de.gematik.ti.directory.cli.admin.AdminAPI
+import de.gematik.ti.directory.cli.fhir.FhirAPI
 import de.gematik.ti.directory.cli.util.VaultException
 import de.gematik.ti.directory.pki.ExtendedCertificateDataDERSerializer
 import io.ktor.http.*
@@ -23,8 +24,9 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import mu.KotlinLogging
 
-val AdminAPIKey = AttributeKey<AdminAPI>("AdminAPI")
-val GlobalAPIKey = AttributeKey<GlobalAPI>("GlobalAPI")
+val AdminAPIAttributeName = AttributeKey<AdminAPI>("AdminAPI")
+val FhirAPIKeyAttributeName = AttributeKey<FhirAPI>("FhirAPI")
+val GlobalAPIKeyAttributeName = AttributeKey<GlobalAPI>("GlobalAPI")
 
 val logger = KotlinLogging.logger {}
 
@@ -40,11 +42,13 @@ class Configuration(
 fun Application.directoryModule(configure: Configuration.() -> Unit = {}) {
     val globalAPI = GlobalAPI()
     val adminAPI = AdminAPI(globalAPI)
+    val fhirAPI = FhirAPI(globalAPI)
     val cfg = Configuration(globalAPI, adminAPI)
     // allow external code to customize the configuration
     configure(cfg)
-    attributes.put(GlobalAPIKey, globalAPI)
-    attributes.put(AdminAPIKey, adminAPI)
+    attributes.put(GlobalAPIKeyAttributeName, globalAPI)
+    attributes.put(AdminAPIAttributeName, adminAPI)
+    attributes.put(FhirAPIKeyAttributeName, fhirAPI)
 
     install(ContentNegotiation) {
         json(
@@ -110,10 +114,15 @@ data class Outcome(
 
 val ApplicationCall.adminAPI: AdminAPI
     get() {
-        return application.attributes[AdminAPIKey]
+        return application.attributes[AdminAPIAttributeName]
+    }
+
+val ApplicationCall.fhirAPI: FhirAPI
+    get() {
+        return application.attributes[FhirAPIKeyAttributeName]
     }
 
 val ApplicationCall.globalAPI: GlobalAPI
     get() {
-        return application.attributes[GlobalAPIKey]
+        return application.attributes[GlobalAPIKeyAttributeName]
     }
