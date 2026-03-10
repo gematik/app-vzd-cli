@@ -25,7 +25,7 @@ import kotlinx.serialization.modules.contextual
 import mu.KotlinLogging
 
 val AdminAPIAttributeName = AttributeKey<AdminAPI>("AdminAPI")
-val FhirAPIKeyAttributeName = AttributeKey<FhirAPI>("FhirAPI")
+val FhirAPIAttributeName = AttributeKey<FhirAPI>("FhirAPI")
 val GlobalAPIKeyAttributeName = AttributeKey<GlobalAPI>("GlobalAPI")
 
 val logger = KotlinLogging.logger {}
@@ -48,7 +48,7 @@ fun Application.directoryModule(configure: Configuration.() -> Unit = {}) {
     configure(cfg)
     attributes.put(GlobalAPIKeyAttributeName, globalAPI)
     attributes.put(AdminAPIAttributeName, adminAPI)
-    attributes.put(FhirAPIKeyAttributeName, fhirAPI)
+    attributes.put(FhirAPIAttributeName, fhirAPI)
 
     install(ContentNegotiation) {
         json(
@@ -74,6 +74,7 @@ fun Application.directoryModule(configure: Configuration.() -> Unit = {}) {
                 globalRoutes()
                 vaultRoute()
                 adminRoutes()
+                fhirRoutes()
             }
 
             route("api/{...}") {
@@ -119,7 +120,7 @@ val ApplicationCall.adminAPI: AdminAPI
 
 val ApplicationCall.fhirAPI: FhirAPI
     get() {
-        return application.attributes[FhirAPIKeyAttributeName]
+        return application.attributes[FhirAPIAttributeName]
     }
 
 val ApplicationCall.globalAPI: GlobalAPI

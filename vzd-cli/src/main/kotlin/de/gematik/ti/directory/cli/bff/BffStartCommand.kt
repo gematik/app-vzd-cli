@@ -78,6 +78,7 @@ class BffStartCommand : CliktCommand(name = "start", help = "Start the client as
                         route("$baseHref/api") {
                             logger.info { "Configuring API routes: $baseHref/api" }
                             adminRoutes()
+                            fhirRoutes()
                             route("{...}") {
                                 handle {
                                     call.respond(HttpStatusCode.NotFound)

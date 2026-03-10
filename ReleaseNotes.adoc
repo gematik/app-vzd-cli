@@ -2,7 +2,7 @@
 
 == Version 3.3.0
 
-- Ergänzt um holder login (`vzd-cli fhir login`)
+- Login wurde überarbeitet, zentralisiert und vereinfacht. `vzd-cli login` ermöglicht jetzt den Login für alle Verzeichnisse (RU, TU, PU) und alle konfigurierte APIs (Admin, FHIR-Holder) mit einem einzigen Befehl.
 - Neue FHIR Befehle:
     - `vzd-cli fhir <tu|ru|pu> edit <telematikID>`: ermöglicht das Editieren eines FHIR Eintrags in einem Text-Editor, die Änderungen werden nach dem Speichern automatisch hochgeladen
     - `vzd-cli fhir <tu|ru|pu> download <telematikID> <filename>`: lädt den FHIR Eintrag mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
@@ -11,6 +11,8 @@
 - `vzd-cli admin <ru|tu|pu> log <TELEMATIK_ID>` - TelematikID kann jetzt auch ohne option `-t` angegeben werden
 - Bugfixes
 - Angular GUI wurde auf die neueste Version aktualisiert (21)
+- GUI / BFF API wurde um FHIR Schnittstellen erweitert
+- GUI unterstützt jetzt auch Inhalte auf FHIR-Directory
 
 == Version 3.2.2
 
@@ -170,15 +172,15 @@ und schreibt diese in `vzd-cli` kompatiblen Format
 
 == Version 0.12.x
 
-- Konfiguration ist komplett neu geschrieben. 
-- Neue Befehle 
+- Konfiguration ist komplett neu geschrieben.
+- Neue Befehle
   - `vzd-cli admin vault`
   - `vzd-cli admin config`
-  - `vzd-cli admin login` 
+  - `vzd-cli admin login`
 - Proxy kann jetzt ein- und ausgeschaltet werden:
   - Proxy an: `vzd-cli admin -x list`
   - Proxy aus: `vzd-cli admin -X list`
 - holder und domainID sind jetzt Teil von CSV-Output
-- Skelett-Zertifikatsblöcke werden beim CSV-Output nicht mehr gezählt 
-- Authentisierung wird jetzt nur beim Bedarf verlangt, z.B. `vzd-cli admin cert-info` funktioniert ohne Authentisierung. 
+- Skelett-Zertifikatsblöcke werden beim CSV-Output nicht mehr gezählt
+- Authentisierung wird jetzt nur beim Bedarf verlangt, z.B. `vzd-cli admin cert-info` funktioniert ohne Authentisierung.
 - Viele Bugfixes
