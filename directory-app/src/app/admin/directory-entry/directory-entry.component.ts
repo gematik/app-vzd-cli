@@ -2,9 +2,10 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnippetType } from 'carbon-components-angular/code-snippet';
 import { AdminBackendService } from 'src/services/admin/admin-backend.service';
+import { FhirBackendService } from 'src/services/fhir/fhir-backend.service';
 import { Coding, ElaborateDirectoryEntry } from 'src/services/admin/admin.model';
 import { IconService, NotificationContent } from 'carbon-components-angular';
-import { Edit16 } from "@carbon/icons";
+import { Edit16, Fire16 } from "@carbon/icons";
 
 interface KIMAddressInfo {
   mail: string
@@ -32,6 +33,8 @@ export class DirectoryEntryComponent implements OnInit {
   queryString: string | null = null
   entry?: ElaborateDirectoryEntry
   get rawData(): string { return JSON.stringify(this.entry, null, 2)}
+  rawFhirData: string = ''
+  fhirError: NotificationContent | null = null
   kimAddressList: KIMAddressInfo[] = []
   userCertificateList: UserCertificateInfo[] = []
   snippetDisplay = "multi" as SnippetType
@@ -50,6 +53,7 @@ export class DirectoryEntryComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private adminBackend: AdminBackendService,
+    private fhirBackend: FhirBackendService,
     private changeDetector: ChangeDetectorRef,
     private iconService: IconService,
   ) { }
@@ -76,8 +80,28 @@ export class DirectoryEntryComponent implements OnInit {
           this.changeDetector.detectChanges()
         }
       )
+      this.fhirBackend.loadEntry(this.env, telematikID).then(
+        value => {
+          this.fhirError = null
+          try {
+            this.rawFhirData = JSON.stringify(JSON.parse(value), null, 2)
+          } catch {
+            this.rawFhirData = value
+          }
+          this.changeDetector.detectChanges()
+        }
+      ).catch((err) => {
+        this.rawFhirData = ''
+        const status = err?.status
+        const message = status === 404
+          ? 'Eintrag nicht im FHIR-Verzeichnis gefunden.'
+          : `Fehler beim Laden der FHIR-Daten${status ? ` (HTTP ${status})` : ''}.`
+        this.fhirError = { type: 'error', title: 'Fehler', message, lowContrast: true }
+        this.changeDetector.detectChanges()
+      })
     })
     this.iconService.register(Edit16)
+    this.iconService.register(Fire16)
   }
 
   validateBaseField(field: string): boolean {

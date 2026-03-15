@@ -246,6 +246,9 @@
             }
           </ibm-structured-list>
         </ibm-tab>
+        <ng-template #fhirHeading><svg ibmIcon="fire" size="16" style="vertical-align: middle; margin-right: 4px;"></svg> FHIR</ng-template>
+        <ibm-tab [heading]="fhirHeading" title="FHIR">
+        </ibm-tab>
         <ibm-tab heading="Karten">
           <h2>Karten</h2>
           @for (smartcard of entry.smartcards; track smartcard) {
@@ -316,11 +319,22 @@
             }
           </ibm-structured-list>
         </ibm-tab>
-        <ibm-tab heading="Rohdaten">
+        <ibm-tab heading="Rohdaten Admin">
           <ibm-code-snippet
             [display]="snippetDisplay"
             [maxCollapsedNumberOfRows]="300"
           >{{rawData}}</ibm-code-snippet>
+        </ibm-tab>
+        <ng-template #rohdatenHeading><svg ibmIcon="fire" size="16" style="vertical-align: middle; margin-right: 4px;"></svg> Rohdaten FHIR</ng-template>
+        <ibm-tab [heading]="rohdatenHeading" title="Rohdaten FHIR">
+          @if (fhirError) {
+            <cds-inline-notification [notificationObj]="fhirError"></cds-inline-notification>
+          } @else {
+            <ibm-code-snippet
+              [display]="snippetDisplay"
+              [maxCollapsedNumberOfRows]="300"
+            >{{rawFhirData}}</ibm-code-snippet>
+          }
         </ibm-tab>
       </ibm-tabs>
     </div>
