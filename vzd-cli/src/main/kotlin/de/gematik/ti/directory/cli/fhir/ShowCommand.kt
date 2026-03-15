@@ -26,13 +26,25 @@ class ShowCommand : CliktCommand(name = "show", help = "SHows all Data of a sing
             "--search" to Scope.Search,
             "--owner" to Scope.Owner,
             "--fdv" to Scope.Fdv,
-        ).default(Scope.Search)
+        )
 
     private val telematikID by argument("TELEMATIK_ID", help = "Telematik-ID of an entry to show")
 
     override fun run() =
         catching {
-            val bundle = runBlocking { context.client.findEntry(scope, telematikID) }
+            val bundle =
+                runBlocking {
+                    val selectedScope = scope
+                    if (selectedScope != null) {
+                        context.client.findEntry(selectedScope, telematikID)
+                    } else {
+                        try {
+                            context.client.findEntry(Scope.Owner, telematikID)
+                        } catch (_: Exception) {
+                            context.client.findEntry(Scope.Search, telematikID)
+                        }
+                    }
+                }
             echo(bundle.toStringOutput(outputFormat))
         }
 }

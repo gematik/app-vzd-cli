@@ -210,7 +210,7 @@ class Client(
         scope: Scope,
         telematikID: String,
         resource: SearchResource? = null,
-    ): Bundle {
+    ): Bundle? {
         var practitionerBundle: Bundle? = null
         var healthcareServiceBundle: Bundle? = null
 
@@ -255,10 +255,7 @@ class Client(
             practitionerJob.join()
             healthcareServiceJob.join()
         }
-        val bundle =
-            practitionerBundle?.takeIf { it.total > 0 }
-                ?: healthcareServiceBundle?.takeIf { it.total > 0 }
-                ?: throw DirectoryException("Entry with TelematikID `$telematikID` not found or cannot be edited.")
-        return bundle
+        return practitionerBundle?.takeIf { it.total > 0 }
+            ?: healthcareServiceBundle?.takeIf { it.total > 0 }
     }
 }
