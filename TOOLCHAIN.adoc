@@ -2,7 +2,7 @@
 
 == Release
 
-Die gewünschte Versionsnummer in `vzd-cli/build.gradle.kts` setzen, z.B. 2.2.0
+Die gewünschte Versionsnummer in `gradle.properties` setzen
 
 === Build und Test
 [source,bash]
@@ -14,8 +14,8 @@ make dist
 
 [source,bash]
 ----
-# install angular 18
-npm install -g @angular/cli@18
+# install angular 22
+npm install -g @angular/cli@22
 
 # start GUI server
 cd vzd-cli
@@ -26,7 +26,7 @@ cd directory-app
 ng serve
 ----
 
-=== Release im github veröffentlichen 
+=== Release im github veröffentlichen
 
 Änderungen zur Vorversion in link:ReleaseNotes.adoc[ReleaseNotes] dokumentieren.
 
@@ -37,4 +37,3 @@ sdk install java 17.0.13-tem
 sdk use java 17.0.13-tem
 make release
 ----
-

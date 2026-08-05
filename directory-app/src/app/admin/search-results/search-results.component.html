@@ -36,14 +36,14 @@
         class="SearchButton"
       >Suchen</button>
     </div>
-    @if (errorMessage) {
+    @if (errorMessage()) {
       <div cdsRow>
         <div cdsCol>
           <ibm-notification
           [notificationObj]="{
           type: 'error',
           title: 'Fehler',
-          message: errorMessage,
+          message: errorMessage(),
           showClose: true,
           lowContrast: true}"
             (close)="onErrorClose()">
@@ -60,9 +60,9 @@
   <div cdsCol [columnNumbers]="{'lg': 8, 'md': 6}">
     <ibm-inline-loading
       class="LoadingState"
-      [state]="loadingState"
+      [state]="loadingState()"
       loadingText="Durchsuchen des Verzeichnisses"
-      [successText]="searchReport"
+      [successText]="searchReport()"
       errorText="Es wurden keine Einträge gefunden, die den Suchkriterien entsprechen">
     </ibm-inline-loading>
   </div>
@@ -82,7 +82,7 @@
   <app-admin-directory-entry-summary [model]="data"></app-admin-directory-entry-summary>
 </ng-template>
 
-@if (rows.length > 0) {
+@if (rows().length > 0) {
   <div cdsRow>
     <div cdsCol [columnNumbers]="{'lg': 2, 'md': 0}"></div>
     <ibm-table-container class="SearchResultsContainer" cdsCol [columnNumbers]="{'lg': 12}">

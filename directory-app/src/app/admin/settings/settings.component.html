@@ -2,7 +2,7 @@
 <div ibmRow class="row">
   <div ibmCol>
     <ibm-inline-loading
-      [state]="loadingState"
+      [state]="loadingState()"
       loadingText="Anmeldung läuft"
       successText="Anmeldung erfolgreich"
       errorText="Anmeldung Fehler">
@@ -16,7 +16,7 @@
     <ibm-list-column>Umgebung</ibm-list-column>
     <ibm-list-column>Aktion</ibm-list-column>
   </ibm-list-header>
-  @for (env of statusModel; track env) {
+  @for (env of statusModel(); track env.env) {
     <ibm-list-row>
       <ibm-list-column>
         <svg [ibmIcon]="env.iconName" [class]="env.iconClass"></svg>

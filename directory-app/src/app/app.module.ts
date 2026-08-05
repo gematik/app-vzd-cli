@@ -4,7 +4,7 @@ declare global {
     }
 }
 
-import { NgModule } from '@angular/core';
+import { NgModule, provideZoneChangeDetection } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -38,6 +38,7 @@ import { APP_BASE_HREF } from '@angular/common';
         AdminModule
     ], 
     providers: [
+        provideZoneChangeDetection(),
         provideHttpClient(withInterceptorsFromDi()),
         { 
             provide: APP_BASE_HREF,

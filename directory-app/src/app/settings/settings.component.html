@@ -12,12 +12,12 @@
       <cds-tab heading="Administration">
         <app-admin-settings></app-admin-settings>
       </cds-tab>
-      @if (config) {
+      @if (config(); as cfg) {
         <cds-tab heading="Einstellungen" (selected)="tabSelected()">
           <div class="notification-container" cdsCol [columnNumbers]="{sm: 3, md: 6, lg: 8}"></div>
           <div cdsCol [columnNumbers]="{sm: 3, md: 6, lg: 8}">
             <cds-inline-loading
-              [state]="configState"
+              [state]="configState()"
               loadingText="Updating configuration"
               successText="Configuration updated"
               errorText="Configuration update error">
@@ -25,21 +25,21 @@
           </div>
           <div cdsCol class="form-item" [columnNumbers]="{sm: 3, md: 6, lg: 8}">
             <cds-checkbox
-              [(ngModel)]="config.updates.preReleasesEnabled"
+              [(ngModel)]="cfg.updates.preReleasesEnabled"
             i18>Enable Pre-Releases</cds-checkbox>
           </div>
           <div cdsCol class="form-item" [columnNumbers]="{sm: 3, md: 6, lg: 8}">
             <cds-checkbox
-              [(ngModel)]="config.httpProxy.enabled"
+              [(ngModel)]="cfg.httpProxy.enabled"
             i18>Enable Proxy</cds-checkbox>
           </div>
-          @if (config.httpProxy.enabled) {
+          @if (cfg.httpProxy.enabled) {
             <div cdsCol class="form-item" [columnNumbers]="{sm: 3, md: 6, lg: 8}">
               <cds-label>
                 Proxy URL
                 <input
                   ibmText
-                  [(ngModel)]="config.httpProxy.proxyURL"
+                  [(ngModel)]="cfg.httpProxy.proxyURL"
                   >
               </cds-label>
             </div>

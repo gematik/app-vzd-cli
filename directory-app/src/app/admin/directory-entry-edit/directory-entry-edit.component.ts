@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 
 import {
   BreadcrumbModule,
@@ -47,7 +47,7 @@ export class DirectoryEntryEditComponent implements OnInit {
   ) {}
 
   env: string | undefined;
-  baseEntry: BaseDirectoryEntry | undefined;
+  baseEntry = signal<BaseDirectoryEntry | undefined>(undefined);
   queryString: string | null = null;
   toggleActive: boolean = true;
   domainIDFlat: string | undefined;
@@ -55,9 +55,9 @@ export class DirectoryEntryEditComponent implements OnInit {
   metaFlat: string | undefined;
   specializationFlat: string | undefined;
 
-  globalNotification: NotificationContent | null = null;
-  modifyNotification: NotificationContent | null = null;
-  dangerNotification: NotificationContent | null = null;
+  globalNotification = signal<NotificationContent | null>(null);
+  modifyNotification = signal<NotificationContent | null>(null);
+  dangerNotification = signal<NotificationContent | null>(null);
 
   ngOnInit(): void {
     this.route.params.subscribe((param) => {
@@ -69,62 +69,62 @@ export class DirectoryEntryEditComponent implements OnInit {
       this.adminBackend
         .loadBaseEntry(this.env!, telematikID)
         .then((value) => {
-          this.baseEntry = value;
-          this.domainIDFlat = arrayToFlatText(this.baseEntry?.domainID);
-          this.holderFlat = arrayToFlatText(this.baseEntry?.holder);
-          this.metaFlat = arrayToFlatText(this.baseEntry?.meta);
-          this.specializationFlat = arrayToFlatText(
-            this.baseEntry?.specialization
-          );
+          this.baseEntry.set(value);
+          this.domainIDFlat = arrayToFlatText(value.domainID);
+          this.holderFlat = arrayToFlatText(value.holder);
+          this.metaFlat = arrayToFlatText(value.meta);
+          this.specializationFlat = arrayToFlatText(value.specialization);
         })
         .catch((error) => {
-          this.globalNotification = {
+          this.globalNotification.set({
             lowContrast: true,
             type: 'error',
             title: 'Fehler',
             message: error.message,
-          };
+          });
         });
     });
   }
 
   onSave(): void {
+    const baseEntry = this.baseEntry()!;
     // split textareay to arrays by comma or new line, trimming the whitespaces, removing empty strings and assigning to null if empty
-    this.baseEntry!.domainID = flatTextToArray(this.domainIDFlat);
-    this.baseEntry!.holder = flatTextToArray(this.holderFlat);
-    this.baseEntry!.meta = flatTextToArray(this.metaFlat);
-    this.baseEntry!.specialization = flatTextToArray(this.specializationFlat);
+    baseEntry.domainID = flatTextToArray(this.domainIDFlat);
+    baseEntry.holder = flatTextToArray(this.holderFlat);
+    baseEntry.meta = flatTextToArray(this.metaFlat);
+    baseEntry.specialization = flatTextToArray(this.specializationFlat);
 
     this.adminBackend
-      .modifyBaseEntry(this.env!, this.baseEntry!)
+      .modifyBaseEntry(this.env!, baseEntry)
       .then((value) => {
         this.router.navigate(
-          ['entry', this.baseEntry?.telematikID, { q: this.queryString }],
+          ['entry', baseEntry.telematikID, { q: this.queryString }],
           { relativeTo: this.route.parent, queryParams: { modified: 'true' } }
         );
       })
       .catch((error) => {
-        this.modifyNotification = {
+        this.modifyNotification.set({
           lowContrast: true,
           type: 'error',
           title: 'Fehler',
           message: error.message,
-        };
+        });
       });
   }
 
   onCancel(): void {
     this.router.navigate(
-      ['entry', this.baseEntry?.telematikID, { q: this.queryString }],
+      ['entry', this.baseEntry()?.telematikID, { q: this.queryString }],
       { relativeTo: this.route.parent }
     );
   }
 
   onDelete(): void {
+    const baseEntry = this.baseEntry();
     const ref = this.modalService.show({
       type: AlertModalType.danger,
       title: 'Löschen bestätigen',
-      content: `<p>${this.baseEntry?.telematikID}</p><p>${this.baseEntry?.displayName}</p>`,
+      content: `<p>${baseEntry?.telematikID}</p><p>${baseEntry?.displayName}</p>`,
       size: 'md',
       buttons: [
         {
@@ -142,25 +142,26 @@ export class DirectoryEntryEditComponent implements OnInit {
 
   doDelete() {
     this.adminBackend
-      .deleteEntry(this.env!, this.baseEntry!.telematikID)
+      .deleteEntry(this.env!, this.baseEntry()!.telematikID)
       .then((value) => {
         this.router.navigate([''], { relativeTo: this.route.parent });
       })
       .catch((error) => {
-        this.dangerNotification = {
+        this.dangerNotification.set({
           lowContrast: true,
           type: 'error',
           title: 'Fehler',
           message: error.message,
-        };
+        });
       });
   }
 
   onDeactivate(): void {
+    const baseEntry = this.baseEntry();
     const ref = this.modalService.show({
       type: AlertModalType.danger,
       title: 'Deaktivieren bestätigen',
-      content: `<p>${this.baseEntry?.telematikID}</p><p>${this.baseEntry?.displayName}</p>`,
+      content: `<p>${baseEntry?.telematikID}</p><p>${baseEntry?.displayName}</p>`,
       size: 'md',
       buttons: [
         {
@@ -178,31 +179,32 @@ export class DirectoryEntryEditComponent implements OnInit {
 
   doDeactivate() {
     this.adminBackend
-      .deactivateEntry(this.env!, this.baseEntry!.telematikID)
+      .deactivateEntry(this.env!, this.baseEntry()!.telematikID)
       .then((value) => {
-        this.baseEntry!.active = false;
-        this.dangerNotification = {
+        this.baseEntry()!.active = false;
+        this.dangerNotification.set({
           lowContrast: true,
           type: 'success',
           title: 'Erfolg',
           message: 'Der Eintrag wurde erfolgreich deaktiviert.',
-        };
+        });
       })
       .catch((error) => {
-        this.dangerNotification = {
+        this.dangerNotification.set({
           lowContrast: true,
           type: 'error',
           title: 'Fehler',
           message: error.message,
-        };
+        });
       });
   }
 
   onActivate(): void {
+    const baseEntry = this.baseEntry();
     const ref = this.modalService.show({
       type: AlertModalType.danger,
       title: 'Aktivieren bestätigen',
-      content: `<p>${this.baseEntry?.telematikID}</p><p>${this.baseEntry?.displayName}</p>`,
+      content: `<p>${baseEntry?.telematikID}</p><p>${baseEntry?.displayName}</p>`,
       size: 'md',
       buttons: [
         {
@@ -220,44 +222,44 @@ export class DirectoryEntryEditComponent implements OnInit {
 
   doActivate(): void {
     this.adminBackend
-      .activateEntry(this.env!, this.baseEntry!.telematikID)
+      .activateEntry(this.env!, this.baseEntry()!.telematikID)
       .then((value) => {
-        this.baseEntry!.active = true;
-        this.dangerNotification = {
+        this.baseEntry()!.active = true;
+        this.dangerNotification.set({
           lowContrast: true,
           type: 'success',
           title: 'Erfolg',
           message: 'Der Eintrag wurde erfolgreich aktiviert.',
-        };
+        });
       })
       .catch((error) => {
-        this.dangerNotification = {
+        this.dangerNotification.set({
           type: 'error',
           title: 'Fehler',
           message: error.message,
           target: '.notification-container-danger',
-        };
+        });
       });
   }
 
   get entryType(): string {
-    return this.baseEntry?.entryType?.join(',') ?? '';
+    return this.baseEntry()?.entryType?.join(',') ?? '';
   }
 
   set entryType(value: string) {
-    this.baseEntry!.entryType = value.split(',').map((item) => item.trim());
+    this.baseEntry()!.entryType = value.split(',').map((item) => item.trim());
   }
 
   get maxKOMLEadr(): string {
-    return this.baseEntry?.maxKOMLEadr?.toString() ?? '';
+    return this.baseEntry()?.maxKOMLEadr?.toString() ?? '';
   }
 
   set maxKOMLEadr(value: string) {
     if (value === '') {
-      this.baseEntry!.maxKOMLEadr = null;
+      this.baseEntry()!.maxKOMLEadr = null;
       return;
     }
-    this.baseEntry!.maxKOMLEadr = parseInt(value);
+    this.baseEntry()!.maxKOMLEadr = parseInt(value);
   }
 }
 

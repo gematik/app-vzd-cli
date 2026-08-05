@@ -3,7 +3,7 @@
 <cds-placeholder></cds-placeholder>
 
 
-@if (baseEntry) {
+@if (baseEntry(); as baseEntry) {
   <cds-breadcrumb [noTrailingSlash]="true">
     <cds-breadcrumb-item [route]="['admin', 'ru']">
       <a [routerLink]="['../..', {'q': queryString}]">{{ adminBackend.getEnvLabel(env!) }}</a>
@@ -281,8 +281,8 @@
     <!-- Buttons -->
     <div cdsCol [columnNumbers]="marginCol"></div>
     <div cdsCol [columnNumbers]="contentCol" class="buttons-container">
-      @if (modifyNotification) {
-        <cds-inline-notification [notificationObj]="modifyNotification" (close)="modifyNotification = null">
+      @if (modifyNotification(); as notification) {
+        <cds-inline-notification [notificationObj]="notification" (close)="modifyNotification.set(null)">
         </cds-inline-notification>
       }
       <button cdsButton="primary" (click)="onSave()">
@@ -299,8 +299,8 @@
     <div cdsCol [columnNumbers]="marginCol"></div>
     <div cdsCol [columnNumbers]="contentCol">
       <h2 class="danger-text">Gefahrenzone</h2>
-      @if (dangerNotification) {
-        <cds-inline-notification [notificationObj]="dangerNotification" (close)="dangerNotification = null">
+      @if (dangerNotification(); as notification) {
+        <cds-inline-notification [notificationObj]="notification" (close)="dangerNotification.set(null)">
         </cds-inline-notification>
       }
     </div>
@@ -342,8 +342,8 @@
   <div cdsGrid [useCssGrid]="true">
     <div cdsCol [columnNumbers]="marginCol"></div>
     <div cdsCol [columnNumbers]="contentCol">
-      @if (globalNotification) {
-        <cds-inline-notification [notificationObj]="globalNotification" (close)="globalNotification = null">
+      @if (globalNotification(); as notification) {
+        <cds-inline-notification [notificationObj]="notification" (close)="globalNotification.set(null)">
         </cds-inline-notification>
       }
     </div>

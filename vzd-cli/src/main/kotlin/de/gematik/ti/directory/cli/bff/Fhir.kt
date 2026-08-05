@@ -39,9 +39,7 @@ class Fhir {
 }
 
 fun Route.fhirRoutes() {
-    get<Fhir.Env.Search> { search ->
-        val fhirApi = application.attributes[FhirAPIAttributeName]
-        val fhirClient = fhirApi.createClient(search.parent.env)
+    get<Fhir.Env.Search> { _ ->
     }
 
     get<Fhir.Env.Entry> { entry ->

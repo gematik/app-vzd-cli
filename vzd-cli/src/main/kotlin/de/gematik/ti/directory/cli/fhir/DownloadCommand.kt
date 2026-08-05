@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.path
+import de.gematik.ti.directory.DirectoryException
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.fhir.Scope
 import kotlinx.coroutines.runBlocking
@@ -17,7 +18,9 @@ class DownloadCommand : CliktCommand(name = "download", help = "Loads FHIR Bundl
 
     override fun run() =
         catching {
-            val bundle = runBlocking { context.client.findEntry(Scope.Owner, telematikID) }
+            val bundle =
+                runBlocking { context.client.findEntry(Scope.Owner, telematikID) }
+                    ?: throw DirectoryException("No FHIR entry found for TelematikID $telematikID")
             echo("Written ${bundle.total} resource(s) to $outputFile")
             outputFile.toFile().writeText(bundle.toStringOutput(OutputFormat.JSON))
         }

@@ -1,6 +1,6 @@
 <cds-header brand="gematik" name="Directory" [route]="['']" [useRouter]="true">
   <cds-header-navigation>
-    @for (nav of adminMenuLinks; track nav) {
+    @for (nav of adminMenuLinks(); track nav.route) {
       <cds-header-item
         [isCurrentPage]="isActive(nav.route)"
         [route]="[nav.route]"

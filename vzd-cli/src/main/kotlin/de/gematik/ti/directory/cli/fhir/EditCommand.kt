@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.output.TermUi
 import com.github.ajalt.clikt.parameters.arguments.argument
+import de.gematik.ti.directory.DirectoryException
 import de.gematik.ti.directory.cli.fhir.FhirCliEnvironmentContext
 import de.gematik.ti.directory.cli.fhir.OutputFormat
 import de.gematik.ti.directory.cli.fhir.toStringOutput
@@ -20,7 +21,9 @@ class EditCommand : CliktCommand(name = "edit", help = "Edit resources of single
 
     override fun run() =
         catching {
-            val bundle = runBlocking { context.client.findEntry(Scope.Owner, telematikID) }
+            val bundle =
+                runBlocking { context.client.findEntry(Scope.Owner, telematikID) }
+                    ?: throw DirectoryException("No FHIR entry found for TelematikID $telematikID")
             val textToEdit = bundle.toStringOutput(OutputFormat.JSON)
             val editedText = TermUi.editText(textToEdit, requireSave = true)
             editedText?.let {

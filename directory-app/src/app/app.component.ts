@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Title } from "@angular/platform-browser";
 import { Router } from '@angular/router';
 import { NavigationLink, NavigationService } from "../services/navigation.service";
@@ -22,14 +22,14 @@ export class AppComponent implements OnInit {
 
   }
 
-  public adminMenuLinks: NavigationLink[] = []
+  public adminMenuLinks = signal<NavigationLink[]>([])
 
   public isActive(link: string) {
     return this.router.url.startsWith(link)
   }
 
   public isSettingsAvailable() {
-    return this.navigationService.settingsAvailable
+    return this.navigationService.settingsAvailable()
   }
 
   public ngOnInit(): void {
@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
     this.iconsService.register(Settings24)
     this.navigationService.adminMenuLinks$
       .subscribe(links => {
-        this.adminMenuLinks = links
+        this.adminMenuLinks.set(links)
       });
   }
   

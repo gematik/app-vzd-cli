@@ -15,19 +15,17 @@
     </ibm-breadcrumb>
   </div>
 </div>
-@if (globalNotification) {
+@if (globalNotification(); as notification) {
   <div ibmRow>
     <div ibmCol [columnNumbers]="{'lg': 3}"></div>
     <div style="padding:1em" ibmCol [columnNumbers]="{'lg': 10}">
-      @if (globalNotification) {
-        <cds-inline-notification [notificationObj]="globalNotification" (close)="globalNotification = null">
-        </cds-inline-notification>
-      }
+      <cds-inline-notification [notificationObj]="notification" (close)="globalNotification.set(undefined)">
+      </cds-inline-notification>
     </div>
     <div ibmCol [columnNumbers]="{'lg': 3}"></div>
   </div>
 }
-@if (entry) {
+@if (entry(); as entry) {
   <div ibmRow>
     <div ibmCol [columnNumbers]="{'lg': 3}"></div>
     <div ibmCol [columnNumbers]="{'lg': 10}">
@@ -42,8 +40,8 @@
           </button>
         </div>
       </div>
-      <ibm-tabs [isNavigation]="true" [followFocus]="true">
-        <ibm-tab heading="Allgemein">
+      <ibm-tabs [followFocus]="true">
+        <ibm-tab heading="Allgemein" [active]="activeTab === 0" (selected)="activeTab = 0">
           <h2>{{entryKindTitle}}</h2>
           <ibm-label
             [invalid]="validateBaseField('displayName')"
@@ -247,59 +245,118 @@
           </ibm-structured-list>
         </ibm-tab>
         <ng-template #fhirHeading><svg ibmIcon="fire" size="16" style="vertical-align: middle; margin-right: 4px;"></svg> FHIR</ng-template>
-        <ibm-tab [heading]="fhirHeading" title="FHIR">
-        </ibm-tab>
-        <ibm-tab heading="Karten">
-          <h2>Karten</h2>
-          @for (smartcard of entry.smartcards; track smartcard) {
-            <app-admin-directory-entry-smartcard
-              [entry]="entry"
-              [smartcard]="smartcard">
-            </app-admin-directory-entry-smartcard>
+        <ibm-tab [heading]="fhirHeading" title="FHIR" [active]="activeTab === 1" (selected)="activeTab = 1">
+          <h4>Öffnungszeiten</h4>
+          @if (fhirDaySchedule().length === 0 && !fhirError) {
+            <p class="no-fhir-data">Keine Öffnungszeiten hinterlegt.</p>
           }
-          <ibm-structured-list [condensed]="true">
-            @if (entry.smartcards === undefined || entry.smartcards.length == 0) {
-              <ibm-list-row>
-                <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
-                <ibm-list-column>Keine Karten</ibm-list-column>
-              </ibm-list-row>
-            }
-          </ibm-structured-list>
-          <h2>Zertifikate</h2>
-          <div class="UserCertificateList">
+          @if (fhirDaySchedule().length > 0) {
             <ibm-structured-list [condensed]="true">
-              <ibm-list-header>
-                <ibm-list-column [nowrap]="true"> </ibm-list-column>
-                <ibm-list-column [nowrap]="true">Seriennummer</ibm-list-column>
-                <ibm-list-column [nowrap]="true">Alg</ibm-list-column>
-                <ibm-list-column [nowrap]="true">Herausgeber</ibm-list-column>
-                <ibm-list-column [nowrap]="true">herausgegeben</ibm-list-column>
-                <ibm-list-column [nowrap]="true">läuft ab</ibm-list-column>
-              </ibm-list-header>
-              @for (cert of userCertificateList; track cert) {
+              @for (d of fhirDaySchedule(); track d) {
                 <ibm-list-row>
-                  <ibm-list-column><svg [ibmIcon]="cert.iconName" [class]="cert.iconClass"></svg></ibm-list-column>
-                  <ibm-list-column>{{cert.serialNumber}}</ibm-list-column>
-                  <ibm-list-column>{{cert.algorithm}}</ibm-list-column>
-                  <ibm-list-column>{{cert.issuer}}</ibm-list-column>
-                  <ibm-list-column>{{cert.notBefore}}</ibm-list-column>
-                  <ibm-list-column>{{cert.notAfter}}</ibm-list-column>
-                </ibm-list-row>
-              }
-              @if (userCertificateList === undefined || userCertificateList.length === 0) {
-                <ibm-list-row>
-                  <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
-                  <ibm-list-column>Keine Zertifikate</ibm-list-column>
-                  <ibm-list-column></ibm-list-column>
-                  <ibm-list-column></ibm-list-column>
-                  <ibm-list-column></ibm-list-column>
-                  <ibm-list-column></ibm-list-column>
+                  <ibm-list-column>{{d.day}}</ibm-list-column>
+                  <ibm-list-column [class.opening-times__time--closed]="d.closed">
+                    @if (d.closed) { Geschlossen }
+                    @else {
+                      @for (slot of d.slots; track slot; let last = $last) {
+                        {{slot.allDay ? 'Ganztägig' : slot.startTime + ' – ' + slot.endTime}}@if (!last) {<br>}
+                      }
+                    }
+                  </ibm-list-column>
                 </ibm-list-row>
               }
             </ibm-structured-list>
-          </div>
+          }
+          @if (fhirNotAvailable.length > 0) {
+            <h4 style="margin-top: 2rem;">Nicht verfügbar</h4>
+            <ibm-structured-list [condensed]="true">
+              <ibm-list-header>
+                <ibm-list-column [nowrap]="true">Beschreibung</ibm-list-column>
+                <ibm-list-column [nowrap]="true">Von</ibm-list-column>
+                <ibm-list-column [nowrap]="true">Bis</ibm-list-column>
+              </ibm-list-header>
+              @for (n of fhirNotAvailable; track n) {
+                <ibm-list-row>
+                  <ibm-list-column>{{n.description}}</ibm-list-column>
+                  <ibm-list-column>{{n.from ?? '–'}}</ibm-list-column>
+                  <ibm-list-column>{{n.to ?? '–'}}</ibm-list-column>
+                </ibm-list-row>
+              }
+            </ibm-structured-list>
+          }
         </ibm-tab>
-        <ibm-tab heading="Protokoll">
+        <ibm-tab heading="Karten" [active]="activeTab === 2" (selected)="activeTab = 2">
+          <h4>Karten</h4>
+          <ibm-structured-list [condensed]="true">
+            <ibm-list-header>
+              <ibm-list-column [nowrap]="true">Gültigkeit</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Typ</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Status</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Ausgestellt</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Läuft ab</ibm-list-column>
+            </ibm-list-header>
+            @if (!entry.smartcards || entry.smartcards.length === 0) {
+              <ibm-list-row>
+                <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                <ibm-list-column>Keine Karten</ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+              </ibm-list-row>
+            }
+            @for (smartcard of entry.smartcards; track smartcard) {
+              <ibm-list-row>
+                <ibm-list-column>
+                  <app-admin-directory-entry-validity-period
+                    [compact]="true"
+                    [notBefore]="smartcard.notBefore"
+                    [notAfter]="smartcard.notAfter">
+                  </app-admin-directory-entry-validity-period>
+                </ibm-list-column>
+                <ibm-list-column>{{smartcard.type}}</ibm-list-column>
+                <ibm-list-column>
+                  <svg [ibmIcon]="smartcard.active ? 'checkmark--filled' : 'warning--filled'"
+                       [class]="smartcard.active ? 'success' : 'warning'"></svg>
+                </ibm-list-column>
+                <ibm-list-column>{{smartcard.notBefore.substring(0, 10)}}</ibm-list-column>
+                <ibm-list-column>{{smartcard.notAfter.substring(0, 10)}}</ibm-list-column>
+              </ibm-list-row>
+            }
+          </ibm-structured-list>
+
+          <h4 style="margin-top: 2rem;">Zertifikate</h4>
+          <ibm-structured-list [condensed]="true">
+            <ibm-list-header>
+              <ibm-list-column [nowrap]="true">Status</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Seriennummer</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Alg</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Herausgeber</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Ausgestellt</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Läuft ab</ibm-list-column>
+            </ibm-list-header>
+            @if (userCertificateList.length === 0) {
+              <ibm-list-row>
+                <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                <ibm-list-column>Keine Zertifikate</ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+              </ibm-list-row>
+            }
+            @for (cert of userCertificateList; track cert) {
+              <ibm-list-row>
+                <ibm-list-column><svg [ibmIcon]="cert.iconName" [class]="cert.iconClass"></svg></ibm-list-column>
+                <ibm-list-column>{{cert.serialNumber}}</ibm-list-column>
+                <ibm-list-column>{{cert.algorithm}}</ibm-list-column>
+                <ibm-list-column>{{cert.issuer}}</ibm-list-column>
+                <ibm-list-column>{{cert.notBefore}}</ibm-list-column>
+                <ibm-list-column>{{cert.notAfter}}</ibm-list-column>
+              </ibm-list-row>
+            }
+          </ibm-structured-list>
+        </ibm-tab>
+        <ibm-tab heading="Protokoll" [active]="activeTab === 3" (selected)="activeTab = 3">
           <h2>Änderungsprotokoll</h2>
           <ibm-structured-list
             [condensed]="true">
@@ -319,14 +376,14 @@
             }
           </ibm-structured-list>
         </ibm-tab>
-        <ibm-tab heading="Rohdaten Admin">
+        <ibm-tab heading="Rohdaten Admin" [active]="activeTab === 4" (selected)="activeTab = 4">
           <ibm-code-snippet
             [display]="snippetDisplay"
             [maxCollapsedNumberOfRows]="300"
           >{{rawData}}</ibm-code-snippet>
         </ibm-tab>
         <ng-template #rohdatenHeading><svg ibmIcon="fire" size="16" style="vertical-align: middle; margin-right: 4px;"></svg> Rohdaten FHIR</ng-template>
-        <ibm-tab [heading]="rohdatenHeading" title="Rohdaten FHIR">
+        <ibm-tab [heading]="rohdatenHeading" title="Rohdaten FHIR" [active]="activeTab === 5" (selected)="activeTab = 5">
           @if (fhirError) {
             <cds-inline-notification [notificationObj]="fhirError"></cds-inline-notification>
           } @else {

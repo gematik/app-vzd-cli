@@ -15,6 +15,7 @@ const thresholds = [
 export class ValidityPeriodComponent implements OnInit {
   @Input() notBefore = ""
   @Input() notAfter = ""
+  @Input() compact = false
   text = ""
 
   threshold? = thresholds[2]

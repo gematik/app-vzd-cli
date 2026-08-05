@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ApplicationRef, Component, OnInit, signal } from '@angular/core';
 import {
   InlineLoadingState,
   ModalService,
@@ -25,8 +25,8 @@ interface EnvironmentStatusModel {
   standalone: false,
 })
 export class SettingsComponent implements OnInit {
-  protected statusModel: EnvironmentStatusModel[] = [];
-  protected loadingState = InlineLoadingState.Hidden;
+  protected statusModel = signal<EnvironmentStatusModel[]>([]);
+  protected loadingState = signal(InlineLoadingState.Hidden);
 
   constructor(
     private iconService: IconService,
@@ -34,6 +34,7 @@ export class SettingsComponent implements OnInit {
     private adminBackend: AdminBackendService,
     private notificationService: NotificationService,
     private modalService: ModalService,
+    private appRef: ApplicationRef,
   ) {}
 
   ngOnInit(): void {
@@ -43,7 +44,7 @@ export class SettingsComponent implements OnInit {
     this.adminBackend.updateStatus();
     this.adminBackend.status$.subscribe({
       next(adminStatus) {
-        self.statusModel = adminStatus.environmentStatus.map((envStatus) => {
+        self.statusModel.set(adminStatus.environmentStatus.map((envStatus) => {
           if (envStatus.accessible) {
             return {
               env: envStatus.env,
@@ -61,7 +62,7 @@ export class SettingsComponent implements OnInit {
               iconClass: 'error',
             };
           }
-        });
+        }));
       },
       error(err) {
         self.showError(err);
@@ -85,23 +86,33 @@ export class SettingsComponent implements OnInit {
       inputs: {
         prompt: `Einloggen in die ${this.adminBackend.getEnvLabel(env)}`,
         passwordCallback: (password: string) => {
-          this.loadingState = InlineLoadingState.Active;
+          this.loadingState.set(InlineLoadingState.Active);
           this.backendService
             .loginUsingVault(env, password)
             .then(() => {
               this.adminBackend.updateStatus();
-              this.loadingState = InlineLoadingState.Finished;
-              const model = this.statusModel.find((e) => e.env == env);
-              model!.iconName = 'checkmark--filled';
-              model!.iconClass = 'success';
-              model!.status = 'success';
+              this.loadingState.set(InlineLoadingState.Finished);
+              this.statusModel.update((list) =>
+                list.map((e): EnvironmentStatusModel =>
+                  e.env == env
+                    ? {
+                        ...e,
+                        iconName: 'checkmark--filled',
+                        iconClass: 'success',
+                        status: 'success',
+                      }
+                    : e,
+                ),
+              );
             })
             .catch((err) => {
-              this.loadingState = InlineLoadingState.Error;
+              this.loadingState.set(InlineLoadingState.Error);
               this.showError(err);
             });
         },
       },
     });
+    // Carbon opens the modal via an internal setTimeout; force a render so it appears.
+    setTimeout(() => this.appRef.tick());
   }
 }

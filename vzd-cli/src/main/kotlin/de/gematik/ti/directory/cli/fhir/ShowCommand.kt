@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
+import de.gematik.ti.directory.DirectoryException
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.fhir.Scope
 import kotlinx.coroutines.runBlocking
@@ -44,7 +45,7 @@ class ShowCommand : CliktCommand(name = "show", help = "SHows all Data of a sing
                             context.client.findEntry(Scope.Search, telematikID)
                         }
                     }
-                }
+                } ?: throw DirectoryException("No FHIR entry found for TelematikID $telematikID")
             echo(bundle.toStringOutput(outputFormat))
         }
 }

@@ -1,16 +1,26 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
 .circle {
   background: var(--background);
   border-radius: 50%;
+  flex-shrink: 0;
   width: 6em;
   height: 6em;
-	transition: all 500ms ease-in;
-	will-change: transform;
-  text-align: center;
-  padding-top: 2.5em;
-  font-weight: 600;
+  transition: all 500ms ease-in;
+  will-change: transform;
 }
 
-.circle span {
+.wrapper.compact .circle {
+  width: 4em;
+  height: 4em;
+}
+
+.wrapper span {
   font-weight: 600;
   font-size: smaller;
+  white-space: nowrap;
 }
