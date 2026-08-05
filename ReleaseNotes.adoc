@@ -7,12 +7,15 @@
     - `vzd-cli fhir <tu|ru|pu> edit <telematikID>`: ermöglicht das Editieren eines FHIR Eintrags in einem Text-Editor, die Änderungen werden nach dem Speichern automatisch hochgeladen
     - `vzd-cli fhir <tu|ru|pu> download <telematikID> <filename>`: lädt den FHIR Eintrag mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
     - `vzd-cli fhir <tu|ru|pu> upload <filename>`: lädt den FHIR Eintrag aus der angegebenen Datei in das Verzeichnis hoch (erstellt oder aktualisiert den Eintrag)
+- FHIR Befehle `show`, `download` und `edit` melden jetzt einen klaren Fehler, wenn zur TelematikID kein Eintrag gefunden wird, statt abzubrechen
 - ApoVZD Unterstützung wurde entfernt
 - `vzd-cli admin <ru|tu|pu> log <TELEMATIK_ID>` - TelematikID kann jetzt auch ohne option `-t` angegeben werden
 - Bugfixes
 - Angular GUI wurde auf die neueste Version aktualisiert (21)
 - GUI / BFF API wurde um FHIR Schnittstellen erweitert
 - GUI unterstützt jetzt auch Inhalte auf FHIR-Directory
+- GUI: Abhängigkeiten (u. a. Carbon Design System) aktualisiert und bekannte Sicherheitslücken (CVEs) behoben
+- GUI: diverse Darstellungsfehler behoben (Login-Dialog, Suchergebnisse, Einstellungen und Detailansicht mit Tabs werden jetzt korrekt angezeigt)
 
 == Version 3.2.2
 
