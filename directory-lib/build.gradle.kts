@@ -36,4 +36,6 @@ dependencies {
     val hapiVersion: String by project
     api("ca.uhn.hapi.fhir:hapi-fhir-base:$hapiVersion")
     api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiVersion")
+    // jose4j for JWT processing
+    api("org.bitbucket.b_c:jose4j:0.9.6")
 }

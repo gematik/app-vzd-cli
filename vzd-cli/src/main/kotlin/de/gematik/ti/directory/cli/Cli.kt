@@ -13,7 +13,6 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import de.gematik.ti.directory.DirectoryException
 import de.gematik.ti.directory.admin.AdminResponseException
-import de.gematik.ti.directory.apo.ApoCli
 import de.gematik.ti.directory.cli.admin.AdminCli
 import de.gematik.ti.directory.cli.bff.BffCommand
 import de.gematik.ti.directory.cli.fhir.FhirCli
@@ -113,7 +112,6 @@ class Cli : CliktCommand(name = "vzd-cli") {
             LoginCommand(),
             AdminCli(),
             FhirCli(),
-            ApoCli(),
             GuiCommand(),
             PersCommand(),
             BffCommand(),
@@ -131,25 +129,31 @@ class Cli : CliktCommand(name = "vzd-cli") {
                     PosixFilePermission.OWNER_EXECUTE,
                 ),
             )
-        } catch (e: UnsupportedOperationException) {
+        } catch (_: UnsupportedOperationException) {
         } // ignore this exception on windows
     }
 
     override fun run() {
         val root: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
-        if (verbosity == 1) {
-            root.level = Level.INFO
-        } else if (verbosity == 2) {
-            root.level = Level.DEBUG
-        } else {
-            root.level = Level.ERROR
+        when (verbosity) {
+            1 -> {
+                root.level = Level.INFO
+            }
+
+            2 -> {
+                root.level = Level.DEBUG
+            }
+
+            else -> {
+                root.level = Level.ERROR
+            }
         }
         // reduce log level for some FHIR classes, which log obvious things
         val fhir = LoggerFactory.getLogger("ca.uhn.fhir.context.ModelScanner") as Logger
         fhir.level = Level.ERROR
         try {
             this.javaClass.classLoader.loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider")
-        } catch (e: ClassNotFoundException) {
+        } catch (_: ClassNotFoundException) {
             echo("Required jars (BouncyCastle) are not installed. Please force update using `vzd-cli update -r`", err = true)
         }
         val globalAPI = GlobalAPI()
@@ -165,7 +169,7 @@ class Cli : CliktCommand(name = "vzd-cli") {
                     )
                 }
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // ignore error when checking for update
         }
     }

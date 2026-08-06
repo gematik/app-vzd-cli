@@ -15,6 +15,7 @@ import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -33,14 +34,14 @@ class FhirAPI(
         val client =
             Client {
                 envConfig = cfg
-                authFdv {
-                    accessToken {
-                        retrieveAccessTokenFdv(env)
-                    }
-                }
-                authSearch {
-                    accessToken {
-                        retrieveAccessTokenSearch(env)
+                auth {
+                    accessTokenForRequest { request ->
+                        val path = request.url.encodedPath
+                        if (path.startsWith("/fdv")) {
+                            retrieveAccessTokenFdv(env)
+                        } else {
+                            retrieveAccessTokenSearch(env)
+                        }
                     }
                 }
                 if (globalAPI.config.httpProxy.enabled) {
@@ -88,6 +89,44 @@ class FhirAPI(
             )?.accessToken ?: throw DirectoryAuthException("You are not logged in to environment (FDVSearchAPI): $env")
     }
 
+    fun loginHolder(
+        env: DirectoryEnvironment,
+        holderAccessToken: String,
+    ): Map<String, String> {
+        val tokenStore = TokenStore()
+        val envConfig = config.environment(env)
+
+        val httpClient = createHttpClient()
+        val authzResponse: JsonObject =
+            runBlocking {
+                val response =
+                    httpClient.get(envConfig.holder.authorizationEndpoint) {
+                        headers {
+                            append("Authorization", "Bearer $holderAccessToken")
+                        }
+                    }
+
+                if (response.status == HttpStatusCode.Forbidden) {
+                    throw DirectoryAuthException("Holder login failed. Re-login as administrator.")
+                } else if (response.status != HttpStatusCode.OK) {
+                    val body: String = response.body()
+                    throw DirectoryAuthException(
+                        "Holder login failed: env:$env , url:${envConfig.fdv.authorizationEndpoint}, status:${response.status.value}, body:$body",
+                    )
+                }
+                response.body()
+            }
+        if (authzResponse["access_token"] == null) {
+            throw DirectoryAuthException("Login failed: env:$env , url:${envConfig.holder.authorizationEndpoint}")
+        }
+        val accessToken = authzResponse["access_token"]!!.jsonPrimitive.content
+        tokenStore.addAccessToken(envConfig.holder.apiURL, accessToken)
+        tokenStore.addAccessToken(envConfig.search.apiURL, accessToken)
+
+        logger.info { "Login successful: env:$env , url:${envConfig.holder.authorizationEndpoint}" }
+        return tokenStore.claimsFor(envConfig.holder.apiURL)!!
+    }
+
     fun loginFdv(
         env: DirectoryEnvironment,
         clientID: String,
@@ -102,25 +141,9 @@ class FhirAPI(
                 if (globalAPI.config.httpProxy.enabled) globalAPI.config.httpProxy.proxyURL else null,
             )
         val authResponse = runBlocking { auth.authenticate(clientID, clientSecret) }
-
-        val httpClient =
-            HttpClient(CIO) {
-                install(ContentNegotiation) {
-                    json(
-                        Json {
-                            ignoreUnknownKeys = true
-                        },
-                    )
-                }
-                if (globalAPI.config.httpProxy.enabled) {
-                    engine {
-                        logger.debug { "Using proxy: ${globalAPI.config.httpProxy.proxyURL} for FHIR authorization" }
-                        proxy = ProxyBuilder.http(globalAPI.config.httpProxy.proxyURL)
-                    }
-                }
-            }
         val token = authResponse.accessToken
 
+        val httpClient = createHttpClient()
         val authzResponse: JsonObject =
             runBlocking {
                 val response =
@@ -147,4 +170,21 @@ class FhirAPI(
         logger.info { "Login successful: env:$env , clientID:$clientID, url:${envConfig.fdv.apiURL}" }
         return tokenStore.claimsFor(envConfig.fdv.apiURL)!!
     }
+
+    fun createHttpClient(): HttpClient =
+        HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                    },
+                )
+            }
+            if (globalAPI.config.httpProxy.enabled) {
+                engine {
+                    logger.debug { "Using proxy: ${globalAPI.config.httpProxy.proxyURL} for FHIR authorization" }
+                    proxy = ProxyBuilder.http(globalAPI.config.httpProxy.proxyURL)
+                }
+            }
+        }
 }

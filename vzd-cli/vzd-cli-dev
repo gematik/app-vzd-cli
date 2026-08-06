@@ -1,7 +1,10 @@
 #!/bin/bash
+# Resolve gradlew relative to this script, not the caller's working directory,
+# so it always uses this project's wrapper regardless of where it is invoked from.
+GRADLEW="$(cd "$(dirname "$0")/.." && pwd)/gradlew"
 if [ -z "$*" ]
 then
-  ../gradlew -q run
+  "$GRADLEW" -q run
 else
-  ../gradlew -q run --args="$*"
+  "$GRADLEW" -q run --args="$*"
 fi

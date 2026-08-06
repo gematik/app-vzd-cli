@@ -2,6 +2,16 @@ h2 {
     margin-bottom: 1.5em;
 }
 
+.no-fhir-data {
+    color: var(--cds-text-secondary, #525252);
+    font-style: italic;
+    margin-top: 1rem;
+}
+
+.opening-times__time--closed {
+    color: var(--cds-text-disabled, #a8a8a8);
+}
+
 .right {
     text-align: right;
 }
@@ -36,4 +46,8 @@ h2 {
 
 ::ng-deep .cds--structured-list {
     margin-top: 2em;
+}
+
+::ng-deep .cds--structured-list-td {
+    vertical-align: middle !important;
 }

@@ -28,7 +28,7 @@ fun Route.vaultRoute() {
         try {
             val vault = KeyStoreVaultProvider().open(vaultPassword, SERVICE_NAME)
 
-            val adminAPI = call.application.attributes[AdminAPIKey]
+            val adminAPI = call.application.attributes[AdminAPIAttributeName]
 
             vault.list().forEach { secret ->
                 application.log.info("Logging in to: ${secret.variant}")

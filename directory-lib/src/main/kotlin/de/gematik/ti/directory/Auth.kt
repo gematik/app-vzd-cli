@@ -10,6 +10,7 @@ import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -96,15 +97,14 @@ class ClientCredentialsAuthenticator(
 val DirectoryAuthPlugin =
     createClientPlugin("DirectoryAuthPlugin", ::DirectoryAuthPluginConfig) {
 
-        var accessToken = runBlocking { pluginConfig.accessTokenCallback() }
-
         on(Send) { request ->
+            var accessToken = runBlocking { pluginConfig.accessTokenCallback(request) }
             request.headers.append("Authorization", "Bearer $accessToken")
             val originalCall = proceed(request)
             if (pluginConfig.retry && originalCall.response.status == HttpStatusCode.Unauthorized) {
                 logger.debug { "Token was refused by the server. Probably expired, obtain new token and retry." }
                 // try to obtain the accessToken again and retry
-                accessToken = runBlocking { pluginConfig.accessTokenCallback() }
+                accessToken = runBlocking { pluginConfig.accessTokenCallback(request) }
                 request.headers["Authorization"] = "Bearer $accessToken"
                 proceed(request)
             } else {
@@ -115,9 +115,13 @@ val DirectoryAuthPlugin =
 
 class DirectoryAuthPluginConfig {
     var retry = true
-    internal var accessTokenCallback: suspend () -> String? = { null }
+    internal var accessTokenCallback: suspend (request: HttpRequestBuilder) -> String? = { null }
 
     fun accessToken(block: suspend () -> String?) {
+        accessTokenCallback = { block() }
+    }
+
+    fun accessTokenForRequest(block: suspend (request: HttpRequestBuilder) -> String?) {
         accessTokenCallback = block
     }
 }

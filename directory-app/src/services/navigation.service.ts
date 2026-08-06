@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { AdminBackendService } from './admin/admin-backend.service';
 import { BackendService } from './backend.service';
@@ -12,8 +12,8 @@ export interface NavigationLink {
   providedIn: 'root'
 })
 export class NavigationService {
-  public adminMenuLinks$: Observable<NavigationLink[]> 
-  public settingsAvailable = false
+  public adminMenuLinks$: Observable<NavigationLink[]>
+  public settingsAvailable = signal(false)
 
   constructor(
     private adminBackend: AdminBackendService,
@@ -34,7 +34,7 @@ export class NavigationService {
 
     this.backendService.getConfig().subscribe({
       next(config) {
-        self.settingsAvailable = true
+        self.settingsAvailable.set(true)
       }
     })
   }

@@ -2,6 +2,20 @@
   padding: 0;
 }
 
+// The Carbon search always renders a (here empty) label above the input, which
+// offsets it from the adjacent button. Remove that label's space so the input
+// and the button line up.
+.SearchField ::ng-deep .cds--label {
+  display: none;
+}
+
+// Pin the search box to the same height as the button so the two align.
+.SearchField ::ng-deep .cds--search,
+.SearchField ::ng-deep .cds--search-input {
+  height: 48px;
+  min-height: 48px;
+}
+
 .SearchButton {
   height: 48px;
   max-width: unset;

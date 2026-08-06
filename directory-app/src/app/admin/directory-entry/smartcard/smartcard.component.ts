@@ -2,9 +2,10 @@ import { Component, Input, OnInit, Pipe, PipeTransform } from '@angular/core';
 import { CertificateInfo, ElaborateDirectoryEntry, Smartcard, UserCertificate } from 'src/services/admin/admin.model';
 
 @Component({
-  selector: 'app-admin-directory-entry-smartcard',
-  templateUrl: './smartcard.component.html',
-  styleUrls: ['./smartcard.component.scss']
+    selector: 'app-admin-directory-entry-smartcard',
+    templateUrl: './smartcard.component.html',
+    styleUrls: ['./smartcard.component.scss'],
+    standalone: false
 })
 export class SmartcardComponent implements OnInit {
   @Input() entry!: ElaborateDirectoryEntry

@@ -1,18 +1,20 @@
 <cds-header brand="gematik" name="Directory" [route]="['']" [useRouter]="true">
   <cds-header-navigation>
-    <cds-header-item 
-      *ngFor="let nav of adminMenuLinks"
-      [isCurrentPage]="isActive(nav.route)"
-      [route]="[nav.route]"
-      >{{nav.title}}
-    </cds-header-item>
+    @for (nav of adminMenuLinks(); track nav.route) {
+      <cds-header-item
+        [isCurrentPage]="isActive(nav.route)"
+        [route]="[nav.route]"
+        >{{nav.title}}
+      </cds-header-item>
+    }
   </cds-header-navigation>
   <cds-header-global>
-    <cds-header-action
-      *ngIf="isSettingsAvailable()"
-      description="Settings" (selected)="router.navigate(['settings'])">
-      <svg cdsIcon="settings" size="24" class="icon settings"></svg>
-    </cds-header-action>
+    @if (isSettingsAvailable()) {
+      <cds-header-action
+        description="Settings" (selected)="router.navigate(['settings'])">
+        <svg cdsIcon="settings" size="24" class="icon settings"></svg>
+      </cds-header-action>
+    }
   </cds-header-global>
 </cds-header>
 

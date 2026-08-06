@@ -1,47 +1,51 @@
 <div class="notification-container"></div>
 <div ibmRow class="row">
-    <div ibmCol>
-        <ibm-inline-loading
-            [state]="loadingState"
-            loadingText="Anmeldung läuft"
-            successText="Anmeldung erfolgreich"
-            errorText="Anmeldung Fehler">
-        </ibm-inline-loading>
-    </div>
+  <div ibmCol>
+    <ibm-inline-loading
+      [state]="loadingState()"
+      loadingText="Anmeldung läuft"
+      successText="Anmeldung erfolgreich"
+      errorText="Anmeldung Fehler">
+    </ibm-inline-loading>
+  </div>
 </div>
 
 <ibm-structured-list>
-    <ibm-list-header>
-        <ibm-list-column></ibm-list-column>
-        <ibm-list-column>Umgebung</ibm-list-column>
-        <ibm-list-column>Aktion</ibm-list-column>
-    </ibm-list-header>
-    <ibm-list-row *ngFor="let env of statusModel">
-        <ibm-list-column>
-            <svg [ibmIcon]="env.iconName" [class]="env.iconClass"></svg>
-        </ibm-list-column>
-        <ibm-list-column>
-            {{env.title}}
-        </ibm-list-column>
-        <ibm-list-column>
-            <button
-            *ngIf="env.status === 'success'"
-            size="sm" 
+  <ibm-list-header>
+    <ibm-list-column></ibm-list-column>
+    <ibm-list-column>Umgebung</ibm-list-column>
+    <ibm-list-column>Aktion</ibm-list-column>
+  </ibm-list-header>
+  @for (env of statusModel(); track env.env) {
+    <ibm-list-row>
+      <ibm-list-column>
+        <svg [ibmIcon]="env.iconName" [class]="env.iconClass"></svg>
+      </ibm-list-column>
+      <ibm-list-column>
+        {{env.title}}
+      </ibm-list-column>
+      <ibm-list-column>
+        @if (env.status === 'success') {
+          <button
+            size="sm"
             ibmButton="primary"
             [routerLink]="['/admin', env.env]"
             >
             Suchen
             <svg class="cds--btn__icon" ibmIcon="api" size="16"></svg>
-            </button>    
-            <button
-            *ngIf="env.status === 'error'"
-            size="sm" 
+          </button>
+        }
+        @if (env.status === 'error') {
+          <button
+            size="sm"
             ibmButton="tertiary"
             (click)="onLogin(env.env)"
             >
             Login
             <svg class="cds--btn__icon" ibmIcon="login" size="16"></svg>
-            </button>    
-        </ibm-list-column>
+          </button>
+        }
+      </ibm-list-column>
     </ibm-list-row>
+  }
 </ibm-structured-list>

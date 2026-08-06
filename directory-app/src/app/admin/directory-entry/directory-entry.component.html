@@ -1,309 +1,400 @@
 <div ibmRow>
-    <div ibmCol [columnNumbers]="{'lg': 16}">
-        <ibm-breadcrumb [noTrailingSlash]="true">
-            <ibm-breadcrumb-item>
-                <a [routerLink]="['../../search']">Suche</a>
-            </ibm-breadcrumb-item>
-            <ibm-breadcrumb-item *ngIf="queryString">
-                <a [routerLink]="['../../search-results', {'q': queryString}]">Suchergebnise</a>
-            </ibm-breadcrumb-item>
-            <ibm-breadcrumb-item>
-                Eintrag
-            </ibm-breadcrumb-item>
-        </ibm-breadcrumb>   
-    </div>
+  <div ibmCol [columnNumbers]="{'lg': 16}">
+    <ibm-breadcrumb [noTrailingSlash]="true">
+      <ibm-breadcrumb-item>
+        <a [routerLink]="['../../search']">Suche</a>
+      </ibm-breadcrumb-item>
+      @if (queryString) {
+        <ibm-breadcrumb-item>
+          <a [routerLink]="['../../search-results', {'q': queryString}]">Suchergebnise</a>
+        </ibm-breadcrumb-item>
+      }
+      <ibm-breadcrumb-item>
+        Eintrag
+      </ibm-breadcrumb-item>
+    </ibm-breadcrumb>
+  </div>
 </div>
-<div ibmRow *ngIf="globalNotification">
+@if (globalNotification(); as notification) {
+  <div ibmRow>
     <div ibmCol [columnNumbers]="{'lg': 3}"></div>
     <div style="padding:1em" ibmCol [columnNumbers]="{'lg': 10}">
-        <cds-inline-notification *ngIf="globalNotification" [notificationObj]="globalNotification" (close)="globalNotification = null">
-        </cds-inline-notification>
+      <cds-inline-notification [notificationObj]="notification" (close)="globalNotification.set(undefined)">
+      </cds-inline-notification>
     </div>
     <div ibmCol [columnNumbers]="{'lg': 3}"></div>
-</div>
-<div ibmRow *ngIf="entry">
+  </div>
+}
+@if (entry(); as entry) {
+  <div ibmRow>
     <div ibmCol [columnNumbers]="{'lg': 3}"></div>
     <div ibmCol [columnNumbers]="{'lg': 10}">
-        <div ibmRow>
-            <div ibmCol>
-                <h1>{{entry.base.displayName}}</h1>
-            </div>
-            <div ibmCol [columnNumbers]="{'lg': 4}" class="right">
-                <button cdsButton="primary" (click)="onEdit()">
-                    Bearbeiten
-                    <svg class="cds--btn__icon" cdsIcon="edit" size="16"></svg>
-                </button>
-            </div>
+      <div ibmRow>
+        <div ibmCol>
+          <h1>{{entry.base.displayName}}</h1>
         </div>
-        <ibm-tabs [isNavigation]="true" [followFocus]="true">
-            <ibm-tab heading="Allgemein">
-
-                <h2>{{entryKindTitle}}</h2>
-                
-                <ibm-label
-                    [invalid]="validateBaseField('displayName')"
-                    [invalidText]="'Ungültiger Anzeigename'">
-                    Anzeigename
-                    <input
-                        cdsText
-                        [(ngModel)]="entry.base.displayName"
-                        readonly="true"
-                        [invalid]="validateBaseField('displayName')"
-                        >
-                </ibm-label>
-                
-                <div ibmRow *ngIf="entry.base.fhirResourceType == 'Practitioner'">
-                    <ibm-label 
-                        ibmCol
-                        [columnNumbers]="{'lg': 8}"
-                        [invalid]="validateBaseField('sn')"
-                        [invalidText]="'Ungültiger Nachname'">
-
-                        Name
-                        <input
-                            ibmText
-                            [(ngModel)]="entry.base.sn"
-                            readonly="true"
-                            [invalid]="validateBaseField('sn')"
-                        >
-                    </ibm-label>
-                    <ibm-label 
-                        ibmCol
-                        [columnNumbers]="{'lg': 8}"
-                        [invalid]="validateBaseField('givenName')"
-                        [invalidText]="'Ungültiger Vorname'">
-                        Vorname(n)
-                        <input
-                            ibmText
-                            [(ngModel)]="entry.base.givenName"
-                            readonly="true"
-                            [invalid]="validateBaseField('givenName')"
-                        >
-                    </ibm-label>
-                    </div>
-    
-
-                <ibm-label>
-                    TelematikID
-                    <input
-                        ibmText
-                        [(ngModel)]="entry.base.telematikID"
-                        readonly="true"
-                    >
-                </ibm-label> 
-                <ibm-label>
-                    DomainID
-                    <textarea
-                        ibmText
-                        readonly="true"
-                    >{{domainIDText}}</textarea>
-                </ibm-label> 
-
-                <ibm-label>
-                    Adresse
-                    <input
-                        ibmText
-                        [(ngModel)]="entry.base.streetAddress"
-                        readonly="true"
-                    >
-                </ibm-label> 
-
-                <div ibmRow>
-                <ibm-label 
-                    ibmCol
-                    [columnNumbers]="{'lg': 11}"
+        <div ibmCol [columnNumbers]="{'lg': 4}" class="right">
+          <button cdsButton="primary" (click)="onEdit()">
+            Bearbeiten
+            <svg class="cds--btn__icon" cdsIcon="edit" size="16"></svg>
+          </button>
+        </div>
+      </div>
+      <ibm-tabs [followFocus]="true">
+        <ibm-tab heading="Allgemein" [active]="activeTab === 0" (selected)="activeTab = 0">
+          <h2>{{entryKindTitle}}</h2>
+          <ibm-label
+            [invalid]="validateBaseField('displayName')"
+            [invalidText]="'Ungültiger Anzeigename'">
+            Anzeigename
+            <input
+              cdsText
+              [(ngModel)]="entry.base.displayName"
+              readonly="true"
+              [invalid]="validateBaseField('displayName')"
+              >
+          </ibm-label>
+          @if (entry.base.fhirResourceType == 'Practitioner') {
+            <div ibmRow>
+              <ibm-label
+                ibmCol
+                [columnNumbers]="{'lg': 8}"
+                [invalid]="validateBaseField('sn')"
+                [invalidText]="'Ungültiger Nachname'">
+                Name
+                <input
+                  ibmText
+                  [(ngModel)]="entry.base.sn"
+                  readonly="true"
+                  [invalid]="validateBaseField('sn')"
+                  >
+              </ibm-label>
+              <ibm-label
+                ibmCol
+                [columnNumbers]="{'lg': 8}"
+                [invalid]="validateBaseField('givenName')"
+                [invalidText]="'Ungültiger Vorname'">
+                Vorname(n)
+                <input
+                  ibmText
+                  [(ngModel)]="entry.base.givenName"
+                  readonly="true"
+                  [invalid]="validateBaseField('givenName')"
+                  >
+              </ibm-label>
+            </div>
+          }
+          <ibm-label>
+            TelematikID
+            <input
+              ibmText
+              [(ngModel)]="entry.base.telematikID"
+              readonly="true"
+              >
+          </ibm-label>
+          <ibm-label>
+            DomainID
+            <textarea
+              ibmText
+              readonly="true"
+            >{{domainIDText}}</textarea>
+          </ibm-label>
+          <ibm-label>
+            Adresse
+            <input
+              ibmText
+              [(ngModel)]="entry.base.streetAddress"
+              readonly="true"
+              >
+          </ibm-label>
+          <div ibmRow>
+            <ibm-label
+              ibmCol
+              [columnNumbers]="{'lg': 11}"
+              >
+              Ort
+              <input
+                ibmText
+                [(ngModel)]="entry.base.localityName"
+                readonly="true"
                 >
-                    Ort
-                    <input
-                        ibmText
-                        [(ngModel)]="entry.base.localityName"
-                        readonly="true"
-                    >
-                </ibm-label>
-                <ibm-label 
-                    ibmCol
-                    [columnNumbers]="{'lg': 5}"
+            </ibm-label>
+            <ibm-label
+              ibmCol
+              [columnNumbers]="{'lg': 5}"
+              >
+              PLZ
+              <input
+                ibmText
+                [(ngModel)]="entry.base.postalCode"
+                readonly="true"
                 >
-                    PLZ
-                    <input
-                        ibmText
-                        [(ngModel)]="entry.base.postalCode"
-                        readonly="true"
-                    >
-                </ibm-label>
-                </div>
-                <div ibmRow>
-                    <ibm-label 
-                        ibmCol
-                        [columnNumbers]="{'lg': 11}"
-                    >
-                        Bundesland
-                        <input
-                            ibmText
-                            [(ngModel)]="entry.base.stateOrProvinceName"
-                            readonly="true"
-                        >
-                    </ibm-label>
-                    <ibm-label 
-                        ibmCol
-                        [columnNumbers]="{'lg': 5}"
-                        [invalid]="validateBaseField('countryCode')"
-                        [invalidText]="'Ungültiger Landescode'"
-                    >
-                        Landescode
-                        <input
-                            ibmText
-                            [(ngModel)]="entry.base.countryCode"
-                            readonly="true"
-                            [invalid]="validateBaseField('countryCode')"
-                        >
-                    </ibm-label>
-                    </div>
-    
-                <ibm-structured-list 
-                    [condensed]="true">
-                    <ibm-list-header>
-                        <ibm-list-column class="icon"></ibm-list-column>
-                        <ibm-list-column [nowrap]="true">Holder</ibm-list-column>
-                        <ibm-list-column class="right">Code</ibm-list-column>
-                    </ibm-list-header>
-                    <ibm-list-row *ngFor="let code of entry.base.holder">
-                        <ibm-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
-                        <ibm-list-column>{{code?.display}}</ibm-list-column>
-                        <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
-                    </ibm-list-row>
-                    <ibm-list-row *ngIf="(entry.base.holder?.length ?? 0) == 0">
-                        <ibm-list-column class="icon"><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
-                        <ibm-list-column>Keine Holder</ibm-list-column>
-                    </ibm-list-row>
-                </ibm-structured-list>
+            </ibm-label>
+          </div>
+          <div ibmRow>
+            <ibm-label
+              ibmCol
+              [columnNumbers]="{'lg': 11}"
+              >
+              Bundesland
+              <input
+                ibmText
+                [(ngModel)]="entry.base.stateOrProvinceName"
+                readonly="true"
+                >
+            </ibm-label>
+            <ibm-label
+              ibmCol
+              [columnNumbers]="{'lg': 5}"
+              [invalid]="validateBaseField('countryCode')"
+              [invalidText]="'Ungültiger Landescode'"
+              >
+              Landescode
+              <input
+                ibmText
+                [(ngModel)]="entry.base.countryCode"
+                readonly="true"
+                [invalid]="validateBaseField('countryCode')"
+                >
+            </ibm-label>
+          </div>
+          <ibm-structured-list
+            [condensed]="true">
+            <ibm-list-header>
+              <ibm-list-column class="icon"></ibm-list-column>
+              <ibm-list-column [nowrap]="true">Holder</ibm-list-column>
+              <ibm-list-column class="right">Code</ibm-list-column>
+            </ibm-list-header>
+            @for (code of entry.base.holder; track code) {
+              <ibm-list-row>
+                <ibm-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
+                <ibm-list-column>{{code?.display}}</ibm-list-column>
+                <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
+              </ibm-list-row>
+            }
+            @if ((entry.base.holder?.length ?? 0) == 0) {
+              <ibm-list-row>
+                <ibm-list-column class="icon"><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                <ibm-list-column>Keine Holder</ibm-list-column>
+              </ibm-list-row>
+            }
+          </ibm-structured-list>
+          <ibm-structured-list
+            [condensed]="true">
+            <ibm-list-header>
+              <ibm-list-column class="icon"></ibm-list-column>
+              <ibm-list-column [nowrap]="true">ProfessionOID</ibm-list-column>
+              <ibm-list-column class="right">Code</ibm-list-column>
+            </ibm-list-header>
+            @for (code of entry.base.professionOID; track code) {
+              <ibm-list-row>
+                <ibm-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
+                <ibm-list-column>{{code?.display}}</ibm-list-column>
+                <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
+              </ibm-list-row>
+            }
+            @if ((entry.base.professionOID?.length ?? 0) == 0) {
+              <ibm-list-row>
+                <ibm-list-column class="icon"><svg ibmIcon="error--filled" class="error"></svg></ibm-list-column>
+                <ibm-list-column>Keine ProfessionOID</ibm-list-column>
+              </ibm-list-row>
+            }
+          </ibm-structured-list>
+          <ibm-structured-list
+            [condensed]="true">
+            <ibm-list-header>
+              <ibm-list-column class="icon"></ibm-list-column>
+              <ibm-list-column [nowrap]="true">Spezialisierung</ibm-list-column>
+              <ibm-list-column class="right">Code</ibm-list-column>
+            </ibm-list-header>
+            @for (code of entry.base.specialization; track code) {
+              <ibm-list-row>
+                <ibm-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
+                <ibm-list-column>{{code?.display}}</ibm-list-column>
+                <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
+              </ibm-list-row>
+            }
+            @if ((entry.base.specialization?.length ?? 0) == 0) {
+              <ibm-list-row>
+                <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                <ibm-list-column>Keine Spezialisierung</ibm-list-column>
+              </ibm-list-row>
+            }
+          </ibm-structured-list>
+          <ibm-structured-list [condensed]="true">
+            <ibm-list-header>
+              <ibm-list-column></ibm-list-column>
+              <ibm-list-column [nowrap]="true">KIM-Adresse</ibm-list-column>
+              <ibm-list-column>Anbieter</ibm-list-column>
+              <ibm-list-column class="right">Version</ibm-list-column>
+            </ibm-list-header>
+            @for (kimAddress of entry.kimAddresses; track kimAddress) {
+              <ibm-list-row>
+                <ibm-list-column><svg ibmIcon="checkmark--filled" class="success"></svg></ibm-list-column>
+                <ibm-list-column>{{kimAddress?.mail}}</ibm-list-column>
+                <ibm-list-column>{{kimAddress?.provider?.display}}</ibm-list-column>
+                <ibm-list-column class="right">{{kimAddress?.version}}</ibm-list-column>
+              </ibm-list-row>
+            }
+            @if ((entry.kimAddresses?.length ?? 0) == 0) {
+              <ibm-list-row>
+                <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                <ibm-list-column>Keine KIM-Adressen</ibm-list-column>
+              </ibm-list-row>
+            }
+          </ibm-structured-list>
+        </ibm-tab>
+        <ng-template #fhirHeading><svg ibmIcon="fire" size="16" style="vertical-align: middle; margin-right: 4px;"></svg> FHIR</ng-template>
+        <ibm-tab [heading]="fhirHeading" title="FHIR" [active]="activeTab === 1" (selected)="activeTab = 1">
+          <h4>Öffnungszeiten</h4>
+          @if (fhirDaySchedule().length === 0 && !fhirError) {
+            <p class="no-fhir-data">Keine Öffnungszeiten hinterlegt.</p>
+          }
+          @if (fhirDaySchedule().length > 0) {
+            <ibm-structured-list [condensed]="true">
+              @for (d of fhirDaySchedule(); track d) {
+                <ibm-list-row>
+                  <ibm-list-column>{{d.day}}</ibm-list-column>
+                  <ibm-list-column [class.opening-times__time--closed]="d.closed">
+                    @if (d.closed) { Geschlossen }
+                    @else {
+                      @for (slot of d.slots; track slot; let last = $last) {
+                        {{slot.allDay ? 'Ganztägig' : slot.startTime + ' – ' + slot.endTime}}@if (!last) {<br>}
+                      }
+                    }
+                  </ibm-list-column>
+                </ibm-list-row>
+              }
+            </ibm-structured-list>
+          }
+          @if (fhirNotAvailable.length > 0) {
+            <h4 style="margin-top: 2rem;">Nicht verfügbar</h4>
+            <ibm-structured-list [condensed]="true">
+              <ibm-list-header>
+                <ibm-list-column [nowrap]="true">Beschreibung</ibm-list-column>
+                <ibm-list-column [nowrap]="true">Von</ibm-list-column>
+                <ibm-list-column [nowrap]="true">Bis</ibm-list-column>
+              </ibm-list-header>
+              @for (n of fhirNotAvailable; track n) {
+                <ibm-list-row>
+                  <ibm-list-column>{{n.description}}</ibm-list-column>
+                  <ibm-list-column>{{n.from ?? '–'}}</ibm-list-column>
+                  <ibm-list-column>{{n.to ?? '–'}}</ibm-list-column>
+                </ibm-list-row>
+              }
+            </ibm-structured-list>
+          }
+        </ibm-tab>
+        <ibm-tab heading="Karten" [active]="activeTab === 2" (selected)="activeTab = 2">
+          <h4>Karten</h4>
+          <ibm-structured-list [condensed]="true">
+            <ibm-list-header>
+              <ibm-list-column [nowrap]="true">Gültigkeit</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Typ</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Status</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Ausgestellt</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Läuft ab</ibm-list-column>
+            </ibm-list-header>
+            @if (!entry.smartcards || entry.smartcards.length === 0) {
+              <ibm-list-row>
+                <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                <ibm-list-column>Keine Karten</ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+              </ibm-list-row>
+            }
+            @for (smartcard of entry.smartcards; track smartcard) {
+              <ibm-list-row>
+                <ibm-list-column>
+                  <app-admin-directory-entry-validity-period
+                    [compact]="true"
+                    [notBefore]="smartcard.notBefore"
+                    [notAfter]="smartcard.notAfter">
+                  </app-admin-directory-entry-validity-period>
+                </ibm-list-column>
+                <ibm-list-column>{{smartcard.type}}</ibm-list-column>
+                <ibm-list-column>
+                  <svg [ibmIcon]="smartcard.active ? 'checkmark--filled' : 'warning--filled'"
+                       [class]="smartcard.active ? 'success' : 'warning'"></svg>
+                </ibm-list-column>
+                <ibm-list-column>{{smartcard.notBefore.substring(0, 10)}}</ibm-list-column>
+                <ibm-list-column>{{smartcard.notAfter.substring(0, 10)}}</ibm-list-column>
+              </ibm-list-row>
+            }
+          </ibm-structured-list>
 
-                <ibm-structured-list 
-                    [condensed]="true">
-                    <ibm-list-header>
-                        <ibm-list-column class="icon"></ibm-list-column>
-                        <ibm-list-column [nowrap]="true">ProfessionOID</ibm-list-column>
-                        <ibm-list-column class="right">Code</ibm-list-column>
-                    </ibm-list-header>
-                    <ibm-list-row *ngFor="let code of entry.base.professionOID">
-                        <ibm-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
-                        <ibm-list-column>{{code?.display}}</ibm-list-column>
-                        <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
-                    </ibm-list-row>
-                    <ibm-list-row *ngIf="(entry.base.professionOID?.length ?? 0) == 0">
-                        <ibm-list-column class="icon"><svg ibmIcon="error--filled" class="error"></svg></ibm-list-column>
-                        <ibm-list-column>Keine ProfessionOID</ibm-list-column>
-                    </ibm-list-row>
-                </ibm-structured-list>
-
-                <ibm-structured-list
-                    [condensed]="true">
-                    <ibm-list-header>
-                        <ibm-list-column class="icon"></ibm-list-column>
-                        <ibm-list-column [nowrap]="true">Spezialisierung</ibm-list-column>
-                        <ibm-list-column class="right">Code</ibm-list-column>
-                    </ibm-list-header>
-                    <ibm-list-row *ngFor="let code of entry.base.specialization">
-                        <ibm-list-column class="icon"><svg [ibmIcon]="codeIconName(code)" [class]="codeIconClass(code)"></svg></ibm-list-column>
-                        <ibm-list-column>{{code?.display}}</ibm-list-column>
-                        <ibm-list-column class="right">{{code?.code}}</ibm-list-column>
-                    </ibm-list-row>
-                    <ibm-list-row *ngIf="(entry.base.specialization?.length ?? 0) == 0">
-                        <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
-                        <ibm-list-column>Keine Spezialisierung</ibm-list-column>
-                    </ibm-list-row>
-                </ibm-structured-list>
-
-                <ibm-structured-list [condensed]="true">
-                    <ibm-list-header>
-                        <ibm-list-column></ibm-list-column>
-                        <ibm-list-column [nowrap]="true">KIM-Adresse</ibm-list-column>
-                        <ibm-list-column>Anbieter</ibm-list-column>
-                        <ibm-list-column class="right">Version</ibm-list-column>
-                    </ibm-list-header>
-                    <ibm-list-row *ngFor="let kimAddress of entry.kimAddresses">
-                        <ibm-list-column><svg ibmIcon="checkmark--filled" class="success"></svg></ibm-list-column>
-                        <ibm-list-column>{{kimAddress?.mail}}</ibm-list-column>
-                        <ibm-list-column>{{kimAddress?.provider?.display}}</ibm-list-column>
-                        <ibm-list-column class="right">{{kimAddress?.version}}</ibm-list-column>
-                    </ibm-list-row>
-                    <ibm-list-row *ngIf="(entry.kimAddresses?.length ?? 0) == 0">
-                        <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
-                        <ibm-list-column>Keine KIM-Adressen</ibm-list-column>
-                    </ibm-list-row>
-                </ibm-structured-list>           
-            </ibm-tab>
-            <ibm-tab heading="Karten">
-                <h2>Karten</h2>
-                <app-admin-directory-entry-smartcard 
-                    *ngFor="let smartcard of entry.smartcards" 
-                    [entry]="entry"
-                    [smartcard]="smartcard">
-                </app-admin-directory-entry-smartcard>
-                <ibm-structured-list [condensed]="true">
-                    <ibm-list-row *ngIf="entry.smartcards === undefined || entry.smartcards.length == 0">
-                        <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
-                        <ibm-list-column>Keine Karten</ibm-list-column>
-                    </ibm-list-row>
-                </ibm-structured-list>
-
-                <h2>Zertifikate</h2>
-
-                <div class="UserCertificateList">
-                    <ibm-structured-list [condensed]="true">
-                        <ibm-list-header>
-                            <ibm-list-column [nowrap]="true"> </ibm-list-column>
-                            <ibm-list-column [nowrap]="true">Seriennummer</ibm-list-column>
-                            <ibm-list-column [nowrap]="true">Alg</ibm-list-column>
-                            <ibm-list-column [nowrap]="true">Herausgeber</ibm-list-column>
-                            <ibm-list-column [nowrap]="true">herausgegeben</ibm-list-column>
-                            <ibm-list-column [nowrap]="true">läuft ab</ibm-list-column>
-                        </ibm-list-header>
-                        <ibm-list-row *ngFor="let cert of userCertificateList">
-                            <ibm-list-column><svg [ibmIcon]="cert.iconName" [class]="cert.iconClass"></svg></ibm-list-column>
-                            <ibm-list-column>{{cert.serialNumber}}</ibm-list-column>
-                            <ibm-list-column>{{cert.algorithm}}</ibm-list-column>
-                            <ibm-list-column>{{cert.issuer}}</ibm-list-column>
-                            <ibm-list-column>{{cert.notBefore}}</ibm-list-column>
-                            <ibm-list-column>{{cert.notAfter}}</ibm-list-column>
-                        </ibm-list-row>
-                        <ibm-list-row *ngIf="userCertificateList === undefined || userCertificateList.length === 0">
-                            <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
-                            <ibm-list-column>Keine Zertifikate</ibm-list-column>
-                            <ibm-list-column></ibm-list-column>
-                            <ibm-list-column></ibm-list-column>
-                            <ibm-list-column></ibm-list-column>
-                            <ibm-list-column></ibm-list-column>
-                        </ibm-list-row>
-                    </ibm-structured-list>           
-                </div>
-            </ibm-tab>
-            <ibm-tab heading="Protokoll">
-                <h2>Änderungsprotokoll</h2>
-                <ibm-structured-list 
-                    [condensed]="true">
-                    <ibm-list-header>
-                        <ibm-list-column class="icon"></ibm-list-column>
-                        <ibm-list-column [nowrap]="true">Zeitstempel</ibm-list-column>
-                        <ibm-list-column [nowrap]="true">Bearbeiter</ibm-list-column>
-                        <ibm-list-column>Operation</ibm-list-column>
-                    </ibm-list-header>
-                    <ibm-list-row *ngFor="let log of entry.logs">
-                        <ibm-list-column class="icon"><svg ibmIcon="checkmark--filled" class="success"></svg></ibm-list-column>
-                        <ibm-list-column>{{formatDate(log.logTime)}}</ibm-list-column>
-                        <ibm-list-column>{{log.clientID}}</ibm-list-column>
-                        <ibm-list-column>{{operationLabel(log.operation)}}</ibm-list-column>
-                    </ibm-list-row>
-                </ibm-structured-list>
-            </ibm-tab>
-            <ibm-tab heading="Rohdaten">
-                <ibm-code-snippet
-                    [display]="snippetDisplay"
-                    [maxCollapsedNumberOfRows]="300"
-                >{{rawData}}</ibm-code-snippet>
-            </ibm-tab>
-        </ibm-tabs>
+          <h4 style="margin-top: 2rem;">Zertifikate</h4>
+          <ibm-structured-list [condensed]="true">
+            <ibm-list-header>
+              <ibm-list-column [nowrap]="true">Status</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Seriennummer</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Alg</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Herausgeber</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Ausgestellt</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Läuft ab</ibm-list-column>
+            </ibm-list-header>
+            @if (userCertificateList.length === 0) {
+              <ibm-list-row>
+                <ibm-list-column><svg ibmIcon="warning--filled" class="warning"></svg></ibm-list-column>
+                <ibm-list-column>Keine Zertifikate</ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+                <ibm-list-column></ibm-list-column>
+              </ibm-list-row>
+            }
+            @for (cert of userCertificateList; track cert) {
+              <ibm-list-row>
+                <ibm-list-column><svg [ibmIcon]="cert.iconName" [class]="cert.iconClass"></svg></ibm-list-column>
+                <ibm-list-column>{{cert.serialNumber}}</ibm-list-column>
+                <ibm-list-column>{{cert.algorithm}}</ibm-list-column>
+                <ibm-list-column>{{cert.issuer}}</ibm-list-column>
+                <ibm-list-column>{{cert.notBefore}}</ibm-list-column>
+                <ibm-list-column>{{cert.notAfter}}</ibm-list-column>
+              </ibm-list-row>
+            }
+          </ibm-structured-list>
+        </ibm-tab>
+        <ibm-tab heading="Protokoll" [active]="activeTab === 3" (selected)="activeTab = 3">
+          <h2>Änderungsprotokoll</h2>
+          <ibm-structured-list
+            [condensed]="true">
+            <ibm-list-header>
+              <ibm-list-column class="icon"></ibm-list-column>
+              <ibm-list-column [nowrap]="true">Zeitstempel</ibm-list-column>
+              <ibm-list-column [nowrap]="true">Bearbeiter</ibm-list-column>
+              <ibm-list-column>Operation</ibm-list-column>
+            </ibm-list-header>
+            @for (log of entry.logs; track log) {
+              <ibm-list-row>
+                <ibm-list-column class="icon"><svg ibmIcon="checkmark--filled" class="success"></svg></ibm-list-column>
+                <ibm-list-column>{{formatDate(log.logTime)}}</ibm-list-column>
+                <ibm-list-column>{{log.clientID}}</ibm-list-column>
+                <ibm-list-column>{{operationLabel(log.operation)}}</ibm-list-column>
+              </ibm-list-row>
+            }
+          </ibm-structured-list>
+        </ibm-tab>
+        <ibm-tab heading="Rohdaten Admin" [active]="activeTab === 4" (selected)="activeTab = 4">
+          <ibm-code-snippet
+            [display]="snippetDisplay"
+            [maxCollapsedNumberOfRows]="300"
+          >{{rawData}}</ibm-code-snippet>
+        </ibm-tab>
+        <ng-template #rohdatenHeading><svg ibmIcon="fire" size="16" style="vertical-align: middle; margin-right: 4px;"></svg> Rohdaten FHIR</ng-template>
+        <ibm-tab [heading]="rohdatenHeading" title="Rohdaten FHIR" [active]="activeTab === 5" (selected)="activeTab = 5">
+          @if (fhirError) {
+            <cds-inline-notification [notificationObj]="fhirError"></cds-inline-notification>
+          } @else {
+            <ibm-code-snippet
+              [display]="snippetDisplay"
+              [maxCollapsedNumberOfRows]="300"
+            >{{rawFhirData}}</ibm-code-snippet>
+          }
+        </ibm-tab>
+      </ibm-tabs>
     </div>
     <div ibmCol [columnNumbers]="{'lg': 3}"></div>
-</div>
-  
+  </div>
+}

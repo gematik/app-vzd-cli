@@ -34,9 +34,9 @@ Commands:
   login                Logins into all configured APIs
   admin                CLI for DirectoryAdministration API
   fhir                 CLI for FHIR Directory
-  apo                  CLI for ApoVZD API
   gui                  Starts HTTP Server with GUI
   pers                 Process gematik SMC-B/HBA Exports
+  bff                  CLI to run client as microservice backend for frontend
   generate-completion  Generate a tab-complete script for the given shell
 ----
 
@@ -140,6 +140,8 @@ Die Anmeldung muss alle 6 Stunden wiederholt werden.
 
 [source,bash]
 ----
+# In alle Umgebungen / alle konfigurierte APIs anmelden
+vzd-cli login
 # Anmelden in die Referenzumgebung (ru)
 # es folgt eine Vault-Passwortabfrage
 vzd-cli login ru
@@ -176,15 +178,41 @@ vzd-cli admin ru search Müller Berlin
 vzd-cli admin ru show 1-SMC-B-Testkarte-883110000117729
 ----
 
-.*(Neu) Beispiel:* Suche nach einträgen in der FHIR FDV Search API in der Produktivumgebung (`pu`)
+.*(Neu) Beispiel:* Suche nach Einträgen in der FHIR FDV Search API in der Produktivumgebung (`ru`)
 [source,bash]
 ----
-vzd-cli fhir pu fdv search healthcare-service -t <TelematikID>
-vzd-cli fhir pu fdv search practitioner-role -t <TelematikID>
+vzd-cli fhir ru search healthcare-service -t <TelematikID>
+vzd-cli fhir ru earch practitioner-role -t <TelematikID>
 # oder in Kurzform
-vzd-cli fhir pu fdv search hs -t <TelematikID>
-vzd-cli fhir pu fdv search pr -t <TelematikID>
+vzd-cli fhir ru search hs -t <TelematikID>
+vzd-cli fhir ru search pr -t <TelematikID>
 ----
+
+.*(Neu) Beispiel:* Zeigen der Detailinformationen für die angegebene telematikID in der FHIR FDV Search API in der Referenzumgebung (`ru`)
+[source,bash]
+----
+vzd-cli fhir ru show <TelematikID>
+----
+
+.*(Neu) Beispiel:* Editieren des Eintrags mit der angegebenen TelematikID in der Referenzumgebung (`ru`)
+[source,bash]
+----
+vzd-cli fhir ru edit <TelematikID>
+----
+
+.*(Neu) Beispiel:* Download des FHIR Eintrags mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
+[source,bash]
+----
+vzd-cli fhir download <TelematikID> <filename>
+----
+
+.*(Neu) Beispiel:* Upload des FHIR Eintrags aus der angegebenen Datei in das Verzeichnis (erstellt oder aktualisiert den Eintrag)
+[source,bash]
+----
+vzd-cli fhir upload <filename>
+----
+
+
 
 == Übergreifende Befehle
 
@@ -621,19 +649,18 @@ Durch den Befehl `vzd-cli gui` wird ein HTTP Server gestartet und ein neuer Brow
 
 == (Neu) `vzd-cli fhir`: FHIR Directory APIs
 
-=== `vzd-cli fhir <tu|ru|pu> fdv search`
+=== `vzd-cli fhir <tu|ru|pu> login`
 
-Suche nach Einträgen in der FHIR FDV Search API.
+Anmelden beim FHIR Directory als Holder mit den für admin konfigurierten OAuth2 Client-Credentials aus dem Vault.
+Damit die Anmeldung funktioniert muus man sich als admin angemeldet haben (s. `vzd-cli admin <tu|ru|pu> login` oder `vzd-cli login`).
 
-.*Beispiel:* Suche nach Einträgen mit TelematikID
+.*Beispiel:* In alle drei Umgebungen einloggen
 [source,bash]
 ----
-vzd-cli fhir pu fdv search hs -t 1-1234567890
+vzd-cli fhir tu login
+vzd-cli fhir ru login
+vzd-cli fhir pu login
 ----
-
-=== `vzd-cli fhir fdv-vault`
-
-Befehle zur Verwaltung von OAuth2 Geheimnissen für die FHIR FDV Search API. Aufbau ist analog zu `vzd-cli admin vault`.
 
 === `vzd-cli fhir <tu|ru|pu> token`
 
@@ -659,6 +686,56 @@ vzd-cli fhir ru search hs -t 1-2234567890
 # Suche nach PractitionerRole Einträgen
 vzd-cli fhir ru search pr -t 1-1234567890
 ----
+
+=== `vzd-cli fhir <tu|ru|pu> show`
+Zeigt ausführliche Details zu dem FHIR Eintrag.
+
+.*Beispiel*
+----
+vzd-cli fhir ru show 1-1234567890
+----
+
+=== `vzd-cli fhir <tu|ru|pu> edit`
+
+Editieren des FHIR Eintrags mit der angegebenen TelematikID in einem Text-Editor.
+
+.*Beispiel*
+----
+vzd-cli fhir ru edit 1-1234567890
+----
+
+=== `vzd-cli fhir <tu|ru|pu> download`
+
+Lädt den FHIR Eintrag mit der angegebenen TelematikID und speichert ihn in der angegebenen Datei
+.*Beispiel*
+[source,bash]
+----
+vzd-cli fhir download 1-1234567890 bundle.json
+----
+
+=== `vzd-cli fhir <tu|ru|pu> upload`
+
+Lädt den FHIR Eintrag aus der angegebenen Datei in das Verzeichnis hoch (erstellt oder aktualisiert den Eintrag).
+.*Beispiel*
+[source,bash]
+----
+vzd-cli fhir upload bundle.json
+----
+
+
+=== `vzd-cli fhir <tu|ru|pu> fdv search`
+
+Suche nach Einträgen in der FHIR FDV Search API.
+
+.*Beispiel:* Suche nach Einträgen mit TelematikID
+[source,bash]
+----
+vzd-cli fhir pu fdv search hs -t 1-1234567890
+----
+
+=== `vzd-cli fhir fdv-vault`
+
+Befehle zur Verwaltung von OAuth2 Geheimnissen für die FHIR FDV Search API. Aufbau ist analog zu `vzd-cli admin vault`.
 
 == License
 

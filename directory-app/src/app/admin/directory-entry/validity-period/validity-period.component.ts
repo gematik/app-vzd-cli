@@ -7,13 +7,15 @@ const thresholds = [
 ]
 
 @Component({
-  selector: 'app-admin-directory-entry-validity-period',
-  templateUrl: './validity-period.component.html',
-  styleUrls: ['./validity-period.component.scss']
+    selector: 'app-admin-directory-entry-validity-period',
+    templateUrl: './validity-period.component.html',
+    styleUrls: ['./validity-period.component.scss'],
+    standalone: false
 })
 export class ValidityPeriodComponent implements OnInit {
   @Input() notBefore = ""
   @Input() notAfter = ""
+  @Input() compact = false
   text = ""
 
   threshold? = thresholds[2]

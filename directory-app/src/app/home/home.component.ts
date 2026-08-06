@@ -4,8 +4,9 @@ import { first, firstValueFrom } from 'rxjs';
 import { NavigationService } from 'src/services/navigation.service';
 
 @Component({
-  selector: 'app-home',
-  template: '',
+    selector: 'app-home',
+    template: '',
+    standalone: false
 })
 export class HomeComponent implements OnInit {
 
