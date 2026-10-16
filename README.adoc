@@ -739,7 +739,7 @@ Befehle zur Verwaltung von OAuth2 Geheimnissen für die FHIR FDV Search API. Auf
 
 == License
 
-Copyright 2022-2025 gematik GmbH
+Copyright 2022-2026 gematik GmbH
 
 EUROPEAN UNION PUBLIC LICENCE v. 1.2
 
