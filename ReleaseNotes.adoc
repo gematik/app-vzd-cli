@@ -1,5 +1,10 @@
 = Changelog `vzd-cli`
 
+== Unreleased
+
+- Lizenzheader (EUPL-1.2) in allen Quelldateien ergänzt
+- GUI: Angular auf 21.2.25 aktualisiert und Sicherheitslücken in transitiven Abhängigkeiten behoben (Dependabot)
+
 == Version 3.3.0
 
 - Login wurde überarbeitet, zentralisiert und vereinfacht. `vzd-cli login` ermöglicht jetzt den Login für alle Verzeichnisse (RU, TU, PU) und alle konfigurierte APIs (Admin, FHIR-Holder) mit einem einzigen Befehl.
