@@ -30,6 +30,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
+import de.gematik.ti.directory.admin.fromCertificate
 import de.gematik.ti.directory.cli.toJsonPrettyNoDefaults
 import de.gematik.ti.directory.cli.toYamlNoDefaults
 import de.gematik.ti.directory.pki.CertificateDataDER
@@ -122,19 +123,7 @@ class ExtractCommand :
         yamlPath.writeText(base.toYamlNoDefaults())
     }
 
-    private fun baseEntryFromCert(cert: CertificateDataDER): BaseDirectoryEntry {
-        val base = BaseDirectoryEntry(cert.certificateInfo.admissionStatement.registrationNumber, entryType = listOf("1"))
-        base.displayName = cert.certificateInfo.subjectInfo.cn
-        base.givenName = cert.certificateInfo.subjectInfo.givenName
-        base.sn = cert.certificateInfo.subjectInfo.sn
-
-        base.countryCode = cert.certificateInfo.subjectInfo.countryCode
-        base.stateOrProvinceName = cert.certificateInfo.subjectInfo.stateOrProvinceName
-        base.postalCode = cert.certificateInfo.subjectInfo.postalCode
-        base.localityName = cert.certificateInfo.subjectInfo.localityName
-        base.streetAddress = cert.certificateInfo.subjectInfo.streetAddress
-        return base
-    }
+    private fun baseEntryFromCert(cert: CertificateDataDER): BaseDirectoryEntry = BaseDirectoryEntry.fromCertificate(cert)
 
     private fun writeCert(cert: CertificateDataDER) {
         echo("└── ${cert.certificateInfo.serialNumber}")

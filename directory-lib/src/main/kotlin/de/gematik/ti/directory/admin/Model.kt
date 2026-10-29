@@ -97,7 +97,9 @@ data class BaseDirectoryEntry(
     var active: Boolean = true,
     var meta: List<String>? = null,
     var providedBy: String? = null,
-)
+) {
+    companion object
+}
 
 @Serializable
 data class UpdateBaseDirectoryEntry(
