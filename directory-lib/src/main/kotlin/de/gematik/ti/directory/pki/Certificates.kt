@@ -24,6 +24,7 @@
 package de.gematik.ti.directory.pki
 
 import de.gematik.ti.directory.DirectoryException
+import de.gematik.ti.directory.admin.EntryTypeMapping
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.KSerializer
@@ -69,6 +70,8 @@ data class CertificateInfo(
     val ocspReponderURL: String? = null,
     var ocspResponse: OCSPResponse? = null,
     var thumbprint: String? = null,
+    val certificateType: String? = null,
+    val entryType: String? = null,
 )
 
 /**
@@ -141,6 +144,8 @@ data class CertificateDataDER(
                 ocspResponderURL,
                 null,
                 thumbprintStr,
+                certificate.certificateType()?.label,
+                EntryTypeMapping.entryTypeOf(admission.professionOids)?.toString(),
             )
         }
     }
