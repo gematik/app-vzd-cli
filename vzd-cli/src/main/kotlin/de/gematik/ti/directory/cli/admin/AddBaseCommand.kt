@@ -34,6 +34,7 @@ import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.AdminResponseException
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.CreateDirectoryEntry
+import de.gematik.ti.directory.admin.setAttributes
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.cli.toJsonPretty
 import de.gematik.ti.directory.cli.toYaml
@@ -43,32 +44,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
-import java.beans.Introspector
 import java.io.File
-
-fun setAttributes(
-    baseDirectoryEntry: BaseDirectoryEntry?,
-    attrs: Map<String, String>,
-) {
-    attrs.forEach { (name, value) ->
-
-        val beanInfo = Introspector.getBeanInfo(BaseDirectoryEntry::class.java)
-
-        val property = beanInfo.propertyDescriptors.filter { it.writeMethod != null }.first { it.name == name }
-
-        if (property.propertyType == String::class.java) {
-            property.writeMethod.invoke(baseDirectoryEntry, value)
-        } else if (property.propertyType == Int::class.java || property.propertyType == Integer::class.java) {
-            property.writeMethod.invoke(baseDirectoryEntry, value.toInt())
-        } else if (property.readMethod.genericReturnType.typeName == "java.util.List<java.lang.String>") {
-            property.writeMethod.invoke(baseDirectoryEntry, value.split(',').map { it.trim() })
-        } else if (property.propertyType == Boolean::class.java) {
-            property.writeMethod.invoke(baseDirectoryEntry, value.toBoolean())
-        } else {
-            throw UsageError("Unsupported property type '$name': ${property.readMethod.genericReturnType.typeName}")
-        }
-    }
-}
 
 class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory entry") {
     private val logger = KotlinLogging.logger {}

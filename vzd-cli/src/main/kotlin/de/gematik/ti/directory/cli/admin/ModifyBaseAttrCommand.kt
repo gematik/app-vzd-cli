@@ -34,6 +34,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.UpdateBaseDirectoryEntry
+import de.gematik.ti.directory.admin.setAttributes
 import de.gematik.ti.directory.cli.*
 import de.gematik.ti.directory.cli.toJsonPrettyNoDefaults
 import kotlinx.coroutines.runBlocking
