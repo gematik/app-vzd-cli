@@ -485,9 +485,43 @@ vzd-cli admin template base --json > Eintrag.json
 
 Neuen Verzeichnisdiensteintrag erstellen.
 
-*Beispiel:* einen leeren Eintrag mit angegebenen telematikID erstellen:
+==== Eintrag direkt aus dem ENC-Zertifikat anlegen (`--from-cert`)
+
+Der empfohlene Weg: Basiseintrag und Zertifikat werden in einem Schritt aus dem ENC-Zertifikat der SMC-B (C.HCI.ENC) bzw. des HBA (C.HP.ENC) angelegt. Als Eingabe werden DER, PEM und PKCS#12 (`.p12`/`.pfx`) akzeptiert; aus einem PKCS#12 wird das ENC-Zertifikat automatisch ausgewählt (AUT/OSIG werden ignoriert, abgelaufene Zertifikate mit Warnung verworfen).
+
+[source,bash]
 ----
-vzd-cli admin ru add-base -s telematikID=9-TEST -s entryType=4
+# Apotheke aus der SMC-B-Datei anlegen, PKCS#12-Passwort aus einer Umgebungsvariable
+vzd-cli admin ru add-base --from-cert smcb.p12 --passin env:SMCB_PIN
+
+# Werte überschreiben oder bewusst leer lassen (-s ATTR= ohne Wert)
+vzd-cli admin ru add-base --from-cert smcb.der -s specialization=10 -s stateOrProvinceName=
+
+# Skripte und CI: niemals nachfragen, bei fehlenden Pflichtwerten abbrechen
+vzd-cli admin ru add-base --from-cert smcb.der --no-prompt -s specialization=10
+----
+
+Aus dem Zertifikat kommen `telematikID`, `displayName` (CN, bei HBA `Nachname, Vorname`) und die Adresse aus dem Subject (`streetAddress`, `postalCode`, `localityName`, `stateOrProvinceName`, `countryCode`). `entryType`, `professionOID`, `cn`, `sn`, `givenName`, `personalEntry` und `holder` werden *nicht* gesendet, der VZD setzt sie selbst aus dem Zertifikat (gemSpec_VZD, Tab_VZD_Datenbeschreibung).
+
+Vor dem Upload prüft die CLI die Regeln aus gemILF_Pflege_VZD (Pflichtfelder je Sektor anhand der TelematikID, `countryCode` bei Adresse, PLZ fünfstellig bei DE, Bundesland aus dem CodeSystem Region, Format von `specialization`). Fehlende Pflichtwerte werden interaktiv abgefragt; mit `--no-prompt` oder ohne Terminal bricht die CLI mit einer Liste der fehlenden Attribute und dem passenden `-s`-Aufruf ab. Ein `-s ATTR=` mit leerem Wert bedeutet "bewusst leer" und macht aus dem Fehler eine Warnung.
+
+Formate für `specialization` je Sektor:
+
+[cols="1,2,2",options="header"]
+|===
+|Sektor |Format |Beispiel
+|Apotheke (SMC-B) |Code aus https://simplifier.net/vzd-fhir-directory/pharmacytypeldapcs[PharmacyTypeLDAPCS], nur der Code |`10` (Offizin-Apotheke), `40` (Versandapotheke). Die FHIR-Codes wie `offizin-apotheke` sind im LDAP-VZD nicht gültig.
+|Andere SMC-B |`urn:psc:<OID>:<Code>` aus HealthcareServiceTypeVS |`urn:psc:1.3.6.1.4.1.19376.3.276.1.5.4:ALLG`
+|HBA |`urn:as:<OID>:<Code>` aus PractitionerQualificationVS |`urn:as:1.2.276.0.76.5.514:011001`
+|===
+
+==== Leeren Basiseintrag ohne Zertifikat anlegen
+
+Ohne Zertifikat muss `entryType` angegeben werden. Der Wert folgt der Tabelle Tab_VZD_Mapping_Eintragstyp_und_ProfessionOID aus gemSpec_VZD: 1 = Berufsgruppe (HBA), 3 = Leistungserbringerinstitution (z. B. Apotheke `1.2.276.0.76.4.54`, Arztpraxis, Krankenhaus), 4 = Organisation, 5 = Krankenkasse. Beim späteren `add-cert` muss der Wert zum Zertifikat passen, sonst lehnt der VZD das Zertifikat mit `entryType mismatch` ab.
+
+*Beispiel:* einen leeren Apotheken-Eintrag mit angegebener telematikID erstellen:
+----
+vzd-cli admin ru add-base -s telematikID=3-01.2.2023000 -s entryType=3
 ----
 
 === `vzd-cli admin <tu|ru|pu> load-base`
@@ -508,11 +542,12 @@ Löscht Einträge aus dem Verzeichnisdienst.
 
 === `vzd-cli admin cert-info`
 
-Zeigt informationen aus Zertifikate (DER-Format) und führt OCSP-Abfragen durch.
+Zeigt Informationen aus Zertifikaten (DER, PEM oder PKCS#12) und führt OCSP-Abfragen durch. Neben dem Subject und dem Admission Statement werden `certificateType` (z. B. `C.HCI.ENC`, `C.HCI.AUT`, `C.HP.ENC`) und der aus der professionOID abgeleitete `entryType` ausgegeben.
 
 [source,bash]
 ----
 vzd-cli admin cert-info cert1.der cert2.der --ocsp
+vzd-cli admin cert-info smcb.p12 --passin pass:123456
 ----
 
 
@@ -522,7 +557,9 @@ Suche und Anzeige von X509-Zertifikaten.
 
 === `vzd-cli admin <tu|ru|pu> add-cert`
 
-Fügt einen neuen X509-Zertifikat zu existierenden Verzeichnisdiensteintrag hinzu.
+Fügt ein X509-Zertifikat (DER, PEM oder PKCS#12, Passwort über `--passin`) zu einem existierenden Verzeichnisdiensteintrag hinzu. Für neue Einträge ist `add-base --from-cert` der einfachere Weg.
+
+Vor dem Upload prüft die CLI lokal, ob es sich um ein ENC-Zertifikat handelt (der VZD akzeptiert nur C.HCI.ENC und C.HP.ENC), ob das Admission Statement vorhanden ist und ob `entryType` des Basiseintrags zur professionOID des Zertifikats passt. Verstöße werden mit Erklärung und Korrekturvorschlag gemeldet statt mit dem Server-Text `Error when KOMLECertPolicies-check!` oder `entryType mismatch`.
 
 [source,bash]
 ----
@@ -649,18 +686,11 @@ Durch den Befehl `vzd-cli gui` wird ein HTTP Server gestartet und ein neuer Brow
 
 == (Neu) `vzd-cli fhir`: FHIR Directory APIs
 
-=== `vzd-cli fhir <tu|ru|pu> login`
+=== Anmeldung am FHIR Directory
 
-Anmelden beim FHIR Directory als Holder mit den für admin konfigurierten OAuth2 Client-Credentials aus dem Vault.
-Damit die Anmeldung funktioniert muus man sich als admin angemeldet haben (s. `vzd-cli admin <tu|ru|pu> login` oder `vzd-cli login`).
+Die Anmeldung als Holder erfolgt zentral über `vzd-cli login` (s. oben) mit den für admin konfigurierten OAuth2 Client-Credentials aus dem Vault. Einen eigenen Befehl `vzd-cli fhir <tu|ru|pu> login` gibt es nicht mehr.
 
-.*Beispiel:* In alle drei Umgebungen einloggen
-[source,bash]
-----
-vzd-cli fhir tu login
-vzd-cli fhir ru login
-vzd-cli fhir pu login
-----
+Für die FDV Search API gibt es `vzd-cli fhir <tu|ru|pu> fdv login` und `vzd-cli fhir <tu|ru|pu> fdv token`.
 
 === `vzd-cli fhir <tu|ru|pu> token`
 

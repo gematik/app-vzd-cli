@@ -2,6 +2,13 @@
 
 == Unreleased
 
+- `vzd-cli admin <ru|tu|pu> add-base --from-cert <FILE>`: legt Basiseintrag und Zertifikat in einem Schritt aus dem ENC-Zertifikat an (DER, PEM oder PKCS#12 mit `--passin`). Werte aus dem Zertifikat können mit `-s` überschrieben oder mit `-s ATTR=` bewusst leer gelassen werden; fehlende Pflichtwerte je Sektor (gemILF_Pflege_VZD) werden interaktiv abgefragt, `--no-prompt` bricht stattdessen mit einer Liste ab. `entryType` und `professionOID` werden nicht mehr vom Nutzer geraten, sondern vom VZD aus dem Zertifikat gesetzt.
+- `vzd-cli admin <ru|tu|pu> add-cert` akzeptiert PKCS#12 und prüft vor dem Upload lokal Zertifikatstyp (nur C.HCI.ENC/C.HP.ENC), Admission Statement und `entryType` des Basiseintrags; Fehler werden erklärt statt als Server-Text ausgegeben
+- `vzd-cli admin cert-info` akzeptiert PKCS#12 und zeigt `certificateType` sowie den abgeleiteten `entryType`
+- Bekannte Server-Fehler (`entryType mismatch`, `HealthcareSpeciality mismatch`, `KOMLECertPolicies`, `stateOrProvinceName`) werden um die erlaubten Werte bzw. das Mapping ergänzt
+- Bugfix: Apotheken-Spezialisierungen werden in `show` mit den LDAP-Bedeutungen aus PharmacyTypeLDAPCS angezeigt (10 = Offizin-Apotheke statt Handverkauf)
+- Bugfix: `vzd-cli pers extract` setzt beim Ableiten des Basiseintrags aus dem Zertifikat nicht mehr pauschal `entryType=1`
+- README: Apotheken-Beispiel mit `entryType=3`, Formate für `specialization` je Sektor, Anmeldung am FHIR Directory korrigiert
 - Lizenzheader (EUPL-1.2) in allen Quelldateien ergänzt
 - GUI: Angular auf 21.2.25 aktualisiert und Sicherheitslücken in transitiven Abhängigkeiten behoben (Dependabot)
 
