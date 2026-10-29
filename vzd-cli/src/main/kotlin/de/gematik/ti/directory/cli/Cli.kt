@@ -36,6 +36,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import de.gematik.ti.directory.DirectoryException
 import de.gematik.ti.directory.admin.AdminResponseException
+import de.gematik.ti.directory.admin.explainServerError
 import de.gematik.ti.directory.cli.admin.AdminCli
 import de.gematik.ti.directory.cli.bff.BffCommand
 import de.gematik.ti.directory.cli.fhir.FhirCli
@@ -90,7 +91,8 @@ fun catching(throwingBlock: () -> Unit = {}) {
                 "ACCESS_TOKEN is invalid. Please login again using `vzd-cli admin <ru|tu|pu> login` or provide token by other means.",
             )
         } else {
-            throw CliktError(e.details)
+            val details = e.details
+            throw CliktError(explainServerError(details)?.let { "$details\n$it" } ?: details)
         }
     } catch (e: SerializationException) {
         throw CliktError(e.message)
