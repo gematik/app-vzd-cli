@@ -1,0 +1,232 @@
+{
+  "sectors": [
+    {
+      "pattern": "^1-20.*",
+      "name": "Kassenärztliche Vereinigungen (SMC-B)",
+      "table": 2,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "specialization",
+        "domainID"
+      ],
+      "specializationFormat": "PSC"
+    },
+    {
+      "pattern": "^2-2.*",
+      "name": "Kassenzahnärztliche Vereinigungen (SMC-B)",
+      "table": 3,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "specialization",
+        "domainID"
+      ],
+      "specializationFormat": "PSC"
+    },
+    {
+      "pattern": "(^3-...2.*|^9-2.54.*)",
+      "name": "Apotheken (SMC-B)",
+      "table": 4,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "specialization"
+      ],
+      "specializationFormat": "PHARMACY_LDAP"
+    },
+    {
+      "pattern": "(^3-...3.*|^9-1.(32|33|34).*)",
+      "name": "Apotheker, Pharmazieingenieure, Apothekerassistenten (HBA)",
+      "table": 5,
+      "cardType": "HBA",
+      "mandatory": [],
+      "specializationFormat": "AS"
+    },
+    {
+      "pattern": "^5-.*",
+      "name": "DKTIG Krankenhaus (SMC-B)",
+      "table": 6,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "specialization"
+      ],
+      "specializationFormat": "PSC"
+    },
+    {
+      "pattern": "^4-1.*",
+      "name": "Psychotherapeuten (HBA)",
+      "table": 7,
+      "cardType": "HBA",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "specialization"
+      ],
+      "specializationFormat": "AS"
+    },
+    {
+      "pattern": "^1-1*",
+      "name": "Ärzte-Kammern (HBA)",
+      "table": 8,
+      "cardType": "HBA",
+      "mandatory": [
+        "specialization"
+      ],
+      "specializationFormat": "AS"
+    },
+    {
+      "pattern": "^2-0?1.*",
+      "name": "Zahnärzte-Kammern (HBA)",
+      "table": 9,
+      "cardType": "HBA",
+      "mandatory": [
+        "specialization"
+      ],
+      "specializationFormat": "AS"
+    },
+    {
+      "pattern": "^8-01.*",
+      "name": "GKV-SV SMC-B KTR",
+      "table": 10,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "organization"
+      ],
+      "specializationFormat": "NONE"
+    },
+    {
+      "pattern": "^8-(03|04).*",
+      "name": "GKV-SV SM-B KTR ePA",
+      "table": 11,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "organization"
+      ],
+      "specializationFormat": "NONE"
+    },
+    {
+      "pattern": "^9-2.(58|187|210|223|226|227|228|224|225|229|230|231|242|243|244|245|262|263|264|265|266|267|268|269|270|271|284|285|286|295).*",
+      "name": "SMC-B-Org (gematik)",
+      "table": 12,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName"
+      ],
+      "specializationFormat": "PSC"
+    },
+    {
+      "pattern": "^10-67.(245|246|247|278|279|280|281|311).*",
+      "name": "eGBR Nichtärztliche Institutionen (SMC-B)",
+      "table": 13,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "stateOrProvinceName",
+        "specialization",
+        "domainID"
+      ],
+      "specializationFormat": "PSC"
+    },
+    {
+      "pattern": "^10-67.(232|233|234|235|236|274|275|276|277|312).*",
+      "name": "eGBR Weitere Gesundheitsfachberufe (HBA)",
+      "table": 14,
+      "cardType": "HBA",
+      "mandatory": [
+        "specialization",
+        "domainID"
+      ],
+      "specializationFormat": "AS"
+    },
+    {
+      "pattern": "^9-2.(50|51|34|254|255|256).*",
+      "name": "Weitere ärztliche Institutionen (SMC-B)",
+      "table": 15,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "specialization"
+      ],
+      "specializationFormat": "PSC"
+    },
+    {
+      "pattern": "^9-2.(59|273|303).*",
+      "name": "Weitere Kostenträger und PKV (SMC-B)",
+      "table": 16,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName"
+      ],
+      "specializationFormat": "NONE"
+    },
+    {
+      "pattern": "^9-2.282.*",
+      "name": "DiGA (SMC-B)",
+      "table": 17,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName"
+      ],
+      "specializationFormat": "NONE"
+    },
+    {
+      "pattern": "^11-2.*",
+      "name": "Handwerkskammern Nichtärztliche Institutionen (SMC-B)",
+      "table": 18,
+      "cardType": "SMC_B",
+      "mandatory": [
+        "streetAddress",
+        "postalCode",
+        "localityName",
+        "stateOrProvinceName",
+        "specialization"
+      ],
+      "specializationFormat": "PSC"
+    },
+    {
+      "pattern": "^11-1.*",
+      "name": "Handwerkskammern Weitere Gesundheitsfachberufe (BA)",
+      "table": 19,
+      "cardType": "HBA",
+      "mandatory": [
+        "specialization"
+      ],
+      "specializationFormat": "AS"
+    },
+    {
+      "pattern": "^9-2.292.*",
+      "name": "NCPeH (SMC-B)",
+      "table": 20,
+      "cardType": "SMC_B",
+      "mandatory": [],
+      "specializationFormat": "NONE"
+    }
+  ]
+}
