@@ -56,4 +56,6 @@ private fun loadSimpleCodeSystem(name: String): SimpleCodeSystem = json.decodeFr
 val OrganizationProfessionOID = loadSimpleCodeSystem("OrganizationProfessionOID")
 val PractitionerProfessionOID = loadSimpleCodeSystem("PractitionerProfessionOID")
 val PharmacyHealthcareSpecialtyCS = loadSimpleCodeSystem("PharmacyHealthcareSpecialtyCS")
+val PharmacyTypeLDAPCS = loadSimpleCodeSystem("PharmacyTypeLDAPCS")
+val Region = loadSimpleCodeSystem("Region")
 val Holder = loadSimpleCodeSystem("HolderCS")

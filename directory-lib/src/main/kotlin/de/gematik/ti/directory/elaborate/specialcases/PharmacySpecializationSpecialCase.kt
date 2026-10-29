@@ -25,7 +25,7 @@ package de.gematik.ti.directory.elaborate.specialcases
 
 import de.gematik.ti.directory.elaborate.ElaborateDirectoryEntry
 import de.gematik.ti.directory.elaborate.SpecialCase
-import de.gematik.ti.directory.fhir.PharmacyHealthcareSpecialtyCS
+import de.gematik.ti.directory.fhir.PharmacyTypeLDAPCS
 
 class PharmacySpecializationSpecialCase : SpecialCase {
     override fun apply(entry: ElaborateDirectoryEntry) {
@@ -35,7 +35,7 @@ class PharmacySpecializationSpecialCase : SpecialCase {
                     if (it.system != null) {
                         it
                     } else {
-                        PharmacyHealthcareSpecialtyCS.resolveCode(it.code) ?: it
+                        PharmacyTypeLDAPCS.resolveCode(it.code) ?: it
                     }
                 }
         }

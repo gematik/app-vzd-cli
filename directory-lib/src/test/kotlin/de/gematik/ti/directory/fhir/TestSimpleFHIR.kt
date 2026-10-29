@@ -23,9 +23,13 @@
 
 package de.gematik.ti.directory.fhir
 
+import de.gematik.ti.directory.admin.BaseDirectoryEntry
+import de.gematik.ti.directory.admin.DirectoryEntry
+import de.gematik.ti.directory.elaborate.elaborate
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 
 class TestSimpleFHIR :
     FeatureSpec({
@@ -47,6 +51,21 @@ class TestSimpleFHIR :
                         )?.display shouldBe "Allgemeinmedizin"
                 }
                 PractitionerQualificationVS.resolveCode("urn:oid:1.2.276.0.76.5.114", "010")?.display shouldBe "FA Allgemeinmedizin"
+            }
+
+            scenario("PharmacyTypeLDAPCS codes") {
+                PharmacyTypeLDAPCS.concept.map { it.code } shouldBe listOf("10", "20", "30", "40", "50")
+                PharmacyTypeLDAPCS.resolveCode("10")?.display shouldBe "Offizin-Apotheke"
+            }
+
+            scenario("Region has 18 values") {
+                Region.concept.size shouldBe 18
+                Region.resolveCode("Schleswig-Holstein") shouldNotBe null
+            }
+
+            scenario("Pharmacy specialization resolves to LDAP code system") {
+                val entry = DirectoryEntry(BaseDirectoryEntry(telematikID = "3-01.2.2023000", specialization = listOf("10")))
+                entry.elaborate().base.specialization?.first()?.display shouldBe "Offizin-Apotheke"
             }
         }
     })
