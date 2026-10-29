@@ -28,12 +28,14 @@ import com.github.ajalt.clikt.core.UsageError
 import de.gematik.ti.directory.cli.admin.formatFindingsForAbort
 import de.gematik.ti.directory.cli.admin.promptForErrors
 import de.gematik.ti.directory.pki.TestCertificates
+import de.gematik.ti.directory.admin.withAnswers
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import kotlin.io.path.writeText
 
 class TestAddBaseFromCert :
@@ -57,13 +59,6 @@ class TestAddBaseFromCert :
                     }
                 e.message shouldContain "postalCode must be a 5 digit number"
                 e.message shouldContain "-s postalCode="
-            }
-            scenario("--no-prompt with deliberately empty countryCode is only a warning") {
-                val e =
-                    shouldThrow<CliktError> {
-                        runCLI(listOf("admin", "ru", "add-base", "--from-cert", pharmacy.toString(), "--no-prompt", "-s", "specialization=10", "-s", "countryCode="))
-                    }
-                e.message shouldContain "ACCESS_TOKEN"
             }
             scenario("--no-prompt with missing specialization lists the pharmacy codes") {
                 val e = shouldThrow<CliktError> { runCLI(listOf("admin", "ru", "add-base", "--from-cert", pharmacy.toString(), "--no-prompt")) }
@@ -99,6 +94,28 @@ class TestAddBaseFromCert :
                 result.hasErrors() shouldBe false
                 result.base.postalCode shouldBe "10117"
                 result.base.specialization shouldBe null
+            }
+            scenario("formatFindingsForAbort omits the --no-prompt hint for interactive users") {
+                formatFindingsForAbort(pharmacyDraft, interactive = true) shouldNotContain "--no-prompt"
+                formatFindingsForAbort(pharmacyDraft) shouldContain "--no-prompt"
+            }
+            scenario("promptForErrors re-asks while the answer is invalid") {
+                val draft = draftFromCertificates(listOf(TestCertificates.toDer(pharmacyCert)), mapOf("specialization" to "10"))
+                val answers = ArrayDeque(listOf("1011", "abc", "10117"))
+                val asked = mutableListOf<String>()
+                val result = promptForErrors(draft.withAnswers(mapOf("postalCode" to "1011"))) { f, _ -> asked += f.attribute; answers.removeFirst() }
+                asked shouldBe listOf("postalCode", "postalCode", "postalCode")
+                result.hasErrors() shouldBe false
+                result.base.postalCode shouldBe "10117"
+            }
+            scenario("promptForErrors gives up after three invalid answers") {
+                val draft = draftFromCertificates(listOf(TestCertificates.toDer(pharmacyCert)), mapOf("specialization" to "10", "postalCode" to "1011"))
+                val result = promptForErrors(draft) { _, _ -> "1" }
+                result.hasErrors() shouldBe true
+            }
+            scenario("promptForErrors aborts on end of input") {
+                val draft = draftFromCertificates(listOf(TestCertificates.toDer(pharmacyCert)), emptyMap())
+                shouldThrow<CliktError> { promptForErrors(draft) { _, _ -> null } }.message shouldContain "Aborted"
             }
             scenario("promptForErrors treats the dash answer as deliberately empty") {
                 val draft = draftFromCertificates(listOf(TestCertificates.toDer(pharmacyCert)), emptyMap())

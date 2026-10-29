@@ -46,10 +46,20 @@ class CertificateSelectionException(
  * Keeps the certificates the VZD would accept: encryption type, admission present, currently valid.
  * Sorted by notBefore because the VZD takes the automatically extracted values from the last certificate.
  */
+data class CertificateSelection(
+    val selected: List<CertificateDataDER>,
+    val rejected: List<String>,
+)
+
 fun selectEncryptionCertificates(
     certs: List<CertificateDataDER>,
     now: Instant = Clock.System.now(),
-): List<CertificateDataDER> {
+): List<CertificateDataDER> = selectEncryptionCertificatesWithReport(certs, now).selected
+
+fun selectEncryptionCertificatesWithReport(
+    certs: List<CertificateDataDER>,
+    now: Instant = Clock.System.now(),
+): CertificateSelection {
     val rejected = mutableListOf<String>()
     val selected =
         certs.filter { cert ->
@@ -77,7 +87,7 @@ fun selectEncryptionCertificates(
     if (sorted.map { it.certificateInfo.subject }.distinct().size > 1) {
         logger.info { "Selected certificates have different subjects; base entry is derived from the newest one" }
     }
-    return sorted
+    return CertificateSelection(sorted, rejected)
 }
 
 private fun rejectionReason(
@@ -111,6 +121,7 @@ data class CertificateEntryDraft(
     val sector: Sector?,
     val findings: List<PreflightFinding>,
     val deliberatelyEmpty: Set<String>,
+    val rejected: List<String> = emptyList(),
 ) {
     fun toCreateDirectoryEntry(): CreateDirectoryEntry =
         CreateDirectoryEntry(base, certificates.map { UserCertificate(userCertificate = it) })
@@ -123,7 +134,8 @@ fun draftFromCertificates(
     overrides: Map<String, String>,
     now: Instant = Clock.System.now(),
 ): CertificateEntryDraft {
-    val selected = selectEncryptionCertificates(certs, now)
+    val selection = selectEncryptionCertificatesWithReport(certs, now)
+    val selected = selection.selected
     val primary = selected.last()
     val professionOids = primary.certificateInfo.admissionStatement.professionOids
     val entryType = EntryTypeMapping.entryTypeOf(professionOids)
@@ -147,6 +159,7 @@ fun draftFromCertificates(
         sector = SectorMapping.sectorOf(base.telematikID),
         findings = preflight(base, deliberatelyEmpty),
         deliberatelyEmpty = deliberatelyEmpty,
+        rejected = selection.rejected,
     )
 }
 

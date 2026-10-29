@@ -161,6 +161,7 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
     private fun createFromCertificate(file: Path): List<DirectoryEntry>? {
         val certificates = loadCertificates(file, certificateInput.passwordProvider(this, noPrompt))
         var draft = draftFromCertificates(certificates, attrs)
+        draft.rejected.forEach { echo("Warning: ignoring certificate $it", err = true) }
 
         val interactive = !noPrompt && System.console() != null
         if (interactive) {
@@ -169,7 +170,7 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
             }
         }
         if (draft.hasErrors()) {
-            throw CliktError(formatFindingsForAbort(draft))
+            throw CliktError(formatFindingsForAbort(draft, interactive))
         }
         draft.findings
             .filter { it.severity == FindingSeverity.WARNING }
@@ -197,7 +198,7 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
 
     private fun addCertificatesToExistingEntry(draft: CertificateEntryDraft): List<DirectoryEntry>? {
         val telematikID = draft.base.telematikID
-        logger.warn { "Entry with telematikID=$telematikID already exists. Adding certificates to the existing entry." }
+        echo("Entry with telematikID=$telematikID already exists. Adding certificates to the existing entry.", err = true)
         val existing =
             runBlocking { context.client.readDirectoryEntry(mapOf("telematikID" to telematikID)) }?.firstOrNull()
                 ?: throw CliktError("Entry with telematikID $telematikID exists but could not be read.")
@@ -208,7 +209,7 @@ class AddBaseCommand : CliktCommand(name = "add-base", help = "Add new directory
                 echo("Added certificate: telematikID=$telematikID serialNumber=${cert.certificateInfo.serialNumber}")
             } catch (e: AdminResponseException) {
                 if (e.response.status != HttpStatusCode.Conflict) throw e
-                logger.warn { "Certificate with serialNumber=${cert.certificateInfo.serialNumber} already exists. Ignoring conflict." }
+                echo("Certificate with serialNumber=${cert.certificateInfo.serialNumber} already exists. Ignoring conflict.", err = true)
             }
         }
         return runBlocking { context.client.readDirectoryEntry(mapOf("uid" to uid)) }

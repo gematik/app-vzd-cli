@@ -503,7 +503,7 @@ vzd-cli admin ru add-base --from-cert smcb.der --no-prompt -s specialization=10
 
 Aus dem Zertifikat kommen `telematikID`, `displayName` (CN, bei HBA `Nachname, Vorname`) und die Adresse aus dem Subject (`streetAddress`, `postalCode`, `localityName`, `stateOrProvinceName`, `countryCode`). `entryType`, `professionOID`, `cn`, `sn`, `givenName`, `personalEntry` und `holder` werden *nicht* gesendet, der VZD setzt sie selbst aus dem Zertifikat (gemSpec_VZD, Tab_VZD_Datenbeschreibung).
 
-Vor dem Upload prüft die CLI die Regeln aus gemILF_Pflege_VZD (Pflichtfelder je Sektor anhand der TelematikID, `countryCode` bei Adresse, PLZ fünfstellig bei DE, Bundesland aus dem CodeSystem Region, Format von `specialization`). Fehlende Pflichtwerte werden interaktiv abgefragt; mit `--no-prompt` oder ohne Terminal bricht die CLI mit einer Liste der fehlenden Attribute und dem passenden `-s`-Aufruf ab. Ein `-s ATTR=` mit leerem Wert bedeutet "bewusst leer" und macht aus dem Fehler eine Warnung.
+Vor dem Upload prüft die CLI die Regeln aus gemILF_Pflege_VZD (Pflichtfelder je Sektor anhand der TelematikID, `countryCode` bei Adresse, PLZ fünfstellig bei DE, Bundesland aus dem CodeSystem Region, Format von `specialization`). Fehlende Pflichtwerte werden interaktiv abgefragt (Enter übernimmt den Vorschlag, `-` lässt das Attribut bewusst leer); mit `--no-prompt` oder ohne Terminal bricht die CLI mit einer Liste der fehlenden Attribute und dem passenden `-s`-Aufruf ab. Ein `-s ATTR=` mit leerem Wert bedeutet "bewusst leer" und macht aus dem Fehler eine Warnung. Verworfene Zertifikate (AUT/OSIG, abgelaufen, ohne Admission Statement) werden auf stderr gemeldet.
 
 Formate für `specialization` je Sektor:
 

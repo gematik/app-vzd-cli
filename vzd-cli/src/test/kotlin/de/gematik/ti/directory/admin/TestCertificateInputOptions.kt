@@ -31,6 +31,7 @@ import io.kotest.core.spec.style.FeatureSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import org.bouncycastle.asn1.x509.KeyUsage
 import kotlin.io.path.writeBytes
 
@@ -56,6 +57,15 @@ class TestCertificateInputOptions :
                 val out = runCLI(listOf("admin", "cert-info", "--passin", "pass:secret", p12.toString()))
                 out shouldContain "certificateType: C.HCI.ENC"
                 out shouldContain "certificateType: C.HCI.AUT"
+            }
+            scenario("skips certificates without admission statement instead of crashing") {
+                val enc = TestCertificates.synthetic("CN=ENC", "1.2.276.0.76.4.76", KeyUsage.keyAgreement, "3-SMC-B-Test")
+                val foreign = TestCertificates.synthetic("CN=Foreign", "1.2.3.4", KeyUsage.digitalSignature, null).first
+                val p12 = tempdir().toPath().resolve("mixed.p12")
+                p12.writeBytes(TestCertificates.pkcs12("secret".toCharArray(), listOf(enc), listOf(foreign)))
+                val out = runCLI(listOf("admin", "cert-info", "--passin", "pass:secret", p12.toString()))
+                out shouldContain "certificateType: C.HCI.ENC"
+                out shouldNotContain "CN=Foreign"
             }
         }
     })

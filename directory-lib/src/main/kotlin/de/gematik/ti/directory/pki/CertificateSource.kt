@@ -76,7 +76,8 @@ private fun loadX509(
             .getInstance("X.509")
             .generateCertificates(bytes.inputStream())
             .map { it as X509Certificate }
-            .ifEmpty { throw DirectoryException("No certificate found in $file") }
+            .filter { it.basicConstraints == -1 }
+            .ifEmpty { throw DirectoryException("No end-entity certificate found in $file") }
     } catch (e: java.security.cert.CertificateException) {
         throw DirectoryException("Cannot read certificate file $file: ${e.message}", e)
     }

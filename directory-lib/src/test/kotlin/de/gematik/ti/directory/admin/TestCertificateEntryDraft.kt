@@ -88,6 +88,27 @@ class TestCertificateEntryDraft :
                 d.findings.map { it.attribute } shouldContain "specialization"
                 d.toCreateDirectoryEntry().directoryEntryBase!!.specialization shouldBe null
             }
+            scenario("Deliberately empty countryCode yields warning only") {
+                val d = draftFromCertificates(listOf(TestCertificates.toDer(TestCertificates.pharmacyEnc())), mapOf("specialization" to "10", "countryCode" to ""))
+                d.hasErrors() shouldBe false
+                d.toCreateDirectoryEntry().directoryEntryBase!!.countryCode shouldBe null
+            }
+            scenario("Rejected certificates are reported on the draft") {
+                val valid = TestCertificates.pharmacyEnc()
+                val expired =
+                    TestCertificates.synthetic(
+                        "CN=Old,C=DE",
+                        "1.2.276.0.76.4.76",
+                        KeyUsage.keyAgreement,
+                        TestCertificates.PHARMACY_TELEMATIK_ID,
+                        notBefore = Instant.parse("2015-01-01T00:00:00Z"),
+                        notAfter = Instant.parse("2020-01-01T00:00:00Z"),
+                    ).first
+                val d = draftFromCertificates(listOf(expired, valid).map(TestCertificates::toDer), mapOf("specialization" to "10"))
+                d.certificates.size shouldBe 1
+                d.rejected.size shouldBe 1
+                d.rejected.first() shouldContainText "expired 2020-01-01"
+            }
             scenario("withAnswers resolves a finding") {
                 val d = draftFromCertificates(listOf(TestCertificates.toDer(TestCertificates.pharmacyEnc())), emptyMap())
                 d.hasErrors() shouldBe true

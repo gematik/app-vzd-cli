@@ -23,6 +23,7 @@
 
 package de.gematik.ti.directory.cli.admin
 
+import com.github.ajalt.clikt.core.CliktError
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
 import de.gematik.ti.directory.admin.CertificateEntryDraft
 import de.gematik.ti.directory.admin.PreflightFinding
@@ -33,7 +34,12 @@ import java.beans.Introspector
 /** Typed at a prompt that offers a suggestion, this answer leaves the attribute deliberately empty. */
 const val EMPTY_ANSWER = "-"
 
-fun formatFindingsForAbort(draft: CertificateEntryDraft): String {
+private const val MAX_ATTEMPTS = 3
+
+fun formatFindingsForAbort(
+    draft: CertificateEntryDraft,
+    interactive: Boolean = false,
+): String {
     val errors = draft.findings.filter { it.severity == FindingSeverity.ERROR }
     val header =
         "Following attributes are missing or invalid" +
@@ -46,7 +52,8 @@ fun formatFindingsForAbort(draft: CertificateEntryDraft): String {
     val sets = attributes.map { attribute -> "-s $attribute=${errors.first { it.attribute == attribute }.suggestion ?: "VALUE"}" }
     val empties = attributes.map { "-s $it=" }
     val footer =
-        "Set them with ${sets.joinToString(" ")}, mark deliberately empty with ${empties.joinToString(" ")}, or run without --no-prompt."
+        "Set them with ${sets.joinToString(" ")}, mark deliberately empty with ${empties.joinToString(" ")}" +
+            (if (interactive) "." else ", or run without --no-prompt.")
     return (listOf(header) + lines + footer).joinToString("\n")
 }
 
@@ -56,26 +63,29 @@ fun promptText(finding: PreflightFinding): String =
         "\n  Enter '$EMPTY_ANSWER' to leave it empty"
 
 /**
- * Asks once per attribute with an ERROR finding; answers are applied and the preflight re-run until no new
- * errors appear. A blank answer or [EMPTY_ANSWER] marks the attribute as deliberately empty.
+ * Asks for every attribute with an ERROR finding, re-asking up to [MAX_ATTEMPTS] times while the answer
+ * is still invalid; answers are applied and the preflight re-run until no fixable error remains.
+ * [EMPTY_ANSWER] marks the attribute as deliberately empty, a null answer (end of input) aborts.
  */
 fun promptForErrors(
     draft: CertificateEntryDraft,
     ask: (PreflightFinding, String?) -> String?,
 ): CertificateEntryDraft {
     var current = draft
-    val asked = mutableSetOf<String>()
+    val attempts = mutableMapOf<String, Int>()
     while (true) {
         val pending =
             current.findings
-                .filter { it.severity == FindingSeverity.ERROR && it.attribute !in asked }
+                .filter { it.severity == FindingSeverity.ERROR && (attempts[it.attribute] ?: 0) < MAX_ATTEMPTS }
                 .distinctBy { it.attribute }
         if (pending.isEmpty()) return current
         val answers =
             pending.associate { finding ->
-                asked += finding.attribute
-                val answer = ask(finding, finding.suggestion ?: currentValue(current.base, finding.attribute))
-                finding.attribute to answer?.takeUnless { it.trim() == EMPTY_ANSWER }
+                attempts[finding.attribute] = (attempts[finding.attribute] ?: 0) + 1
+                val answer =
+                    ask(finding, finding.suggestion ?: currentValue(current.base, finding.attribute))
+                        ?: throw CliktError("Aborted")
+                finding.attribute to answer.takeUnless { it.trim() == EMPTY_ANSWER }
             }
         current = current.withAnswers(answers)
     }

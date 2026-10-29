@@ -34,6 +34,7 @@ import org.bouncycastle.asn1.isismtt.x509.Admissions
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo
 import org.bouncycastle.asn1.x500.DirectoryString
 import org.bouncycastle.asn1.x500.X500Name
+import org.bouncycastle.asn1.x509.BasicConstraints
 import org.bouncycastle.asn1.x509.CertificatePolicies
 import org.bouncycastle.asn1.x509.Extension
 import org.bouncycastle.asn1.x509.KeyUsage
@@ -79,6 +80,9 @@ object TestCertificates {
 
     fun toDer(cert: X509Certificate): CertificateDataDER = CertificateDataDER(Base64.toBase64String(cert.encoded))
 
+    fun toPem(cert: X509Certificate): String =
+        "-----BEGIN CERTIFICATE-----\n" + Base64.toBase64String(cert.encoded).chunked(64).joinToString("\n") + "\n-----END CERTIFICATE-----\n"
+
     fun writeDer(
         cert: X509Certificate,
         dir: Path,
@@ -93,6 +97,7 @@ object TestCertificates {
         professionOid: String = OID_PUBLIC_PHARMACY,
         notBefore: Instant = Clock.System.now() - 1.days,
         notAfter: Instant = Clock.System.now() + 1.days,
+        ca: Boolean = false,
     ): Pair<X509Certificate, PrivateKey> {
         val keyPair =
             KeyPairGenerator.getInstance("EC").apply { initialize(ECGenParameterSpec("secp256r1")) }.generateKeyPair()
@@ -108,6 +113,7 @@ object TestCertificates {
             )
         builder.addExtension(Extension.certificatePolicies, false, CertificatePolicies(PolicyInformation(ASN1ObjectIdentifier(policyOid))))
         builder.addExtension(Extension.keyUsage, true, KeyUsage(keyUsage))
+        if (ca) builder.addExtension(Extension.basicConstraints, true, BasicConstraints(true))
         if (telematikID != null) {
             val professionInfo =
                 ProfessionInfo(

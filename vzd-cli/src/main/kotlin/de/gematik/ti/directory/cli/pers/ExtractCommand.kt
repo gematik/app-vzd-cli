@@ -30,6 +30,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.admin.BaseDirectoryEntry
+import de.gematik.ti.directory.admin.EntryTypeMapping
 import de.gematik.ti.directory.admin.fromCertificate
 import de.gematik.ti.directory.cli.toJsonPrettyNoDefaults
 import de.gematik.ti.directory.cli.toYamlNoDefaults
@@ -45,6 +46,15 @@ import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
+
+/**
+ * Extracted entries are uploaded with the file-based add-base, where no certificate accompanies the request,
+ * so entryType has to be carried along; the VZD cannot derive it there.
+ */
+fun baseEntryForExtract(cert: CertificateDataDER): BaseDirectoryEntry =
+    BaseDirectoryEntry.fromCertificate(cert).apply {
+        entryType = EntryTypeMapping.entryTypeOf(cert.certificateInfo.admissionStatement.professionOids)?.let { listOf(it.toString()) }
+    }
 
 fun NodeList.forEach(action: (Node) -> Unit) {
     (0 until this.length)
@@ -123,7 +133,7 @@ class ExtractCommand :
         yamlPath.writeText(base.toYamlNoDefaults())
     }
 
-    private fun baseEntryFromCert(cert: CertificateDataDER): BaseDirectoryEntry = BaseDirectoryEntry.fromCertificate(cert)
+    private fun baseEntryFromCert(cert: CertificateDataDER): BaseDirectoryEntry = baseEntryForExtract(cert)
 
     private fun writeCert(cert: CertificateDataDER) {
         echo("└── ${cert.certificateInfo.serialNumber}")

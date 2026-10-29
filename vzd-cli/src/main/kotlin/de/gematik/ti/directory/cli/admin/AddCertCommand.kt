@@ -38,7 +38,7 @@ import de.gematik.ti.directory.admin.CertificateSelectionException
 import de.gematik.ti.directory.admin.EntryTypeMapping
 import de.gematik.ti.directory.admin.UserCertificate
 import de.gematik.ti.directory.admin.explainServerError
-import de.gematik.ti.directory.admin.selectEncryptionCertificates
+import de.gematik.ti.directory.admin.selectEncryptionCertificatesWithReport
 import de.gematik.ti.directory.cli.catching
 import de.gematik.ti.directory.pki.CertificateDataDER
 import de.gematik.ti.directory.pki.loadCertificates
@@ -82,12 +82,14 @@ class AddCertCommand : CliktCommand(name = "add-cert", help = "Add certificates 
         catching {
             val password = certificateInput.passwordProvider(this, noPrompt = false)
             files.forEach { file ->
-                val certificates =
+                val selection =
                     try {
-                        selectEncryptionCertificates(loadCertificates(file, password))
+                        selectEncryptionCertificatesWithReport(loadCertificates(file, password))
                     } catch (e: CertificateSelectionException) {
                         throw CliktError("${file.fileName}: ${e.message}")
                     }
+                selection.rejected.forEach { echo("Warning: ignoring certificate $it", err = true) }
+                val certificates = selection.selected
                 val telematikID = certificates.first().certificateInfo.admissionStatement.registrationNumber
 
                 val entry =

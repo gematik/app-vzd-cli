@@ -34,6 +34,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.clikt.parameters.types.path
 import de.gematik.ti.directory.cli.*
+import de.gematik.ti.directory.pki.hasAdmission
 import de.gematik.ti.directory.pki.loadCertificates
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -57,6 +58,10 @@ class CertInfoCommand : CliktCommand(name = "cert-info", help = "Show details of
             files.forEach { file ->
                 logger.info { "Processing ${file.name}" }
                 loadCertificates(file, password).forEach { userCertificate ->
+                    if (!userCertificate.certificate.hasAdmission()) {
+                        echo("${userCertificate.certificate.subjectX500Principal.name}: no admission statement, not a TI certificate, skipped", err = true)
+                        return@forEach
+                    }
                     val certificateInfo = userCertificate.certificateInfo
 
                     if (ocspOptions.enableOcsp) {

@@ -54,6 +54,12 @@ class TestCertificateSource :
                 loadCertificates(pem) { null }.first().certificateInfo.admissionStatement.registrationNumber shouldBe
                     "1-SMC-B-Testkarte-883110000117035"
             }
+            scenario("PEM bundle drops CA certificates") {
+                val ca = TestCertificates.synthetic("CN=Test CA", "1.2.3.4", KeyUsage.keyCertSign, null, ca = true).first
+                val pem = tmp.resolve("bundle.pem")
+                pem.writeText(listOf(enc.first, ca).joinToString("") { TestCertificates.toPem(it) })
+                loadCertificates(pem) { null }.map { it.certificateInfo.subjectInfo.cn } shouldBe listOf("ENC")
+            }
             scenario("PKCS#12 with ENC key entry and AUT trusted cert returns both end-entity certs") {
                 val certs = loadCertificates(p12) { "secret".toCharArray() }
                 certs.map { it.certificateInfo.subjectInfo.cn }.toSet() shouldBe setOf("ENC", "AUT")
