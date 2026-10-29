@@ -73,6 +73,11 @@ object TestCertificates {
 
     val smcbValidAt: Instant = Instant.parse("2023-06-01T00:00:00Z")
 
+    /** SMC-B of a KV practice (TelematikID 1-20278677945, professionOID .50), valid 2026-10-29 to 2028-04-07. */
+    val arztEnc: Path = testdata.resolve("1-20278677945-smcb-arzt.enc.der")
+    val arztAut: Path = testdata.resolve("1-20278677945-smcb-arzt.aut.der")
+    val arztValidAt: Instant = Instant.parse("2027-01-01T00:00:00Z")
+
     const val PHARMACY_TELEMATIK_ID = "3-01.2.2023000"
     const val OID_PUBLIC_PHARMACY = "1.2.276.0.76.4.54"
 

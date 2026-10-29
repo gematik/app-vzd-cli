@@ -61,6 +61,30 @@ class TestCertificateEntryDraft :
             }
         }
 
+        feature("Real KV practice card") {
+            scenario("ENC yields sector KV with address and state from the subject") {
+                val d = draftFromCertificates(listOf(TestCertificates.load(TestCertificates.arztEnc)), emptyMap(), now = TestCertificates.arztValidAt)
+                d.entryType shouldBe 3
+                d.sector?.table shouldBe 2
+                d.base.telematikID shouldBe "1-20278677945"
+                d.base.displayName shouldBe "Praxis Hülya HornTEST-ONLY"
+                d.base.streetAddress shouldBe "Talstraße 9220"
+                d.base.postalCode shouldBe "22414"
+                d.base.localityName shouldBe "Halberstadt"
+                d.base.stateOrProvinceName shouldBe "Hessen"
+                d.base.countryCode shouldBe "DE"
+                d.findings.filter { it.severity == de.gematik.ti.directory.validation.FindingSeverity.ERROR }.map { it.attribute }.sorted() shouldBe
+                    listOf("domainID", "specialization")
+            }
+            scenario("AUT of the same card is rejected, ENC selected") {
+                val certs = listOf(TestCertificates.arztAut, TestCertificates.arztEnc).map(TestCertificates::load)
+                val d = draftFromCertificates(certs, mapOf("specialization" to "urn:psc:1.3.6.1.4.1.19376.3.276.1.5.4:ALLG", "domainID" to "123456789"), now = TestCertificates.arztValidAt)
+                d.certificates.size shouldBe 1
+                d.rejected.single() shouldContainText "C.HCI.AUT"
+                d.hasErrors() shouldBe false
+            }
+        }
+
         feature("Draft") {
             scenario("SMC-B DER builds request without derived attributes") {
                 val d = draftFromCertificates(listOf(TestCertificates.load(TestCertificates.smcbRsaEnc)), emptyMap(), now = TestCertificates.smcbValidAt)
