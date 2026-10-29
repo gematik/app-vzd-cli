@@ -2,6 +2,7 @@
 plugins {
     id("de.gematik.directory.library-conventions")
     kotlin("plugin.serialization") version "1.9.22"
+    `java-test-fixtures`
 }
 
 kotlin {
@@ -38,4 +39,8 @@ dependencies {
     api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiVersion")
     // jose4j for JWT processing
     api("org.bitbucket.b_c:jose4j:0.9.6")
+
+    testFixturesImplementation("org.bouncycastle:bcprov-jdk15on:$bcVersion")
+    testFixturesImplementation("org.bouncycastle:bcpkix-jdk15on:$bcVersion")
+    testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 }

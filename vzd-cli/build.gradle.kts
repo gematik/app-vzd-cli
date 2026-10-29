@@ -20,6 +20,7 @@ java {
 
 dependencies {
     implementation(project(":directory-lib"))
+    testImplementation(testFixtures(project(":directory-lib")))
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
